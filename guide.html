@@ -13,7 +13,8 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .topbar button{border:1px solid #d8d0bd;background:#fff;border-radius:20px;padding:6px 12px;font-size:13px;cursor:pointer}
 .hero{background:linear-gradient(135deg,#7a1f2b,#c25e3a);color:#fff;padding:18px 16px}
 .hero h1{font-size:20px}.hero p{font-size:13px;opacity:.92;margin-top:4px}
-.cats{display:flex;gap:8px;padding:12px;overflow-x:auto;background:#fff;border-bottom:1px solid #e3ddd0;position:sticky;top:51px;z-index:9}
+.cats{display:flex;gap:8px;padding:12px;overflow-x:auto;background:#fff;border-bottom:1px solid #e3ddd0;position:sticky;top:51px;z-index:9;flex-wrap:wrap}
+.cat.place{border-width:2px}.cat.cat2{font-size:14px;padding:6px 14px}
 .cat{flex:none;border:1px solid #d8d0bd;border-radius:22px;padding:8px 16px;font-size:15px;background:#fff;cursor:pointer}
 .cat.on{background:#7a1f2b;color:#fff;border-color:#7a1f2b;font-weight:700}
 .legend{background:#fff;border-bottom:1px solid #e3ddd0;padding:8px 14px;font-size:12px;color:#666}
@@ -49,7 +50,15 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 #stats .row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
 #stats .row button{flex:1;border:1px solid #7a1f2b;background:#fff;color:#7a1f2b;border-radius:10px;padding:10px;font-size:14px;font-weight:700;cursor:pointer;min-width:140px}
 #stats .close{background:#7a1f2b !important;color:#fff !important}
-@media print{.topbar,.cats,.vote,#statsBtn,#gate{display:none}.sect{display:block}}
+@media print{.topbar,.cats,.vote,#statsBtn,#gate,#galov{display:none}.sect{display:block}}
+#galov{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:60;display:none;align-items:center;justify-content:center}
+#galov.on{display:flex}
+#galov img.gi{max-width:94vw;max-height:78vh;border-radius:10px}
+#galov .gx{position:absolute;top:12px;right:18px;color:#fff;font-size:30px;cursor:pointer}
+#galov .gp,#galov .gn{position:absolute;color:#fff;font-size:46px;cursor:pointer;padding:18px;user-select:none}
+#galov .gp{left:2px}#galov .gn{right:2px}
+#galov .gc{position:absolute;bottom:14px;color:#fff;font-size:13px}
+img.ph{cursor:zoom-in}
 </style>
 </head>
 <body>
@@ -58,20 +67,26 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 <div class="topbar"><div class="logo">💬 三港討論區</div><a href="index.html" style="font-size:13px;color:#10293f;text-decoration:none;font-weight:700">‹ 入口</a><div class="sp"></div><span class="who" id="who"></span><button onclick="rename()">改名</button><button onclick="window.print()">🖨</button></div>
 <div class="hero"><h1>那霸／宮古島／石垣島・投票選最想去</h1><p>🔥=熱門程度・💚=推薦程度。圖片Wikimedia Commons（需連網）。價格時間為約略值，出發前複查。✅定番・⚠️可能變動</p></div>
 <div class="cats">
-<button class="cat on" onclick="sw('naha',this)">🌺 那霸</button>
-<button class="cat" onclick="sw('miyako',this)">🏝 宮古島</button>
-<button class="cat" onclick="sw('ishigaki',this)">🪨 石垣島</button>
+<button class="cat place on" onclick="swPlace('naha',this)">🌺 那霸</button>
+<button class="cat place" onclick="swPlace('miyako',this)">🏝 宮古島</button>
+<button class="cat place" onclick="swPlace('ishigaki',this)">🪨 石垣島</button>
+<button class="cat cat2 on" onclick="swCat('food',this)">🍜 餐廳</button>
+<button class="cat cat2" onclick="swCat('spot',this)">📷 景點</button>
+<button class="cat cat2" onclick="swCat('shop',this)">🛍 購物</button>
+<button class="cat cat2" onclick="swCat('souv',this)">🎁 伴手禮</button>
+<button class="cat cat2" onclick="swCat('feat',this)">✨ 當地特色</button>
 </div>
 <div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。票數存在<strong>本機</strong>，跨裝置合併請用統計內的「投票碼」功能。</div>
 <div class="wrap">
 
 <!-- ================= NAHA ================= -->
 <div class="sect on" id="s-naha">
-<h2 class="st">🍜 餐廳</h2>
+<h2 class="st" data-c="food">🍜 餐廳</h2>
 <div class="card"><h3>第一牧志公設市場・二樓食堂街 ✅</h3><div class="en">Makishi Public Market 2F（食堂在市場新大樓2樓，建築外觀見景點區）</div>
 <div class="stars"><b>🔥🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚💚</span></div>
 <p><span class="tag">代客料理</span><span class="tag">海鮮</span></p>
 <p>特色：1樓挑龍蝦、夜光貝、石垣牛請2F代煮。體驗＋午餐一次解決。</p>
+<p class="kv"><b>必點：</b>1F現挑伊勢龍蝦做刺身＋夜光貝奶油燒＋石垣牛鹽燒，跟2F說要「半刺身半燒烤」。</p>
 <p class="kv"><b>花費：</b>每人約¥2,000–3,500｜<b>時間：</b>11:00–20:00左右（週三部分店休⚠️）｜<b>交通：</b>單軌牧志站步行約5分</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=第一牧志公設市場+那霸" target="_blank">🗺 地圖</a></div>
 
@@ -80,6 +95,7 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 <div class="stars"><b>🔥🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
 <p><span class="tag">豚骨拉麵</span><span class="tag">排隊名店</span></p>
 <p>特色：福岡系細麵豚骨，可選麵硬度＋辣度，市場人太多時的午餐備案。</p>
+<p class="kv"><b>必點：</b>經典豚骨＋半熟蛋＋煎餃，麵選硬、蔥多加，怕膩點小辣烈火。</p>
 <p class="kv"><b>花費：</b>¥1,000–1,300/人｜<b>時間：</b>約11:00–24:00，午間排隊20–40分</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=暖暮拉麵+那霸牧志" target="_blank">🗺 地圖</a></div>
 
@@ -88,6 +104,7 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 <div class="stars"><b>🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
 <p><span class="tag">男人麵／女人麵</span><span class="tag">在地人氣</span></p>
 <p>特色：「おんな味」清爽鹽味 vs「おとこ味」濃厚蒜香背脂，DFS順路，B計畫午餐首選。</p>
+<p class="kv"><b>必點：</b>第一次點おんな味（鹽味清爽），敢吃蒜再戰おとこ味＋煎餃。</p>
 <p class="kv"><b>花費：</b>¥900–1,200/人｜<b>交通：</b>單軌小祿站步行約8分</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=通堂拉麵+小祿本店" target="_blank">🗺 地圖</a></div>
 
@@ -96,14 +113,17 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 <div class="stars"><b>🔥🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
 <p><span class="tag">外帶點心</span><span class="tag">排隊</span></p>
 <p>特色：午餐肉＋玉子＋高菜／蝦仁現做，邊走邊吃或帶回船，國際通分店可分散人潮。</p>
+<p class="kv"><b>必點：</b>蝦仁＋油味噌口味最搶手，現做趁熱吃，冷掉口感差一半。</p>
 <p class="kv"><b>花費：</b>¥400–700/個｜<b>時間：</b>07:00–19:00左右，午前排隊最長</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=豬肉蛋飯糰+牧志市場本店" target="_blank">🗺 地圖</a></div>
 
 <div class="card"><h3>泊いゆまち（泊港魚市場）✅</h3><div class="en">Tomari Iyumachi</div>
 <img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/Tomari%2C_Naha_202407.jpg/960px-Tomari%2C_Naha_202407.jpg" onerror="this.style.display='none'" alt="泊港"><div class="credit">圖：泊港實景（2024）／Wikimedia Commons</div>
+<img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6d/Tekkadon_001.jpg/960px-Tekkadon_001.jpg" onerror="this.style.display='none'" alt="本鮪丼意象"><div class="credit">圖：本鮪丼意象／Wikimedia Commons</div>
 <div class="stars"><b>🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
 <p><span class="tag">海鮮丼</span><span class="tag">在地市場</span></p>
 <p>特色：比公設市場更在地價格更親，現切本鮪＋近海魚丼，碼頭計程車約10分，適合早到先吃。</p>
+<p class="kv"><b>必點：</b>本鮪中腹丼＋當日近海魚刺身拼盤，早上去魚料最齊。</p>
 <p class="kv"><b>花費：</b>海鮮丼¥1,000–2,000｜<b>時間：</b>約09:00–18:00（早去魚料最齊）</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=泊いゆまち" target="_blank">🗺 地圖</a></div>
 
@@ -112,6 +132,7 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 <div class="stars"><b>🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
 <p><span class="tag">老字號牛排</span><span class="tag">美式復古</span></p>
 <p>特色：1953年創業，鐵板紐約客＋玉米濃湯＋A1醬汁，午間套餐划算。離碼頭車程約10分。</p>
+<p class="kv"><b>必點：</b>紐約客牛排＋玉米濃湯＋A1醬汁，午間套餐最划算。</p>
 <p class="kv"><b>花費：</b>午餐¥1,500–2,500／晚餐¥3,000–5,000｜<b>時間：</b>11:00–22:00左右⚠️</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=ジャッキーステーキハウス+那霸" target="_blank">🗺 地圖</a></div>
 
@@ -120,6 +141,7 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 <div class="stars"><b>🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
 <p><span class="tag">沖繩定食</span><span class="tag">高CP</span></p>
 <p>特色：雞肉飯（ジューシー）、麵線炒、苦瓜炒，市場旁老食堂，翻桌快價格親，怕排隊者的避難所。</p>
+<p class="kv"><b>必點：</b>雞肉飯（ジューシー）＋麵線炒＋苦瓜炒，一餐全包。</p>
 <p class="kv"><b>花費：</b>¥700–1,200/人｜<b>交通：</b>牧志站步行約5分</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=花笠食堂+那霸" target="_blank">🗺 地圖</a></div>
 
@@ -128,6 +150,7 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 <div class="stars"><b>🔥🔥🔥🔥</b> <span class="rec">💚💚💚</span></div>
 <p><span class="tag">甜點</span><span class="tag">沖繩限定口味</span></p>
 <p>特色：紅芋、鹽金楚糕、琉球紅茶口味必試，下午茶或飯後一球。</p>
+<p class="kv"><b>必點：</b>紅芋＋鹽金楚糕雙球，先問期間限定口味。</p>
 <p class="kv"><b>花費：</b>單球¥400–500｜<b>交通：</b>國際通上，県庁前站步行約5分</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=Blue+Seal+國際通" target="_blank">🗺 地圖</a></div>
 
@@ -136,14 +159,17 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 <div class="stars"><b>🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
 <p><span class="tag">和牛燒肉</span><span class="tag">午間套餐</span></p>
 <p>特色：縣產和牛＋石垣牛吃到飽／套餐名店，國際通店交通最方便。午間套餐比晚餐划算，建議先訂位⚠️。</p>
+<p class="kv"><b>必點：</b>午間和牛拼盤＋石垣牛特選，晚餐改吃到飽不如午間套餐划算。</p>
 <p class="kv"><b>花費：</b>午餐¥2,500–4,000／晚餐¥5,000–8,000｜<b>交通：</b>牧志站步行約5分</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=琉球の牛+国際通り" target="_blank">🗺 地圖</a></div>
 
 <div class="card"><h3>鄉土料理 田舎（inaka）✅</h3><div class="en">Inaka, Kumoji</div>
 <img class="ph" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/6/66/Various_Awamori_bottles_by_jetalone_in_Ginza%2C_Tokyo.jpg" onerror="this.style.display='none'" alt="泡盛"><div class="credit">圖：泡盛與鄉土料理（圖為泡盛）／Wikimedia Commons</div>
+<img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/5/56/Rafti%2C_Okinawan_stewed_pork_belly_by_ayustety_in_Tokyo.jpg/960px-Rafti%2C_Okinawan_stewed_pork_belly_by_ayustety_in_Tokyo.jpg" onerror="this.style.display='none'" alt="拉フテー意象"><div class="credit">圖：拉フテー意象／Wikimedia Commons</div>
 <div class="stars"><b>🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
 <p><span class="tag">鄉土定食</span><span class="tag">在地客多</span></p>
 <p>特色：拉フテー（燉五花）、ちゃんぷるー定食、山羊汁（挑戰者限定⚠️），久茂地老店，觀光客少。</p>
+<p class="kv"><b>必點：</b>拉フテー定食＋苦瓜炒，山羊汁留給勇者，配泡盛一杯。</p>
 <p class="kv"><b>花費：</b>¥1,000–2,000/人｜<b>交通：</b>県庁前站步行約7分</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=田舎+郷土料理+那霸" target="_blank">🗺 地圖</a></div>
 
@@ -151,9 +177,10 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 <div class="stars"><b>🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
 <p><span class="tag">美式牛排</span><span class="tag">份量大</span></p>
 <p>特色：美軍最愛的德州風牛排，T骨＋玉米＋大蒜奶油，辻本店離碼頭近（車程約8分），早午餐時段人較少。</p>
+<p class="kv"><b>必點：</b>T骨＋大蒜奶油玉米＋馬鈴薯，醬料另要一份。</p>
 <p class="kv"><b>花費：</b>¥2,000–4,000/人｜<b>時間：</b>11:00–24:00左右⚠️</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=88ステーキ+辻本店" target="_blank">🗺 地圖</a></div>
-<h2 class="st">📷 景點</h2>
+<h2 class="st" data-c="spot">📷 景點</h2>
 <div class="card"><h3>波上宮＋波之上海灘 ✅</h3><div class="en">Naminoue Shrine &amp; Beach</div>
 <img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/4/42/The_distant_view_of_Naminoueg%C5%AB_Honden.jpg/960px-The_distant_view_of_Naminoueg%C5%AB_Honden.jpg" onerror="this.style.display='none'" alt="波上宮"><div class="credit">圖：Wikimedia Commons</div>
 <div class="stars"><b>🔥🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚💚</span></div>
@@ -215,7 +242,7 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 <p class="kv"><b>費用：</b>約¥200｜<b>時間：</b>09:00–18:00左右⚠️</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=福州園+那霸" target="_blank">🗺 地圖</a></div>
 
-<h2 class="st">🏬 百貨公司（含主要店面）</h2>
+<h2 class="st" data-c="shop">🏬 百貨公司（含主要店面）</h2>
 <div class="card"><h3>りうぼう（Ryubo）・國際通 ✅</h3><div class="en">那霸唯一傳統百貨（國際通・県庁前站直結）</div>
 <div class="stars"><b>🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
 <p>國際通老字號百貨，B1食品＋沖繩物產最齊，退稅方便。</p>
@@ -247,11 +274,10 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 <p class="kv"><b>時間：</b>24小時｜<b>交通：</b>牧志站步行約5分</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=唐吉訶德+國際通店" target="_blank">🗺 地圖</a></div>
 
-<h2 class="st">🏮 商店街（特色伴手禮）</h2>
+<h2 class="st" data-c="shop">🏮 商店街（特色伴手禮）</h2>
 <div class="card"><h3>平和通商店街（有頂拱廊）✅</h3><div class="en">Heiwa Dori</div>
-<img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/0/05/Chinsuko.jpg/960px-Chinsuko.jpg" onerror="this.style.display='none'" alt="金楚糕"><div class="credit">圖：伴手禮意象（圖為金楚糕）／Wikimedia Commons</div>
 <div class="stars"><b>🔥🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚💚</span></div>
-<p>國際通轉入即達的有頂商店街，雨天晴天都好逛。</p>
+<p>國際通轉入即達的有頂商店街，雨天晴天都好逛。（金楚糕實拍見下方伴手禮區）</p>
 <div class="shop"><b>特色伴手禮：</b><ul>
 <li>御菓子御殿 紅芋塔（元祖）</li><li>ちんすこう（新垣、雪塩味）</li>
 <li>雪塩小包、島胡椒、海葡萄乾貨</li><li>泡盛小瓶（久米仙、瑞泉）、Orion周邊</li><li>島ぞうり（島夾腳拖，可刻字）</li></ul></div>
@@ -269,7 +295,7 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 <div class="stars"><b>🔥🔥🔥</b> <span class="rec">💚💚💚</span></div>
 <p>國際通南側文青小街，選物店古著咖啡陶器雜貨：琉球玻璃小物、紅型染手巾、獨立咖啡豆、島辣椒調味料。</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=浮島通+那霸" target="_blank">🗺 地圖</a></div>
-<h2 class="st">⛩ 神社</h2>
+<h2 class="st" data-c="spot">⛩ 神社（併入景點票選）</h2>
 <div class="card"><h3>波上宮 ✅</h3><div class="en">Naminoue-gu（琉球八社之首）</div>
 <img class="ph" loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Naminoueg%C5%AB%20Honden.JPG?width=960" onerror="this.style.display='none'" alt="波上宮本殿"><div class="credit">圖：波上宮本殿／Wikimedia Commons</div>
 <div class="stars"><b>🔥🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚💚</span></div>
@@ -295,6 +321,20 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 <p>介紹：琉球八社最古老神秘，藏於末吉公園深山，需爬石階穿越森林。御朱印在宮司宅領取（時間不定⚠️）。體力時間有餘者再訪。</p>
 <p class="kv"><b>交通：</b>市壺川站步行約20分＋登山20分｜<b>停留：</b>約1小時</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=末吉宮" target="_blank">🗺 地圖</a></div>
+
+<h2 class="st" data-c="souv">🎁 伴手禮（那霸必買清單）</h2>
+<div class="card"><h3>那霸伴手禮總整理 ✅</h3>
+<img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/0/05/Chinsuko.jpg/960px-Chinsuko.jpg" onerror="this.style.display='none'" alt="金楚糕"><div class="credit">圖：伴手禮意象（圖為金楚糕）／Wikimedia Commons</div>
+<div class="stars"><b>🔥🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚💚</span></div>
+<div class="shop"><b>必買：</b><ul>
+<li>御菓子御殿 紅芋塔（元祖，機場也買得到但國際通款多）</li><li>ちんすこう：新垣本店 vs 雪塩味，兩家都拿</li><li>雪塩小包、島胡椒、海葡萄乾貨</li><li>泡盛小瓶（久米仙、瑞泉）＋Orion周邊</li><li>島ぞうり（島夾腳拖，平和通可刻字）</li></ul></div>
+<p class="kv"><b>哪買：</b>平和通商店街＋唐吉訶德＋りうぼうB1＋機場免稅（比價後下手）</p></div>
+
+<h2 class="st" data-c="feat">✨ 當地特色（那霸限定體驗）</h2>
+<div class="card"><h3>那霸限定體驗 ✅</h3>
+<div class="stars"><b>🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
+<div class="shop"><b>必體驗：</b><ul>
+<li>島ぞうり刻字：平和通現場刻名，30分鐘取件，約¥2,000–3,000</li><li>壺屋陶器繪付け：需預約⚠️，岸上時間緊者改買現成品</li><li>週日步行者天國：國際通部分時段封街⚠️（以官方公告為準）</li></ul></div></div>
 
 <div class="card"><h3>安里八幡宮 ✅</h3><div class="en">Asato Hachimangu</div>
 <div class="stars"><b>🔥🔥</b> <span class="rec">💚💚💚</span></div>
@@ -344,6 +384,7 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 <img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/Miyako_soba.jpg/960px-Miyako_soba.jpg" onerror="this.style.display='none'" alt="宮古そば"><div class="credit">圖：Wikimedia Commons</div>
 <div class="stars"><b>🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
 <p>特色：鰹魚清湯＋藏在麵下的軟骨排骨。12月芒果非產季⚠️。島の駅可順買黑糖泡盛海葡萄乾貨。</p>
+<p class="kv"><b>必點：</b>軟骨ソーキそば＋じゅーしー（炊飯），麵別攪先喝湯。</p>
 <p class="kv"><b>花費：</b>¥800–1,500/人</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=古謝そば屋+宮古島" target="_blank">🗺 地圖</a></div>
 
@@ -351,12 +392,14 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 <img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/Japanese_Mozuku.jpg/960px-Japanese_Mozuku.jpg" onerror="this.style.display='none'" alt="海蘊意象"><div class="credit">圖：海蘊意象（名物もずくそば）／Wikimedia Commons</div>
 <div class="stars"><b>🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
 <p>特色：伊良部島名店，海蘊麵＋伊良部そば，開店即排隊、賣完打烊⚠️。走伊良部大橋行程者順路，市區出發單程約40分。</p>
+<p class="kv"><b>必點：</b>もずくそば＋伊良部そば，賣完打烊中午前到。</p>
 <p class="kv"><b>花費：</b>¥800–1,200/人｜<b>時間：</b>11:00–賣完為止</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=丸吉食堂+宮古島" target="_blank">🗺 地圖</a></div>
 
 <div class="card"><h3>島の駅みやこ（購物）✅</h3><div class="en">Shima-no-Eki Miyako</div>
 <div class="stars"><b>🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
 <p>介紹：農產直賣＋美食＋伴手禮複合設施，宮古牛可樂餅現吃、黑糖ちんすこう泡盛價格實在。室內為主，雨天友善，停留約1–2小時。</p>
+<p class="kv"><b>必點：</b>宮古牛可樂餅＋黑糖霜淇淋，現買現吃。</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=島の駅みやこ" target="_blank">🗺 地圖</a></div>
 
 <div class="card"><h3>宮古島市総合博物館 ✅</h3><div class="en">Miyakojima City Museum</div>
@@ -401,6 +444,19 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 <div class="stars"><b>🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
 <p>介紹：藥妝零食伴手禮最後補貨點，可退稅⚠️。宮古島<b>無大型家電量販</b>，電器請去那霸買或回台灣買。</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=ドン・キホーテ宮古島店" target="_blank">🗺 地圖</a></div>
+
+<h2 class="st" data-c="souv">🎁 伴手禮（宮古必買）</h2>
+<div class="card"><h3>宮古伴手禮總整理 ✅</h3>
+<div class="stars"><b>🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
+<div class="shop"><b>必買：</b><ul>
+<li>雪塩小包＋雪塩霜淇淋粉（雪塩館最齊）</li><li>黑糖（多良間島黑糖上等）、黑糖飴</li><li>泡盛（菊之露、沖之光）、もずく加工品</li><li>マンゴー加工品⚠️12月非產季，生果別期待</li></ul></div>
+<p class="kv"><b>哪買：</b>島の駅みやこ＋雪塩館＋サンエー</p></div>
+
+<h2 class="st" data-c="feat">✨ 當地特色（宮古限定體驗）</h2>
+<div class="card"><h3>宮古限定體驗 ✅</h3>
+<div class="stars"><b>🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
+<div class="shop"><b>必體驗：</b><ul>
+<li>伊良部大橋夕陽drive：回港前順光最美（包車跟司機講）</li><li>下地島17END追飛機：配合航班時間，飛機迷聖地</li><li>漲水御嶽晨訪：觀光客到達前的肅靜時刻</li></ul></div></div>
 </div>
 
 <!-- ================= ISHIGAKI ================= -->
@@ -436,12 +492,14 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 <img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a1/Yae-yama_soba_noodle_%2836406849992%29.jpg/960px-Yae-yama_soba_noodle_%2836406849992%29.jpg" onerror="this.style.display='none'" alt="八重山そば"><div class="credit">圖：Wikimedia Commons</div>
 <div class="stars"><b>🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
 <p>特色：細麵＋鰹豚清湯＋豬肉片。ひとし本店要預約且多為晚餐⚠️，午餐以そば＋市場小吃為主。</p>
+<p class="kv"><b>必點：</b>八重山そば＋じゅーしー，加自家製辣油。</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=島そば一番地+石垣" target="_blank">🗺 地圖</a></div>
 
 <div class="card"><h3>明石食堂（八重山そば名店 ⚠️）</h3><div class="en">Akeshi Shokudo・午前完売注意</div>
 <img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fd/Soki_1.jpg/960px-Soki_1.jpg" onerror="this.style.display='none'" alt="軟骨排骨意象"><div class="credit">圖：軟骨排骨意象（名物ソーキそば）／Wikimedia Commons</div>
 <div class="stars"><b>🔥🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
 <p>特色：石垣最難吃到的そば，ソーキ肉大塊＋濃郁湯頭，開店排隊、午前賣完⚠️。位明石聚落（偏遠，包車順路才去），趕行程者略過。</p>
+<p class="kv"><b>必點：</b>ソーキそば（大）＋自家製辣油，午前賣完早去。</p>
 <p class="kv"><b>花費：</b>¥900–1,300/人</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=明石食堂+石垣" target="_blank">🗺 地圖</a></div>
 
@@ -449,11 +507,13 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 <img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2d/%E9%BB%92%E5%B3%B6%E3%81%AE%E7%89%9B671.jpg/960px-%E9%BB%92%E5%B3%B6%E3%81%AE%E7%89%9B671.jpg" onerror="this.style.display='none'" alt="石垣牛"><div class="credit">圖：八重山黑島牛意象／Wikimedia Commons</div>
 <div class="stars"><b>🔥🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
 <p>特色：日本最南品牌和牛，午間燒肉套餐¥2,500–4,000（金城／MARU系），比晚餐划算。想吃晚餐級需訂位⚠️。</p>
+<p class="kv"><b>必點：</b>午間拼盤＋特上牛排，先吃原味再沾醬。</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=石垣牛+焼肉+石垣市" target="_blank">🗺 地圖</a></div>
 
 <div class="card"><h3>ひとし石敢當店（預約難 ⚠️）</h3><div class="en">Hitoshi (要預約)</div>
 <div class="stars"><b>🔥🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
 <p>特色：石垣第一海鮮居酒屋，マグロ＋石垣牛握壽司＋島魚刺身，tabelog高分。電話預約一位難求⚠️，午餐時段去碰運氣或直接放棄改吃そば＋市場。</p>
+<p class="kv"><b>必點：</b>マグロ盛合せ＋石垣牛握壽司＋島魚刺身，有位就全點。</p>
 <p class="kv"><b>花費：</b>¥3,000–5,000/人</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=ひとし+石敢當店" target="_blank">🗺 地圖</a></div>
 
@@ -461,6 +521,7 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 <img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0d/Sata_andagi_001.jpg/960px-Sata_andagi_001.jpg" onerror="this.style.display='none'" alt="サーターアンダギー"><div class="credit">圖：Wikimedia Commons</div>
 <div class="stars"><b>🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
 <p>特色：現炸黑糖甜甜圈＋石垣限定乳酸飲「ゲンキクール」（¥200），市場內邊走邊吃組合。</p>
+<p class="kv"><b>必點：</b>現炸原味＋黑糖口味，配ゲンキクール。</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=ユーグレナモール" target="_blank">🗺 地圖</a></div>
 
 <div class="card"><h3>ユーグレナモール＋石垣公設市場 ✅</h3><div class="en">Euglena Mall (日本最南商店街)</div>
@@ -494,6 +555,19 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 <div class="stars"><b>🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
 <p>介紹：石垣最大級量販，藥妝零食伴手禮＋部分家電小物，可退稅⚠️。石垣島<b>無百貨公司、無大型家電量販</b>，電器請去那霸買或回台灣買。</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=ドン・キホーテ石垣島店" target="_blank">🗺 地圖</a></div>
+
+<h2 class="st" data-c="souv">🎁 伴手禮（石垣必買）</h2>
+<div class="card"><h3>石垣伴手禮總整理 ✅</h3>
+<div class="stars"><b>🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
+<div class="shop"><b>必買：</b><ul>
+<li>泡盛（請福、白百合）、ミンサー織小物（足守り伝説）</li><li>黑糖、ちんすこう、石垣の塩</li><li>辣油苦瓜乾貨、ゲンキクール粉末版（若有）</li></ul></div>
+<p class="kv"><b>哪買：</b>ユーグレナモール＋公設市場＋ドンキ</p></div>
+
+<h2 class="st" data-c="feat">✨ 當地特色（石垣限定體驗）</h2>
+<div class="card"><h3>石垣限定體驗 ✅</h3>
+<div class="stars"><b>🔥🔥🔥</b> <span class="rec">💚💚💚</span></div>
+<div class="shop"><b>必體驗：</b><ul>
+<li>フサキ夕陽：西海岸日落，回船前精算時間⚠️</li><li>公設市場早市＋ゲンキクール：早上最有活力</li><li>やいま村舞踊：先查當日時刻，錯過就只剩猴子</li></ul></div></div>
 </div>
 
 <div class="note">⚠️ 郵輪行程：12/16基隆18:00啟航→12/17宮古島08:00–18:00→<b>12/18那霸07:00–19:00</b>→12/19石垣島09:00–19:00→12/20基隆07:00抵達。營業時間票價皆為約略值，出發前複查。宮古石垣大眾運輸稀少，包車／船方團優先。</div>
@@ -506,9 +580,15 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 </div></div>
 
 <script>
-var SECTS=[['s-naha','那霸'],['s-miyako','宮古島'],['s-ishigaki','石垣島']];
-var GROUPS=['那霸餐廳','那霸景點','那霸購物','那霸神社','宮古島','石垣島'];
-function kindOf(sectId,h2txt){if(sectId!=='s-naha')return SECTS.filter(function(s){return s[0]===sectId;})[0][1];if(h2txt.indexOf('百貨')>=0||h2txt.indexOf('商店街')>=0||h2txt.indexOf('購物')>=0)return '那霸購物';if(h2txt.indexOf('景點')>=0)return '那霸景點';if(h2txt.indexOf('神社')>=0)return '那霸神社';return '那霸餐廳';}
+var PLACES=[['s-naha','那霸'],['s-miyako','宮古島'],['s-ishigaki','石垣島']];
+var CATS=['food','spot','shop','souv','feat'];
+var CATN={food:'餐廳',spot:'景點',shop:'購物',souv:'伴手禮',feat:'當地特色'};
+var CARDMAP={
+'s-naha':['food','food','food','food','food','food','food','food','food','food','food','spot','spot','spot','spot','spot','spot','spot','spot','spot','shop','shop','shop','shop','shop','shop','shop','spot','spot','spot','spot','souv','feat','spot'],
+'s-miyako':['spot','spot','spot','spot','spot','food','food','shop','spot','spot','spot','spot','spot','shop','shop','souv','feat'],
+'s-ishigaki':['spot','spot','spot','food','food','food','food','food','shop','spot','spot','spot','shop','spot','souv','feat']};
+var GROUPS=[];PLACES.forEach(function(s){CATS.forEach(function(c){GROUPS.push(s[1]+CATN[c]);});});
+var curP='s-naha',curC='food';
 var VKEY='discuss_votes_v1',NKEY='discuss_name_v1';
 function loadV(){var v={};try{v=JSON.parse(localStorage.getItem(VKEY)||'{}');}catch(e){v={};}
 var moved=false;function mv(o,n){if(v[o]){var cur=v[n]||[];v[o].forEach(function(name){if(cur.indexOf(name)<0)cur.push(name);});if(cur.length)v[n]=cur;delete v[o];moved=true;}}
@@ -522,18 +602,31 @@ function me(){return localStorage.getItem(NKEY)||'';}
 function enter(){var n=document.getElementById('nameInput').value.trim();if(!n){alert('請先寫名字');return;}localStorage.setItem(NKEY,n);document.getElementById('gate').classList.add('hide');paintWho();refreshVotes();}
 function rename(){var n=prompt('你的名字',me());if(n&&n.trim()){localStorage.setItem(NKEY,n.trim());paintWho();refreshVotes();}}
 function paintWho(){document.getElementById('who').textContent=me()?('👤 '+me()):'';}
-function titles(){var m={};SECTS.forEach(function(s){var kind=s[1];var nodes=document.querySelectorAll('#'+s[0]+' > *');var idx=0;nodes.forEach(function(n){if(n.tagName==='H2'){kind=kindOf(s[0],n.textContent);}else if(n.classList&&n.classList.contains('card')){var h=n.querySelector('h3');m[s[0]+'#'+idx]={t:h?h.textContent.trim():'項目'+(idx+1),g:kind};idx++;}});});return m;}
-function buildVoteUI(){SECTS.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){if(c.querySelector('.vote'))return;var d=document.createElement('div');d.className='vote';d.innerHTML='<button>👍 投票</button><span class="cnt">0票</span>';c.appendChild(d);var btn=d.querySelector('button');btn.onclick=(function(id){return function(){toggle(id);};})(s[0]+'#'+i);});});}
+function titles(){var m={};PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){var h=c.querySelector('h3');var cat=(CARDMAP[s[0]]||[])[i]||'spot';m[s[0]+'#'+i]={t:h?h.textContent.trim():'項目'+(i+1),g:s[1]+CATN[cat]};});});return m;}
+function cardCat(sectId,idx){return (CARDMAP[sectId]||[])[idx]||'spot';}
+function buildVoteUI(){PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){if(c.querySelector('.vote'))return;var d=document.createElement('div');d.className='vote';d.innerHTML='<button>👍 投票</button><span class="cnt">0票</span>';c.appendChild(d);var btn=d.querySelector('button');btn.onclick=(function(id){return function(){toggle(id);};})(s[0]+'#'+i);});});}
 function toggle(id){var n=me();if(!n){document.getElementById('gate').classList.remove('hide');return;}var v=loadV();var arr=v[id]||[];var ix=arr.indexOf(n);if(ix>=0)arr.splice(ix,1);else arr.push(n);if(!arr.length)delete v[id];else v[id]=arr;saveV(v);refreshVotes();}
-function refreshVotes(){var v=loadV(),n=me(),t=titles();SECTS.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){var d=c.querySelector('.vote');if(!d)return;var id=s[0]+'#'+i,arr=v[id]||[],btn=d.querySelector('button'),cnt=d.querySelector('.cnt');btn.textContent=arr.indexOf(n)>=0?'✅ 已投':'👍 投票';btn.classList.toggle('voted',arr.indexOf(n)>=0);cnt.textContent=arr.length+'票'+(arr.length?'（'+arr.join('、')+'）':'');});});if(document.getElementById('stats').classList.contains('on'))renderStats();}
-function sw(id,el){document.querySelectorAll('.cat').forEach(c=>c.classList.remove('on'));el.classList.add('on');document.querySelectorAll('.sect').forEach(s=>s.classList.remove('on'));document.getElementById('s-'+id).classList.add('on');window.scrollTo({top:0,behavior:'smooth'});}
+function refreshVotes(){var v=loadV(),n=me(),t=titles();PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){var d=c.querySelector('.vote');if(!d)return;var id=s[0]+'#'+i,arr=v[id]||[],btn=d.querySelector('button'),cnt=d.querySelector('.cnt');btn.textContent=arr.indexOf(n)>=0?'✅ 已投':'👍 投票';btn.classList.toggle('voted',arr.indexOf(n)>=0);cnt.textContent=arr.length+'票'+(arr.length?'（'+arr.join('、')+'）':'');});});if(document.getElementById('stats').classList.contains('on'))renderStats();}
+function swPlace(id,el){curP='s-'+id;document.querySelectorAll('.cat.place').forEach(c=>c.classList.remove('on'));el.classList.add('on');applyFilter();window.scrollTo({top:0,behavior:'smooth'});}
+function swCat(c,el){curC=c;document.querySelectorAll('.cat.cat2').forEach(x=>x.classList.remove('on'));el.classList.add('on');applyFilter();}
+function applyFilter(){PLACES.forEach(function(s){var show=s[0]===curP;document.getElementById(s[0]).classList.toggle('on',show);if(!show)return;var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(card,i){card.style.display=cardCat(s[0],i)===curC?'':'none';});var h2s=document.querySelectorAll('#'+s[0]+' h2.st');h2s.forEach(function(h){var dc=h.getAttribute('data-c');h.style.display=(!dc||dc===curC)?'':'none';});});}
 function openStats(){renderStats();document.getElementById('stats').classList.add('on');}
 function closeStats(){document.getElementById('stats').classList.remove('on');}
 function renderStats(){var v=loadV(),t=titles(),h='';GROUPS.forEach(function(g){var items=[];Object.keys(v).forEach(function(id){if(t[id]&&t[id].g===g&&v[id].length)items.push({t:t[id].t,c:v[id].length,n:v[id]});});items.sort(function(a,b){return b.c-a.c;});h+='<h3>'+g+' Top3</h3>';if(!items.length)h+='<ol><li>尚無投票</li></ol>';else h+='<ol>'+items.slice(0,3).map(function(x){return '<li>'+x.t+' — <b>'+x.c+'票</b>（'+x.n.join('、')+'）</li>';}).join('')+'</ol>';});document.getElementById('statsBody').innerHTML=h;var total=0;Object.keys(v).forEach(function(k){total+=v[k].length;});document.getElementById('statsSub').textContent='共 '+total+' 票・本機統計（含合併）';}
 function exportVotes(){var s=btoa(unescape(encodeURIComponent(JSON.stringify(loadV()))));var done=function(){alert('投票碼已複製，傳給家人合併');};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(s).then(done,function(){prompt('複製此投票碼',s);});else prompt('複製此投票碼',s);}
 function importVotes(){var s=prompt('貼上家人傳來的投票碼');if(!s)return;try{var inc=JSON.parse(decodeURIComponent(escape(atob(s.trim()))));var v=loadV();Object.keys(inc).forEach(function(id){var cur=v[id]||[];inc[id].forEach(function(n){if(cur.indexOf(n)<0)cur.push(n);});if(cur.length)v[id]=cur;});saveV(v);refreshVotes();alert('已合併！');}catch(e){alert('投票碼格式錯誤');}}
 document.getElementById('nameInput').addEventListener('keydown',function(e){if(e.key==='Enter')enter();});
-buildVoteUI();paintWho();
+buildVoteUI();paintWho();applyFilter();initGal();
+function visImgs(){return Array.prototype.slice.call(document.querySelectorAll('img.ph')).filter(function(im){return im.style.display!=='none'&&im.offsetParent!==null&&im.src;});}
+function initGal(){var ov=document.createElement('div');ov.id='galov';ov.innerHTML='<span class="gx">✕</span><span class="gp">‹</span><img class="gi"><span class="gn">›</span><div class="gc"></div>';document.body.appendChild(ov);var idx=0,gi=ov.querySelector('.gi'),gc=ov.querySelector('.gc');
+function show(i){var L=visImgs();if(!L.length)return;idx=(i+L.length)%L.length;gi.src=L[idx].src;gi.alt=L[idx].alt||'';gc.textContent=(idx+1)+'/'+L.length+' '+(L[idx].alt||'');ov.classList.add('on');}
+document.addEventListener('click',function(e){if(e.target&&e.target.classList&&e.target.classList.contains('ph')){var L=visImgs();show(L.indexOf(e.target));}});
+ov.querySelector('.gx').onclick=function(){ov.classList.remove('on');};
+ov.querySelector('.gp').onclick=function(e){e.stopPropagation();show(idx-1);};
+ov.querySelector('.gn').onclick=function(e){e.stopPropagation();show(idx+1);};
+ov.onclick=function(e){if(e.target===ov)ov.classList.remove('on');};
+var tx=0;ov.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;},{passive:true});
+ov.addEventListener('touchend',function(e){var dx=e.changedTouches[0].clientX-tx;if(dx>50)show(idx-1);else if(dx<-50)show(idx+1);});}
 if(me()){document.getElementById('gate').classList.add('hide');refreshVotes();}
 </script>
 </body>
