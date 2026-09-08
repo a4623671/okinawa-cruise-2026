@@ -14,11 +14,17 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .hero{background:linear-gradient(135deg,#123c2b,#1e7a4f);color:#fff;padding:20px 16px}
 .hero h1{font-size:21px}.hero p{font-size:13px;opacity:.92;margin-top:4px}
 .wrap{padding:14px 12px 60px;max-width:760px;margin:0 auto}
+.zone{border-radius:14px;padding:4px 12px 12px;margin:14px 0}
+.zone.cruise{background:#e9f3ec;border:2px solid #1e7a4f}
+.zone.other{background:#fff;border:1px solid #d8d0bd}
+.zone>h2{font-size:18px;margin:12px 2px 10px}
+.zone.cruise>h2{color:#0d4d2e}.zone.other>h2{color:#555}
 .chk{background:#fff;border:1px solid #d8d0bd;border-radius:12px;padding:10px 14px;margin-bottom:10px;font-size:14px}
 .chk label{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
 .chk input{width:20px;height:20px;accent-color:#0e6e5a;flex:none;margin-top:3px}
 .chk.done label{color:#999;text-decoration:line-through}
-h2.st{font-size:17px;margin:20px 2px 10px;color:#123c2b}
+h3.st{font-size:15px;margin:14px 2px 8px;color:#0d4d2e}
+.zone.other h3.st{color:#666}
 .tip{font-size:13px;background:#fff8e1;border:1px dashed #d9b53a;border-radius:10px;padding:10px 12px;margin:10px 0}
 .star{color:#b3541e;font-weight:800}
 .prog{background:#fff;border-radius:12px;padding:10px 14px;font-size:14px;font-weight:700;position:sticky;top:51px;z-index:9;border:1px solid #d8d0bd}
@@ -33,56 +39,52 @@ h2.st{font-size:17px;margin:20px 2px 10px;color:#123c2b}
 <div class="wrap">
 <div class="prog"><span id="ptxt">準備進度 0/0</span><div class="bar"><i id="pbar"></i></div></div>
 
-<h2 class="st">1️⃣ 證件與報到文件 <span class="star">★必備</span></h2>
+<div class="zone cruise">
+<h2>🚢 郵輪專區（只有搭郵輪才需要的）</h2>
+
+<h3 class="st">證件與報到 <span class="star">★必備</span></h3>
 <div class="chk"><label><input type="checkbox"><span><b>護照正本</b>：效期 6 個月以上（至 2027/6/20 後）＋空白頁 2 頁以上。影本另外放行李箱一份。</span></label></div>
 <div class="chk"><label><input type="checkbox"><span><b>船票／登船憑證</b>：旅行社給的 e-ticket 列印＋手機存檔。基隆港務大樓報到用。</span></label></div>
 <div class="chk"><label><input type="checkbox"><span><b>信用卡</b>：登船時綁船上消費帳戶（本人＋額度夠）。建議帶 2 張不同發卡組織備用。</span></label></div>
-<div class="chk"><label><input type="checkbox"><span><b>保險</b>：旅平險＋郵輪／海外醫療＋不便險。12 月東海風浪＋日本就醫貴，務必保。</span></label></div>
-<div class="chk"><label><input type="checkbox"><span><b>常用藥＋處方箋影本</b>：慢性病藥帶足天數＋2 天份量。暈船藥（人生旅安、暈可平等）出發前先吃。</span></label></div>
+<div class="chk"><label><input type="checkbox"><span><b>暈船藥＋常用藥</b>：12 月東海風浪大，暈船藥（人生旅安等）出發前先吃；慢性病藥帶足天數＋2 天份量＋處方箋影本。</span></label></div>
 
-<h2 class="st">2️⃣ <span class="star">★</span>磁鐵掛勾（郵輪神器）</h2>
-<div class="tip">郵輪艙房牆壁和天花板全是<strong>金屬</strong>，磁鐵一吸就行。不用打孔、不用黏膠、不傷牆，MSC 官方默許，是老郵輪客 <strong>Top 1 必帶</strong>小物。</div>
-<div class="chk"><label><input type="checkbox"><span><b>強力磁鐵掛勾（釹磁鐵・垂直承重 5kg 以上）4–6 個</b>：只買這一種就夠。用途：掛隔日行程單、每日日報、外套、帽子、伴手禮袋、浴室晾小衣物（夜市／大創弱磁款吸不住外套，別買）。搜尋關鍵字「強力磁鐵掛勾 5kg 郵輪」，一顆約 NT$30–60。</span></label></div>
+<h3 class="st"><span class="star">★</span>磁鐵掛勾（郵輪神器，一款就夠）</h3>
+<div class="tip">郵輪艙房牆壁和天花板全是<strong>金屬</strong>，磁鐵一吸就行，不打孔不傷牆，是老郵輪客 Top 1 必帶小物。</div>
+<div class="chk"><label><input type="checkbox"><span><b>強力磁鐵掛勾（釹磁鐵・垂直承重 5kg 以上）4–6 個</b>：掛行程單、每日日報、外套、伴手禮袋、浴室晾小衣物。夜市弱磁款吸不住，搜尋「強力磁鐵掛勾 5kg 郵輪」，一顆約 NT$30–60。</span></label></div>
 
-<h2 class="st">3️⃣ 艙房生活用品</h2>
-<div class="chk"><label><input type="checkbox"><span><b>多孔 USB 充電器（不帶延長線）</b>：艙房插座少，一顆多孔 USB 頭＋萬國轉接頭搞定全家手機相機。⚠️ 船公司可能禁止延長線，本清單不推薦攜帶。</span></label></div>
-<div class="chk"><label><input type="checkbox"><span><b>萬國轉接頭</b>：船上多為歐規圓孔＋USB-A，日本岸上是美規扁孔，一顆萬國頭全包。</span></label></div>
-<div class="chk"><label><input type="checkbox"><span><b>行動電源＋充電線備用</b>：岸上一整天拍照導航，回船前別沒電。</span></label></div>
-<div class="chk"><label><input type="checkbox"><span><b>耳塞＋眼罩</b>：艙房隔音普通＋走廊半夜有人聲，淺眠者必備。</span></label></div>
-<div class="chk"><label><input type="checkbox"><span><b>小夜燈（USB／電池式）</b>：內艙房全黑，半夜上廁所不用開大燈吵醒室友。</span></label></div>
-<div class="chk"><label><input type="checkbox"><span><b>盥洗包＋防曬＋護唇膏</b>：船上備品陽春；12 月沖繩紫外線仍強，海邊行程要防曬。</span></label></div>
+<h3 class="st">服裝（三樣就好）</h3>
+<div class="chk"><label><input type="checkbox"><span><b>白色上衣（白色之夜）</b>：榮耀號經典 White Party，帶一件白上衣即可參加甲板派對。</span></label></div>
+<div class="chk"><label><input type="checkbox"><span><b>拖鞋</b>：艙房內＋甲板泳池畔用，好穿脫防滑即可。</span></label></div>
+<div class="chk"><label><input type="checkbox"><span><b>泳衣</b>：船上泳池、SPA、滑水道用。泳帽只有下水游泳才需要備著，不游泳不用帶。</span></label></div>
 
-<h2 class="st">4️⃣ 服裝（5天4夜・12月中旬）</h2>
-<div class="chk"><label><input type="checkbox"><span><b>正式之夜服裝 1 套</b>：MSC 有 1–2 晚 Gala Night（西裝／小禮服，不強制但建議，餐廳氣氛滿點）。</span></label></div>
-<div class="chk"><label><input type="checkbox"><span><b>白色之夜服裝</b>：榮耀號經典 White Party，帶一件白上衣即可參加甲板派對。</span></label></div>
-<div class="chk"><label><input type="checkbox"><span><b>防風外套＋薄長袖</b>：12 月那霸約 15–19°C、海風大＋甲板體感再低 3°C；基隆更冷，洋蔥式穿法。</span></label></div>
-<div class="chk"><label><input type="checkbox"><span><b>好走的鞋 2 雙</b>：岸上每天 8,000–15,000 步，防水好走優先；另帶一雙晚宴鞋。</span></label></div>
-<div class="chk"><label><input type="checkbox"><span><b>泳衣＋泳帽</b>：船上泳池、SPA、滑水道用（MSC 泳池多要泳帽⚠️）。</span></label></div>
-
-<h2 class="st">5️⃣ 網路與3C</h2>
-<div class="chk"><label><input type="checkbox"><span><b>決定船上網路方案</b>：MSC 船上 Wi-Fi 按裝置／航程計費不便宜，先查好價格；純岸上用、日本 eSIM／漫遊＋船上離線即可省一筆。</span></label></div>
-<div class="chk"><label><input type="checkbox"><span><b>日本上網 eSIM／漫遊</b>：三個靠港日導航＋查地圖＋回報平安用，台灣先買好 eSIM 下船即連。</span></label></div>
+<h3 class="st">船上消費與 APP</h3>
 <div class="chk"><label><input type="checkbox"><span><b>MSC for Me APP</b>：出發前先安裝登入，船上查日報、訂餐廳、看帳單全靠它。</span></label></div>
-<div class="chk"><label><input type="checkbox"><span><b>離線地圖＋本行程 HTML</b>：Google Maps 先下載沖繩離線圖；本系列兩個 HTML 在基隆先開一次快取，上船慢慢看。</span></label></div>
+<div class="chk"><label><input type="checkbox"><span><b>船上網路方案</b>：MSC 船上 Wi-Fi 按裝置／航程計費不便宜，先查好價格；只靠岸上網路＋船上離線可省一筆。</span></label></div>
+<div class="chk"><label><input type="checkbox"><span><b>酒水＋服務費觀念</b>：酒水套餐按天計費，不喝酒單點即可；服務費按人按晚掛房帳。MSC 酒水自帶政策以船公司公告為準⚠️。</span></label></div>
 
-<h2 class="st">6️⃣ 錢、酒水與消費觀念</h2>
-<div class="chk"><label><input type="checkbox"><span><b>日圓現金</b>：市場、食堂、計程車、神社御朱印多只收現金。每人至少 ¥30,000–50,000，台灣先換好。</span></label></div>
-<div class="chk"><label><input type="checkbox"><span><b>酒水方案先算帳</b>：MSC 酒水套餐按天計費，不喝酒的人單點＋免費水／早餐果汁即可；可自帶上船的瓶數以船公司公告為準⚠️。</span></label></div>
-<div class="chk"><label><input type="checkbox"><span><b>服務費（小費）</b>：MSC 按人按晚收取酒店服務費，會直接掛房帳，先有心理準備。</span></label></div>
-<div class="chk"><label><input type="checkbox"><span><b>岸上交通預算</b>：宮古石垣包車半日約¥18,000–30,000／台，5 人攤約¥4,000–6,000／人；那霸計程車＋單軌約¥3,000–4,000／人／天。</span></label></div>
+<h3 class="st">登船當天（12/16 基隆）</h3>
+<div class="chk"><label><input type="checkbox"><span><b>14:00 前到港務大樓</b>：報到→掛行李牌→托運→安檢→登船，18:00 啟航關閘嚴格⚠️。隨身小包放證件藥物充電器泳衣（托運行李傍晚才到房）。</span></label></div>
+<div class="chk"><label><input type="checkbox"><span><b>救生演習＋晚餐梯次＋包車確認</b>：演習強制參加；主餐廳梯次先確認；自組包車跟司機確認碼頭接人方式＋回船時間。</span></label></div>
+</div>
 
-<h2 class="st">7️⃣ 登船當天流程（12/16 基隆）</h2>
-<div class="chk"><label><input type="checkbox"><span><b>14:00 前到港務大樓</b>：報到→掛行李牌→托運行李→安檢→登船，18:00 啟航，關閘時間嚴格⚠️。</span></label></div>
-<div class="chk"><label><input type="checkbox"><span><b>隨身小包</b>：證件、藥、充電器、泳衣放隨身包（托運行李傍晚才送到房）。</span></label></div>
-<div class="chk"><label><input type="checkbox"><span><b>救生演習＋晚餐梯次確認</b>：一上船先看日報，演習強制參加；主餐廳梯次先確認。</span></label></div>
-<div class="chk"><label><input type="checkbox"><span><b>岸上團／包車最終確認</b>：船方團看集合時間地點；自組包車跟司機確認碼頭接人方式＋回船時間。</span></label></div>
+<div class="zone other">
+<h2>🧳 其他區（一般旅行小物，與郵輪關聯低）</h2>
+<div class="chk"><label><input type="checkbox"><span><b>日本 eSIM／漫遊</b>：三個靠港日導航＋查地圖用，台灣先買好下船即連。</span></label></div>
+<div class="chk"><label><input type="checkbox"><span><b>旅平險＋不便險</b>：海外醫療＋行程延誤，日本就醫貴務必保。</span></label></div>
+<div class="chk"><label><input type="checkbox"><span><b>日圓現金</b>：市場食堂計程車御朱印多只收現金，每人至少 ¥30,000–50,000，台灣先換好。</span></label></div>
+<div class="chk"><label><input type="checkbox"><span><b>多孔 USB 充電器＋萬國轉接頭</b>：船上歐規圓孔多、日本岸上扁孔，一組搞定全家充電。⚠️ 船公司可能禁延長線，不帶。</span></label></div>
+<div class="chk"><label><input type="checkbox"><span><b>行動電源＋充電線</b>：岸上一整天拍照導航用。</span></label></div>
+<div class="chk"><label><input type="checkbox"><span><b>耳塞</b>：艙房隔音普通＋走廊半夜人聲，淺眠者必備。</span></label></div>
+<div class="chk"><label><input type="checkbox"><span><b>盥洗包＋防曬＋護唇膏</b>：船上備品陽春；12 月沖繩紫外線仍強。</span></label></div>
+<div class="chk"><label><input type="checkbox"><span><b>離線地圖＋本行程 HTML</b>：Google Maps 先下載沖繩離線圖；行程指南在基隆先開一次快取。</span></label></div>
+<div class="chk"><label><input type="checkbox"><span><b>岸上交通預算</b>：宮古石垣包車半日約¥18,000–30,000／台（5 人攤約¥4,000–6,000／人）；那霸計程車＋單軌約¥3,000–4,000／人／天。</span></label></div>
+</div>
 
-<div class="tip">💡 磁鐵掛勾選購關鍵字：搜「強力磁鐵掛勾 5kg 郵輪」，選掛勾本體金屬、一顆約 NT$30–60 的，一家四口帶 6–8 顆最剛好。別買彩色可愛弱磁款，吸外套會滑下來。</div>
 </div>
 <script>
-function upd(){var c=document.querySelectorAll('input[type=checkbox]');var d=0;document.querySelectorAll('.chk').forEach(function(b){var i=b.querySelector('input');b.classList.toggle('done',i.checked);if(i.checked)d++;});document.getElementById('ptxt').textContent='準備進度 '+d+'/'+c.length;document.getElementById('pbar').style.width=(c.length?d/c.length*100:0)+'%';try{localStorage.setItem('cruise_prep',JSON.stringify(Array.prototype.map.call(c,function(x){return x.checked?1:0;})));}catch(e){}}
+function upd(){var c=document.querySelectorAll('input[type=checkbox]');var d=0;document.querySelectorAll('.chk').forEach(function(b){var i=b.querySelector('input');b.classList.toggle('done',i.checked);if(i.checked)d++;});document.getElementById('ptxt').textContent='準備進度 '+d+'/'+c.length;document.getElementById('pbar').style.width=(c.length?d/c.length*100:0)+'%';try{localStorage.setItem('cruise_prep_v2',JSON.stringify(Array.prototype.map.call(c,function(x){return x.checked?1:0;})));}catch(e){}}
 document.querySelectorAll('input[type=checkbox]').forEach(function(c){c.addEventListener('change',upd);});
-try{var s=JSON.parse(localStorage.getItem('cruise_prep')||'[]');document.querySelectorAll('input[type=checkbox]').forEach(function(c,i){if(s[i])c.checked=true;});}catch(e){}
+try{var s=JSON.parse(localStorage.getItem('cruise_prep_v2')||'[]');document.querySelectorAll('input[type=checkbox]').forEach(function(c,i){if(s[i])c.checked=true;});}catch(e){}
 upd();
 </script>
 </body>
