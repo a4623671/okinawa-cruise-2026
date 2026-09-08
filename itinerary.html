@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MSC榮耀號・5天岸上觀光初稿（A/B計畫＋圖）</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;background:#f4f1ea;color:#2b2b2b;line-height:1.6}
+.topbar{background:#fff;border-bottom:1px solid #e3ddd0;padding:10px 14px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:10}
+.topbar .logo{font-weight:800;font-size:18px}.topbar .sp{flex:1}
+.topbar button{border:1px solid #d8d0bd;background:#fff;border-radius:20px;padding:6px 14px;font-size:14px;cursor:pointer}
+.hero{background:linear-gradient(135deg,#0e3a5d,#146b8c);color:#fff;padding:18px 16px}
+.hero h1{font-size:20px;margin-bottom:4px}.hero .meta{font-size:14px;opacity:.92}
+.hero .warn{margin-top:10px;background:#fff3d6;color:#7a5200;border-radius:10px;padding:8px 12px;font-size:13px}
+.days{display:flex;gap:8px;padding:10px 12px;background:#fff;border-bottom:1px solid #e3ddd0;overflow-x:auto;position:sticky;top:51px;z-index:9}
+.day{flex:none;border:1px solid #d8d0bd;border-radius:16px;padding:6px 14px;font-size:14px;background:#fff;cursor:pointer;text-align:center}
+.day small{display:block;font-size:11px;color:#888}.day.on{background:#10293f;color:#fff;border-color:#10293f;font-weight:700}.day.on small{color:#cfe0ee}
+.abrow{display:none;gap:8px;padding:10px 12px 0}.abrow.on{display:flex}
+.ab{flex:1;border:1px solid #d8d0bd;border-radius:20px;padding:7px;font-size:14px;background:#fff;cursor:pointer}
+.ab.on{background:#b3541e;color:#fff;border-color:#b3541e;font-weight:700}
+.plan{display:none;padding:10px 12px 90px}.plan.on{display:block}
+.desc{background:#fff;border:1px dashed #cfc5ab;border-radius:12px;padding:10px 14px;margin:10px 0 12px;font-size:14px}
+.tl{position:relative;margin-left:8px;padding-left:22px;border-left:2px dotted #c9bfa6}
+.stop{background:#fff;border-radius:12px;padding:10px 12px;margin:0 0 10px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.stop .row1{display:flex;align-items:center;gap:8px}
+.stop .time{font-weight:800;font-size:14px;white-space:nowrap}
+.badge{font-size:12px;border-radius:6px;padding:1px 8px;white-space:nowrap}
+.b-spot{background:#e3f2e4;color:#1e7a34}.b-food{background:#fdf0d5;color:#9a6200}
+.b-trans{background:#fde8e4;color:#b3402a}.b-port{background:#e2e8f0;color:#33415c}
+.b-shop{background:#e8e4f8;color:#5b4a9e}.b-shrine{background:#e0f2f1;color:#0b6e5f}
+.stop h3{font-size:16px;margin:4px 0 2px}.stop .sub{font-size:13px;color:#666}
+.stop .dur{margin-left:auto;font-size:13px;font-weight:700;color:#b3541e;white-space:nowrap;text-align:right}
+.ph{width:100%;border-radius:10px;margin:8px 0 2px;display:block}
+.credit{font-size:11px;color:#999}
+.stop .detail{display:none;font-size:13px;background:#faf7ef;border-radius:8px;padding:8px 10px;margin-top:8px}
+.stop.open .detail{display:block}
+.ibtn{border:none;background:#e8dfc8;width:26px;height:26px;border-radius:50%;font-style:italic;font-weight:800;cursor:pointer;flex:none}
+.pick{display:flex;gap:8px;align-items:center;margin-top:8px;font-size:13px}
+.pick input{width:18px;height:18px;accent-color:#0e6e5a}
+.trans{background:transparent;box-shadow:none;border:1px dashed #d8cdb4}
+.summary{position:fixed;left:0;right:0;bottom:0;background:#10293f;color:#fff;padding:10px 14px;display:flex;gap:10px;align-items:center;font-size:14px;z-index:20}
+.summary .grow{flex:1}.summary button{border:none;border-radius:20px;padding:8px 16px;font-weight:700;cursor:pointer}
+#btnCopy{background:#ffcf4d}#btnPrint{background:#fff}
+.sheet{display:none;background:#fff;color:#222;border-radius:14px;padding:14px;margin:12px;font-size:14px}
+.sheet.on{display:block}.sheet li{margin:4px 0 4px 18px}
+.note{font-size:12px;color:#888;margin:10px 2px}
+@media print{.topbar,.days,.abrow,.summary,.pick,.ibtn{display:none}.plan{display:block}}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="logo">🚢 行程</div><div class="sp"></div><button onclick="window.print()">🖨 列印</button></div>
+<div class="hero">
+<h1>2026 MSC榮耀號・5天4夜岸上觀光初稿</h1>
+<div class="meta">12/16基隆18:00啟航 → 12/17宮古島08:00–18:00 → 12/18那霸07:00–19:00 → 12/19石垣島09:00–19:00 → 12/20基隆07:00抵達</div>
+<div class="warn">⚠️ 各港「回船時間」以船上公告為準（多為起航前1小時）。本初稿已倒推緩衝。圖片來自Wikimedia Commons，需連網載入。</div>
+</div>
+<div class="days">
+<button class="day" onclick="swDay(0,this)">12/16<small>基隆登船</small></button>
+<button class="day" onclick="swDay(1,this)">12/17<small>宮古島</small></button>
+<button class="day on" onclick="swDay(2,this)">12/18<small>那霸港</small></button>
+<button class="day" onclick="swDay(3,this)">12/19<small>石垣島</small></button>
+<button class="day" onclick="swDay(4,this)">12/20<small>基隆返抵</small></button>
+</div>
+
+<!-- ================= DAY0 KEELUNG ================= -->
+<div class="abrow" id="ab0"></div>
+<div class="plan" id="day0">
+<div class="desc">登船日：15:00前到基隆港務大樓報到（建議14:00），18:00啟航。上午可逛廟口＋正濱彩色屋＋基隆塔，行李可先寄港務大樓或車站置物櫃。</div>
+<div class="tl">
+<div class="stop"><div class="row1"><span class="time">11:30–13:00</span><span class="badge b-food">餐廳</span><button class="ibtn" onclick="this.closest('.stop').classList.toggle('open')">i</button></div>
+<h3>🍜 基隆廟口夜市（午餐）</h3><div class="sub">鼎邊趖、天婦羅、泡泡冰、油飯</div><div class="dur">1小時30分</div>
+<img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2b/2026.03.27_Keelung_Miaokou_Night_Market.jpg/960px-2026.03.27_Keelung_Miaokou_Night_Market.jpg" onerror="this.style.display='none'" alt="基隆廟口"><div class="credit">圖：Wikimedia Commons</div>
+<div class="detail">白天部分名攤即營業（天一香肉羹順、王記天婦羅）。每人約NT$200–400。</div>
+<div class="pick"><input type="checkbox" data-t="90" data-n="D1 廟口午餐" checked><span>加入我的初稿</span></div></div>
+<div class="stop"><div class="row1"><span class="time">13:30–14:10</span><span class="badge b-spot">景點</span><button class="ibtn" onclick="this.closest('.stop').classList.toggle('open')">i</button></div>
+<h3>🎨 正濱漁港彩色屋</h3><div class="sub">台版威尼斯彩色小屋＋和平橋觀景</div><div class="dur">40分</div>
+<img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/2020_Zhengbin_Fishing_Port.jpg/960px-2020_Zhengbin_Fishing_Port.jpg" onerror="this.style.display='none'" alt="正濱漁港"><div class="credit">圖：Wikimedia Commons</div>
+<div class="detail">計程車自廟口約10分。拍照20分＋周邊咖啡，快閃即可。</div>
+<div class="pick"><input type="checkbox" data-t="40" data-n="D1 正濱彩色屋" checked><span>加入我的初稿</span></div></div>
+<div class="stop"><div class="row1"><span class="time">14:20–15:00</span><span class="badge b-spot">景點</span><button class="ibtn" onclick="this.closest('.stop').classList.toggle('open')">i</button></div>
+<h3>🗼 基隆塔＋主普壇遠眺</h3><div class="sub">豎梯＋空中走廊俯瞰港灣</div><div class="dur">40分</div>
+<img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/Keelung_Tower_and_Ts%C3%BA-ph%C3%B3o-tu%C3%A2nn_20231023.jpg/960px-Keelung_Tower_and_Ts%C3%BA-ph%C3%B3o-tu%C3%A2nn_20231023.jpg" onerror="this.style.display='none'" alt="基隆塔"><div class="credit">圖：Wikimedia Commons</div>
+<div class="detail">免費。距港務大樓步行可達，看完直接去報到最順。</div>
+<div class="pick"><input type="checkbox" data-t="40" data-n="D1 基隆塔" checked><span>加入我的初稿</span></div></div>
+<div class="stop trans"><div class="row1"><span class="time">15:00–15:30</span><span class="badge b-trans">交通</span></div>
+<h3>🧳 前往基隆港務大樓報到＋安檢</h3><div class="sub">備護照＋船票＋信用卡（船上消費綁卡）</div><div class="dur">30分</div></div>
+<div class="stop"><div class="row1"><span class="time">18:00</span><span class="badge b-port">啟航</span></div>
+<h3>🎉 MSC榮耀號啟航（甲板派對）</h3><div class="sub">救生演習→晚餐→歌舞秀，先查APP行程</div></div>
+</div>
+<div class="note">💡 D1備選（時間充裕）：和平島地質公園（豆腐岩＋海泳池，門票NT$120，約2小時）。</div>
+</div>
+
+<!-- ================= DAY1 MIYAKO ================= -->
+<div class="abrow on" id="ab1" style="display:none"><button class="ab on" onclick="swPlan(1,'A',this)">☀️ A・海灘經典</button><button class="ab" onclick="swPlan(1,'B',this)">☂️ B・雨天備案</button></div>
+<div class="plan" id="day1A">
+<div class="desc">宮古島08:00–18:00（<b>17:00前返船</b>）。島上大眾運輸稀少，強烈建議：包車半日（約¥20,000–30,000/台）／租車／船方岸上團。A計畫：東洋第一美灘＋雪塩＋東端燈塔。</div>
+<div class="tl">
+<div class="stop"><div class="row1"><span class="time">08:00</span><span class="badge b-port">到港</span></div><h3>🛳 平良港下船</h3><div class="sub">包車司機多在碼頭舉牌接人，先確認回船時間</div>
+<div class="pick"><input type="checkbox" data-t="0" checked disabled><span>固定行程</span></div></div>
+<div class="stop"><div class="row1"><span class="time">09:00–10:30</span><span class="badge b-spot">景點</span><button class="ibtn" onclick="this.closest('.stop').classList.toggle('open')">i</button></div>
+<h3>🏖 与那覇前浜ビーチ（前濱海灘）</h3><div class="sub">7km白沙＋漸層藍、「東洋一美しい」海灘</div><div class="dur">1小時30分</div>
+<img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/Yonahamaehama_Miyakojima_Okinawa_Japan01bs3s4592.jpg/960px-Yonahamaehama_Miyakojima_Okinawa_Japan01bs3s4592.jpg" onerror="this.style.display='none'" alt="与那覇前浜"><div class="credit">圖：Wikimedia Commons</div>
+<div class="detail">12月不適合下水，沙灘散步＋來間大橋遠眺。停留拍照約1小時，廁所＋小賣店有。</div>
+<div class="pick"><input type="checkbox" data-t="90" data-n="D2 前浜海灘" checked><span>加入我的初稿</span></div></div>
+<div class="stop"><div class="row1"><span class="time">11:00–12:00</span><span class="badge b-spot">景點＋購物</span><button class="ibtn" onclick="this.closest('.stop').classList.toggle('open')">i</button></div>
+<h3>🧂 雪塩ミュージアム（雪鹽館）</h3><div class="sub">製鹽見學＋雪鹽霜淇淋＋伴手禮</div><div class="dur">1小時</div>
+<img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/%E5%A1%A9%E5%B1%8B_%288908176948%29.jpg/960px-%E5%A1%A9%E5%B1%8B_%288908176948%29.jpg" onerror="this.style.display='none'" alt="雪塩"><div class="credit">圖：Wikimedia Commons（塩屋意象）</div>
+<div class="detail">免費入館，霜淇淋約¥400。雪鹽小包是全島通用伴手禮，這裡一次買齊最省事。</div>
+<div class="pick"><input type="checkbox" data-t="60" data-n="D2 雪塩ミュージアム" checked><span>加入我的初稿</span></div></div>
+<div class="stop"><div class="row1"><span class="time">12:15–13:30</span><span class="badge b-food">餐廳</span><button class="ibtn" onclick="this.closest('.stop').classList.toggle('open')">i</button></div>
+<h3>🍜 午餐：宮古そば（古謝そば屋／島の駅みやこ內）</h3><div class="sub">鰹魚清湯＋軟骨排骨麵，約¥800–1,200/人</div><div class="dur">1小時15分</div>
+<div class="detail">12月芒果非產季⚠️，別為芒果而來。島の駅可順買黑糖、泡盛、海葡萄乾貨。</div>
+<div class="pick"><input type="checkbox" data-t="75" data-n="D2 宮古そば午餐" checked><span>加入我的初稿</span></div></div>
+<div class="stop"><div class="row1"><span class="time">14:00–15:30</span><span class="badge b-spot">景點</span><button class="ibtn" onclick="this.closest('.stop').classList.toggle('open')">i</button></div>
+<h3>🗼 東平安名岬（燈塔）</h3><div class="sub">2km細長海岬＋白色燈塔，宮古代表風景</div><div class="dur">1小時30分</div>
+<img class="ph" loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Miyako%20higashi%20hennazaki%20lighthouse.JPG?width=960" onerror="this.style.display='none'" alt="東平安名岬"><div class="credit">圖：Wikimedia Commons</div>
+<div class="detail">燈塔可登頂（約¥200）。風大注意保暖，遊步道來回約40分。</div>
+<div class="pick"><input type="checkbox" data-t="90" data-n="D2 東平安名岬" checked><span>加入我的初稿</span></div></div>
+<div class="stop trans"><div class="row1"><span class="time">15:30–17:00</span><span class="badge b-trans">交通</span></div><h3>🚕 返回平良港（17:00前登船）</h3><div class="sub">東端回港約40–50分，務必預留</div><div class="dur">緩衝1.5小時</div></div>
+</div>
+<div class="note">💡 備選：砂山ビーチ（岩門海灘，停留40分）可替換雪塩館，視包車路線而定。A計畫包車費攤提約¥4,000–6,000/人（5人座）。</div>
+</div>
+
+<div class="plan" id="day1B">
+<div class="desc">雨天版：全室內＋車窓。雪塩館 → 島の駅（午餐＋購物） → 伊良部大橋車窓 → 市區宮古神社（車訪） → 返船。</div>
+<div class="tl">
+<div class="stop"><div class="row1"><span class="time">09:00–10:30</span><span class="badge b-spot">景點（室內）</span></div><h3>🧂 雪塩ミュージアム＋工廠見學</h3><div class="sub">室內導覽＋試吃＋購物</div><div class="dur">1小時30分</div>
+<img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/%E5%A1%A9%E5%B1%8B_%288908176948%29.jpg/960px-%E5%A1%A9%E5%B1%8B_%288908176948%29.jpg" onerror="this.style.display='none'" alt="雪塩"><div class="credit">圖：Wikimedia Commons</div>
+<div class="pick"><input type="checkbox" data-t="90" data-n="D2B 雪塩館" checked><span>加入我的初稿</span></div></div>
+<div class="stop"><div class="row1"><span class="time">11:00–13:00</span><span class="badge b-food">餐廳＋購物</span></div><h3>🛍 島の駅みやこ（午餐＋伴手禮）</h3><div class="sub">宮古牛可樂餅、そば、農產直賣，室內好躲雨</div><div class="dur">2小時</div>
+<div class="detail">午餐約¥1,000–2,000/人。黑糖、ちんすこう、泡盛此處價格實在。</div>
+<div class="pick"><input type="checkbox" data-t="120" data-n="D2B 島の駅" checked><span>加入我的初稿</span></div></div>
+<div class="stop"><div class="row1"><span class="time">13:30–14:30</span><span class="badge b-spot">車窓</span></div><h3>🌉 伊良部大橋 drive-through</h3><div class="sub">全長3,540m免費長橋，不下車賞海</div><div class="dur">1小時</div>
+<img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a7/Miyako_irabu_bridge.jpg/960px-Miyako_irabu_bridge.jpg" onerror="this.style.display='none'" alt="伊良部大橋"><div class="credit">圖：Wikimedia Commons</div>
+<div class="pick"><input type="checkbox" data-t="60" data-n="D2B 伊良部大橋" checked><span>加入我的初稿</span></div></div>
+<div class="stop trans"><div class="row1"><span class="time">15:30–17:00</span><span class="badge b-trans">交通</span></div><h3>🚕 返回平良港（17:00前登船）</h3><div class="dur">緩衝1.5小時</div></div>
+</div>
+</div>
+
+<!-- ================= DAY2 NAHA ================= -->
+<div class="abrow" id="ab2"><button class="ab on" onclick="swPlan(2,'A',this)">☀️ A・晴天經典</button><button class="ab" onclick="swPlan(2,'B',this)">☂️ B・雨天備案</button></div>
+<div class="plan on" id="day2A">
+<div class="desc">那霸07:00–19:00（<b>18:00前返船</b>）。海邊波上宮＋公設市場代客料理＋國際通，步行＋單軌＋計程車。</div>
+<div class="tl">
+<div class="stop"><div class="row1"><span class="time">07:00</span><span class="badge b-port">到港</span><button class="ibtn" onclick="this.closest('.stop').classList.toggle('open')">i</button></div>
+<h3>🛳 那霸港（若狹／新港碼頭）</h3><div class="sub">下船＋查驗約30–60分，08:00前出關</div>
+<div class="detail">先確認船上回船時間海報。碼頭計程車往波上宮約10分／¥1,000上下。</div>
+<div class="pick"><input type="checkbox" data-t="0" checked disabled><span>固定行程</span></div></div>
+<div class="stop trans"><div class="row1"><span class="time">08:00–08:30</span><span class="badge b-trans">交通</span></div><h3>🚕 前往波上宮</h3><div class="sub">約2.5km</div><div class="dur">30分</div></div>
+<div class="stop"><div class="row1"><span class="time">09:00–10:30</span><span class="badge b-shrine">神社＋景點</span><button class="ibtn" onclick="this.closest('.stop').classList.toggle('open')">i</button></div>
+<h3>⛩ 波上宮參拜＋波之上海灘</h3><div class="sub">琉球八社之首，海崖神社＋市區唯一沙灘</div><div class="dur">1小時30分</div>
+<img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/4/42/The_distant_view_of_Naminoueg%C5%AB_Honden.jpg/960px-The_distant_view_of_Naminoueg%C5%AB_Honden.jpg" onerror="this.style.display='none'" alt="波上宮"><div class="credit">圖：Wikimedia Commons</div>
+<div class="detail">御朱印所09:00起。懸崖步道拍神社＋海同框。冬季沙灘不開放游泳，純散步。</div>
+<div class="pick"><input type="checkbox" data-t="90" data-n="D3 波上宮＋波之上海灘" checked><span>加入我的初稿</span></div></div>
+<div class="stop trans"><div class="row1"><span class="time">10:30–10:50</span><span class="badge b-trans">交通</span></div><h3>🚕 前往第一牧志公設市場</h3><div class="sub">約1.5km／單軌美榮橋→牧志亦可</div><div class="dur">20分</div></div>
+<div class="stop"><div class="row1"><span class="time">11:15–12:15</span><span class="badge b-spot">景點</span><button class="ibtn" onclick="this.closest('.stop').classList.toggle('open')">i</button></div>
+<h3>🐟 逛第一牧志公設市場</h3><div class="sub">1F挑海鮮、2F食堂代客料理</div><div class="dur">1小時</div>
+<img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/Naha_City_First_Makishi_Public_Market_new_building.JPG/960px-Naha_City_First_Makishi_Public_Market_new_building.JPG" onerror="this.style.display='none'" alt="第一牧志公設市場"><div class="credit">圖：Wikimedia Commons</div>
+<div class="detail">調理費約¥500–800/道。週三部分店休⚠️。</div>
+<div class="pick"><input type="checkbox" data-t="60" data-n="D3 第一牧志公設市場" checked><span>加入我的初稿</span></div></div>
+<div class="stop"><div class="row1"><span class="time">12:30–13:45</span><span class="badge b-food">餐廳</span><button class="ibtn" onclick="this.closest('.stop').classList.toggle('open')">i</button></div>
+<h3>🍜 午餐：市場二樓食堂／暖暮拉麵（擇一）</h3><div class="sub">代客料理¥2,000–3,500/人；拉麵¥1,000–1,300/人</div><div class="dur">1小時15分</div>
+<div class="detail">暖暮午間排隊20–40分。豬肉蛋飯糰本店可外帶當點心。</div>
+<div class="pick"><input type="checkbox" data-t="75" data-n="D3 午餐" checked><span>加入我的初稿</span></div></div>
+<div class="stop"><div class="row1"><span class="time">14:00–16:30</span><span class="badge b-shop">購物</span><button class="ibtn" onclick="this.closest('.stop').classList.toggle('open')">i</button></div>
+<h3>🛍 國際通＋平和通散策購物</h3><div class="sub">唐吉訶德、御菓子御殿、塩屋、りうぼう百貨</div><div class="dur">2小時30分</div>
+<img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/Kokusai-dori08s3s4440.jpg/960px-Kokusai-dori08s3s4440.jpg" onerror="this.style.display='none'" alt="國際通"><div class="credit">圖：Wikimedia Commons</div>
+<div class="detail">平和通有頂拱廊。唐吉訶德可退稅，預留結帳排隊。</div>
+<div class="pick"><input type="checkbox" data-t="150" data-n="D3 國際通購物" checked><span>加入我的初稿</span></div></div>
+<div class="stop"><div class="row1"><span class="time">16:30–17:00</span><span class="badge b-food">甜點</span></div><h3>🍨 Blue Seal／豬肉蛋飯糰</h3><div class="sub">單球¥400–500；飯糰¥400–600</div><div class="dur">30分</div>
+<div class="pick"><input type="checkbox" data-t="30" data-n="D3 下午茶" checked><span>加入我的初稿</span></div></div>
+<div class="stop trans"><div class="row1"><span class="time">17:00–17:30</span><span class="badge b-trans">交通</span></div><h3>🚕 返回那霸港（18:00前登船）</h3><div class="dur">30分</div></div>
+</div>
+<div class="note">💡 A計畫花費/人：交通¥3,000–4,000＋午餐¥1,000–3,500＋購物自理。</div>
+</div>
+
+<div class="plan" id="day2B">
+<div class="desc">雨天版：博物館＋DFS＋有頂棚市場，室內約7成。</div>
+<div class="tl">
+<div class="stop"><div class="row1"><span class="time">09:00–11:00</span><span class="badge b-spot">景點（室內）</span><button class="ibtn" onclick="this.closest('.stop').classList.toggle('open')">i</button></div>
+<h3>🏛 沖繩縣立博物館・美術館</h3><div class="sub">琉球歷史＋自然＋美術，約¥400–800</div><div class="dur">2小時</div>
+<img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/Okinawa_Prefectural_Museum_%26_Art_Museum01bss3200.jpg/960px-Okinawa_Prefectural_Museum_%26_Art_Museum01bss3200.jpg" onerror="this.style.display='none'" alt="沖繩縣立博物館"><div class="credit">圖：Wikimedia Commons</div>
+<div class="detail">09:00–18:00，週一休⚠️。有中文簡介。</div>
+<div class="pick"><input type="checkbox" data-t="120" data-n="D3B 博物館・美術館" checked><span>加入我的初稿</span></div></div>
+<div class="stop"><div class="row1"><span class="time">11:30–13:00</span><span class="badge b-food">餐廳＋購物</span></div><h3>🛍 T廣場DFS＋午餐（通堂拉麵小祿店）</h3><div class="sub">免稅＋午餐¥1,000–1,500/人，護照＋船票享免稅</div><div class="dur">1小時30分</div>
+<div class="pick"><input type="checkbox" data-t="90" data-n="D3B DFS＋午餐" checked><span>加入我的初稿</span></div></div>
+<div class="stop"><div class="row1"><span class="time">13:30–15:30</span><span class="badge b-spot">景點（有頂棚）</span></div><h3>🐟 公設市場＋平和通拱廊</h3><div class="sub">市場室內＋商店街有屋頂</div><div class="dur">2小時</div>
+<img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/Naha_City_First_Makishi_Public_Market_new_building.JPG/960px-Naha_City_First_Makishi_Public_Market_new_building.JPG" onerror="this.style.display='none'" alt="公設市場"><div class="credit">圖：Wikimedia Commons</div>
+<div class="pick"><input type="checkbox" data-t="120" data-n="D3B 市場＋平和通" checked><span>加入我的初稿</span></div></div>
+<div class="stop"><div class="row1"><span class="time">15:30–17:00</span><span class="badge b-shop">購物（室內）</span></div><h3>🏬 りうぼう百貨＋唐吉訶德</h3><div class="sub">地下食品＋藥妝補齊，退稅預留30分結帳</div><div class="dur">1小時30分</div>
+<div class="pick"><input type="checkbox" data-t="90" data-n="D3B 百貨＋唐吉訶德" checked><span>加入我的初稿</span></div></div>
+<div class="stop trans"><div class="row1"><span class="time">17:00–17:30</span><span class="badge b-trans">交通</span></div><h3>🚕 返回那霸港（18:00前登船）</h3><div class="dur">30分</div></div>
+</div>
+</div>
+
+<!-- ================= DAY3 ISHIGAKI ================= -->
+<div class="abrow" id="ab3" style="display:none"><button class="ab on" onclick="swPlan(3,'A',this)">☀️ A・海灣經典</button><button class="ab" onclick="swPlan(3,'B',this)">☂️ B・雨天備案</button></div>
+<div class="plan" id="day3A">
+<div class="desc">石垣島09:00–19:00（<b>18:00前返船</b>）。景點分散，建議包車半日（約¥18,000–28,000/台）或船方團。A計畫：川平灣玻璃船＋最北展望台＋民俗村＋市區市場。</div>
+<div class="tl">
+<div class="stop"><div class="row1"><span class="time">09:00</span><span class="badge b-port">到港</span></div><h3>🛳 石垣港（離島碼頭旁）下船</h3><div class="sub">包車碼頭接人，目標10:00到川平</div>
+<div class="pick"><input type="checkbox" data-t="0" checked disabled><span>固定行程</span></div></div>
+<div class="stop"><div class="row1"><span class="time">10:00–11:30</span><span class="badge b-spot">景點</span><button class="ibtn" onclick="this.closest('.stop').classList.toggle('open')">i</button></div>
+<h3>🛥 川平湾グラスボート（玻璃船）</h3><div class="sub">日本百景＋米其林三星海灣，船票約¥1,000–1,500</div><div class="dur">1小時30分</div>
+<img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Kabira-Bay-Kabira-park-2019.jpg/960px-Kabira-Bay-Kabira-park-2019.jpg" onerror="this.style.display='none'" alt="川平湾"><div class="credit">圖：Wikimedia Commons</div>
+<div class="detail">海灣禁泳，玻璃船30分看珊瑚＋海龜（運氣）。展望台免費。停車場有ミルミル本舗霜淇淋。</div>
+<div class="pick"><input type="checkbox" data-t="90" data-n="D4 川平湾玻璃船" checked><span>加入我的初稿</span></div></div>
+<div class="stop"><div class="row1"><span class="time">11:45–12:15</span><span class="badge b-spot">景點</span></div><h3>🔭 玉取崎展望台（順路）</h3><div class="sub">太平洋＋東海雙海展望，停留20分</div><div class="dur">30分</div>
+<div class="detail">川平回程順路5分車程。無遮蔭，風大。</div>
+<div class="pick"><input type="checkbox" data-t="30" data-n="D4 玉取崎展望台" checked><span>加入我的初稿</span></div></div>
+<div class="stop"><div class="row1"><span class="time">12:30–13:45</span><span class="badge b-food">餐廳</span><button class="ibtn" onclick="this.closest('.stop').classList.toggle('open')">i</button></div>
+<h3>🍜 午餐：八重山そば（島そば一番地／來夏）＋石垣牛可樂餅</h3><div class="sub">細麵＋鰹豚湯，約¥900–1,500/人</div><div class="dur">1小時15分</div>
+<div class="detail">ひとし本店要預約且多為晚餐⚠️，午餐以そば＋市場小吃為主。石垣牛午間套餐¥2,500–4,000（金城／MARU系）。</div>
+<div class="pick"><input type="checkbox" data-t="75" data-n="D4 八重山そば午餐" checked><span>加入我的初稿</span></div></div>
+<div class="stop"><div class="row1"><span class="time">14:00–15:30</span><span class="badge b-spot">景點</span><button class="ibtn" onclick="this.closest('.stop').classList.toggle('open')">i</button></div>
+<h3>🐒 石垣やいま村（民俗村）</h3><div class="sub">紅瓦古民家＋松鼠猴＋海角展望，門票約¥1,000</div><div class="dur">1小時30分</div>
+<img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/5/56/%E7%9F%B3%E5%9E%A3%E3%82%84%E3%81%84%E3%81%BE%E6%9D%91_-_panoramio.jpg/960px-%E7%9F%B3%E5%9E%A3%E3%82%84%E3%81%84%E3%81%BE%E6%9D%91_-_panoramio.jpg" onerror="this.style.display='none'" alt="やいま村"><div class="credit">圖：Wikimedia Commons</div>
+<div class="detail">名蔵湾海景＋傳統舞踊（時刻限定⚠️）。長袖＋防蚊。</div>
+<div class="pick"><input type="checkbox" data-t="90" data-n="D4 やいま村" checked><span>加入我的初稿</span></div></div>
+<div class="stop"><div class="row1"><span class="time">15:45–17:15</span><span class="badge b-shop">購物</span></div><h3>🛍 ユーグレナモール＋石垣公設市場</h3><div class="sub">日本最南商店街：泡盛、黑糖、ミンサー織</div><div class="dur">1小時30分</div>
+<img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/9/91/Ishigaki_euglena_mall_2012.jpg/960px-Ishigaki_euglena_mall_2012.jpg" onerror="this.style.display='none'" alt="ユーグレナモール"><div class="credit">圖：Wikimedia Commons</div>
+<div class="detail">さよこ？不，是「ゲンキクール」必喝（¥200）。サーターアンダギー現炸店多。</div>
+<div class="pick"><input type="checkbox" data-t="90" data-n="D4 市場購物" checked><span>加入我的初稿</span></div></div>
+<div class="stop trans"><div class="row1"><span class="time">17:15–17:30</span><span class="badge b-trans">交通</span></div><h3>🚕 返回石垣港（18:00前登船）</h3><div class="sub">市區→碼頭約10分</div><div class="dur">15分</div></div>
+</div>
+<div class="note">💡 備選：唐人墓（清代歷史，順路20分）。包車攤提約¥4,000–6,000/人。</div>
+</div>
+
+<div class="plan" id="day3B">
+<div class="desc">雨天版：鍾乳洞（全室內）＋民俗村雨備＋市區市場，包車移動。</div>
+<div class="tl">
+<div class="stop"><div class="row1"><span class="time">10:00–11:30</span><span class="badge b-spot">景點（室內）</span><button class="ibtn" onclick="this.closest('.stop').classList.toggle('open')">i</button></div>
+<h3>🪨 石垣島鍾乳洞</h3><div class="sub">全長3.2km illuminated 洞窟，門票約¥1,200</div><div class="dur">1小時30分</div>
+<div class="detail">全程有頂＋燈光，雨天首選。洞內涼，帶薄外套。出口有水果土產店。</div>
+<div class="pick"><input type="checkbox" data-t="90" data-n="D4B 鍾乳洞" checked><span>加入我的初稿</span></div></div>
+<div class="stop"><div class="row1"><span class="time">12:00–13:15</span><span class="badge b-food">餐廳</span></div><h3>🍜 午餐：八重山そば＋石垣牛小吃（市區）</h3><div class="sub">約¥1,000–2,000/人</div><div class="dur">1小時15分</div>
+<div class="pick"><input type="checkbox" data-t="75" data-n="D4B 午餐" checked><span>加入我的初稿</span></div></div>
+<div class="stop"><div class="row1"><span class="time">13:30–15:00</span><span class="badge b-spot">景點</span></div><h3>🐒 石垣やいま村（雨備：古民家室內＋展望台快閃）</h3><div class="sub">門票約¥1,000，重點看室內展示＋猴園雨棚</div><div class="dur">1小時30分</div>
+<img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/5/56/%E7%9F%B3%E5%9E%A3%E3%82%84%E3%81%84%E3%81%BE%E6%9D%91_-_panoramio.jpg/960px-%E7%9F%B3%E5%9E%A3%E3%82%84%E3%81%84%E3%81%BE%E6%9D%91_-_panoramio.jpg" onerror="this.style.display='none'" alt="やいま村"><div class="credit">圖：Wikimedia Commons</div>
+<div class="pick"><input type="checkbox" data-t="90" data-n="D4B やいま村" checked><span>加入我的初稿</span></div></div>
+<div class="stop"><div class="row1"><span class="time">15:15–17:15</span><span class="badge b-shop">購物（有頂）</span></div><h3>🛍 ユーグレナモール＋公設市場（有拱廊段）</h3><div class="sub">伴手禮＋ゲンキクール＋現炸サーターアンダギー</div><div class="dur">2小時</div>
+<img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/9/91/Ishigaki_euglena_mall_2012.jpg/960px-Ishigaki_euglena_mall_2012.jpg" onerror="this.style.display='none'" alt="市場"><div class="credit">圖：Wikimedia Commons</div>
+<div class="pick"><input type="checkbox" data-t="120" data-n="D4B 市場購物" checked><span>加入我的初稿</span></div></div>
+<div class="stop trans"><div class="row1"><span class="time">17:15–17:30</span><span class="badge b-trans">交通</span></div><h3>🚕 返回石垣港（18:00前登船）</h3><div class="dur">15分</div></div>
+</div>
+</div>
+
+<!-- ================= DAY4 KEELUNG BACK ================= -->
+<div class="abrow" id="ab4"></div>
+<div class="plan" id="day4">
+<div class="desc">返抵日：07:00到基隆，下船＋提領行李約1–1.5小時。廟口早餐後解散，或加碼和平島半日遊。</div>
+<div class="tl">
+<div class="stop"><div class="row1"><span class="time">07:00–08:30</span><span class="badge b-port">到港</span></div><h3>🛳 基隆港下船＋行李</h3><div class="sub">分批下船，拿行李＋過證照</div>
+<div class="pick"><input type="checkbox" data-t="0" checked disabled><span>固定行程</span></div></div>
+<div class="stop"><div class="row1"><span class="time">09:00–10:00</span><span class="badge b-food">餐廳</span></div><h3>🍜 廟口早餐（周家豆漿／廟口小吃）</h3><div class="sub">返台第一餐，約NT$100–200/人</div><div class="dur">1小時</div>
+<img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2b/2026.03.27_Keelung_Miaokou_Night_Market.jpg/960px-2026.03.27_Keelung_Miaokou_Night_Market.jpg" onerror="this.style.display='none'" alt="廟口"><div class="credit">圖：Wikimedia Commons</div>
+<div class="pick"><input type="checkbox" data-t="60" data-n="D5 廟口早餐" checked><span>加入我的初稿</span></div></div>
+<div class="stop"><div class="row1"><span class="time">10:30–12:30</span><span class="badge b-spot">景點（備選）</span><button class="ibtn" onclick="this.closest('.stop').classList.toggle('open')">i</button></div>
+<h3>🪨 和平島地質公園（備選）</h3><div class="sub">豆腐岩＋海蝕＋親親水池，門票NT$120</div><div class="dur">2小時</div>
+<img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/7/73/2022_Hoping_Island_Keelung_TAIWAN_ii.jpg/960px-2022_Hoping_Island_Keelung_TAIWAN_ii.jpg" onerror="this.style.display='none'" alt="和平島"><div class="credit">圖：Wikimedia Commons</div>
+<div class="detail">不趕高鐵者適用。公車＋步行可達，園內約1.5小時。</div>
+<div class="pick"><input type="checkbox" data-t="120" data-n="D5 和平島（備選）"><span>加入我的初稿</span></div></div>
+</div>
+</div>
+
+<div class="sheet" id="sheet"><h3>📋 我的初稿（當前頁面已勾選）</h3><ul id="mylist"></ul><p id="mytotal" style="font-weight:800;margin-top:8px"></p></div>
+<div class="summary"><div class="grow" id="sumtxt">已選 0 項・合計 0 分</div><button id="btnCopy" onclick="copyPlan()">複製初稿</button><button id="btnPrint" onclick="showSheet()">檢視</button></div>
+<script>
+var curDay=2,curPlan={1:'A',2:'A',3:'A'};
+function visPlan(){var p='day'+curDay;if(curDay===1||curDay===2||curDay===3)p+=curPlan[curDay];return p;}
+function swDay(d,el){curDay=d;document.querySelectorAll('.day').forEach(t=>t.classList.remove('on'));el.classList.add('on');refresh();}
+function swPlan(d,p,el){curPlan[d]=p;var row=document.getElementById('ab'+d);row.querySelectorAll('.ab').forEach(t=>t.classList.remove('on'));el.classList.add('on');refresh();}
+function refresh(){document.querySelectorAll('.plan').forEach(s=>s.classList.remove('on'));document.getElementById(visPlan()).classList.add('on');document.querySelectorAll('.abrow').forEach(r=>{r.classList.remove('on');r.style.display='none';});var ab=document.getElementById('ab'+curDay);if(ab&&ab.children.length){ab.classList.add('on');ab.style.display='flex';}upd();}
+function fmt(m){return Math.floor(m/60)>0?Math.floor(m/60)+'小時'+(m%60?m%60+'分':''):m+'分';}
+function upd(){var n=0,t=0;document.querySelectorAll('#'+visPlan()+' input[type=checkbox]:checked').forEach(c=>{if(c.dataset.n){n++;t+=+c.dataset.t;}});document.getElementById('sumtxt').textContent='已選 '+n+' 項・合計約 '+fmt(t)+'（不含交通緩衝）';}
+document.querySelectorAll('input[type=checkbox]').forEach(c=>c.addEventListener('change',upd));
+function cur(){var a=[];document.querySelectorAll('#'+visPlan()+' input[type=checkbox]:checked').forEach(c=>{if(c.dataset.n)a.push('・'+c.dataset.n+'（約'+fmt(+c.dataset.t)+'）');});return a;}
+function showSheet(){var a=cur();document.getElementById('mylist').innerHTML=a.length?a.map(x=>'<li>'+x+'</li>').join(''):'<li>尚未勾選</li>';var t=0;document.querySelectorAll('#'+visPlan()+' input[type=checkbox]:checked').forEach(c=>{t+=+(c.dataset.t||0);});document.getElementById('mytotal').textContent='合計體驗時間約 '+fmt(t)+'（＋交通緩衝）';document.getElementById('sheet').classList.add('on');document.getElementById('sheet').scrollIntoView({behavior:'smooth'});}
+function copyPlan(){var names=['12/16基隆登船','12/17宮古島','12/18那霸','12/19石垣島','12/20基隆返抵'];var txt='【郵輪初稿｜'+names[curDay]+'】\n'+cur().join('\n');navigator.clipboard.writeText(txt).then(()=>alert('已複製，可貼到記事本/LINE'));}
+refresh();
+</script>
+</body>
+</html>
