@@ -441,7 +441,13 @@ var SECTS=[['s-naha','那霸'],['s-miyako','宮古島'],['s-ishigaki','石垣島
 var GROUPS=['那霸餐廳','那霸景點','那霸購物','那霸神社','宮古島','石垣島'];
 function kindOf(sectId,h2txt){if(sectId!=='s-naha')return SECTS.filter(function(s){return s[0]===sectId;})[0][1];if(h2txt.indexOf('百貨')>=0||h2txt.indexOf('商店街')>=0||h2txt.indexOf('購物')>=0)return '那霸購物';if(h2txt.indexOf('景點')>=0)return '那霸景點';if(h2txt.indexOf('神社')>=0)return '那霸神社';return '那霸餐廳';}
 var VKEY='discuss_votes_v1',NKEY='discuss_name_v1';
-function loadV(){try{return JSON.parse(localStorage.getItem(VKEY)||'{}');}catch(e){return {};}}
+function loadV(){var v={};try{v=JSON.parse(localStorage.getItem(VKEY)||'{}');}catch(e){v={};}
+var moved=false;function mv(o,n){if(v[o]){var cur=v[n]||[];v[o].forEach(function(name){if(cur.indexOf(name)<0)cur.push(name);});if(cur.length)v[n]=cur;delete v[o];moved=true;}}
+var i;for(i=0;i<11;i++)mv('s-food#'+i,'s-naha#'+i);
+for(i=0;i<6;i++)mv('s-spot#'+i,'s-naha#'+(11+i));mv('s-spot#6','s-naha#19');
+for(i=0;i<7;i++)mv('s-shop#'+i,'s-naha#'+(20+i));
+for(i=0;i<5;i++)mv('s-shrine#'+i,'s-naha#'+(27+i));
+if(moved)saveV(v);return v;}
 function saveV(v){try{localStorage.setItem(VKEY,JSON.stringify(v));}catch(e){}}
 function me(){return localStorage.getItem(NKEY)||'';}
 function enter(){var n=document.getElementById('nameInput').value.trim();if(!n){alert('請先寫名字');return;}localStorage.setItem(NKEY,n);document.getElementById('gate').classList.add('hide');paintWho();refreshVotes();}
