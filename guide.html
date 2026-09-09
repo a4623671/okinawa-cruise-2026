@@ -79,6 +79,9 @@ tr.sdet td{background:#faf7ef}
 .sortrow button.on{background:#7a1f2b;color:#fff;border-color:#7a1f2b;font-weight:700}
 .ranktbl{width:100%;border-collapse:collapse}
 .gcap{text-align:center;font-size:13px;font-weight:800;margin:4px 0 0}
+.wtag{display:inline-block;font-size:11px;background:#e8f4ee;color:#0e6e5a;border-radius:10px;padding:0 8px;margin-left:6px;white-space:nowrap}
+#donkizone{border:2px solid #b3541e}
+#donkizone h3{color:#b3541e}
 .ranktbl td{border-bottom:1px solid #eee;padding:8px 4px;vertical-align:top;font-size:13px}
 .srank{font-weight:800;white-space:nowrap;text-align:center}
 .sth{width:48px;height:48px;border-radius:8px;object-fit:cover;cursor:zoom-in;flex:none}
@@ -821,9 +824,25 @@ var SOUV_EXTRA={
 {id:'x-naha-f01',t:'雪塩小包',x:'海水製粉末鹽，煮飯撒一點升級。',p:'約¥500–800｜市場/平和通',hot:4,tw:4},
 {id:'x-naha-f02',t:'黑糖',x:'多良間黑糖，直接吃配茶。',p:'約¥400–800｜市場/超市',hot:3,tw:3},
 {id:'x-naha-f03',t:'海葡萄乾貨',x:'輕便好帶，泡水還原。',p:'約¥600–1,000｜市場/平和通',hot:3,tw:3},
-{id:'x-naha-f04',t:'ちんすこうショコラ',x:'巧克力版金楚糕，小孩最愛。',p:'約¥700–1,100｜平和通/唐吉',hot:3,tw:3}],
+{id:'x-naha-f04',t:'ちんすこうショコラ',x:'巧克力版金楚糕，小孩最愛。',p:'約¥700–1,100｜平和通/唐吉',hot:3,tw:3},
+{id:'tw-ebisen',t:'南風堂蝦餅',x:'蝦味濃薄片微辣，獨立包裝秒殺。',p:'14入約¥756｜唐吉訶德',hot:5,tw:5},
+{id:'tw-wakame',t:'沖泡海帶芽',x:'四種海藻熱水沖就好，膨脹率高別倒多。',p:'約¥896｜唐吉訶德',hot:5,tw:5},
+{id:'tw-cotton',t:'雪塩棉花餅',x:'黑糖紅芋椰子味，空氣感。',p:'約¥300｜國際通塩屋',hot:4,tw:4},
+{id:'tw-shiochoco',t:'鹽味白巧克力',x:'鹹甜＋玉米片脆口超創新。',p:'約¥950｜國際通',hot:4,tw:4},
+{id:'tw-calbee',t:'Calbee薯塊',x:'紅芋/海苔鹽/黑糖三色，現炸紅芋薯條更讚。',p:'約¥924｜唐吉訶德/Calbee+店',hot:4,tw:4},
+{id:'tw-shikuwasa-chip',t:'香檬洋芋片',x:'酸爽輕盈夏天吃涮嘴。',p:'約¥160｜唐吉訶德',hot:4,tw:4},
+{id:'tw-okinawa-ramen',t:'沖繩泡麵',x:'寬扁麵＋甜湯，袋裝可帶回台灣⚠️。',p:'袋裝約¥568｜唐吉訶德',hot:4,tw:4},
+{id:'tw-kabaya',t:'Kabaya餅乾棒',x:'旨鹽黑糖紅芋，¥100分送用。',p:'約¥100｜唐吉訶德',hot:3,tw:4},
+{id:'tw-kitkat',t:'KitKat紅芋',x:'濃厚紫芋威化下午茶。',p:'價格未詳⚠️｜唐吉訶德',hot:4,tw:4},
+{id:'tw-orion-mame',t:'Orion花生豆',x:'杏仁起司/塔可/咖哩三味涮嘴。',p:'價格未詳⚠️｜唐吉訶德',hot:3,tw:4},
+{id:'tw-tomato',t:'梅鹽番茄乾',x:'酸鹹上癮，梅鹽推、海鹽偏鹹⚠️。',p:'超市/唐吉訶德',hot:3,tw:4},
+{id:'tw-35coffee',t:'35咖啡',x:'石化珊瑚烘焙世界唯一。',p:'粉140g約¥1,200｜國際通35咖啡',hot:3,tw:3},
+{id:'tw-hibiscus',t:'扶桑花茶包',x:'酸甜像洛神。',p:'10入約¥1,080｜國際通',hot:3,tw:3},
+{id:'tw-baum',t:'福木屋年輪蛋糕',x:'黑糖最熱銷，偏甜⚠️。',p:'小約¥1,430｜國際通/機場',hot:4,tw:4},
+{id:'tw-awamori-oil',t:'泡盛辣椒油',x:'拌麵沾壽司，怕酒者可略。',p:'約¥918起｜唐吉訶德',hot:4,tw:4}],
 goods:[
 {id:'x-naha-g01',t:'紅型小物',x:'型染手巾杯墊，沖繩味十足。',p:'約¥800–2,000｜浮島通/市場',hot:3,tw:3},
+{id:'tw-tee',t:'沖繩T恤',x:'Orion/Blue Seal/HabuBox，情侶親子裝，¥5000台幣內搞定。',p:'約¥1,000–3,000｜國際通',hot:4,tw:4},
 {id:'x-naha-g02',t:'琉球玻璃',x:'手工吹製杯盤，輕選小件。',p:'約¥1,000–3,000｜浮島通/百貨',hot:3,tw:3},
 {id:'x-naha-g03',t:'壺屋やちむん',x:'陶杯陶盤，登窯老街現挑。',p:'約¥1,500–｜壺屋通',hot:3,tw:3}]},
 's-miyako':{food:[
@@ -840,7 +859,8 @@ goods:[
 {id:'x-ishigaki-f02',t:'ちんすこう',x:'石垣也有好吃金楚糕。',p:'約¥600–1,000｜市場',hot:3,tw:3},
 {id:'x-ishigaki-f04',t:'ゲンキ土產',x:'乳酸飲粉末版若有必拿。',p:'約¥500–｜市場',hot:3,tw:3},
 {id:'x-ishigaki-f05',t:'サーター包裝版',x:'常溫帶回辦公室。',p:'約¥600–1,000｜市場',hot:3,tw:3},
-{id:'x-ishigaki-f06',t:'石垣牛咖哩包',x:'和牛咖哩調理包。',p:'約¥800–1,200｜市場/ドンキ',hot:3,tw:3}],
+{id:'x-ishigaki-f06',t:'石垣牛咖哩包',x:'和牛咖哩調理包。',p:'約¥800–1,200｜市場/ドンキ',hot:3,tw:3},
+{id:'tw-royce',t:'Royce鹽巧洋芋片',x:'石垣島鹽＋巧克力鹹甜，25度以下保存⚠️機場最後買。',p:'約¥864｜機場/國際通',hot:5,tw:4}],
 goods:[
 {id:'x-ishigaki-g01',t:'星砂瓶',x:'星形砂裝瓶，可愛。',p:'約¥500–1,000｜市場',hot:4,tw:3},
 {id:'x-ishigaki-g02',t:'貝細工',x:'小店尋寶一期一會。',p:'約¥800–｜市場周邊小店',hot:3,tw:2},
@@ -850,7 +870,7 @@ SOUV_EXTRA['s-naha'].sauce=[
 {id:'x-sauce-02',t:'コーレーグース',x:'泡盛辣椒水，沖繩麵必加。',p:'約¥400–700｜市場/超市',hot:4,tw:4},
 {id:'x-sauce-03',t:'宮古みそ',x:'甘口島味噌，煮湯醃肉。',p:'約¥600–1,000｜島の駅',hot:3,tw:3},
 {id:'x-ishigaki-f03',t:'石垣の塩',x:'甘味海鹽，配生魚片。',p:'約¥500–900｜市場',hot:4,tw:3}];
-var SOUV_ROWIMG={'s-naha#31':'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5b/Dioscorea_alata_Kavathu_1.jpg/960px-Dioscorea_alata_Kavathu_1.jpg','x-naha-f03':'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/LATO_SEAWEEDS.jpg/960px-LATO_SEAWEEDS.jpg','x-sauce-03':'https://commons.wikimedia.org/wiki/Special:FilePath/Miso_002.jpg?width=960','x-ishigaki-f06':'https://commons.wikimedia.org/wiki/Special:FilePath/Beef_curry_rice_003.jpg?width=960','s-miyako#18':'https://commons.wikimedia.org/wiki/Special:FilePath/Mango_pudding.JPG?width=960','x-naha-g01':'https://commons.wikimedia.org/wiki/Special:FilePath/Bingata.jpg?width=960','x-naha-g02':'https://commons.wikimedia.org/wiki/Special:FilePath/Ryukyu%20Glass%202.jpg?width=960','x-naha-f01':'images/x-naha-f01.jpg','x-naha-f02':'images/x-naha-f02.jpg','x-naha-f04':'images/x-naha-f04.jpg','x-miyako-f01':'images/x-miyako-f01.jpg','x-miyako-f03':'images/x-miyako-f03.jpg','x-miyako-f04':'images/x-miyako-f04.jpg','x-miyako-f05':'images/x-miyako-f05.jpg','x-miyako-g01':'images/x-miyako-g01.jpg','x-ishigaki-f01':'images/x-ishigaki-f01.jpg','x-ishigaki-f02':'images/x-ishigaki-f02.jpg','x-ishigaki-f03':'images/x-ishigaki-f03.jpg','x-ishigaki-f04':'images/x-ishigaki-f04.jpg','x-ishigaki-f05':'images/x-ishigaki-f05.jpg','x-ishigaki-g01':'images/x-ishigaki-g01.jpg','x-ishigaki-g03':'images/x-ishigaki-g03.jpg','x-sauce-01':'images/x-sauce-01.jpg','x-sauce-02':'images/x-sauce-02.jpg','x-ishigaki-g02':'images/x-ishigaki-g02.jpg'};
+var SOUV_ROWIMG={'s-naha#31':'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5b/Dioscorea_alata_Kavathu_1.jpg/960px-Dioscorea_alata_Kavathu_1.jpg','x-naha-f03':'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/LATO_SEAWEEDS.jpg/960px-LATO_SEAWEEDS.jpg','x-sauce-03':'https://commons.wikimedia.org/wiki/Special:FilePath/Miso_002.jpg?width=960','x-ishigaki-f06':'https://commons.wikimedia.org/wiki/Special:FilePath/Beef_curry_rice_003.jpg?width=960','s-miyako#18':'https://commons.wikimedia.org/wiki/Special:FilePath/Mango_pudding.JPG?width=960','x-naha-g01':'https://commons.wikimedia.org/wiki/Special:FilePath/Bingata.jpg?width=960','x-naha-g02':'https://commons.wikimedia.org/wiki/Special:FilePath/Ryukyu%20Glass%202.jpg?width=960','x-naha-f01':'images/x-naha-f01.jpg','x-naha-f02':'images/x-naha-f02.jpg','x-naha-f04':'images/x-naha-f04.jpg','x-miyako-f01':'images/x-miyako-f01.jpg','x-miyako-f03':'images/x-miyako-f03.jpg','x-miyako-f04':'images/x-miyako-f04.jpg','x-miyako-f05':'images/x-miyako-f05.jpg','x-miyako-g01':'images/x-miyako-g01.jpg','x-ishigaki-f01':'images/x-ishigaki-f01.jpg','x-ishigaki-f02':'images/x-ishigaki-f02.jpg','x-ishigaki-f03':'images/x-ishigaki-f03.jpg','x-ishigaki-f04':'images/x-ishigaki-f04.jpg','x-ishigaki-f05':'images/x-ishigaki-f05.jpg','x-ishigaki-g01':'images/x-ishigaki-g01.jpg','x-ishigaki-g03':'images/x-ishigaki-g03.jpg','x-sauce-01':'images/x-sauce-01.jpg','x-sauce-02':'images/x-sauce-02.jpg','tw-ebisen':'images/tw-ebisen.jpg','tw-wakame':'images/tw-wakame.jpg','tw-shiochoco':'images/tw-shiochoco.jpg','tw-calbee':'images/tw-calbee.jpg','tw-shikuwasa-chip':'images/tw-shikuwasa-chip.jpg','tw-okinawa-ramen':'images/tw-okinawa-ramen.jpg','tw-kitkat':'images/tw-kitkat.jpg','tw-orion-mame':'images/tw-orion-mame.jpg','tw-tomato':'images/tw-tomato.jpg','tw-35coffee':'images/tw-35coffee.jpg','tw-hibiscus':'images/tw-hibiscus.jpg','tw-tee':'images/tw-tee.jpg'};
 var SOUV_SORT={};
 function souvCardEl(place,idx){var cards=document.querySelectorAll('#'+place+' .card');return cards[idx];}
 function souvRowObj(place,id){
@@ -890,16 +910,20 @@ function renderRanks(){
   paintRanks();
 }
 function bindRankGal(gw){var g=gw.querySelector('.gal');if(!g)return;var trk=g.querySelector('.trk'),n=trk.children.length,idx=0,cap=gw.querySelector('.gcap');function dr(){var s='';for(var k=0;k<n;k++)s+=(k===idx?'●':'○');var d=g.querySelector('.gdot');if(d)d.textContent=s;if(cap&&n)cap.textContent=(idx+1)+'/'+n+' '+trk.children[idx].getAttribute('data-t');}function go(i){if(!n)return;idx=(i+n)%n;trk.style.transform='translateX(-'+(idx*100)+'%)';dr();}g.querySelector('.gl').onclick=function(e){e.stopPropagation();go(idx-1);};g.querySelector('.gr').onclick=function(e){e.stopPropagation();go(idx+1);};var tx=0;trk.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;},{passive:true});trk.addEventListener('touchend',function(e){var dx=e.changedTouches[0].clientX-tx;if(dx>40)go(idx-1);else if(dx<-40)go(idx+1);});dr();}
+var SOUV_WMAP={'s-naha#31':'國際通','s-naha#32':'唐吉訶德','s-naha#33':'機場','s-naha#34':'平和通','s-naha#35':'唐吉訶德','s-naha#36':'市場','s-naha#37':'市場','s-miyako#15':'雪塩館','s-miyako#16':'唐吉訶德','s-miyako#17':'島の駅','s-miyako#18':'島の駅','s-miyako#19':'島の駅','s-ishigaki#15':'市場','s-ishigaki#16':'市場','s-ishigaki#17':'市場','s-ishigaki#18':'唐吉訶德','s-ishigaki#19':'市場','x-ishigaki-f03':'市場','tw-ebisen':'唐吉訶德','tw-wakame':'唐吉訶德','tw-cotton':'國際通','tw-shiochoco':'國際通','tw-calbee':'唐吉訶德','tw-shikuwasa-chip':'唐吉訶德','tw-okinawa-ramen':'唐吉訶德','tw-kabaya':'唐吉訶德','tw-kitkat':'唐吉訶德','tw-orion-mame':'唐吉訶德','tw-tomato':'超市','tw-35coffee':'國際通','tw-hibiscus':'國際通','tw-baum':'國際通','tw-awamori-oil':'唐吉訶德','tw-tee':'國際通','tw-royce':'機場'};
+function renderDonki(){if(document.getElementById('donkizone'))return;var host=document.querySelector('#s-naha');if(!host)return;var d=document.createElement('div');d.className='rankcard';d.id='donkizone';d.innerHTML='<h3 style="font-size:16px">🛒 唐吉訶德特區（24h・退稅・優惠券先存）</h3><p style="font-size:13px">國際通店24小時＋中文店員＋退稅。優惠券<a href="https://japanportal.donki-global.com/coupon/?ptcd=0046000103" target="_blank">按此開券</a>：免稅10%外滿1萬再折5%、滿3萬再折7%。結帳排隊30分是常態，退稅預留時間。下面是本站有賣的唐吉訶德品項，點名跳過去投票。</p><div id="donkilist"></div>';host.appendChild(d);paintDonkiList();}
+function paintDonkiList(){var box=document.getElementById('donkilist');if(!box)return;var t=titles(),v=loadV(),h='';Object.keys(SOUV_WMAP).forEach(function(id){if(SOUV_WMAP[id].indexOf('唐吉訶德')<0||!t[id])return;var vc=(v[id]||[]).length;h+='<div style="font-size:13px;padding:5px 0;border-bottom:1px dotted #e3ddd0"><a class="slink" onclick="jumpToRow(\''+id+'\')">'+t[id].t+'</a> <span style="color:#888">（'+t[id].g+'・'+vc+'票）</span></div>';});box.innerHTML=h||'<p style="font-size:13px;color:#888">尚無資料</p>';}
+function jumpToRow(id){var r=document.querySelector('tr.srow[data-id="'+id+'"]');if(!r)return;var pl=r.getAttribute('data-pl'),kd=r.getAttribute('data-kind')||'food';curP=pl;curC=kd;document.querySelectorAll('.cat.place').forEach(function(b){var o=b.getAttribute('onclick')||'';b.classList.toggle('on',o.indexOf("'"+pl.replace('s-','')+"'")>=0);});document.querySelectorAll('.cat.cat2').forEach(function(b){var o=b.getAttribute('onclick')||'';b.classList.toggle('on',o.indexOf("'"+kd+"'")>=0);});applyFilter();paintDonkiList();r.scrollIntoView({behavior:'smooth',block:'center'});r.style.outline='3px solid #ffcf4d';setTimeout(function(){r.style.outline='';},2500);}
 function paintRank(place,kind){
   var sel='.rankcard[data-place="'+place+'"][data-kind="'+kind+'"] tbody';var tb=document.querySelector(sel);if(!tb)return;
   var k=SOUV_SORT[place+kind]||'hot',v=loadV();
   var items=souvItems(place,kind);
   items.forEach(function(o){o._s=(k==='tw'?o.tw*100:k==='vote'?((v[o.id]||[]).length*100):o.hot*100)+o.hot;});
   items.sort(function(a,b){return b._s-a._s;});
-  tb.innerHTML=items.map(function(o,i){var vc=(v[o.id]||[]).length,cc=(CMT[o.id]||[]).length;o.img=SOUV_ROWIMG[o.id]||o.img;
-    return '<tr class="srow" data-id="'+o.id+'" data-g="'+(SOUV_GOV[o.id]||placeName(place)+'伴手禮')+'" data-t="'+o.t.replace(/"/g,'')+'">'
+  tb.innerHTML=items.map(function(o,i){var vc=(v[o.id]||[]).length,cc=(CMT[o.id]||[]).length;o.img=SOUV_ROWIMG[o.id]||o.img;o.w=SOUV_WMAP[o.id]||'';
+    return '<tr class="srow" data-id="'+o.id+'" data-g="'+(SOUV_GOV[o.id]||placeName(place)+'伴手禮')+'" data-t="'+o.t.replace(/"/g,'')+'" data-pl="'+place+'" data-kind="'+kind+'">'
     +'<td class="r srank">'+(i+1)+'</td>'
-    +'<td><div style="display:flex;gap:8px;align-items:flex-start">'+(o.img?'<img class="sth" loading="lazy" src="'+o.img+'" onerror="this.style.display=\'none\'" alt="">':'<span class="sth sthold">📷待補</span>')+'<div><div class="sname">'+o.t+'</div><div class="sintro">'+o.x+'<br>'+o.p+'</div></div></div></td>'
+    +'<td><div style="display:flex;gap:8px;align-items:flex-start">'+(o.img?'<img class="sth" loading="lazy" src="'+o.img+'" onerror="this.style.display=\'none\'" alt="">':'<span class="sth sthold">📷待補</span>')+'<div><div class="sname">'+o.t+(o.w?' <span class="wtag">'+o.w+'</span>':'')+'</div><div class="sintro">'+o.x+'<br>'+o.p+'</div></div></div></td>'
     +'<td class="n sscore">'+souvScoreTxt(o,k)+'</td>'
     +'<td class="r"><button class="svote'+(vc&&v[o.id].indexOf(me())>=0?' voted':'')+'">👍</button><div class="scnt2">'+vc+'</div><button class="scmt">💬'+(cc?' '+cc:'')+'</button></td></tr>'
     +'<tr class="sdet" data-id="'+o.id+'" style="display:none"><td colspan="5"></td></tr>';}).join('');
@@ -914,10 +938,10 @@ function paintRanks(){PLACES.forEach(function(s){paintRank(s[0],'food');paintRan
 function refreshRanks(){var v=loadV(),n=me();document.querySelectorAll('tr.srow').forEach(function(r){var id=r.getAttribute('data-id'),arr=v[id]||[];var b=r.querySelector('.svote'),c=r.querySelector('.scnt2'),m=r.querySelector('.scmt');if(b){b.textContent='👍';b.classList.toggle('voted',arr.indexOf(n)>=0);}if(c)c.textContent=arr.length;if(m){var cc=(CMT[id]||[]).length;m.textContent='💬'+(cc?' '+cc:'');}var rk=r.closest('.rankcard');if(rk){var k=SOUV_SORT[rk.getAttribute('data-place')+rk.getAttribute('data-kind')]||'hot';var sc=r.querySelector('.sscore');if(sc){if(k==='vote')sc.textContent=arr.length+'票';}}});}
 function toggle(id){var n=me();if(!n){document.getElementById('gate').classList.remove('hide');return;}if(GH_BUSY)return;GH_BUSY=true;
 ghGet().then(function(remote){var arr=remote[id]||[];var want=arr.indexOf(n)<0;function attempt(t){if(want){if(arr.indexOf(n)<0)arr.push(n);}else{var ix=arr.indexOf(n);if(ix>=0)arr.splice(ix,1);}if(!arr.length)delete remote[id];else remote[id]=arr;return ghPut(remote,GH_SHA).catch(function(e){if(t<=0)throw e;return ghGet().then(function(r2){remote=r2;arr=remote[id]||[];return attempt(t-1);});});}return attempt(2);}).then(function(v){saveV(v);setMode('online');refreshVotes();GH_BUSY=false;}).catch(function(e){GH_BUSY=false;setMode('offline');try{localStorage.setItem(GH_DIRTY,'1');}catch(x){}var v=loadV();var arr=v[id]||[];var ix=arr.indexOf(n);if(ix>=0)arr.splice(ix,1);else arr.push(n);if(!arr.length)delete v[id];else v[id]=arr;saveV(v);refreshVotes();alert('連線失敗，已暫存本機，連網後自動上傳');});}
-function refreshVotes(){var v=loadV(),n=me(),t=titles();PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){var d=c.querySelector('.vote');if(!d)return;var id=s[0]+'#'+i,arr=v[id]||[],btn=d.querySelector('button'),cnt=d.querySelector('.cnt');btn.textContent=arr.indexOf(n)>=0?'✅ 已投':'👍 投票';btn.classList.toggle('voted',arr.indexOf(n)>=0);cnt.textContent=arr.length+'票'+(arr.length?'（'+arr.join('、')+'）':'');});});paintComments();refreshRanks();if(document.getElementById('stats').classList.contains('on'))renderStats();}
+function refreshVotes(){var v=loadV(),n=me(),t=titles();PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){var d=c.querySelector('.vote');if(!d)return;var id=s[0]+'#'+i,arr=v[id]||[],btn=d.querySelector('button'),cnt=d.querySelector('.cnt');btn.textContent=arr.indexOf(n)>=0?'✅ 已投':'👍 投票';btn.classList.toggle('voted',arr.indexOf(n)>=0);cnt.textContent=arr.length+'票'+(arr.length?'（'+arr.join('、')+'）':'');});});paintComments();refreshRanks();paintDonkiList();if(document.getElementById('stats').classList.contains('on'))renderStats();}
 function swPlace(id,el){curP='s-'+id;document.querySelectorAll('.cat.place').forEach(c=>c.classList.remove('on'));el.classList.add('on');applyFilter();var w=document.querySelector('.wrap');if(w)window.scrollTo({top:0,behavior:'smooth'});}
 function swCat(c,el){curC=c;document.querySelectorAll('.cat.cat2').forEach(x=>x.classList.remove('on'));el.classList.add('on');applyFilter();}
-function applyFilter(){PLACES.forEach(function(s){var show=s[0]===curP;document.getElementById(s[0]).classList.toggle('on',show);if(!show)return;var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(card,i){if(card.classList.contains('retired'))return;card.style.display=cardCat(s[0],i)===curC?'':'none';});var rks=document.querySelectorAll('#'+s[0]+' .rankcard');rks.forEach(function(r){r.style.display=(show&&curC==='souv')?'':'none';});var h2s=document.querySelectorAll('#'+s[0]+' h2.st');h2s.forEach(function(h){var dc=h.getAttribute('data-c');h.style.display=(!dc||dc===curC)?'':'none';});});}
+function applyFilter(){PLACES.forEach(function(s){var show=s[0]===curP;document.getElementById(s[0]).classList.toggle('on',show);if(!show)return;var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(card,i){if(card.classList.contains('retired'))return;card.style.display=cardCat(s[0],i)===curC?'':'none';});var rks=document.querySelectorAll('#'+s[0]+' .rankcard');rks.forEach(function(r){r.style.display=(show&&(curC==='souv'||r.id==='donkizone'))?'':'none';});var h2s=document.querySelectorAll('#'+s[0]+' h2.st');h2s.forEach(function(h){var dc=h.getAttribute('data-c');h.style.display=(!dc||dc===curC)?'':'none';});});}
 function openStats(){renderStats();document.getElementById('stats').classList.add('on');}
 function closeStats(){document.getElementById('stats').classList.remove('on');}
 var CATICON={food:'🍜',spot:'📷',shop:'🛍',souv:'🎁',feat:'✨'},PEMOJI={'那霸':'🌺','宮古島':'🏝','石垣島':'🪨'};
@@ -957,7 +981,7 @@ ov.querySelector('.gn').onclick=function(e){e.stopPropagation();show(idx+1);};
 ov.onclick=function(e){if(e.target===ov)ov.classList.remove('on');};
 var tx=0;ov.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;},{passive:true});
 ov.addEventListener('touchend',function(e){var dx=e.changedTouches[0].clientX-tx;if(dx>50)show(idx-1);else if(dx<-50)show(idx+1);});}
-renderRanks();applyFilter();initGal();initSwipe();paintTW();renderNameBtns();if(me())document.getElementById('gate').classList.add('hide');refreshVotes();syncFromRemote();setInterval(function(){syncFromRemote(true);},15000);
+renderRanks();renderDonki();applyFilter();initGal();initSwipe();paintTW();renderNameBtns();if(me())document.getElementById('gate').classList.add('hide');refreshVotes();syncFromRemote();setInterval(function(){syncFromRemote(true);},15000);
 </script>
 </body>
 </html>
