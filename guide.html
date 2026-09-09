@@ -80,7 +80,8 @@ tr.sdet td{background:#faf7ef}
 .ranktbl{width:100%;border-collapse:collapse}
 .ranktbl td{border-bottom:1px solid #eee;padding:8px 4px;vertical-align:top;font-size:13px}
 .srank{font-weight:800;white-space:nowrap;text-align:center}
-.sth{width:48px;height:48px;border-radius:8px;object-fit:cover;cursor:zoom-in}
+.sth{width:48px;height:48px;border-radius:8px;object-fit:cover;cursor:zoom-in;flex:none}
+.sth.sthold{display:inline-flex;align-items:center;justify-content:center;background:#f0e9d6;font-size:11px;color:#999;cursor:default}
 .sname{font-weight:800;font-size:14px}
 .sintro{color:#555;font-size:12px;margin-top:2px}
 .sscore{font-weight:800;white-space:nowrap;text-align:center}
@@ -848,7 +849,7 @@ SOUV_EXTRA['s-naha'].sauce=[
 {id:'x-sauce-02',t:'コーレーグース',x:'泡盛辣椒水，沖繩麵必加。',p:'約¥400–700｜市場/超市',hot:4,tw:4},
 {id:'x-sauce-03',t:'宮古みそ',x:'甘口島味噌，煮湯醃肉。',p:'約¥600–1,000｜島の駅',hot:3,tw:3},
 {id:'x-ishigaki-f03',t:'石垣の塩',x:'甘味海鹽，配生魚片。',p:'約¥500–900｜市場',hot:4,tw:3}];
-var SOUV_THUMB={'s-nahafood':'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/05/Chinsuko.jpg/960px-Chinsuko.jpg','s-nahagoods':'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/85/%E5%B3%B6%E3%81%9E%E3%81%86%E3%82%8A.jpg/960px-%E5%B3%B6%E3%81%9E%E3%81%86%E3%82%8A.jpg','s-nahasauce':'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Piper_retrofractum.jpg/960px-Piper_retrofractum.jpg','s-miyakofood':'https://commons.wikimedia.org/wiki/Special:FilePath/Miyako%20miyako%20paradise.jpg?width=960','s-miyakogoods':'https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/Miyakomamoru.jpg/960px-Miyakomamoru.jpg','s-miyakosauce':'','s-ishigakifood':'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/%E3%83%A9%E3%83%BC%E6%B2%B90588.JPG/960px-%E3%83%A9%E3%83%BC%E6%B2%B90588.JPG','s-ishigakigoods':'https://commons.wikimedia.org/wiki/Special:FilePath/Ishigaki%20Island%20minsa.jpg?width=960','s-ishigakisauce':''};
+var SOUV_ROWIMG={'s-naha#31':'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5b/Dioscorea_alata_Kavathu_1.jpg/960px-Dioscorea_alata_Kavathu_1.jpg','x-naha-f03':'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/LATO_SEAWEEDS.jpg/960px-LATO_SEAWEEDS.jpg','x-sauce-03':'https://commons.wikimedia.org/wiki/Special:FilePath/Miso_002.jpg?width=960','x-ishigaki-f06':'https://commons.wikimedia.org/wiki/Special:FilePath/Beef_curry_rice_003.jpg?width=960','s-miyako#18':'https://commons.wikimedia.org/wiki/Special:FilePath/Mango_pudding.JPG?width=960','x-naha-g01':'https://commons.wikimedia.org/wiki/Special:FilePath/Bingata.jpg?width=960','x-naha-g02':'https://commons.wikimedia.org/wiki/Special:FilePath/Ryukyu%20Glass%202.jpg?width=960'};
 var SOUV_SORT={};
 function souvCardEl(place,idx){var cards=document.querySelectorAll('#'+place+' .card');return cards[idx];}
 function souvRowObj(place,id){
@@ -896,10 +897,10 @@ function paintRank(place,kind){
   var items=souvItems(place,kind);
   items.forEach(function(o){o._s=(k==='tw'?o.tw*100:k==='vote'?((v[o.id]||[]).length*100):o.hot*100)+o.hot;});
   items.sort(function(a,b){return b._s-a._s;});
-  tb.innerHTML=items.map(function(o,i){var vc=(v[o.id]||[]).length,cc=(CMT[o.id]||[]).length;
+  tb.innerHTML=items.map(function(o,i){var vc=(v[o.id]||[]).length,cc=(CMT[o.id]||[]).length;o.img=SOUV_ROWIMG[o.id]||o.img;
     return '<tr class="srow" data-id="'+o.id+'" data-g="'+(SOUV_GOV[o.id]||placeName(place)+'伴手禮')+'" data-t="'+o.t.replace(/"/g,'')+'">'
     +'<td class="r srank">'+(i+1)+'</td>'
-    +'<td><div style="display:flex;gap:8px;align-items:flex-start">'+((SOUV_THUMB[place+kind]||o.img)?'<img class="sth" loading="lazy" src="'+(SOUV_THUMB[place+kind]||o.img)+'" onerror="this.style.display=\'none\'" alt="">':'')+'<div><div class="sname">'+o.t+'</div><div class="sintro">'+o.x+'<br>'+o.p+'</div></div></div></td>'
+    +'<td><div style="display:flex;gap:8px;align-items:flex-start">'+(o.img?'<img class="sth" loading="lazy" src="'+o.img+'" onerror="this.style.display=\'none\'" alt="">':'<span class="sth sthold">📷待補</span>')+'<div><div class="sname">'+o.t+'</div><div class="sintro">'+o.x+'<br>'+o.p+'</div></div></div></td>'
     +'<td class="n sscore">'+souvScoreTxt(o,k)+'</td>'
     +'<td class="r"><button class="svote'+(vc&&v[o.id].indexOf(me())>=0?' voted':'')+'">👍</button><div class="scnt2">'+vc+'</div><button class="scmt">💬'+(cc?' '+cc:'')+'</button></td></tr>'
     +'<tr class="sdet" data-id="'+o.id+'" style="display:none"><td colspan="5"></td></tr>';}).join('');
