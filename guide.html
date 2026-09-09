@@ -47,6 +47,12 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 #stats h2{font-size:18px;margin-bottom:4px}#stats .sub{font-size:12px;color:#888;margin-bottom:10px}
 #stats h3{font-size:15px;color:#7a1f2b;margin:14px 0 6px}
 #stats ol{margin-left:22px;font-size:14px}#stats li{margin:4px 0}
+#stats table{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0 4px}
+#stats th{background:#7a1f2b;color:#fff;padding:6px 8px;text-align:left}
+#stats td{border-bottom:1px solid #eee;padding:6px 8px;vertical-align:top}
+#stats tr:nth-child(even) td{background:#faf7ef}
+#stats td.r,#stats th.r{text-align:center;white-space:nowrap}
+#stats td.n{font-weight:800;text-align:center}
 #stats .row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
 #stats .row button{flex:1;border:1px solid #7a1f2b;background:#fff;color:#7a1f2b;border-radius:10px;padding:10px;font-size:14px;font-weight:700;cursor:pointer;min-width:140px}
 #stats .close{background:#7a1f2b !important;color:#fff !important}
@@ -737,7 +743,7 @@ function swCat(c,el){curC=c;document.querySelectorAll('.cat.cat2').forEach(x=>x.
 function applyFilter(){PLACES.forEach(function(s){var show=s[0]===curP;document.getElementById(s[0]).classList.toggle('on',show);if(!show)return;var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(card,i){card.style.display=cardCat(s[0],i)===curC?'':'none';});var h2s=document.querySelectorAll('#'+s[0]+' h2.st');h2s.forEach(function(h){var dc=h.getAttribute('data-c');h.style.display=(!dc||dc===curC)?'':'none';});});}
 function openStats(){renderStats();document.getElementById('stats').classList.add('on');}
 function closeStats(){document.getElementById('stats').classList.remove('on');}
-function renderStats(){var v=loadV(),t=titles(),h='';GROUPS.forEach(function(g){var items=[];Object.keys(v).forEach(function(id){if(t[id]&&t[id].g===g&&v[id].length)items.push({t:t[id].t,c:v[id].length,n:v[id]});});items.sort(function(a,b){return b.c-a.c;});h+='<h3>'+g+' Top3</h3>';if(!items.length)h+='<ol><li>尚無投票</li></ol>';else h+='<ol>'+items.slice(0,3).map(function(x){return '<li>'+x.t+' — <b>'+x.c+'票</b>（'+x.n.join('、')+'）</li>';}).join('')+'</ol>';});document.getElementById('statsBody').innerHTML=h;var total=0;Object.keys(v).forEach(function(k){total+=v[k].length;});document.getElementById('statsSub').textContent='共 '+total+' 票・全員同步';}
+function renderStats(){var v=loadV(),t=titles(),h='',medal=['🥇','🥈','🥉'];GROUPS.forEach(function(g){var items=[];Object.keys(v).forEach(function(id){if(t[id]&&t[id].g===g&&v[id].length)items.push({t:t[id].t,c:v[id].length,n:v[id]});});if(!items.length)return;items.sort(function(a,b){return b.c-a.c;});h+='<h3>'+g+'</h3><table><tr><th class="r">名次</th><th>項目</th><th class="r">票數</th><th>投票人</th></tr>'+items.slice(0,5).map(function(x,i){return '<tr><td class="r">'+(medal[i]||(i+1))+'</td><td>'+x.t+'</td><td class="n">'+x.c+'</td><td>'+x.n.join('、')+'</td></tr>';}).join('')+'</table>';});if(!h)h='<p style="font-size:14px;color:#888">尚無投票，大家投起來！</p>';document.getElementById('statsBody').innerHTML=h;var total=0;Object.keys(v).forEach(function(k){total+=v[k].length;});document.getElementById('statsSub').textContent='共 '+total+' 票・全員同步';}
 function exportVotes(){var s=btoa(unescape(encodeURIComponent(JSON.stringify(loadV()))));var done=function(){alert('投票碼已複製，傳給家人合併');};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(s).then(done,function(){prompt('複製此投票碼',s);});else prompt('複製此投票碼',s);}
 function importVotes(){var s=prompt('貼上家人傳來的投票碼');if(!s)return;try{var inc=JSON.parse(decodeURIComponent(escape(atob(s.trim()))));var v=loadV();Object.keys(inc).forEach(function(id){var cur=v[id]||[];inc[id].forEach(function(n){if(cur.indexOf(n)<0)cur.push(n);});if(cur.length)v[id]=cur;});saveV(v);refreshVotes();alert('已合併！');}catch(e){alert('投票碼格式錯誤');}}
 document.getElementById('nameInput').addEventListener('keydown',function(e){if(e.key==='Enter')enter();});
