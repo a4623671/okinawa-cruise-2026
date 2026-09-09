@@ -80,6 +80,9 @@ tr.sdet td{background:#faf7ef}
 .ranktbl{width:100%;border-collapse:collapse}
 .gcap{text-align:center;font-size:13px;font-weight:800;margin:4px 0 0}
 .wtag{display:inline-block;font-size:11px;background:#e8f4ee;color:#0e6e5a;border-radius:10px;padding:0 8px;margin-left:6px;white-space:nowrap}
+.otag{display:inline-block;font-size:11px;background:#fdf0d5;color:#9a6200;border-radius:10px;padding:0 8px;margin-left:6px;white-space:nowrap}
+.onlyb{display:inline-block;font-size:11px;background:#fde8e4;color:#b3402a;border-radius:10px;padding:0 8px;margin-left:6px;white-space:nowrap;font-weight:800}
+.nearnote{color:#0e6e5a;font-size:12px}
 #donkizone{border:2px solid #b3541e}
 #donkizone h3{color:#b3541e}
 .ranktbl td{border-bottom:1px solid #eee;padding:8px 4px;vertical-align:top;font-size:13px}
@@ -887,8 +890,11 @@ function souvItems(place,kind){
   ex.forEach(function(e){out.push({id:e.id,t:e.t,x:e.x,p:e.p,img:null,hot:e.hot,tw:e.tw});});
   return out;
 }
-function souvScore(o,k){if(k==='tw')return o.tw;if(k==='vote')return (loadV()[o.id]||[]).length;return o.hot;}
-function souvScoreTxt(o,k){if(k==='tw')return '🇹🇼'+o.tw;if(k==='vote')return (loadV()[o.id]||[]).length+'票';return '🔥'+o.hot;}
+function souvW(id){return SOUV_WMAP[id]||'';}
+function souvScore(o,k){if(k==='tw')return o.tw;if(k==='vote')return (loadV()[o.id]||[]).length;if(k==='donki')return (souvW(o.id).indexOf('唐吉訶德')>=0?10000:0)+o.hot;return o.hot;}
+function souvScoreTxt(o,k){if(k==='tw')return '🇹🇼'+o.tw;if(k==='vote')return (loadV()[o.id]||[]).length+'票';if(k==='donki')return (souvW(o.id).indexOf('唐吉訶德')>=0?'🛒':'')+'🔥'+o.hot;return '🔥'+o.hot;}
+var SOUV_ONLY_T=['まもる君','ゲンキ','島ぞうり','やちむん','宮古そば乾麺','八重山そば乾麺','請福','菊之露','沖之光','石垣の塩','ピパーツ','ラー油','ミンサー','星砂','上布','コスメ'];
+function souvOrigin(t,place){if(t.indexOf('雪塩')>=0)return '宮古島';if(t.indexOf('石垣島ラー油')>=0||t.indexOf('ピパーツ')>=0||t.indexOf('石垣の塩')>=0)return '石垣島';if(t.indexOf('宮古みそ')>=0)return '宮古島';if(t.indexOf('島唐辛子')>=0||t.indexOf('コーレーグース')>=0)return '沖繩';return placeName(place);}
 function renderRanks(){
   PLACES.forEach(function(s){
     var place=s[0];
@@ -899,7 +905,7 @@ function renderRanks(){
       var shell=document.createElement('div');shell.className='rankcard';shell.setAttribute('data-place',place);shell.setAttribute('data-kind',kind);
       shell.innerHTML='<h3 style="font-size:16px">'+(kind==='food'?'🍱 吃的':kind==='goods'?'🛍 物品':'🧂 醬料（三島）')+'</h3>'
         +'<div class="galwrap"></div>'
-        +'<div class="sortrow"><button data-k="hot" class="on">🔥熱門</button><button data-k="tw">🇹🇼台灣人</button><button data-k="vote">🗳家人票</button></div>'
+        +'<div class="sortrow"><button data-k="hot" class="on">🔥熱門</button><button data-k="tw">🇹🇼台灣人</button><button data-k="vote">🗳家人票</button><button data-k="donki">🛒Donki有</button></div>'
         +'<table class="ranktbl"><tbody></tbody></table>';
       h2.after(shell);
       shell.querySelectorAll('.sortrow button').forEach(function(b){b.onclick=function(){shell.querySelectorAll('.sortrow button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');SOUV_SORT[place+kind]=b.getAttribute('data-k');paintRank(place,kind);};});
@@ -918,12 +924,12 @@ function paintRank(place,kind){
   var sel='.rankcard[data-place="'+place+'"][data-kind="'+kind+'"] tbody';var tb=document.querySelector(sel);if(!tb)return;
   var k=SOUV_SORT[place+kind]||'hot',v=loadV();
   var items=souvItems(place,kind);
-  items.forEach(function(o){o._s=(k==='tw'?o.tw*100:k==='vote'?((v[o.id]||[]).length*100):o.hot*100)+o.hot;});
+  items.forEach(function(o){o._s=souvScore(o,k)*100+o.hot;});
   items.sort(function(a,b){return b._s-a._s;});
-  tb.innerHTML=items.map(function(o,i){var vc=(v[o.id]||[]).length,cc=(CMT[o.id]||[]).length;o.img=SOUV_ROWIMG[o.id]||o.img;o.w=SOUV_WMAP[o.id]||'';
+  tb.innerHTML=items.map(function(o,i){var vc=(v[o.id]||[]).length,cc=(CMT[o.id]||[]).length;o.img=SOUV_ROWIMG[o.id]||o.img;o.w=SOUV_WMAP[o.id]||'';o.o=souvOrigin(cleanT(o.t),place);o.only=SOUV_ONLY_T.some(function(s){return cleanT(o.t).indexOf(s)>=0;});o.near=(place==='s-naha'&&cleanT(o.t).indexOf('雪塩')>=0?'📍那霸國際通鹽屋/機場就買得到，不必等到宮古島':'');
     return '<tr class="srow" data-id="'+o.id+'" data-g="'+(SOUV_GOV[o.id]||placeName(place)+'伴手禮')+'" data-t="'+o.t.replace(/"/g,'')+'" data-pl="'+place+'" data-kind="'+kind+'">'
     +'<td class="r srank">'+(i+1)+'</td>'
-    +'<td><div style="display:flex;gap:8px;align-items:flex-start">'+(o.img?'<img class="sth" loading="lazy" src="'+o.img+'" onerror="this.style.display=\'none\'" alt="">':'<span class="sth sthold">📷待補</span>')+'<div><div class="sname">'+o.t+(o.w?' <span class="wtag">'+o.w+'</span>':'')+'</div><div class="sintro">'+o.x+'<br>'+o.p+'</div></div></div></td>'
+    +'<td><div style="display:flex;gap:8px;align-items:flex-start">'+(o.img?'<img class="sth" loading="lazy" src="'+o.img+'" onerror="this.style.display=\'none\'" alt="">':'<span class="sth sthold">📷待補</span>')+'<div><div class="sname">'+o.t+' <span class="otag">'+o.o+'</span>'+(o.only?' <span class="onlyb">當地限定</span>':'')+(o.w?' <span class="wtag">'+o.w+'</span>':'')+'</div><div class="sintro">'+o.x+'<br>'+o.p+(o.near?'<br><span class="nearnote">'+o.near+'</span>':'')+'</div></div></div></td>'
     +'<td class="n sscore">'+souvScoreTxt(o,k)+'</td>'
     +'<td class="r"><button class="svote'+(vc&&v[o.id].indexOf(me())>=0?' voted':'')+'">👍</button><div class="scnt2">'+vc+'</div><button class="scmt">💬'+(cc?' '+cc:'')+'</button></td></tr>'
     +'<tr class="sdet" data-id="'+o.id+'" style="display:none"><td colspan="5"></td></tr>';}).join('');
