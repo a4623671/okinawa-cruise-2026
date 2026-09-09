@@ -808,8 +808,10 @@ function toggleCmt(btn){var th=btn.closest('.cmt').querySelector('.thread');th.s
 function sendComment(id,inputEl,btnEl){var n=me();if(!n){document.getElementById('gate').classList.remove('hide');return;}var t=(inputEl.value||'').trim().slice(0,140);if(!t){alert('先寫點什麼');return;}if(CMT_BUSY)return;CMT_BUSY=true;btnEl.disabled=true;
 chGet().then(function(remote){var arr=remote[id]||[];arr.push({n:n,t:t.replace(/</g,'&lt;'),ts:new Date().toISOString()});remote[id]=arr;function attempt(k){return chPut(remote,CMT_SHA).catch(function(e){if(k<=0)throw e;return chGet().then(function(r2){remote=r2;var a2=remote[id]||[];a2.push({n:n,t:t.replace(/</g,'&lt;'),ts:new Date().toISOString()});remote[id]=a2;return attempt(k-1);});});}return attempt(2);}).then(function(c){CMT=c;saveCmt(c);inputEl.value='';CMT_BUSY=false;btnEl.disabled=false;paintComments();refreshStatDetail(id);}).catch(function(e){CMT_BUSY=false;btnEl.disabled=false;alert('連線失敗，留言沒送出，請重試');});}
 function renderCmtStats(){var t=titles(),by={};Object.keys(CMT).forEach(function(id){(CMT[id]||[]).forEach(function(m){(by[m.n]=by[m.n]||[]).push({item:t[id]?t[id].t:id,text:m.t,ts:m.ts});});});var names=Object.keys(by);if(!names.length)return '';var h='<h3>💬 每人留言</h3>';names.sort().forEach(function(n){h+='<div class="pblock"><h4>👤 '+n+'（'+by[n].length+'則）</h4>'+by[n].map(function(x){return '<div class="prow"><span class="pi">【'+x.item+'】</span>'+x.text+' <span class="tm" style="color:#999;font-size:11px">'+fmtTs(x.ts)+'</span></div>';}).join('')+'</div>';});return h;}
-var SOUV_FOOD={'s-naha':['s-naha#31','s-naha#32','s-naha#33','s-naha#35','s-naha#36','s-naha#37'],'s-miyako':['s-miyako#15','s-miyako#16','s-miyako#17','s-miyako#18'],'s-ishigaki':['s-ishigaki#15','s-ishigaki#17','s-ishigaki#18','s-ishigaki#19']};
+var SOUV_FOOD={'s-naha':['s-naha#31','s-naha#32','s-naha#33','s-naha#35','s-naha#36','s-naha#37'],'s-miyako':['s-miyako#15','s-miyako#16','s-miyako#17','s-miyako#18'],'s-ishigaki':['s-ishigaki#15','s-ishigaki#17']};
 var SOUV_GOODS={'s-naha':['s-naha#34'],'s-miyako':['s-miyako#19'],'s-ishigaki':['s-ishigaki#16']};
+var SOUV_SAUCE={'s-naha':['s-ishigaki#18','s-ishigaki#19']};
+var SOUV_GOV={'s-ishigaki#18':'石垣島伴手禮','s-ishigaki#19':'石垣島伴手禮','x-ishigaki-f03':'石垣島伴手禮'};
 var SOUV_XGAL={'s-naha':['https://commons.wikimedia.org/wiki/Special:FilePath/Bingata.jpg?width=960','https://commons.wikimedia.org/wiki/Special:FilePath/Ryukyu%20Glass%202.jpg?width=960'],'s-miyako':[],'s-ishigaki':['https://commons.wikimedia.org/wiki/Special:FilePath/Star%20sand%20Iriomote.jpg?width=960']};
 var SOUV_EXTRA={
 's-naha':{food:[
@@ -833,7 +835,6 @@ goods:[
 's-ishigaki':{food:[
 {id:'x-ishigaki-f01',t:'八重山そば乾麺',x:'細麵鰹湯在家重現。',p:'約¥600–1,000｜市場/ドンキ',hot:3,tw:3},
 {id:'x-ishigaki-f02',t:'ちんすこう',x:'石垣也有好吃金楚糕。',p:'約¥600–1,000｜市場',hot:3,tw:3},
-{id:'x-ishigaki-f03',t:'石垣の塩',x:'甘味海鹽，配生魚片。',p:'約¥500–900｜市場',hot:4,tw:3},
 {id:'x-ishigaki-f04',t:'ゲンキ土產',x:'乳酸飲粉末版若有必拿。',p:'約¥500–｜市場',hot:3,tw:3},
 {id:'x-ishigaki-f05',t:'サーター包裝版',x:'常溫帶回辦公室。',p:'約¥600–1,000｜市場',hot:3,tw:3},
 {id:'x-ishigaki-f06',t:'石垣牛咖哩包',x:'和牛咖哩調理包。',p:'約¥800–1,200｜市場/ドンキ',hot:3,tw:3}],
@@ -841,17 +842,22 @@ goods:[
 {id:'x-ishigaki-g01',t:'星砂瓶',x:'星形砂裝瓶，可愛。',p:'約¥500–1,000｜市場',hot:4,tw:3},
 {id:'x-ishigaki-g02',t:'貝細工',x:'小店尋寶一期一會。',p:'約¥800–｜市場周邊小店',hot:3,tw:2},
 {id:'x-ishigaki-g03',t:'シーサー小',x:'玄關守護神。',p:'約¥1,000–｜市場/陶器店',hot:3,tw:3}]}};
+SOUV_EXTRA['s-naha'].sauce=[
+{id:'x-sauce-01',t:'島唐辛子',x:'沖繩小米辣，泡盛裡泡一根超夠味。',p:'約¥400–800｜市場/平和通',hot:3,tw:3},
+{id:'x-sauce-02',t:'コーレーグース',x:'泡盛辣椒水，沖繩麵必加。',p:'約¥400–700｜市場/超市',hot:4,tw:4},
+{id:'x-sauce-03',t:'宮古みそ',x:'甘口島味噌，煮湯醃肉。',p:'約¥600–1,000｜島の駅',hot:3,tw:3},
+{id:'x-ishigaki-f03',t:'石垣の塩',x:'甘味海鹽，配生魚片。',p:'約¥500–900｜市場',hot:4,tw:3}];
 var SOUV_SORT={};
 function souvCardEl(place,idx){var cards=document.querySelectorAll('#'+place+' .card');return cards[idx];}
 function souvRowObj(place,id){
   var p=id.split('#');
-  if(p.length>1){var c=souvCardEl(place,+p[1]);if(!c)return null;var h=c.querySelector('h3');var img=c.querySelector('img.ph');var ps=c.querySelectorAll(':scope > p');var intro='',price='';ps.forEach(function(pp){if(pp.classList.contains('kv'))price=pp.textContent;else if(!intro)intro=pp.textContent;});var hot=0;var st=c.querySelector('.stars');if(st){var m=st.textContent.match(/🔥/g);hot=m?m.length:0;}return {id:id,t:h?cleanT(h.textContent):id,x:intro,p:price,img:img?img.src:null,hot:hot,tw:TWRATE[id]||0};}
-  var ex=(SOUV_EXTRA[place]||{food:[],goods:[]});var all=ex.food.concat(ex.goods);
+  if(p.length>1){var cards0=document.querySelectorAll('#'+p[0]+' .card');var c=cards0[+p[1]];if(!c)return null;var h=c.querySelector('h3');var img=c.querySelector('img.ph');var ps=c.querySelectorAll(':scope > p');var intro='',price='';ps.forEach(function(pp){if(pp.classList.contains('kv'))price=pp.textContent;else if(!intro)intro=pp.textContent;});var hot=0;var st=c.querySelector('.stars');if(st){var m=st.textContent.match(/🔥/g);hot=m?m.length:0;}return {id:id,t:h?cleanT(h.textContent):id,x:intro,p:price,img:img?img.src:null,hot:hot,tw:TWRATE[id]||0};}
+  var ex=(SOUV_EXTRA[place]||{food:[],goods:[],sauce:[]});var all=ex.food.concat(ex.goods).concat(ex.sauce||[]);
   for(var i=0;i<all.length;i++)if(all[i].id===id)return {id:id,t:all[i].t,x:all[i].x,p:all[i].p,img:null,hot:all[i].hot,tw:all[i].tw};
   return null;
 }
 function souvItems(place,kind){
-  var ids=(kind==='food'?SOUV_FOOD[place]:SOUV_GOODS[place])||[];
+  var ids=(kind==='food'?SOUV_FOOD[place]:kind==='goods'?SOUV_GOODS[place]:SOUV_SAUCE[place])||[];
   var out=ids.map(function(id){return souvRowObj(place,id);}).filter(function(o){return o;});
   var ex=((SOUV_EXTRA[place]||{})[kind])||[];
   ex.forEach(function(e){out.push({id:e.id,t:e.t,x:e.x,p:e.p,img:null,hot:e.hot,tw:e.tw});});
@@ -863,21 +869,22 @@ function renderRanks(){
   PLACES.forEach(function(s){
     var place=s[0];
     var h2=document.querySelector('#'+place+' h2[data-c="souv"]');if(!h2)return;
-    ['food','goods'].forEach(function(kind){
+    ['food','goods','sauce'].forEach(function(kind){
+      var hasRows=((kind==='food'?SOUV_FOOD[place]:kind==='goods'?SOUV_GOODS[place]:SOUV_SAUCE[place])||[]).length||(((SOUV_EXTRA[place]||{})[kind])||[]).length;
+      if(!hasRows)return;
       var shell=document.createElement('div');shell.className='rankcard';shell.setAttribute('data-place',place);shell.setAttribute('data-kind',kind);
       var galImgs=[];
-      ((kind==='food'?SOUV_FOOD[place]:SOUV_GOODS[place])||[]).forEach(function(id){var o=souvRowObj(place,id);if(o&&o.img&&galImgs.indexOf(o.img)<0)galImgs.push(o.img);});
-      (SOUV_XGAL[place]||[]).forEach(function(u){if(galImgs.indexOf(u)<0)galImgs.push(u);});
-      shell.innerHTML='<h3 style="font-size:16px">'+(kind==='food'?'🍱 吃的':'🛍 物品')+'</h3>'
+      ((kind==='food'?SOUV_FOOD[place]:kind==='goods'?SOUV_GOODS[place]:SOUV_SAUCE[place])||[]).forEach(function(id){var o=souvRowObj(place,id);if(o&&o.img&&galImgs.indexOf(o.img)<0)galImgs.push(o.img);});
+      if(kind!=='sauce')(SOUV_XGAL[place]||[]).forEach(function(u){if(galImgs.indexOf(u)<0)galImgs.push(u);});
+      shell.innerHTML='<h3 style="font-size:16px">'+(kind==='food'?'🍱 吃的':kind==='goods'?'🛍 物品':'🧂 醬料（三島）')+'</h3>'
         +(galImgs.length?'<div class="gal"><div class="trk">'+galImgs.map(function(u){return '<img class="ph" loading="lazy" src="'+u+'" onerror="this.style.display=\'none\'" alt="">';}).join('')+'</div><button class="gl">‹</button><button class="gr">›</button><div class="gdot"></div></div><div class="credit">左右滑動多圖／圖：Wikimedia Commons</div>':'')
         +'<div class="sortrow"><button data-k="hot" class="on">🔥熱門</button><button data-k="tw">🇹🇼台灣人</button><button data-k="vote">🗳家人票</button></div>'
         +'<table class="ranktbl"><tbody></tbody></table>';
       h2.after(shell);
       shell.querySelectorAll('.sortrow button').forEach(function(b){b.onclick=function(){shell.querySelectorAll('.sortrow button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');SOUV_SORT[place+kind]=b.getAttribute('data-k');paintRank(place,kind);};});
     });
-    var cards=document.querySelectorAll('#'+place+' .card');
-    var souvIds=(SOUV_FOOD[place]||[]).concat(SOUV_GOODS[place]||[]);
-    souvIds.forEach(function(id){var p=id.split('#');var c=cards[+p[1]];if(c)c.classList.add('retired');});
+    var souvIds=(SOUV_FOOD[place]||[]).concat(SOUV_GOODS[place]||[]).concat(SOUV_SAUCE[place]||[]);
+    souvIds.forEach(function(id){var pp=id.split('#');if(pp.length<2)return;var cards2=document.querySelectorAll('#'+pp[0]+' .card');var c=cards2[+pp[1]];if(c)c.classList.add('retired');});
   });
   paintRanks();
 }
@@ -888,7 +895,7 @@ function paintRank(place,kind){
   items.forEach(function(o){o._s=(k==='tw'?o.tw*100:k==='vote'?((v[o.id]||[]).length*100):o.hot*100)+o.hot;});
   items.sort(function(a,b){return b._s-a._s;});
   tb.innerHTML=items.map(function(o,i){var vc=(v[o.id]||[]).length,cc=(CMT[o.id]||[]).length;
-    return '<tr class="srow" data-id="'+o.id+'" data-g="'+placeName(place)+'伴手禮" data-t="'+o.t.replace(/"/g,'')+'">'
+    return '<tr class="srow" data-id="'+o.id+'" data-g="'+(SOUV_GOV[o.id]||placeName(place)+'伴手禮')+'" data-t="'+o.t.replace(/"/g,'')+'">'
     +'<td class="r srank">'+(i+1)+'</td>'
     +'<td><div style="display:flex;gap:8px;align-items:flex-start">'+(o.img?'<img class="sth" loading="lazy" src="'+o.img+'" onerror="this.style.display=\'none\'" alt="">':'')+'<div><div class="sname">'+o.t+'</div><div class="sintro">'+o.x+'<br>'+o.p+'</div></div></div></td>'
     +'<td class="n sscore">'+souvScoreTxt(o,k)+'</td>'
@@ -899,7 +906,7 @@ function paintRank(place,kind){
 }
 function hideSdet(tbody){tbody.querySelectorAll('tr.sdet').forEach(function(d){d.style.display='none';});}
 function placeName(pid){for(var i=0;i<PLACES.length;i++)if(PLACES[i][0]===pid)return PLACES[i][1];return '';}
-function paintRanks(){PLACES.forEach(function(s){paintRank(s[0],'food');paintRank(s[0],'goods');});}
+function paintRanks(){PLACES.forEach(function(s){paintRank(s[0],'food');paintRank(s[0],'goods');paintRank(s[0],'sauce');});}
 function refreshRanks(){var v=loadV(),n=me();document.querySelectorAll('tr.srow').forEach(function(r){var id=r.getAttribute('data-id'),arr=v[id]||[];var b=r.querySelector('.svote'),c=r.querySelector('.scnt2'),m=r.querySelector('.scmt');if(b){b.textContent='👍';b.classList.toggle('voted',arr.indexOf(n)>=0);}if(c)c.textContent=arr.length;if(m){var cc=(CMT[id]||[]).length;m.textContent='💬'+(cc?' '+cc:'');}var rk=r.closest('.rankcard');if(rk){var k=SOUV_SORT[rk.getAttribute('data-place')+rk.getAttribute('data-kind')]||'hot';var sc=r.querySelector('.sscore');if(sc){if(k==='vote')sc.textContent=arr.length+'票';}}});}
 function toggle(id){var n=me();if(!n){document.getElementById('gate').classList.remove('hide');return;}if(GH_BUSY)return;GH_BUSY=true;
 ghGet().then(function(remote){var arr=remote[id]||[];var want=arr.indexOf(n)<0;function attempt(t){if(want){if(arr.indexOf(n)<0)arr.push(n);}else{var ix=arr.indexOf(n);if(ix>=0)arr.splice(ix,1);}if(!arr.length)delete remote[id];else remote[id]=arr;return ghPut(remote,GH_SHA).catch(function(e){if(t<=0)throw e;return ghGet().then(function(r2){remote=r2;arr=remote[id]||[];return attempt(t-1);});});}return attempt(2);}).then(function(v){saveV(v);setMode('online');refreshVotes();GH_BUSY=false;}).catch(function(e){GH_BUSY=false;setMode('offline');try{localStorage.setItem(GH_DIRTY,'1');}catch(x){}var v=loadV();var arr=v[id]||[];var ix=arr.indexOf(n);if(ix>=0)arr.splice(ix,1);else arr.push(n);if(!arr.length)delete v[id];else v[id]=arr;saveV(v);refreshVotes();alert('連線失敗，已暫存本機，連網後自動上傳');});}
