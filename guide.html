@@ -75,6 +75,7 @@ tr.sdet td{background:#faf7ef}
 .card.retired{display:none !important}
 .rankcard{background:#fff;border-radius:14px;padding:12px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
 .sortrow{display:flex;gap:8px;margin:8px 0}
+.sortnote{font-size:12px;color:#888;margin:6px 0}
 .sortrow button{flex:1;border:1px solid #d8d0bd;background:#fff;border-radius:18px;padding:7px 4px;font-size:13px;cursor:pointer}
 .sortrow button.on{background:#7a1f2b;color:#fff;border-color:#7a1f2b;font-weight:700}
 .ranktbl{width:100%;border-collapse:collapse}
@@ -905,7 +906,7 @@ function renderRanks(){
       var shell=document.createElement('div');shell.className='rankcard';shell.setAttribute('data-place',place);shell.setAttribute('data-kind',kind);
       shell.innerHTML='<h3 style="font-size:16px">'+(kind==='food'?'🍱 吃的':kind==='goods'?'🛍 物品':'🧂 醬料（三島）')+'</h3>'
         +'<div class="galwrap"></div>'
-        +'<div class="sortrow"><button data-k="hot" class="on">🔥熱門</button><button data-k="tw">🇹🇼台灣人</button><button data-k="vote">🗳家人票</button><button data-k="donki">🛒Donki有</button></div>'
+        +'<div class="sortnote">依熱門度排序・分數欄同時顯示 🇹🇼台灣人推薦</div>'
         +'<table class="ranktbl"><tbody></tbody></table>';
       h2.after(shell);
       shell.querySelectorAll('.sortrow button').forEach(function(b){b.onclick=function(){shell.querySelectorAll('.sortrow button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');SOUV_SORT[place+kind]=b.getAttribute('data-k');paintRank(place,kind);};});
@@ -922,7 +923,7 @@ function paintDonkiList(){var box=document.getElementById('donkilist');if(!box)r
 function jumpToRow(id){var r=document.querySelector('tr.srow[data-id="'+id+'"]');if(!r)return;var pl=r.getAttribute('data-pl'),kd=r.getAttribute('data-kind')||'food';curP=pl;curC=kd;document.querySelectorAll('.cat.place').forEach(function(b){var o=b.getAttribute('onclick')||'';b.classList.toggle('on',o.indexOf("'"+pl.replace('s-','')+"'")>=0);});document.querySelectorAll('.cat.cat2').forEach(function(b){var o=b.getAttribute('onclick')||'';b.classList.toggle('on',o.indexOf("'"+kd+"'")>=0);});applyFilter();paintDonkiList();r.scrollIntoView({behavior:'smooth',block:'center'});r.style.outline='3px solid #ffcf4d';setTimeout(function(){r.style.outline='';},2500);}
 function paintRank(place,kind){
   var sel='.rankcard[data-place="'+place+'"][data-kind="'+kind+'"] tbody';var tb=document.querySelector(sel);if(!tb)return;
-  var k=SOUV_SORT[place+kind]||'hot',v=loadV();
+  var k='hot',v=loadV();
   var items=souvItems(place,kind);
   items.forEach(function(o){o._s=souvScore(o,k)*100+o.hot;});
   items.sort(function(a,b){return b._s-a._s;});
@@ -930,7 +931,7 @@ function paintRank(place,kind){
     return '<tr class="srow" data-id="'+o.id+'" data-g="'+(SOUV_GOV[o.id]||placeName(place)+'伴手禮')+'" data-t="'+o.t.replace(/"/g,'')+'" data-pl="'+place+'" data-kind="'+kind+'">'
     +'<td class="r srank">'+(i+1)+'</td>'
     +'<td><div style="display:flex;gap:8px;align-items:flex-start">'+(o.img?'<img class="sth" loading="lazy" src="'+o.img+'" onerror="this.style.display=\'none\'" alt="">':'<span class="sth sthold">📷待補</span>')+'<div><div class="sname">'+o.t+' <span class="otag">'+o.o+'</span>'+(o.only?' <span class="onlyb">當地限定</span>':'')+(o.w?' <span class="wtag">'+o.w+'</span>':'')+'</div><div class="sintro">'+o.x+'<br>'+o.p+(o.near?'<br><span class="nearnote">'+o.near+'</span>':'')+'</div></div></div></td>'
-    +'<td class="n sscore">'+souvScoreTxt(o,k)+'</td>'
+    +'<td class="n sscore">🔥'+o.hot+'<br>🇹🇼'+o.tw+'</td>'
     +'<td class="r"><button class="svote'+(vc&&v[o.id].indexOf(me())>=0?' voted':'')+'">👍</button><div class="scnt2">'+vc+'</div><button class="scmt">💬'+(cc?' '+cc:'')+'</button></td></tr>'
     +'<tr class="sdet" data-id="'+o.id+'" style="display:none"><td colspan="5"></td></tr>';}).join('');
   var gw=document.querySelector('.rankcard[data-place="'+place+'"][data-kind="'+kind+'"] .galwrap');
