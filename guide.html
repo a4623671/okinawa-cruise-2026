@@ -71,6 +71,7 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 #stats td.sub{background:#f0e9d6;font-weight:800;font-size:13px}
 .scb{border:1px solid #d8d0bd;background:#fff;border-radius:14px;padding:2px 8px;font-size:12px;cursor:pointer;white-space:nowrap}
 tr.sdet td{background:#faf7ef}
+.rankcard .gal .trk img{max-height:230px;object-fit:cover}
 .card.retired{display:none !important}
 .rankcard{background:#fff;border-radius:14px;padding:12px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
 .sortrow{display:flex;gap:8px;margin:8px 0}
@@ -847,6 +848,7 @@ SOUV_EXTRA['s-naha'].sauce=[
 {id:'x-sauce-02',t:'コーレーグース',x:'泡盛辣椒水，沖繩麵必加。',p:'約¥400–700｜市場/超市',hot:4,tw:4},
 {id:'x-sauce-03',t:'宮古みそ',x:'甘口島味噌，煮湯醃肉。',p:'約¥600–1,000｜島の駅',hot:3,tw:3},
 {id:'x-ishigaki-f03',t:'石垣の塩',x:'甘味海鹽，配生魚片。',p:'約¥500–900｜市場',hot:4,tw:3}];
+var SOUV_THUMB={'s-nahafood':'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/05/Chinsuko.jpg/960px-Chinsuko.jpg','s-nahagoods':'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/85/%E5%B3%B6%E3%81%9E%E3%81%86%E3%82%8A.jpg/960px-%E5%B3%B6%E3%81%9E%E3%81%86%E3%82%8A.jpg','s-nahasauce':'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Piper_retrofractum.jpg/960px-Piper_retrofractum.jpg','s-miyakofood':'https://commons.wikimedia.org/wiki/Special:FilePath/Miyako%20miyako%20paradise.jpg?width=960','s-miyakogoods':'https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/Miyakomamoru.jpg/960px-Miyakomamoru.jpg','s-miyakosauce':'','s-ishigakifood':'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/%E3%83%A9%E3%83%BC%E6%B2%B90588.JPG/960px-%E3%83%A9%E3%83%BC%E6%B2%B90588.JPG','s-ishigakigoods':'https://commons.wikimedia.org/wiki/Special:FilePath/Ishigaki%20Island%20minsa.jpg?width=960','s-ishigakisauce':''};
 var SOUV_SORT={};
 function souvCardEl(place,idx){var cards=document.querySelectorAll('#'+place+' .card');return cards[idx];}
 function souvRowObj(place,id){
@@ -897,7 +899,7 @@ function paintRank(place,kind){
   tb.innerHTML=items.map(function(o,i){var vc=(v[o.id]||[]).length,cc=(CMT[o.id]||[]).length;
     return '<tr class="srow" data-id="'+o.id+'" data-g="'+(SOUV_GOV[o.id]||placeName(place)+'伴手禮')+'" data-t="'+o.t.replace(/"/g,'')+'">'
     +'<td class="r srank">'+(i+1)+'</td>'
-    +'<td><div style="display:flex;gap:8px;align-items:flex-start">'+(o.img?'<img class="sth" loading="lazy" src="'+o.img+'" onerror="this.style.display=\'none\'" alt="">':'')+'<div><div class="sname">'+o.t+'</div><div class="sintro">'+o.x+'<br>'+o.p+'</div></div></div></td>'
+    +'<td><div style="display:flex;gap:8px;align-items:flex-start">'+((SOUV_THUMB[place+kind]||o.img)?'<img class="sth" loading="lazy" src="'+(SOUV_THUMB[place+kind]||o.img)+'" onerror="this.style.display=\'none\'" alt="">':'')+'<div><div class="sname">'+o.t+'</div><div class="sintro">'+o.x+'<br>'+o.p+'</div></div></div></td>'
     +'<td class="n sscore">'+souvScoreTxt(o,k)+'</td>'
     +'<td class="r"><button class="svote'+(vc&&v[o.id].indexOf(me())>=0?' voted':'')+'">👍</button><div class="scnt2">'+vc+'</div><button class="scmt">💬'+(cc?' '+cc:'')+'</button></td></tr>'
     +'<tr class="sdet" data-id="'+o.id+'" style="display:none"><td colspan="5"></td></tr>';}).join('');
