@@ -275,13 +275,24 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 <div class="sheet" id="sheet"><h3>📋 我的初稿（當前頁面已勾選）</h3><ul id="mylist"></ul><p id="mytotal" style="font-weight:800;margin-top:8px"></p></div>
 <div class="plan" id="setpage">
 <button class="backbtn" onclick="closeSettings()">‹ 回上一頁</button>
+<div class="cfg"><h3>行程規劃偏好</h3>
+<p class="rule">給 AI 規劃行程時參考的軟性偏好，會盡量遵守，但真的沒更好選擇時仍會誠實安排。</p>
+<div class="row"><label>兩段行程間交通不超過幾分鐘</label><input id="cfg_maxLeg" type="number" min="0" max="180"></div>
+<div class="row"><label>純走路交通不超過幾分鐘</label><input id="cfg_maxWalk" type="number" min="0" max="120"></div>
+<div class="row"><label>兩地近到幾分鐘步行就不排交通段</label><input id="cfg_noLegWalk" type="number" min="0" max="30"></div>
+<p class="rule">預設 1 分鐘（約 80 公尺）。超過這個距離的相鄰景點一定會排上交通方式並畫出路線；設太大會讓幾百公尺的路段沒有指路。</p>
+<div class="row"><label>每天花費上限（新台幣）</label><input id="cfg_dailyCap" type="number" min="0" max="50000" step="500"></div>
+<div class="row"><label>盡量避免搭計程車，優先使用大眾運輸</label><input id="cfg_noTaxi" type="checkbox" style="width:22px;height:22px;accent-color:#b3541e"></div>
+<div class="row"><label>郵輪回港要提早幾分鐘</label><input id="cfg_shipBuffer" type="number" min="0" max="180"></div>
+<div class="row"><label>搭飛機要提早幾分鐘到機場</label><input id="cfg_flightBuffer" type="number" min="0" max="300"></div>
+</div>
 <div class="cfg"><h3>📐 動態規劃參數</h3>
 <div class="row"><label>D2 宮古島活動預算（分）</label><input id="cfg_d2" type="number" min="0" max="720"></div>
 <div class="row"><label>D3 那霸活動預算（分）</label><input id="cfg_d3" type="number" min="0" max="720"></div>
 <div class="row"><label>D4 石垣島活動預算（分）</label><input id="cfg_d4" type="number" min="0" max="720"></div>
 <div class="row"><label>一則留言折算票數</label><input id="cfg_cmtw" type="number" min="0" max="2" step="0.5"></div>
 <button class="btn" onclick="saveCfg()">儲存參數</button>
-<button class="btn ghost" onclick="resetCfg()">恢復預設（390／480／450／0.5）</button>
+<button class="btn ghost" onclick="resetCfg()">恢復預設</button>
 <div id="cfgmsg"></div></div>
 <div class="cfg"><h3>📏 開放規則</h3>
 <p class="rule"><b>只能新增</b>：任何人可提案新景點／餐廳／購物／伴手禮，審核後自動加入。</p>
@@ -290,7 +301,7 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 <div class="cfg"><h3>🛡 管理者</h3>
 <p class="rule">待審清單透過 Telegram 審核，確認後由排程器套用＋push。每日 08:00 自動產出投票加權排程 digest。</p></div>
 </div>
-<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20260909-z・有問題請截圖此行</div>
+<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20260909-aa・有問題請截圖此行</div>
 <div class="summary"><div class="grow" id="sumtxt">已選 0 項・合計 0 分</div><button id="btnCopy" onclick="copyPlan()">複製初稿</button><button id="btnPrint" onclick="showSheet()">檢視</button></div>
 <script>
 var curDay=2,curPlan={1:'A',2:'A',3:'A'};
@@ -304,10 +315,10 @@ document.querySelectorAll('input[type=checkbox]').forEach(c=>c.addEventListener(
 function cur(){var a=[];document.querySelectorAll('#'+visPlan()+' input[type=checkbox]:checked').forEach(c=>{if(c.dataset.n)a.push('・'+c.dataset.n+'（約'+fmt(+c.dataset.t)+'）');});return a;}
 function showSheet(){var a=cur();document.getElementById('mylist').innerHTML=a.length?a.map(x=>'<li>'+x+'</li>').join(''):'<li>尚未勾選</li>';var t=0;document.querySelectorAll('#'+visPlan()+' input[type=checkbox]:checked').forEach(c=>{t+=+(c.dataset.t||0);});document.getElementById('mytotal').textContent='合計體驗時間約 '+fmt(t)+'（＋交通緩衝）';document.getElementById('sheet').classList.add('on');document.getElementById('sheet').scrollIntoView({behavior:'smooth'});}
 function copyPlan(){var names=['12/16基隆登船','12/17宮古島','12/18那霸','12/19石垣島','12/20基隆返抵'];var txt='【郵輪初稿｜'+names[curDay]+'】\n'+cur().join('\n');navigator.clipboard.writeText(txt).then(()=>alert('已複製，可貼到記事本/LINE'));}
-var CFGDEF={d2:390,d3:480,d4:450,cmtw:0.5},CFGKEY='plan_cfg_v1';
+var CFGDEF={d2:390,d3:480,d4:450,cmtw:0.5,maxLeg:60,maxWalk:30,noLegWalk:0,dailyCap:3000,noTaxi:true,shipBuffer:45,flightBuffer:120},CFGKEY='plan_cfg_v1';
 function loadCfg(){try{return Object.assign({},CFGDEF,JSON.parse(localStorage.getItem(CFGKEY)||'{}'));}catch(e){return Object.assign({},CFGDEF);}}
-function paintCfg(){var c=loadCfg();document.getElementById('cfg_d2').value=c.d2;document.getElementById('cfg_d3').value=c.d3;document.getElementById('cfg_d4').value=c.d4;document.getElementById('cfg_cmtw').value=c.cmtw;}
-function saveCfg(){var c={d2:+document.getElementById('cfg_d2').value||CFGDEF.d2,d3:+document.getElementById('cfg_d3').value||CFGDEF.d3,d4:+document.getElementById('cfg_d4').value||CFGDEF.d4,cmtw:+document.getElementById('cfg_cmtw').value||0};localStorage.setItem(CFGKEY,JSON.stringify(c));document.getElementById('cfgmsg').textContent='已儲存，下次排程生效';}
+function paintCfg(){var c=loadCfg();['d2','d3','d4','cmtw','maxLeg','maxWalk','noLegWalk','dailyCap','shipBuffer','flightBuffer'].forEach(function(k){document.getElementById('cfg_'+k).value=c[k];});document.getElementById('cfg_noTaxi').checked=!!c.noTaxi;}
+function saveCfg(){var c={},v=function(k){return document.getElementById('cfg_'+k).value;};c.d2=+v('d2')||CFGDEF.d2;c.d3=+v('d3')||CFGDEF.d3;c.d4=+v('d4')||CFGDEF.d4;c.cmtw=+v('cmtw')||0;c.maxLeg=+v('maxLeg');c.maxWalk=+v('maxWalk');c.noLegWalk=+v('noLegWalk');c.dailyCap=+v('dailyCap');c.noTaxi=document.getElementById('cfg_noTaxi').checked;c.shipBuffer=+v('shipBuffer');c.flightBuffer=+v('flightBuffer');localStorage.setItem(CFGKEY,JSON.stringify(c));document.getElementById('cfgmsg').textContent='已儲存，下次排程生效';}
 function resetCfg(){localStorage.removeItem(CFGKEY);paintCfg();document.getElementById('cfgmsg').textContent='已恢復預設';}
 function openSettings(){document.querySelectorAll('.days,.abrow,.plan,.sheet').forEach(s=>{s.style.display='none';});var sp=document.getElementById('setpage');sp.style.display='block';sp.classList.add('on');paintCfg();window.scrollTo({top:0});}
 function closeSettings(){var sp=document.getElementById('setpage');sp.classList.remove('on');document.querySelectorAll('.days,.abrow,.plan,.sheet').forEach(s=>{s.style.display='';});refresh();window.scrollTo({top:0});}
