@@ -722,7 +722,8 @@ function me(){return localStorage.getItem(NKEY)||'';}
 function enter(){var n=document.getElementById('nameInput').value.trim();if(!n){alert('請先寫名字');return;}localStorage.setItem(NKEY,n);document.getElementById('gate').classList.add('hide');paintWho();refreshVotes();}
 function rename(){var n=prompt('你的名字',me());if(n&&n.trim()){localStorage.setItem(NKEY,n.trim());paintWho();refreshVotes();}}
 function paintWho(){document.getElementById('who').textContent=me()?('👤 '+me()):'';}
-function titles(){var m={};PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){var h=c.querySelector('h3');var cat=(CARDMAP[s[0]]||[])[i]||'spot';m[s[0]+'#'+i]={t:h?h.textContent.trim():'項目'+(i+1),g:s[1]+CATN[cat]};});});return m;}
+function cleanT(s){return (s||'').replace(/\s*[✅⚠️]\s*$/,'').trim();}
+function titles(){var m={};PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){var h=c.querySelector('h3');var cat=(CARDMAP[s[0]]||[])[i]||'spot';m[s[0]+'#'+i]={t:h?cleanT(h.textContent):'項目'+(i+1),g:s[1]+CATN[cat]};});});return m;}
 function cardCat(sectId,idx){return (CARDMAP[sectId]||[])[idx]||'spot';}
 function buildVoteUI(){PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){if(c.querySelector('.vote'))return;var d=document.createElement('div');d.className='vote';d.innerHTML='<button>👍 投票</button><span class="cnt">0票</span>';c.appendChild(d);var btn=d.querySelector('button');btn.onclick=(function(id){return function(){toggle(id);};})(s[0]+'#'+i);});});}
 var GH_API='https://api.github.com/repos/a4623671/cruise-votes/contents/votes.json';
