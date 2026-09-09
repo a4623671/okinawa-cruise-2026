@@ -59,6 +59,7 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 #galov .gp{left:2px}#galov .gn{right:2px}
 #galov .gc{position:absolute;bottom:14px;color:#fff;font-size:13px}
 img.ph{cursor:zoom-in}
+.tw{color:#c0392b;font-weight:800;margin-left:6px;white-space:nowrap}
 .gal{position:relative;overflow:hidden;border-radius:10px;margin:8px 0 2px}
 .trk{display:flex;transition:transform .3s}
 .trk img.ph{width:100%;flex:none;margin:0;border-radius:10px}
@@ -82,7 +83,7 @@ img.ph{cursor:zoom-in}
 <button class="cat cat2" onclick="swCat('souv',this)">🎁 伴手禮</button>
 <button class="cat cat2" onclick="swCat('feat',this)">✨ 當地特色</button>
 </div>
-<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。票數存在<strong>本機</strong>，跨裝置合併請用統計內的「投票碼」功能。</div>
+<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數存在<strong>本機</strong>，跨裝置合併請用統計內的「投票碼」功能。</div>
 <div class="wrap">
 
 <!-- ================= NAHA ================= -->
@@ -628,6 +629,13 @@ img.ph{cursor:zoom-in}
 <p class="kv"><b>費用：</b>約¥200⚠️</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=宮良殿内" target="_blank">🗺 地圖</a></div>
 
+<div class="card"><h3>米子燒工房・シーサー農園 ✅</h3><div class="en">Yoneko-yaki (風獅爺公園)</div>
+<img class="ph" loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Rooftop%20Shisa%20lion,%20Taketomijima,%20Okinawa,%20Japan.JPG?width=960" onerror="this.style.display='none'" alt="シーサー意象"><div class="credit">圖：シーサー意象（圖為竹富島屋頂獅子）／Wikimedia Commons</div>
+<div class="stars"><b>🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
+<p>介紹：石垣米子地區的陶器工房＋戶外シーサー園，大大小小風獅爺排滿園區超好拍，可順遊米子海岸。陶器體驗需預約⚠️，時間緊者逛園區＋買小シーサー即可。</p>
+<p class="kv"><b>費用：</b>入園免費，體驗約¥2,000–3,000⚠️｜<b>停留：</b>約40分–1小時｜<b>交通：</b>包車順路（川平方向）</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=米子焼工房+石垣" target="_blank">🗺 地圖</a></div>
+
 <div class="card"><h3>ドン・キホーテ石垣島店 ✅</h3><div class="en">Don Quijote Ishigaki（大型＋退稅）</div>
 <div class="stars"><b>🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
 <p>介紹：石垣最大級量販，藥妝零食伴手禮＋部分家電小物，可退稅⚠️。石垣島<b>無百貨公司、無大型家電量販</b>，電器請去那霸買或回台灣買。</p>
@@ -692,7 +700,7 @@ var CATN={food:'餐廳',spot:'景點',shop:'購物',souv:'伴手禮',feat:'當�
 var CARDMAP={
 's-naha':['food','food','food','food','food','food','food','food','food','food','food','spot','spot','spot','spot','spot','spot','spot','spot','spot','shop','shop','shop','shop','shop','shop','shop','spot','spot','spot','spot','souv','souv','souv','souv','souv','souv','souv','feat','spot'],
 's-miyako':['spot','spot','spot','spot','spot','food','food','shop','spot','spot','spot','spot','spot','shop','shop','souv','souv','souv','souv','souv','feat'],
-'s-ishigaki':['spot','spot','spot','spot','food','food','food','food','food','shop','spot','spot','spot','shop','souv','souv','souv','souv','souv','feat']};
+'s-ishigaki':['spot','spot','spot','spot','food','food','food','food','food','shop','spot','spot','spot','spot','shop','souv','souv','souv','souv','souv','feat']};
 var GROUPS=[];PLACES.forEach(function(s){CATS.forEach(function(c){GROUPS.push(s[1]+CATN[c]);});});
 var curP='s-naha',curC='food';
 var VKEY='discuss_votes_v1',NKEY='discuss_name_v1';
@@ -722,7 +730,9 @@ function renderStats(){var v=loadV(),t=titles(),h='';GROUPS.forEach(function(g){
 function exportVotes(){var s=btoa(unescape(encodeURIComponent(JSON.stringify(loadV()))));var done=function(){alert('投票碼已複製，傳給家人合併');};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(s).then(done,function(){prompt('複製此投票碼',s);});else prompt('複製此投票碼',s);}
 function importVotes(){var s=prompt('貼上家人傳來的投票碼');if(!s)return;try{var inc=JSON.parse(decodeURIComponent(escape(atob(s.trim()))));var v=loadV();Object.keys(inc).forEach(function(id){var cur=v[id]||[];inc[id].forEach(function(n){if(cur.indexOf(n)<0)cur.push(n);});if(cur.length)v[id]=cur;});saveV(v);refreshVotes();alert('已合併！');}catch(e){alert('投票碼格式錯誤');}}
 document.getElementById('nameInput').addEventListener('keydown',function(e){if(e.key==='Enter')enter();});
-buildVoteUI();paintWho();applyFilter();initGal();initSwipe();
+buildVoteUI();paintWho();applyFilter();initGal();initSwipe();paintTW();
+var TWRATE={'s-naha#0':5,'s-naha#1':5,'s-naha#2':4,'s-naha#3':5,'s-naha#4':3,'s-naha#5':4,'s-naha#6':3,'s-naha#7':4,'s-naha#8':4,'s-naha#9':2,'s-naha#10':4,'s-naha#11':5,'s-naha#12':4,'s-naha#13':5,'s-naha#14':5,'s-naha#15':2,'s-naha#16':4,'s-naha#17':3,'s-naha#18':2,'s-naha#19':1,'s-naha#20':3,'s-naha#21':4,'s-naha#22':2,'s-naha#23':4,'s-naha#24':5,'s-naha#25':3,'s-naha#26':2,'s-naha#27':5,'s-naha#28':2,'s-naha#29':1,'s-naha#30':1,'s-naha#31':5,'s-naha#32':5,'s-naha#33':4,'s-naha#34':4,'s-naha#35':3,'s-naha#36':3,'s-naha#37':3,'s-naha#39':1,'s-miyako#0':5,'s-miyako#1':5,'s-miyako#2':4,'s-miyako#3':4,'s-miyako#4':4,'s-miyako#5':4,'s-miyako#6':4,'s-miyako#7':4,'s-miyako#8':2,'s-miyako#9':2,'s-miyako#10':1,'s-miyako#11':2,'s-miyako#12':3,'s-miyako#13':3,'s-miyako#14':3,'s-miyako#15':5,'s-miyako#16':4,'s-miyako#17':4,'s-miyako#18':3,'s-miyako#19':4,'s-ishigaki#0':5,'s-ishigaki#1':3,'s-ishigaki#2':2,'s-ishigaki#3':3,'s-ishigaki#4':4,'s-ishigaki#5':4,'s-ishigaki#6':5,'s-ishigaki#7':5,'s-ishigaki#8':3,'s-ishigaki#9':4,'s-ishigaki#10':2,'s-ishigaki#11':2,'s-ishigaki#12':2,'s-ishigaki#13':3,'s-ishigaki#14':3,'s-ishigaki#15':4,'s-ishigaki#16':3,'s-ishigaki#17':3,'s-ishigaki#18':5,'s-ishigaki#19':3};
+function paintTW(){PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){var v=TWRATE[s[0]+'#'+i];if(!v||c.querySelector('.tw'))return;var st=c.querySelector('.stars');if(!st)return;var sp=document.createElement('span');sp.className='tw';sp.textContent='🇹🇼×'+v;st.appendChild(sp);});});}
 function initSwipe(){document.querySelectorAll('.gal').forEach(function(g){var trk=g.querySelector('.trk'),n=trk.children.length,idx=0,dots=g.querySelector('.gdot');
 function dr(){var s='';for(var k=0;k<n;k++)s+=(k===idx?'●':'○');dots.textContent=s;}
 function go(i){idx=(i+n)%n;trk.style.transform='translateX(-'+(idx*100)+'%)';dr();}
