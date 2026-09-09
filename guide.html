@@ -777,7 +777,7 @@ img.ph{cursor:zoom-in}
 </div>
 
 <div id="imodal"><div class="ipanel"><span class="ix" onclick="closeItem()">✕</span><div id="iboby"></div></div></div>
-<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20260909-x<span id="jsok"></span><span id="jsdiag"></span>・有問題請截圖此行</div>
+<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20260909-y<span id="jsok"></span><span id="jsdiag"></span>・有問題請截圖此行</div>
 <button id="statsBtn" onclick="openStats()">📊 統計</button>
 <div id="stats"><div class="panel"><h2>📊 投票統計</h2><div class="sub" id="statsSub"></div><div id="statsBody"></div>
 <div class="sub" id="syncStat">連線中…</div>
@@ -827,9 +827,9 @@ function unionVotes(a,b){var o={};Object.keys(a).forEach(function(k){o[k]=a[k].s
 function setMode(m){var el=document.getElementById('syncStat');if(el)el.textContent=m==='online'?'🟢 自動同步中':'🟠 離線模式（僅存本機，連網後自動上傳）';}
 function syncFromRemote(silent){return ghGet().then(function(remote){var local=loadV();var dirty=localStorage.getItem(GH_DIRTY)||!localStorage.getItem(GH_UPKEY);if(dirty){var merged=unionVotes(remote,local);localStorage.setItem(GH_UPKEY,'1');localStorage.removeItem(GH_DIRTY);if(JSON.stringify(merged)!==JSON.stringify(remote))return ghPut(merged,GH_SHA).then(function(v){saveV(v);return syncCmt();});}saveV(remote);return syncCmt();}).then(function(){setMode('online');refreshVotes();}).catch(function(e){setMode('offline');if(!silent)refreshVotes();});}
 function syncCmt(){return chGet().then(function(c){CMT=c;saveCmt(c);}).catch(function(e){CMT=loadCmt();});}
-CMT=loadCmt();
 var GH_API_C='https://api.github.com/repos/a4623671/cruise-votes/contents/comments.json';
-var CMT={},CMT_SHA=null,CMT_KEY='discuss_cmt_v1',CMT_BUSY=false;
+var CMT_SHA=null,CMT_KEY='discuss_cmt_v1',CMT_BUSY=false;
+var CMT=loadCmt();
 function loadCmt(){try{return JSON.parse(localStorage.getItem(CMT_KEY)||'{}');}catch(e){return {};}}
 function saveCmt(c){try{localStorage.setItem(CMT_KEY,JSON.stringify(c));}catch(e){}}
 function chGet(){return fetch(GH_API_C+'?t='+Date.now(),{headers:ghHeaders(),cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('cget '+r.status);return r.json();}).then(function(j){CMT_SHA=j.sha;try{return JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));}catch(e){return {};}});}
