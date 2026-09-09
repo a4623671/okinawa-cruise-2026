@@ -45,11 +45,19 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .sheet{display:none;background:#fff;color:#222;border-radius:14px;padding:14px;margin:12px;font-size:14px}
 .sheet.on{display:block}.sheet li{margin:4px 0 4px 18px}
 .note{font-size:12px;color:#888;margin:10px 2px}
-@media print{.topbar,.days,.abrow,.summary,.pick,.ibtn{display:none}.plan{display:block}}
+@media print{.topbar,.days,.abrow,.summary,.pick,.ibtn,#setpage{display:none}.plan{display:block}}
+.cfg{background:#fff;border-radius:12px;padding:10px 14px;margin:0 0 10px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.cfg h3{font-size:16px;margin-bottom:4px}.cfg .row{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:14px}
+.cfg .row label{flex:1}.cfg .row input{width:90px;border:1px solid #d8d0bd;border-radius:8px;padding:6px 8px;font-size:15px;text-align:right}
+.cfg .btn{width:100%;border:none;border-radius:12px;padding:10px;font-size:15px;font-weight:700;background:#10293f;color:#fff;cursor:pointer;margin-top:6px}
+.cfg .btn.ghost{background:#fff;color:#10293f;border:1px solid #d8d0bd}
+.cfg .rule{font-size:13px;color:#555;margin:4px 0}.cfg .rule b{color:#b3541e}
+#cfgmsg{font-size:13px;color:#0e6e5a;text-align:center;min-height:20px}
+.backbtn{border:1px solid #d8d0bd;background:#fff;border-radius:20px;padding:6px 14px;font-size:14px;cursor:pointer;margin-bottom:10px}
 </style>
 </head>
 <body>
-<div class="topbar"><div class="logo">🚢 行程</div><a href="index.html" style="font-size:14px;color:#10293f;text-decoration:none;font-weight:700">‹ 返回入口</a><div class="sp"></div><button onclick="window.print()">🖨 列印</button></div>
+<div class="topbar"><div class="logo">🚢 行程</div><a href="index.html" style="font-size:14px;color:#10293f;text-decoration:none;font-weight:700">‹ 返回入口</a><div class="sp"></div><button onclick="openSettings()">⚙️</button><button onclick="window.print()">🖨 列印</button></div>
 <div class="hero">
 <h1>2026 MSC榮耀號・5天4夜岸上觀光初稿</h1>
 <div class="meta">12/16基隆18:00啟航 → 12/17宮古島08:00–18:00 → 12/18那霸07:00–19:00 → 12/19石垣島09:00–19:00 → 12/20基隆07:00抵達</div>
@@ -265,7 +273,24 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 </div>
 
 <div class="sheet" id="sheet"><h3>📋 我的初稿（當前頁面已勾選）</h3><ul id="mylist"></ul><p id="mytotal" style="font-weight:800;margin-top:8px"></p></div>
-<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20260909-q・有問題請截圖此行</div>
+<div class="plan" id="setpage">
+<button class="backbtn" onclick="closeSettings()">‹ 回上一頁</button>
+<div class="cfg"><h3>📐 動態規劃參數</h3>
+<div class="row"><label>D2 宮古島活動預算（分）</label><input id="cfg_d2" type="number" min="0" max="720"></div>
+<div class="row"><label>D3 那霸活動預算（分）</label><input id="cfg_d3" type="number" min="0" max="720"></div>
+<div class="row"><label>D4 石垣島活動預算（分）</label><input id="cfg_d4" type="number" min="0" max="720"></div>
+<div class="row"><label>一則留言折算票數</label><input id="cfg_cmtw" type="number" min="0" max="2" step="0.5"></div>
+<button class="btn" onclick="saveCfg()">儲存參數</button>
+<button class="btn ghost" onclick="resetCfg()">恢復預設（390／480／450／0.5）</button>
+<div id="cfgmsg"></div></div>
+<div class="cfg"><h3>📏 開放規則</h3>
+<p class="rule"><b>只能新增</b>：任何人可提案新景點／餐廳／購物／伴手禮，審核後自動加入。</p>
+<p class="rule"><b>不能刪除</b>：刪除只能按「建議刪除」附理由，管理者確認才執行。</p>
+<p class="rule"><b>初稿保護</b>：排程變動（替換／調時間）一律先出建議書，管理者確認才改檔。</p></div>
+<div class="cfg"><h3>🛡 管理者</h3>
+<p class="rule">待審清單透過 Telegram 審核，確認後由排程器套用＋push。每日 08:00 自動產出投票加權排程 digest。</p></div>
+</div>
+<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20260909-z・有問題請截圖此行</div>
 <div class="summary"><div class="grow" id="sumtxt">已選 0 項・合計 0 分</div><button id="btnCopy" onclick="copyPlan()">複製初稿</button><button id="btnPrint" onclick="showSheet()">檢視</button></div>
 <script>
 var curDay=2,curPlan={1:'A',2:'A',3:'A'};
@@ -279,6 +304,13 @@ document.querySelectorAll('input[type=checkbox]').forEach(c=>c.addEventListener(
 function cur(){var a=[];document.querySelectorAll('#'+visPlan()+' input[type=checkbox]:checked').forEach(c=>{if(c.dataset.n)a.push('・'+c.dataset.n+'（約'+fmt(+c.dataset.t)+'）');});return a;}
 function showSheet(){var a=cur();document.getElementById('mylist').innerHTML=a.length?a.map(x=>'<li>'+x+'</li>').join(''):'<li>尚未勾選</li>';var t=0;document.querySelectorAll('#'+visPlan()+' input[type=checkbox]:checked').forEach(c=>{t+=+(c.dataset.t||0);});document.getElementById('mytotal').textContent='合計體驗時間約 '+fmt(t)+'（＋交通緩衝）';document.getElementById('sheet').classList.add('on');document.getElementById('sheet').scrollIntoView({behavior:'smooth'});}
 function copyPlan(){var names=['12/16基隆登船','12/17宮古島','12/18那霸','12/19石垣島','12/20基隆返抵'];var txt='【郵輪初稿｜'+names[curDay]+'】\n'+cur().join('\n');navigator.clipboard.writeText(txt).then(()=>alert('已複製，可貼到記事本/LINE'));}
+var CFGDEF={d2:390,d3:480,d4:450,cmtw:0.5},CFGKEY='plan_cfg_v1';
+function loadCfg(){try{return Object.assign({},CFGDEF,JSON.parse(localStorage.getItem(CFGKEY)||'{}'));}catch(e){return Object.assign({},CFGDEF);}}
+function paintCfg(){var c=loadCfg();document.getElementById('cfg_d2').value=c.d2;document.getElementById('cfg_d3').value=c.d3;document.getElementById('cfg_d4').value=c.d4;document.getElementById('cfg_cmtw').value=c.cmtw;}
+function saveCfg(){var c={d2:+document.getElementById('cfg_d2').value||CFGDEF.d2,d3:+document.getElementById('cfg_d3').value||CFGDEF.d3,d4:+document.getElementById('cfg_d4').value||CFGDEF.d4,cmtw:+document.getElementById('cfg_cmtw').value||0};localStorage.setItem(CFGKEY,JSON.stringify(c));document.getElementById('cfgmsg').textContent='已儲存，下次排程生效';}
+function resetCfg(){localStorage.removeItem(CFGKEY);paintCfg();document.getElementById('cfgmsg').textContent='已恢復預設';}
+function openSettings(){document.querySelectorAll('.days,.abrow,.plan,.sheet').forEach(s=>{s.style.display='none';});var sp=document.getElementById('setpage');sp.style.display='block';sp.classList.add('on');paintCfg();window.scrollTo({top:0});}
+function closeSettings(){var sp=document.getElementById('setpage');sp.classList.remove('on');document.querySelectorAll('.days,.abrow,.plan,.sheet').forEach(s=>{s.style.display='';});refresh();window.scrollTo({top:0});}
 refresh();
 </script>
 </body>
