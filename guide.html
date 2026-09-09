@@ -390,6 +390,12 @@ img.ph{cursor:zoom-in}
 <div class="shop"><b>必體驗：</b><ul>
 <li>島ぞうり刻字：平和通現場刻名，30分鐘取件，約¥2,000–3,000</li><li>壺屋陶器繪付け：需預約⚠️，岸上時間緊者改買現成品</li><li>週日步行者天國：國際通部分時段封街⚠️（以官方公告為準）</li></ul></div></div>
 
+<div class="card"><h3>西来院（達摩寺）✅</h3><div class="en">Sairai-in, Shuri Akatacho</div>
+<div class="stars"><b>🔥🔥</b> <span class="rec">💚💚💚</span></div>
+<p>介紹：臨済宗妙心寺派，山号達磨峰，本尊阿弥陀如来，明治時代自儀保町遷至現址，沖繩戰燒毀後重建（以上出自日文維基）。當地人稱達摩寺，2樓外搭一間神社（家人提供⚠️）。御朱印與參拜方式請現場確認。</p>
+<p class="kv"><b>地址：</b>那覇市首里赤田町一丁目（OSM定位）｜<b>交通：</b>單軌首里站步行約15分⚠️｜<b>停留：</b>約30分。無授權好照片故不附圖，請點地圖看實景。</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=西来院+首里赤田町" target="_blank">🗺 地圖</a></div>
+
 <div class="card"><h3>安里八幡宮 ✅</h3><div class="en">Asato Hachimangu</div>
 <div class="stars"><b>🔥🔥</b> <span class="rec">💚💚💚</span></div>
 <p>介紹：琉球八社之一，市區小神社，安里站旁參拜5分鐘可結束。蒐集八社朱印者順路點，一般遊客可略過。</p>
@@ -704,7 +710,7 @@ var PLACES=[['s-naha','那霸'],['s-miyako','宮古島'],['s-ishigaki','石垣�
 var CATS=['food','spot','shop','souv','feat'];
 var CATN={food:'餐廳',spot:'景點',shop:'購物',souv:'伴手禮',feat:'當地特色'};
 var CARDMAP={
-'s-naha':['food','food','food','food','food','food','food','food','food','food','food','spot','spot','spot','spot','spot','spot','spot','spot','spot','shop','shop','shop','shop','shop','shop','shop','spot','spot','spot','spot','souv','souv','souv','souv','souv','souv','souv','feat','spot'],
+'s-naha':['food','food','food','food','food','food','food','food','food','food','food','spot','spot','spot','spot','spot','spot','spot','spot','spot','shop','shop','shop','shop','shop','shop','shop','spot','spot','spot','spot','souv','souv','souv','souv','souv','souv','souv','feat','spot','spot'],
 's-miyako':['spot','spot','spot','spot','spot','food','food','shop','spot','spot','spot','spot','spot','shop','shop','souv','souv','souv','souv','souv','feat'],
 's-ishigaki':['spot','spot','spot','spot','food','food','food','food','food','shop','spot','spot','spot','spot','shop','souv','souv','souv','souv','souv','feat']};
 var GROUPS=[];PLACES.forEach(function(s){CATS.forEach(function(c){GROUPS.push(s[1]+CATN[c]);});});
@@ -749,7 +755,7 @@ function exportVotes(){var s=btoa(unescape(encodeURIComponent(JSON.stringify(loa
 function importVotes(){var s=prompt('貼上家人傳來的投票碼');if(!s)return;try{var inc=JSON.parse(decodeURIComponent(escape(atob(s.trim()))));var v=loadV();Object.keys(inc).forEach(function(id){var cur=v[id]||[];inc[id].forEach(function(n){if(cur.indexOf(n)<0)cur.push(n);});if(cur.length)v[id]=cur;});saveV(v);refreshVotes();alert('已合併！');}catch(e){alert('投票碼格式錯誤');}}
 document.getElementById('nameInput').addEventListener('keydown',function(e){if(e.key==='Enter')enter();});
 buildVoteUI();paintWho();applyFilter();initGal();initSwipe();paintTW();syncFromRemote();setInterval(function(){syncFromRemote(true);},15000);
-var TWRATE={'s-naha#0':5,'s-naha#1':5,'s-naha#2':4,'s-naha#3':5,'s-naha#4':3,'s-naha#5':4,'s-naha#6':3,'s-naha#7':4,'s-naha#8':4,'s-naha#9':2,'s-naha#10':4,'s-naha#11':5,'s-naha#12':4,'s-naha#13':5,'s-naha#14':5,'s-naha#15':2,'s-naha#16':4,'s-naha#17':3,'s-naha#18':2,'s-naha#19':1,'s-naha#20':3,'s-naha#21':4,'s-naha#22':2,'s-naha#23':4,'s-naha#24':5,'s-naha#25':3,'s-naha#26':2,'s-naha#27':5,'s-naha#28':2,'s-naha#29':1,'s-naha#30':1,'s-naha#31':5,'s-naha#32':5,'s-naha#33':4,'s-naha#34':4,'s-naha#35':3,'s-naha#36':3,'s-naha#37':3,'s-naha#39':1,'s-miyako#0':5,'s-miyako#1':5,'s-miyako#2':4,'s-miyako#3':4,'s-miyako#4':4,'s-miyako#5':4,'s-miyako#6':4,'s-miyako#7':4,'s-miyako#8':2,'s-miyako#9':2,'s-miyako#10':1,'s-miyako#11':2,'s-miyako#12':3,'s-miyako#13':3,'s-miyako#14':3,'s-miyako#15':5,'s-miyako#16':4,'s-miyako#17':4,'s-miyako#18':3,'s-miyako#19':4,'s-ishigaki#0':5,'s-ishigaki#1':3,'s-ishigaki#2':2,'s-ishigaki#3':3,'s-ishigaki#4':4,'s-ishigaki#5':4,'s-ishigaki#6':5,'s-ishigaki#7':5,'s-ishigaki#8':3,'s-ishigaki#9':4,'s-ishigaki#10':2,'s-ishigaki#11':2,'s-ishigaki#12':2,'s-ishigaki#13':3,'s-ishigaki#14':3,'s-ishigaki#15':4,'s-ishigaki#16':3,'s-ishigaki#17':3,'s-ishigaki#18':5,'s-ishigaki#19':3};
+var TWRATE={'s-naha#0':5,'s-naha#1':5,'s-naha#2':4,'s-naha#3':5,'s-naha#4':3,'s-naha#5':4,'s-naha#6':3,'s-naha#7':4,'s-naha#8':4,'s-naha#9':2,'s-naha#10':4,'s-naha#11':5,'s-naha#12':4,'s-naha#13':5,'s-naha#14':5,'s-naha#15':2,'s-naha#16':4,'s-naha#17':3,'s-naha#18':2,'s-naha#19':1,'s-naha#20':3,'s-naha#21':4,'s-naha#22':2,'s-naha#23':4,'s-naha#24':5,'s-naha#25':3,'s-naha#26':2,'s-naha#27':5,'s-naha#28':2,'s-naha#29':1,'s-naha#30':1,'s-naha#31':5,'s-naha#32':5,'s-naha#33':4,'s-naha#34':4,'s-naha#35':3,'s-naha#36':3,'s-naha#37':3,'s-naha#39':2,'s-naha#40':1,'s-miyako#0':5,'s-miyako#1':5,'s-miyako#2':4,'s-miyako#3':4,'s-miyako#4':4,'s-miyako#5':4,'s-miyako#6':4,'s-miyako#7':4,'s-miyako#8':2,'s-miyako#9':2,'s-miyako#10':1,'s-miyako#11':2,'s-miyako#12':3,'s-miyako#13':3,'s-miyako#14':3,'s-miyako#15':5,'s-miyako#16':4,'s-miyako#17':4,'s-miyako#18':3,'s-miyako#19':4,'s-ishigaki#0':5,'s-ishigaki#1':3,'s-ishigaki#2':2,'s-ishigaki#3':3,'s-ishigaki#4':4,'s-ishigaki#5':4,'s-ishigaki#6':5,'s-ishigaki#7':5,'s-ishigaki#8':3,'s-ishigaki#9':4,'s-ishigaki#10':2,'s-ishigaki#11':2,'s-ishigaki#12':2,'s-ishigaki#13':3,'s-ishigaki#14':3,'s-ishigaki#15':4,'s-ishigaki#16':3,'s-ishigaki#17':3,'s-ishigaki#18':5,'s-ishigaki#19':3};
 function paintTW(){PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){var v=TWRATE[s[0]+'#'+i];if(!v||c.querySelector('.tw'))return;var st=c.querySelector('.stars');if(!st)return;var sp=document.createElement('span');sp.className='tw';sp.textContent='🇹🇼×'+v;st.appendChild(sp);});});}
 function initSwipe(){document.querySelectorAll('.gal').forEach(function(g){var trk=g.querySelector('.trk'),n=trk.children.length,idx=0,dots=g.querySelector('.gdot');
 function dr(){var s='';for(var k=0;k<n;k++)s+=(k===idx?'●':'○');dots.textContent=s;}
