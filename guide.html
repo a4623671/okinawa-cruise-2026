@@ -78,6 +78,7 @@ tr.sdet td{background:#faf7ef}
 .sortrow button{flex:1;border:1px solid #d8d0bd;background:#fff;border-radius:18px;padding:7px 4px;font-size:13px;cursor:pointer}
 .sortrow button.on{background:#7a1f2b;color:#fff;border-color:#7a1f2b;font-weight:700}
 .ranktbl{width:100%;border-collapse:collapse}
+.gcap{text-align:center;font-size:13px;font-weight:800;margin:4px 0 0}
 .ranktbl td{border-bottom:1px solid #eee;padding:8px 4px;vertical-align:top;font-size:13px}
 .srank{font-weight:800;white-space:nowrap;text-align:center}
 .sth{width:48px;height:48px;border-radius:8px;object-fit:cover;cursor:zoom-in;flex:none}
@@ -876,11 +877,8 @@ function renderRanks(){
       var hasRows=((kind==='food'?SOUV_FOOD[place]:kind==='goods'?SOUV_GOODS[place]:SOUV_SAUCE[place])||[]).length||(((SOUV_EXTRA[place]||{})[kind])||[]).length;
       if(!hasRows)return;
       var shell=document.createElement('div');shell.className='rankcard';shell.setAttribute('data-place',place);shell.setAttribute('data-kind',kind);
-      var galImgs=[];
-      ((kind==='food'?SOUV_FOOD[place]:kind==='goods'?SOUV_GOODS[place]:SOUV_SAUCE[place])||[]).forEach(function(id){var o=souvRowObj(place,id);if(o&&o.img&&galImgs.indexOf(o.img)<0)galImgs.push(o.img);});
-      if(kind!=='sauce')(SOUV_XGAL[place]||[]).forEach(function(u){if(galImgs.indexOf(u)<0)galImgs.push(u);});
       shell.innerHTML='<h3 style="font-size:16px">'+(kind==='food'?'🍱 吃的':kind==='goods'?'🛍 物品':'🧂 醬料（三島）')+'</h3>'
-        +(galImgs.length?'<div class="gal"><div class="trk">'+galImgs.map(function(u){return '<img class="ph" loading="lazy" src="'+u+'" onerror="this.style.display=\'none\'" alt="">';}).join('')+'</div><button class="gl">‹</button><button class="gr">›</button><div class="gdot"></div></div><div class="credit">左右滑動多圖／圖：Wikimedia Commons</div>':'')
+        +'<div class="galwrap"></div>'
         +'<div class="sortrow"><button data-k="hot" class="on">🔥熱門</button><button data-k="tw">🇹🇼台灣人</button><button data-k="vote">🗳家人票</button></div>'
         +'<table class="ranktbl"><tbody></tbody></table>';
       h2.after(shell);
@@ -891,6 +889,7 @@ function renderRanks(){
   });
   paintRanks();
 }
+function bindRankGal(gw){var g=gw.querySelector('.gal');if(!g)return;var trk=g.querySelector('.trk'),n=trk.children.length,idx=0,cap=gw.querySelector('.gcap');function dr(){var s='';for(var k=0;k<n;k++)s+=(k===idx?'●':'○');var d=g.querySelector('.gdot');if(d)d.textContent=s;if(cap&&n)cap.textContent=(idx+1)+'/'+n+' '+trk.children[idx].getAttribute('data-t');}function go(i){if(!n)return;idx=(i+n)%n;trk.style.transform='translateX(-'+(idx*100)+'%)';dr();}g.querySelector('.gl').onclick=function(e){e.stopPropagation();go(idx-1);};g.querySelector('.gr').onclick=function(e){e.stopPropagation();go(idx+1);};var tx=0;trk.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;},{passive:true});trk.addEventListener('touchend',function(e){var dx=e.changedTouches[0].clientX-tx;if(dx>40)go(idx-1);else if(dx<-40)go(idx+1);});dr();}
 function paintRank(place,kind){
   var sel='.rankcard[data-place="'+place+'"][data-kind="'+kind+'"] tbody';var tb=document.querySelector(sel);if(!tb)return;
   var k=SOUV_SORT[place+kind]||'hot',v=loadV();
@@ -904,6 +903,8 @@ function paintRank(place,kind){
     +'<td class="n sscore">'+souvScoreTxt(o,k)+'</td>'
     +'<td class="r"><button class="svote'+(vc&&v[o.id].indexOf(me())>=0?' voted':'')+'">👍</button><div class="scnt2">'+vc+'</div><button class="scmt">💬'+(cc?' '+cc:'')+'</button></td></tr>'
     +'<tr class="sdet" data-id="'+o.id+'" style="display:none"><td colspan="5"></td></tr>';}).join('');
+  var gw=document.querySelector('.rankcard[data-place="'+place+'"][data-kind="'+kind+'"] .galwrap');
+  if(gw){var sl=items.filter(function(o){return o.img;});gw.innerHTML=sl.length?'<div class="gal"><div class="trk">'+sl.map(function(o){return '<img class="ph" loading="lazy" src="'+o.img+'" data-t="'+o.t.replace(/"/g,'')+'" onerror="this.style.display=\'none\'" alt="">';}).join('')+'</div><button class="gl">‹</button><button class="gr">›</button><div class="gdot"></div></div><div class="gcap"></div><div class="credit">左右滑動多圖／圖：店家實拍與CC圖</div>':'';bindRankGal(gw);}
   tb.querySelectorAll('.svote').forEach(function(b){b.onclick=function(){var id=b.closest('tr.srow').getAttribute('data-id');toggle(id);setTimeout(refreshRanks,1500);};});
   tb.querySelectorAll('.scmt').forEach(function(b){b.onclick=function(){var tr=b.closest('tr.srow'),id=tr.getAttribute('data-id'),nx=tr.nextSibling;if(nx&&nx.classList&&nx.classList.contains('sdet')&&nx.style.display!=='none'){nx.style.display='none';return;}hideSdet(tr.parentNode);var d=null,tb2=tr.parentNode;for(var i=0;i<tb2.children.length;i++){if(tb2.children[i].classList.contains('sdet')&&tb2.children[i].getAttribute('data-id')===id){d=tb2.children[i];break;}}if(!d)return;d.firstChild.innerHTML=statDetailHTML(id);bindStatDetail(d,id);d.style.display='';};});
 }
@@ -938,7 +939,7 @@ document.getElementById('nameInput').addEventListener('keydown',function(e){if(e
 buildVoteUI();paintWho();
 var TWRATE={'s-naha#0':5,'s-naha#1':5,'s-naha#2':4,'s-naha#3':5,'s-naha#4':3,'s-naha#5':4,'s-naha#6':3,'s-naha#7':4,'s-naha#8':4,'s-naha#9':2,'s-naha#10':4,'s-naha#11':5,'s-naha#12':4,'s-naha#13':5,'s-naha#14':5,'s-naha#15':2,'s-naha#16':4,'s-naha#17':3,'s-naha#18':2,'s-naha#19':1,'s-naha#20':3,'s-naha#21':4,'s-naha#22':2,'s-naha#23':4,'s-naha#24':5,'s-naha#25':3,'s-naha#26':2,'s-naha#27':5,'s-naha#28':2,'s-naha#29':1,'s-naha#30':1,'s-naha#31':5,'s-naha#32':5,'s-naha#33':4,'s-naha#34':4,'s-naha#35':3,'s-naha#36':3,'s-naha#37':3,'s-naha#39':2,'s-naha#40':1,'s-miyako#0':5,'s-miyako#1':5,'s-miyako#2':4,'s-miyako#3':4,'s-miyako#4':4,'s-miyako#5':4,'s-miyako#6':4,'s-miyako#7':4,'s-miyako#8':2,'s-miyako#9':2,'s-miyako#10':1,'s-miyako#11':2,'s-miyako#12':3,'s-miyako#13':3,'s-miyako#14':3,'s-miyako#15':5,'s-miyako#16':4,'s-miyako#17':4,'s-miyako#18':3,'s-miyako#19':4,'s-ishigaki#0':5,'s-ishigaki#1':3,'s-ishigaki#2':2,'s-ishigaki#3':3,'s-ishigaki#4':4,'s-ishigaki#5':4,'s-ishigaki#6':5,'s-ishigaki#7':5,'s-ishigaki#8':3,'s-ishigaki#9':4,'s-ishigaki#10':2,'s-ishigaki#11':2,'s-ishigaki#12':2,'s-ishigaki#13':3,'s-ishigaki#14':3,'s-ishigaki#15':4,'s-ishigaki#16':3,'s-ishigaki#17':3,'s-ishigaki#18':5,'s-ishigaki#19':3};
 function paintTW(){PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){var v=TWRATE[s[0]+'#'+i];if(!v||c.querySelector('.tw'))return;var st=c.querySelector('.stars');if(!st)return;var sp=document.createElement('span');sp.className='tw';sp.textContent='🇹🇼×'+v;st.appendChild(sp);});});}
-function initSwipe(){document.querySelectorAll('.gal').forEach(function(g){var trk=g.querySelector('.trk'),n=trk.children.length,idx=0,dots=g.querySelector('.gdot');
+function initSwipe(){document.querySelectorAll('.gal').forEach(function(g){if(g.closest('.rankcard'))return;var trk=g.querySelector('.trk'),n=trk.children.length,idx=0,dots=g.querySelector('.gdot');
 function dr(){var s='';for(var k=0;k<n;k++)s+=(k===idx?'●':'○');dots.textContent=s;}
 function go(i){idx=(i+n)%n;trk.style.transform='translateX(-'+(idx*100)+'%)';dr();}
 g.querySelector('.gl').onclick=function(e){e.stopPropagation();go(idx-1);};
