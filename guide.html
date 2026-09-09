@@ -146,7 +146,7 @@ img.ph{cursor:zoom-in}
 <button class="cat cat2" onclick="swCat('souv',this)">🎁 伴手禮</button>
 <button class="cat cat2" onclick="swCat('feat',this)">✨ 當地特色</button>
 </div>
-<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。（版本 20260909-n）</div>
+<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。（版本 20260909-o）</div>
 <div class="wrap">
 
 <!-- ================= NAHA ================= -->
@@ -955,7 +955,7 @@ ghGet().then(function(remote){var arr=remote[id]||[];var want=arr.indexOf(n)<0;f
 function refreshVotes(){var v=loadV(),n=me(),t=titles();PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){var d=c.querySelector('.vote');if(!d)return;var id=s[0]+'#'+i,arr=v[id]||[],btn=d.querySelector('button'),cnt=d.querySelector('.cnt');btn.textContent=arr.indexOf(n)>=0?'✅ 已投':'👍 投票';btn.classList.toggle('voted',arr.indexOf(n)>=0);cnt.textContent=arr.length+'票'+(arr.length?'（'+arr.join('、')+'）':'');});});paintComments();refreshRanks();paintDonkiList();if(document.getElementById('stats').classList.contains('on'))renderStats();}
 function swPlace(id,el){curP='s-'+id;document.querySelectorAll('.cat.place').forEach(c=>c.classList.remove('on'));el.classList.add('on');applyFilter();var w=document.querySelector('.wrap');if(w)window.scrollTo({top:0,behavior:'smooth'});}
 function swCat(c,el){curC=c;document.querySelectorAll('.cat.cat2').forEach(x=>x.classList.remove('on'));el.classList.add('on');applyFilter();}
-function applyFilter(){PLACES.forEach(function(s){var show=s[0]===curP;document.getElementById(s[0]).classList.toggle('on',show);if(!show)return;var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(card,i){if(card.classList.contains('retired'))return;card.style.display=cardCat(s[0],i)===curC?'':'none';});var rks=document.querySelectorAll('#'+s[0]+' .rankcard');rks.forEach(function(r){r.style.display=(show&&(curC==='souv'||r.id==='donkizone'))?'':'none';});var h2s=document.querySelectorAll('#'+s[0]+' h2.st');h2s.forEach(function(h){var dc=h.getAttribute('data-c');h.style.display=(!dc||dc===curC)?'':'none';});});}
+function applyFilter(){PLACES.forEach(function(s){var show=s[0]===curP;document.getElementById(s[0]).classList.toggle('on',show);if(!show)return;var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(card,i){if(card.classList.contains('retired'))return;card.style.display=cardCat(s[0],i)===curC?'':'none';});var rks=document.querySelectorAll('#'+s[0]+' .rankcard');rks.forEach(function(r){r.style.display=(show&&curC==='souv')?'':'none';});var h2s=document.querySelectorAll('#'+s[0]+' h2.st');h2s.forEach(function(h){var dc=h.getAttribute('data-c');h.style.display=(!dc||dc===curC)?'':'none';});});}
 function openStats(){renderStats();document.getElementById('stats').classList.add('on');}
 function closeStats(){document.getElementById('stats').classList.remove('on');}
 var CATICON={food:'🍜',spot:'📷',shop:'🛍',souv:'🎁',feat:'✨'},PEMOJI={'那霸':'🌺','宮古島':'🏝','石垣島':'🪨'};
