@@ -71,6 +71,24 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 #stats td.sub{background:#f0e9d6;font-weight:800;font-size:13px}
 .scb{border:1px solid #d8d0bd;background:#fff;border-radius:14px;padding:2px 8px;font-size:12px;cursor:pointer;white-space:nowrap}
 tr.sdet td{background:#faf7ef}
+.card.retired{display:none !important}
+.rankcard{background:#fff;border-radius:14px;padding:12px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.sortrow{display:flex;gap:8px;margin:8px 0}
+.sortrow button{flex:1;border:1px solid #d8d0bd;background:#fff;border-radius:18px;padding:7px 4px;font-size:13px;cursor:pointer}
+.sortrow button.on{background:#7a1f2b;color:#fff;border-color:#7a1f2b;font-weight:700}
+.ranktbl{width:100%;border-collapse:collapse}
+.ranktbl td{border-bottom:1px solid #eee;padding:8px 4px;vertical-align:top;font-size:13px}
+.srank{font-weight:800;white-space:nowrap;text-align:center}
+.sth{width:48px;height:48px;border-radius:8px;object-fit:cover;cursor:zoom-in}
+.sname{font-weight:800;font-size:14px}
+.sintro{color:#555;font-size:12px;margin-top:2px}
+.sscore{font-weight:800;white-space:nowrap;text-align:center}
+.svote{border:1px solid #0e6e5a;background:#fff;color:#0e6e5a;border-radius:16px;padding:3px 10px;font-size:12px;font-weight:700;cursor:pointer}
+.svote.voted{background:#0e6e5a;color:#fff}
+.scnt2{font-size:12px;font-weight:800}
+.scmt{border:1px solid #d8d0bd;background:#fff;border-radius:14px;padding:2px 8px;font-size:12px;cursor:pointer;margin-top:4px}
+tr.sdet2 td{background:#faf7ef}
+@media print{#statsBtn,#imodal{display:none}}
 #imodal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:48;display:none;align-items:flex-end;justify-content:center}
 #imodal.on{display:flex}
 #imodal .ipanel{background:#fff;border-radius:18px 18px 0 0;max-width:680px;width:100%;max-height:88vh;overflow-y:auto;padding:18px 16px;position:relative}
@@ -763,7 +781,7 @@ function enter(){var n=document.getElementById('nameInput').value.trim();if(!n){
 function rename(){var n=prompt('你的名字',me());if(n&&n.trim()){localStorage.setItem(NKEY,n.trim());rememberName(n.trim());paintWho();refreshVotes();}}
 function paintWho(){document.getElementById('who').textContent=me()?('👤 '+me()):'';}
 function cleanT(s){return (s||'').replace(/\s*[✅⚠️]\s*$/,'').trim();}
-function titles(){var m={};PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){var h=c.querySelector('h3');var cat=(CARDMAP[s[0]]||[])[i]||'spot';m[s[0]+'#'+i]={t:h?cleanT(h.textContent):'項目'+(i+1),g:s[1]+CATN[cat]};});});return m;}
+function titles(){var m={};PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){var h=c.querySelector('h3');var cat=(CARDMAP[s[0]]||[])[i]||'spot';m[s[0]+'#'+i]={t:h?cleanT(h.textContent):'項目'+(i+1),g:s[1]+CATN[cat]};});document.querySelectorAll('#'+s[0]+' tr.srow').forEach(function(r){m[r.getAttribute('data-id')]={t:r.getAttribute('data-t')||'項目',g:r.getAttribute('data-g')||s[1]};});});return m;}
 function cardCat(sectId,idx){return (CARDMAP[sectId]||[])[idx]||'spot';}
 function buildVoteUI(){PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){if(c.querySelector('.vote'))return;var d=document.createElement('div');d.className='vote';d.innerHTML='<button>👍 投票</button><span class="cnt">0票</span>';c.appendChild(d);var btn=d.querySelector('button');btn.onclick=(function(id){return function(){toggle(id);};})(s[0]+'#'+i);var cid=s[0]+'#'+i;var h3t=c.querySelector('h3');if(h3t&&!c.querySelector('a.revw')){var rv=document.createElement('a');rv.className='map revw';rv.target='_blank';rv.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(cleanT(h3t.textContent));rv.textContent='💬 評論';rv.style.marginLeft='6px';var mp0=c.querySelector('a.map');if(mp0)mp0.after(rv);else h3t.after(rv);}if(!c.querySelector('.cmt')){var cm=document.createElement('div');cm.className='cmt';cm.setAttribute('data-id',cid);cm.innerHTML='<button class="cbtn" onclick="toggleCmt(this)">💬 留言</button><div class="thread" style="display:none"><div class="msgs"></div><div class="crow"><input maxlength="140" placeholder="寫下建議…"><button>送出</button></div></div>';c.appendChild(cm);var inp=cm.querySelector('input'),snd=cm.querySelector('.crow button');snd.onclick=(function(id2,in2,s2){return function(){sendComment(id2,in2,s2);};})(cid,inp,snd);inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();snd.click();}});}});});}
 var GH_API='https://api.github.com/repos/a4623671/cruise-votes/contents/votes.json';
@@ -790,12 +808,105 @@ function toggleCmt(btn){var th=btn.closest('.cmt').querySelector('.thread');th.s
 function sendComment(id,inputEl,btnEl){var n=me();if(!n){document.getElementById('gate').classList.remove('hide');return;}var t=(inputEl.value||'').trim().slice(0,140);if(!t){alert('先寫點什麼');return;}if(CMT_BUSY)return;CMT_BUSY=true;btnEl.disabled=true;
 chGet().then(function(remote){var arr=remote[id]||[];arr.push({n:n,t:t.replace(/</g,'&lt;'),ts:new Date().toISOString()});remote[id]=arr;function attempt(k){return chPut(remote,CMT_SHA).catch(function(e){if(k<=0)throw e;return chGet().then(function(r2){remote=r2;var a2=remote[id]||[];a2.push({n:n,t:t.replace(/</g,'&lt;'),ts:new Date().toISOString()});remote[id]=a2;return attempt(k-1);});});}return attempt(2);}).then(function(c){CMT=c;saveCmt(c);inputEl.value='';CMT_BUSY=false;btnEl.disabled=false;paintComments();refreshStatDetail(id);}).catch(function(e){CMT_BUSY=false;btnEl.disabled=false;alert('連線失敗，留言沒送出，請重試');});}
 function renderCmtStats(){var t=titles(),by={};Object.keys(CMT).forEach(function(id){(CMT[id]||[]).forEach(function(m){(by[m.n]=by[m.n]||[]).push({item:t[id]?t[id].t:id,text:m.t,ts:m.ts});});});var names=Object.keys(by);if(!names.length)return '';var h='<h3>💬 每人留言</h3>';names.sort().forEach(function(n){h+='<div class="pblock"><h4>👤 '+n+'（'+by[n].length+'則）</h4>'+by[n].map(function(x){return '<div class="prow"><span class="pi">【'+x.item+'】</span>'+x.text+' <span class="tm" style="color:#999;font-size:11px">'+fmtTs(x.ts)+'</span></div>';}).join('')+'</div>';});return h;}
+var SOUV_FOOD={'s-naha':['s-naha#31','s-naha#32','s-naha#33','s-naha#35','s-naha#36','s-naha#37'],'s-miyako':['s-miyako#15','s-miyako#16','s-miyako#17','s-miyako#18'],'s-ishigaki':['s-ishigaki#15','s-ishigaki#17','s-ishigaki#18','s-ishigaki#19']};
+var SOUV_GOODS={'s-naha':['s-naha#34'],'s-miyako':['s-miyako#19'],'s-ishigaki':['s-ishigaki#16']};
+var SOUV_XGAL={'s-naha':['https://commons.wikimedia.org/wiki/Special:FilePath/Bingata.jpg?width=960','https://commons.wikimedia.org/wiki/Special:FilePath/Ryukyu%20Glass%202.jpg?width=960'],'s-miyako':[],'s-ishigaki':['https://commons.wikimedia.org/wiki/Special:FilePath/Star%20sand%20Iriomote.jpg?width=960']};
+var SOUV_EXTRA={
+'s-naha':{food:[
+{id:'x-naha-f01',t:'雪塩小包',x:'海水製粉末鹽，煮飯撒一點升級。',p:'約¥500–800｜市場/平和通',hot:4,tw:4},
+{id:'x-naha-f02',t:'黑糖',x:'多良間黑糖，直接吃配茶。',p:'約¥400–800｜市場/超市',hot:3,tw:3},
+{id:'x-naha-f03',t:'海葡萄乾貨',x:'輕便好帶，泡水還原。',p:'約¥600–1,000｜市場/平和通',hot:3,tw:3},
+{id:'x-naha-f04',t:'ちんすこうショコラ',x:'巧克力版金楚糕，小孩最愛。',p:'約¥700–1,100｜平和通/唐吉',hot:3,tw:3}],
+goods:[
+{id:'x-naha-g01',t:'紅型小物',x:'型染手巾杯墊，沖繩味十足。',p:'約¥800–2,000｜浮島通/市場',hot:3,tw:3},
+{id:'x-naha-g02',t:'琉球玻璃',x:'手工吹製杯盤，輕選小件。',p:'約¥1,000–3,000｜浮島通/百貨',hot:3,tw:3},
+{id:'x-naha-g03',t:'壺屋やちむん',x:'陶杯陶盤，登窯老街現挑。',p:'約¥1,500–｜壺屋通',hot:3,tw:3}]},
+'s-miyako':{food:[
+{id:'x-miyako-f01',t:'もずく加工品',x:'海蘊湯包＋醋物包，輕便。',p:'約¥400–800｜島の駅',hot:3,tw:3},
+{id:'x-miyako-f02',t:'宮古そば乾麺',x:'回家煮出離島味。',p:'約¥600–1,000｜島の駅/サンエー',hot:3,tw:3},
+{id:'x-miyako-f03',t:'雪塩ちんすこう',x:'鹹甜雙拼最強。',p:'約¥700–1,100｜雪塩館/島の駅',hot:4,tw:4},
+{id:'x-miyako-f04',t:'黑糖飴',x:'不黏牙版黑糖。',p:'約¥400–700｜島の駅/サンエー',hot:3,tw:3},
+{id:'x-miyako-f05',t:'沖之光泡盛',x:'菊之露姊妹品。',p:'約¥1,000–2,000｜島の駅',hot:3,tw:3}],
+goods:[
+{id:'x-miyako-g01',t:'宮古上布小物',x:'苧麻織杯墊手巾，高級感。',p:'約¥1,500–｜島の駅',hot:3,tw:3},
+{id:'x-miyako-g02',t:'雪塩コスメ',x:'鹽皂洗面乳，女生會尖叫。',p:'約¥800–1,500｜雪塩館',hot:3,tw:2}]},
+'s-ishigaki':{food:[
+{id:'x-ishigaki-f01',t:'八重山そば乾麺',x:'細麵鰹湯在家重現。',p:'約¥600–1,000｜市場/ドンキ',hot:3,tw:3},
+{id:'x-ishigaki-f02',t:'ちんすこう',x:'石垣也有好吃金楚糕。',p:'約¥600–1,000｜市場',hot:3,tw:3},
+{id:'x-ishigaki-f03',t:'石垣の塩',x:'甘味海鹽，配生魚片。',p:'約¥500–900｜市場',hot:4,tw:3},
+{id:'x-ishigaki-f04',t:'ゲンキ土產',x:'乳酸飲粉末版若有必拿。',p:'約¥500–｜市場',hot:3,tw:3},
+{id:'x-ishigaki-f05',t:'サーター包裝版',x:'常溫帶回辦公室。',p:'約¥600–1,000｜市場',hot:3,tw:3},
+{id:'x-ishigaki-f06',t:'石垣牛咖哩包',x:'和牛咖哩調理包。',p:'約¥800–1,200｜市場/ドンキ',hot:3,tw:3}],
+goods:[
+{id:'x-ishigaki-g01',t:'星砂瓶',x:'星形砂裝瓶，可愛。',p:'約¥500–1,000｜市場',hot:4,tw:3},
+{id:'x-ishigaki-g02',t:'貝細工',x:'小店尋寶一期一會。',p:'約¥800–｜市場周邊小店',hot:3,tw:2},
+{id:'x-ishigaki-g03',t:'シーサー小',x:'玄關守護神。',p:'約¥1,000–｜市場/陶器店',hot:3,tw:3}]}};
+var SOUV_SORT={};
+function souvCardEl(place,idx){var cards=document.querySelectorAll('#'+place+' .card');return cards[idx];}
+function souvRowObj(place,id){
+  var p=id.split('#');
+  if(p.length>1){var c=souvCardEl(place,+p[1]);if(!c)return null;var h=c.querySelector('h3');var img=c.querySelector('img.ph');var ps=c.querySelectorAll(':scope > p');var intro='',price='';ps.forEach(function(pp){if(pp.classList.contains('kv'))price=pp.textContent;else if(!intro)intro=pp.textContent;});var hot=0;var st=c.querySelector('.stars');if(st){var m=st.textContent.match(/🔥/g);hot=m?m.length:0;}return {id:id,t:h?cleanT(h.textContent):id,x:intro,p:price,img:img?img.src:null,hot:hot,tw:TWRATE[id]||0};}
+  var ex=(SOUV_EXTRA[place]||{food:[],goods:[]});var all=ex.food.concat(ex.goods);
+  for(var i=0;i<all.length;i++)if(all[i].id===id)return {id:id,t:all[i].t,x:all[i].x,p:all[i].p,img:null,hot:all[i].hot,tw:all[i].tw};
+  return null;
+}
+function souvItems(place,kind){
+  var ids=(kind==='food'?SOUV_FOOD[place]:SOUV_GOODS[place])||[];
+  var out=ids.map(function(id){return souvRowObj(place,id);}).filter(function(o){return o;});
+  var ex=((SOUV_EXTRA[place]||{})[kind])||[];
+  ex.forEach(function(e){out.push({id:e.id,t:e.t,x:e.x,p:e.p,img:null,hot:e.hot,tw:e.tw});});
+  return out;
+}
+function souvScore(o,k){if(k==='tw')return o.tw;if(k==='vote')return (loadV()[o.id]||[]).length;return o.hot;}
+function souvScoreTxt(o,k){if(k==='tw')return '🇹🇼'+o.tw;if(k==='vote')return (loadV()[o.id]||[]).length+'票';return '🔥'+o.hot;}
+function renderRanks(){
+  PLACES.forEach(function(s){
+    var place=s[0];
+    var h2=document.querySelector('#'+place+' h2[data-c="souv"]');if(!h2)return;
+    ['food','goods'].forEach(function(kind){
+      var shell=document.createElement('div');shell.className='rankcard';shell.setAttribute('data-place',place);shell.setAttribute('data-kind',kind);
+      var galImgs=[];
+      ((kind==='food'?SOUV_FOOD[place]:SOUV_GOODS[place])||[]).forEach(function(id){var o=souvRowObj(place,id);if(o&&o.img&&galImgs.indexOf(o.img)<0)galImgs.push(o.img);});
+      (SOUV_XGAL[place]||[]).forEach(function(u){if(galImgs.indexOf(u)<0)galImgs.push(u);});
+      shell.innerHTML='<h3 style="font-size:16px">'+(kind==='food'?'🍱 吃的':'🛍 物品')+'</h3>'
+        +(galImgs.length?'<div class="gal"><div class="trk">'+galImgs.map(function(u){return '<img class="ph" loading="lazy" src="'+u+'" onerror="this.style.display=\'none\'" alt="">';}).join('')+'</div><button class="gl">‹</button><button class="gr">›</button><div class="gdot"></div></div><div class="credit">左右滑動多圖／圖：Wikimedia Commons</div>':'')
+        +'<div class="sortrow"><button data-k="hot" class="on">🔥熱門</button><button data-k="tw">🇹🇼台灣人</button><button data-k="vote">🗳家人票</button></div>'
+        +'<table class="ranktbl"><tbody></tbody></table>';
+      h2.after(shell);
+      shell.querySelectorAll('.sortrow button').forEach(function(b){b.onclick=function(){shell.querySelectorAll('.sortrow button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');SOUV_SORT[place+kind]=b.getAttribute('data-k');paintRank(place,kind);};});
+    });
+    var cards=document.querySelectorAll('#'+place+' .card');
+    var souvIds=(SOUV_FOOD[place]||[]).concat(SOUV_GOODS[place]||[]);
+    souvIds.forEach(function(id){var p=id.split('#');var c=cards[+p[1]];if(c)c.classList.add('retired');});
+  });
+  paintRanks();
+}
+function paintRank(place,kind){
+  var sel='.rankcard[data-place="'+place+'"][data-kind="'+kind+'"] tbody';var tb=document.querySelector(sel);if(!tb)return;
+  var k=SOUV_SORT[place+kind]||'hot',v=loadV();
+  var items=souvItems(place,kind);
+  items.forEach(function(o){o._s=(k==='tw'?o.tw*100:k==='vote'?((v[o.id]||[]).length*100):o.hot*100)+o.hot;});
+  items.sort(function(a,b){return b._s-a._s;});
+  tb.innerHTML=items.map(function(o,i){var vc=(v[o.id]||[]).length,cc=(CMT[o.id]||[]).length;
+    return '<tr class="srow" data-id="'+o.id+'" data-g="'+placeName(place)+'伴手禮" data-t="'+o.t.replace(/"/g,'')+'">'
+    +'<td class="r srank">'+(i+1)+'</td>'
+    +'<td><div style="display:flex;gap:8px;align-items:flex-start">'+(o.img?'<img class="sth" loading="lazy" src="'+o.img+'" onerror="this.style.display=\'none\'" alt="">':'')+'<div><div class="sname">'+o.t+'</div><div class="sintro">'+o.x+'<br>'+o.p+'</div></div></div></td>'
+    +'<td class="n sscore">'+souvScoreTxt(o,k)+'</td>'
+    +'<td class="r"><button class="svote'+(vc&&v[o.id].indexOf(me())>=0?' voted':'')+'">👍</button><div class="scnt2">'+vc+'</div><button class="scmt">💬'+(cc?' '+cc:'')+'</button></td></tr>'
+    +'<tr class="sdet" data-id="'+o.id+'" style="display:none"><td colspan="5"></td></tr>';}).join('');
+  tb.querySelectorAll('.svote').forEach(function(b){b.onclick=function(){var id=b.closest('tr.srow').getAttribute('data-id');toggle(id);setTimeout(refreshRanks,1500);};});
+  tb.querySelectorAll('.scmt').forEach(function(b){b.onclick=function(){var tr=b.closest('tr.srow'),id=tr.getAttribute('data-id'),nx=tr.nextSibling;if(nx&&nx.classList&&nx.classList.contains('sdet')&&nx.style.display!=='none'){nx.style.display='none';return;}hideSdet(tr.parentNode);var d=null,tb2=tr.parentNode;for(var i=0;i<tb2.children.length;i++){if(tb2.children[i].classList.contains('sdet')&&tb2.children[i].getAttribute('data-id')===id){d=tb2.children[i];break;}}if(!d)return;d.firstChild.innerHTML=statDetailHTML(id);bindStatDetail(d,id);d.style.display='';};});
+}
+function hideSdet(tbody){tbody.querySelectorAll('tr.sdet').forEach(function(d){d.style.display='none';});}
+function placeName(pid){for(var i=0;i<PLACES.length;i++)if(PLACES[i][0]===pid)return PLACES[i][1];return '';}
+function paintRanks(){PLACES.forEach(function(s){paintRank(s[0],'food');paintRank(s[0],'goods');});}
+function refreshRanks(){var v=loadV(),n=me();document.querySelectorAll('tr.srow').forEach(function(r){var id=r.getAttribute('data-id'),arr=v[id]||[];var b=r.querySelector('.svote'),c=r.querySelector('.scnt2'),m=r.querySelector('.scmt');if(b){b.textContent='👍';b.classList.toggle('voted',arr.indexOf(n)>=0);}if(c)c.textContent=arr.length;if(m){var cc=(CMT[id]||[]).length;m.textContent='💬'+(cc?' '+cc:'');}var rk=r.closest('.rankcard');if(rk){var k=SOUV_SORT[rk.getAttribute('data-place')+rk.getAttribute('data-kind')]||'hot';var sc=r.querySelector('.sscore');if(sc){if(k==='vote')sc.textContent=arr.length+'票';}}});}
 function toggle(id){var n=me();if(!n){document.getElementById('gate').classList.remove('hide');return;}if(GH_BUSY)return;GH_BUSY=true;
 ghGet().then(function(remote){var arr=remote[id]||[];var want=arr.indexOf(n)<0;function attempt(t){if(want){if(arr.indexOf(n)<0)arr.push(n);}else{var ix=arr.indexOf(n);if(ix>=0)arr.splice(ix,1);}if(!arr.length)delete remote[id];else remote[id]=arr;return ghPut(remote,GH_SHA).catch(function(e){if(t<=0)throw e;return ghGet().then(function(r2){remote=r2;arr=remote[id]||[];return attempt(t-1);});});}return attempt(2);}).then(function(v){saveV(v);setMode('online');refreshVotes();GH_BUSY=false;}).catch(function(e){GH_BUSY=false;setMode('offline');try{localStorage.setItem(GH_DIRTY,'1');}catch(x){}var v=loadV();var arr=v[id]||[];var ix=arr.indexOf(n);if(ix>=0)arr.splice(ix,1);else arr.push(n);if(!arr.length)delete v[id];else v[id]=arr;saveV(v);refreshVotes();alert('連線失敗，已暫存本機，連網後自動上傳');});}
-function refreshVotes(){var v=loadV(),n=me(),t=titles();PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){var d=c.querySelector('.vote');if(!d)return;var id=s[0]+'#'+i,arr=v[id]||[],btn=d.querySelector('button'),cnt=d.querySelector('.cnt');btn.textContent=arr.indexOf(n)>=0?'✅ 已投':'👍 投票';btn.classList.toggle('voted',arr.indexOf(n)>=0);cnt.textContent=arr.length+'票'+(arr.length?'（'+arr.join('、')+'）':'');});});paintComments();if(document.getElementById('stats').classList.contains('on'))renderStats();}
-function swPlace(id,el){curP='s-'+id;document.querySelectorAll('.cat.place').forEach(c=>c.classList.remove('on'));el.classList.add('on');applyFilter();window.scrollTo({top:0,behavior:'smooth'});}
+function refreshVotes(){var v=loadV(),n=me(),t=titles();PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){var d=c.querySelector('.vote');if(!d)return;var id=s[0]+'#'+i,arr=v[id]||[],btn=d.querySelector('button'),cnt=d.querySelector('.cnt');btn.textContent=arr.indexOf(n)>=0?'✅ 已投':'👍 投票';btn.classList.toggle('voted',arr.indexOf(n)>=0);cnt.textContent=arr.length+'票'+(arr.length?'（'+arr.join('、')+'）':'');});});paintComments();refreshRanks();if(document.getElementById('stats').classList.contains('on'))renderStats();}
+function swPlace(id,el){curP='s-'+id;document.querySelectorAll('.cat.place').forEach(c=>c.classList.remove('on'));el.classList.add('on');applyFilter();var w=document.querySelector('.wrap');if(w)window.scrollTo({top:0,behavior:'smooth'});}
 function swCat(c,el){curC=c;document.querySelectorAll('.cat.cat2').forEach(x=>x.classList.remove('on'));el.classList.add('on');applyFilter();}
-function applyFilter(){PLACES.forEach(function(s){var show=s[0]===curP;document.getElementById(s[0]).classList.toggle('on',show);if(!show)return;var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(card,i){card.style.display=cardCat(s[0],i)===curC?'':'none';});var h2s=document.querySelectorAll('#'+s[0]+' h2.st');h2s.forEach(function(h){var dc=h.getAttribute('data-c');h.style.display=(!dc||dc===curC)?'':'none';});});}
+function applyFilter(){PLACES.forEach(function(s){var show=s[0]===curP;document.getElementById(s[0]).classList.toggle('on',show);if(!show)return;var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(card,i){if(card.classList.contains('retired'))return;card.style.display=cardCat(s[0],i)===curC?'':'none';});var rks=document.querySelectorAll('#'+s[0]+' .rankcard');rks.forEach(function(r){r.style.display=(show&&curC==='souv')?'':'none';});var h2s=document.querySelectorAll('#'+s[0]+' h2.st');h2s.forEach(function(h){var dc=h.getAttribute('data-c');h.style.display=(!dc||dc===curC)?'':'none';});});}
 function openStats(){renderStats();document.getElementById('stats').classList.add('on');}
 function closeStats(){document.getElementById('stats').classList.remove('on');}
 var CATICON={food:'🍜',spot:'📷',shop:'🛍',souv:'🎁',feat:'✨'},PEMOJI={'那霸':'🌺','宮古島':'🏝','石垣島':'🪨'};
@@ -803,7 +914,7 @@ function statDetailHTML(id){var arr=CMT[id]||[];return (arr.length?arr.map(funct
 function bindStatDetail(d,id){var inp=d.querySelector('input'),snd=d.querySelector('.crow button');snd.onclick=function(){sendComment(id,inp,snd);};inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();snd.click();}});}
 function refreshStatDetail(id){var d=document.querySelector('tr.sdet[data-id="'+id+'"]');if(!d)return;d.firstChild.innerHTML=statDetailHTML(id);bindStatDetail(d,id);}
 var IIMGS=[],IIDX=0;
-function openItem(id){var p=id.split('#'),cards=document.querySelectorAll('#'+p[0]+' .card'),c=cards[+p[1]];if(!c)return;var h=c.querySelector('h3');IIMGS=Array.prototype.map.call(c.querySelectorAll('img.ph'),function(im){return {s:im.src,a:im.alt};}).filter(function(x){return x.s&&x.s.indexOf('data:')!==0;});IIDX=0;var info='',st=c.querySelector('.stars');if(st)info+='<div class="stars">'+st.innerHTML+'</div>';c.querySelectorAll(':scope > p').forEach(function(pp){info+='<p style="font-size:14px;margin:6px 0">'+pp.innerHTML+'</p>';});var _mp=c.querySelector('a.map');var _mrow='<div style="margin:8px 0">'+(_mp?'<a class="map" href="'+_mp.href+'" target="_blank">🗺 地圖</a> ':'')+'<a class="map" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(cleanT(h.textContent))+'" target="_blank">💬 評論</a></div>';
+function openItem(id){if(id.indexOf('#')<0){var row=document.querySelector('tr.srow[data-id="'+id+'"]');if(!row)return;var nm=row.querySelector('.sname'),im=row.querySelector('.sth'),ix=row.querySelector('.sintro');document.getElementById('iboby').innerHTML='<h3 style="font-size:18px;padding-right:30px">'+nm.textContent+'</h3>'+(im?'<img src="'+im.src+'" style="width:100%;border-radius:10px;margin:8px 0">':'')+'<p style="font-size:14px;margin:6px 0">'+ix.innerHTML+'</p>';document.getElementById('imodal').classList.add('on');return;}var p=id.split('#'),cards=document.querySelectorAll('#'+p[0]+' .card'),c=cards[+p[1]];if(!c)return;var h=c.querySelector('h3');IIMGS=Array.prototype.map.call(c.querySelectorAll('img.ph'),function(im){return {s:im.src,a:im.alt};}).filter(function(x){return x.s&&x.s.indexOf('data:')!==0;});IIDX=0;var info='',st=c.querySelector('.stars');if(st)info+='<div class="stars">'+st.innerHTML+'</div>';c.querySelectorAll(':scope > p').forEach(function(pp){info+='<p style="font-size:14px;margin:6px 0">'+pp.innerHTML+'</p>';});var _mp=c.querySelector('a.map');var _mrow='<div style="margin:8px 0">'+(_mp?'<a class="map" href="'+_mp.href+'" target="_blank">🗺 地圖</a> ':'')+'<a class="map" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(cleanT(h.textContent))+'" target="_blank">💬 評論</a></div>';
 document.getElementById('iboby').innerHTML='<h3 style="font-size:18px;padding-right:30px">'+h.textContent+'</h3>'+_mrow+'<div class="igal"><div class="itrk">'+IIMGS.map(function(x){return '<img src="'+x.s+'" alt="'+(x.a||'').replace(/"/g,'')+'">';}).join('')+'</div></div><div style="text-align:center;font-size:12px;color:#888" id="icount"></div>'+info+'<button class="igoto" onclick="gotoItem(\''+id+'\')">前往投票・留言</button>';updI();bindItrk();document.getElementById('imodal').classList.add('on');}
 function updI(){var trk=document.querySelector('#iboby .itrk');if(!trk)return;trk.style.transform='translateX(-'+(IIDX*100)+'%)';var el=document.getElementById('icount');if(el)el.textContent=IIMGS.length?(IIDX+1)+'/'+IIMGS.length:'';}
 function bindItrk(){var trk=document.querySelector('#iboby .itrk');if(!trk)return;trk.addEventListener('touchstart',function(e){trk._tx=e.touches[0].clientX;},{passive:true});trk.addEventListener('touchend',function(e){if(!IIMGS.length)return;var dx=e.changedTouches[0].clientX-trk._tx;if(dx>40)IIDX=(IIDX-1+IIMGS.length)%IIMGS.length;else if(dx<-40)IIDX=(IIDX+1)%IIMGS.length;updI();});}
@@ -814,7 +925,7 @@ function renderStats(){var v=loadV(),t=titles(),h='',medal=['🥇','🥈','🥉'
 function exportVotes(){var s=btoa(unescape(encodeURIComponent(JSON.stringify(loadV()))));var done=function(){alert('投票碼已複製，傳給家人合併');};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(s).then(done,function(){prompt('複製此投票碼',s);});else prompt('複製此投票碼',s);}
 function importVotes(){var s=prompt('貼上家人傳來的投票碼');if(!s)return;try{var inc=JSON.parse(decodeURIComponent(escape(atob(s.trim()))));var v=loadV();Object.keys(inc).forEach(function(id){var cur=v[id]||[];inc[id].forEach(function(n){if(cur.indexOf(n)<0)cur.push(n);});if(cur.length)v[id]=cur;});saveV(v);refreshVotes();alert('已合併！');}catch(e){alert('投票碼格式錯誤');}}
 document.getElementById('nameInput').addEventListener('keydown',function(e){if(e.key==='Enter')enter();});
-buildVoteUI();paintWho();applyFilter();initGal();initSwipe();
+buildVoteUI();paintWho();
 var TWRATE={'s-naha#0':5,'s-naha#1':5,'s-naha#2':4,'s-naha#3':5,'s-naha#4':3,'s-naha#5':4,'s-naha#6':3,'s-naha#7':4,'s-naha#8':4,'s-naha#9':2,'s-naha#10':4,'s-naha#11':5,'s-naha#12':4,'s-naha#13':5,'s-naha#14':5,'s-naha#15':2,'s-naha#16':4,'s-naha#17':3,'s-naha#18':2,'s-naha#19':1,'s-naha#20':3,'s-naha#21':4,'s-naha#22':2,'s-naha#23':4,'s-naha#24':5,'s-naha#25':3,'s-naha#26':2,'s-naha#27':5,'s-naha#28':2,'s-naha#29':1,'s-naha#30':1,'s-naha#31':5,'s-naha#32':5,'s-naha#33':4,'s-naha#34':4,'s-naha#35':3,'s-naha#36':3,'s-naha#37':3,'s-naha#39':2,'s-naha#40':1,'s-miyako#0':5,'s-miyako#1':5,'s-miyako#2':4,'s-miyako#3':4,'s-miyako#4':4,'s-miyako#5':4,'s-miyako#6':4,'s-miyako#7':4,'s-miyako#8':2,'s-miyako#9':2,'s-miyako#10':1,'s-miyako#11':2,'s-miyako#12':3,'s-miyako#13':3,'s-miyako#14':3,'s-miyako#15':5,'s-miyako#16':4,'s-miyako#17':4,'s-miyako#18':3,'s-miyako#19':4,'s-ishigaki#0':5,'s-ishigaki#1':3,'s-ishigaki#2':2,'s-ishigaki#3':3,'s-ishigaki#4':4,'s-ishigaki#5':4,'s-ishigaki#6':5,'s-ishigaki#7':5,'s-ishigaki#8':3,'s-ishigaki#9':4,'s-ishigaki#10':2,'s-ishigaki#11':2,'s-ishigaki#12':2,'s-ishigaki#13':3,'s-ishigaki#14':3,'s-ishigaki#15':4,'s-ishigaki#16':3,'s-ishigaki#17':3,'s-ishigaki#18':5,'s-ishigaki#19':3};
 function paintTW(){PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){var v=TWRATE[s[0]+'#'+i];if(!v||c.querySelector('.tw'))return;var st=c.querySelector('.stars');if(!st)return;var sp=document.createElement('span');sp.className='tw';sp.textContent='🇹🇼×'+v;st.appendChild(sp);});});}
 function initSwipe(){document.querySelectorAll('.gal').forEach(function(g){var trk=g.querySelector('.trk'),n=trk.children.length,idx=0,dots=g.querySelector('.gdot');
@@ -835,7 +946,7 @@ ov.querySelector('.gn').onclick=function(e){e.stopPropagation();show(idx+1);};
 ov.onclick=function(e){if(e.target===ov)ov.classList.remove('on');};
 var tx=0;ov.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;},{passive:true});
 ov.addEventListener('touchend',function(e){var dx=e.changedTouches[0].clientX-tx;if(dx>50)show(idx-1);else if(dx<-50)show(idx+1);});}
-paintTW();renderNameBtns();if(me())document.getElementById('gate').classList.add('hide');refreshVotes();syncFromRemote();setInterval(function(){syncFromRemote(true);},15000);
+renderRanks();applyFilter();initGal();initSwipe();paintTW();renderNameBtns();if(me())document.getElementById('gate').classList.add('hide');refreshVotes();syncFromRemote();setInterval(function(){syncFromRemote(true);},15000);
 </script>
 </body>
 </html>
