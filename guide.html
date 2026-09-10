@@ -158,7 +158,7 @@ img.ph{cursor:zoom-in}
 <button class="cat cat2" onclick="swCat('souv',this)">🎁 伴手禮</button>
 <button class="cat cat2" onclick="swCat('feat',this)">✨ 當地特色</button>
 </div>
-<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20260909-ae）</div>
+<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20260909-af）</div>
 <div class="wrap">
 
 <!-- ================= NAHA ================= -->
@@ -789,7 +789,7 @@ img.ph{cursor:zoom-in}
 </div>
 
 <div id="imodal"><div class="ipanel"><span class="ix" onclick="closeItem()">✕</span><div id="iboby"></div></div></div>
-<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20260909-ae<span id="jsok"></span><span id="jsdiag"></span>・有問題請截圖此行</div>
+<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20260909-af<span id="jsok"></span><span id="jsdiag"></span>・有問題請截圖此行</div>
 <button id="statsBtn" onclick="openStats()">📊 統計</button>
 <button id="chatBtn" onclick="openChat()">💬 小幫手</button>
 <div id="chatpanel"><div style="display:flex;align-items:center;padding:10px 14px 0"><b style="font-size:16px">💬 小幫手</b><span style="flex:1"></span><button onclick="closeChat()" style="border:1px solid #d8d0bd;background:#fff;border-radius:16px;padding:4px 12px;font-size:13px;cursor:pointer">✕ 關閉</button></div><div id="chatlog"></div><div id="chatbar"><input id="chatinput" maxlength="200" placeholder="小幫手即將開通…" disabled><button onclick="sendChat()">送出</button></div></div>
@@ -861,9 +861,9 @@ function closeChat(){document.getElementById('chatpanel').classList.remove('on')
 function sendChat(){var inp=document.getElementById('chatinput');if(inp.disabled)return;var t=inp.value.trim();if(!t)return;if(!me()){document.getElementById('gate').classList.remove('hide');return;}inp.value='';chatAdd('me',t.replace(/</g,'&lt;'));CHAT_HIST.push({role:'user',text:t});if(CHAT_HIST.length>10)CHAT_HIST=CHAT_HIST.slice(-10);fetch(CHAT_URL+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session:CHAT_SESS,history:CHAT_HIST,text:t})}).then(function(r){return r.json();}).then(function(j){CHAT_HIST.push({role:'bot',text:j.reply||''});chatAdd('bot',(j.reply||'嗯…').replace(/\n/g,'<br>'));if(j.proposal)chatProposalCard(j.proposal);}).catch(function(){chatAdd('bot','連線失敗，稍後再試，或改用表單提案。');});}
 function chatLockOld(except){document.querySelectorAll('#chatlog .propok.ai button').forEach(function(b){if(b!==except&&!b.disabled){b.disabled=true;b.textContent='已被新版本取代';}});}
 function chatProposalCard(p){chatLockOld(null);var d=document.createElement('div');d.className='propok ai';var kindn={food:'🍜 餐廳',spot:'📷 景點',shop:'🛍 購物',souv:'🎁 伴手禮',del:'🗑 建議刪除'}[p.kind]||p.kind;var placen={naha:'🌺 那霸',miyako:'🏝 宮古島',ishigaki:'🪨 石垣島'}[p.place]||p.place;d.innerHTML='<b>提案確認</b><br>'+kindn+'・'+placen+'<br><b>'+String(p.title||'').replace(/</g,'&lt;')+'</b><br>'+String(p.intro||'').replace(/</g,'&lt;')+(p.reason?'<br>理由：'+String(p.reason).replace(/</g,'&lt;'):'')+'<button>✅ 確認提案</button>';d.querySelector('button').onclick=function(){confirmChatProposal(p,d);};document.getElementById('chatlog').appendChild(d);document.getElementById('chatlog').scrollTop=1e9;}
-function confirmChatProposal(p,cardEl){var btn=cardEl.querySelector('button');btn.disabled=true;btn.textContent='送出中…';var obj={id:'p'+Date.now().toString(36),ts:new Date().toISOString(),by:me(),kind:p.kind,place:p.place,title:String(p.title||'').slice(0,30),intro:String(p.intro||'').slice(0,140),where:String(p.where||'').slice(0,60),reason:String(p.reason||'').slice(0,140),status:'pending'};function done(ok){btn.textContent=ok?'✅ 已送出，待審核':'❌ 失敗請重試';if(ok){btn.disabled=true;chatLockOld(btn);}else btn.disabled=false;}
-if(CHAT_URL){fetch(CHAT_URL+'/api/propose',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({proposal:obj})}).then(function(r){return r.json();}).then(function(j){done(!!j.ok);if(j.ok)chatAdd('bot','收到！提案已進待審，第二階段會自動排入網頁 🎉');}).catch(function(){done(false);});return;}
-phGet().then(function(list){list.push(obj);return phPut(list,PH_SHA);}).then(function(){done(true);}).catch(function(){done(false);});}
+function confirmChatProposal(p,cardEl){var btn=cardEl.querySelector('button');btn.disabled=true;btn.textContent='送出中…';var obj={id:'p'+Date.now().toString(36),ts:new Date().toISOString(),by:me(),kind:p.kind,place:p.place,title:String(p.title||'').slice(0,30),intro:String(p.intro||'').slice(0,140),where:String(p.where||'').slice(0,60),reason:String(p.reason||'').slice(0,140),status:'confirmed'};function done(ok){btn.textContent=ok?'✅ 已送出，直接改網頁':'❌ 失敗請重試';if(ok){btn.disabled=true;chatLockOld(btn);}else btn.disabled=false;}
+if(CHAT_URL){fetch(CHAT_URL+'/api/propose',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({proposal:obj})}).then(function(r){return r.json();}).then(function(j){done(!!j.ok);if(j.ok)chatAdd('bot','收到！第二階段直接改網頁，稍後重整即生效 🎉');}).catch(function(){done(false);});return;}
+phGet().then(function(list){list.push(obj);return phPut(list,PH_SHA);}).then(function(){done(true);chatAdd('bot','收到！第二階段直接改網頁，稍後重整即生效 🎉');}).catch(function(){done(false);});}
 document.getElementById('chatinput').addEventListener('keydown',function(e){if(e.key==='Enter')sendChat();});
 function paintComments(){var cards=document.querySelectorAll('.card');cards.forEach(function(card){var box=card.querySelector('.cmt');if(!box)return;var id=box.getAttribute('data-id');var arr=CMT[id]||[];var btn=box.querySelector('.cbtn');btn.textContent='💬 留言'+(arr.length?'（'+arr.length+'）':'');var ms=box.querySelector('.msgs');ms.innerHTML=arr.slice(-20).map(function(m){return '<div class="msg"><b>'+m.n+'</b>：'+m.t+'<span class="tm">'+fmtTs(m.ts)+'</span></div>';}).join('');});}
 function toggleCmt(btn){var th=btn.closest('.cmt').querySelector('.thread');th.style.display=th.style.display==='none'?'':'none';}
