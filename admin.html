@@ -26,12 +26,19 @@ h1{font-size:20px;margin-bottom:2px}.sub{font-size:13px;color:#888;margin-bottom
 </head>
 <body>
 <div class="topbar"><a href="index.html">‹ 返回入口</a></div>
+<div id="lock" style="background:#fff;border-radius:14px;padding:24px 18px;text-align:center;margin-top:30px">
+<div style="font-size:40px">🛡</div><h2 style="margin:8px 0">管理者驗證</h2>
+<input id="pw" type="password" inputmode="numeric" placeholder="請輸入密碼" style="width:100%;border:1px solid #d8d0bd;border-radius:10px;padding:12px;font-size:18px;text-align:center;letter-spacing:4px;box-sizing:border-box">
+<button onclick="unlock()" style="width:100%;border:none;border-radius:10px;padding:12px;font-size:16px;font-weight:700;background:#10293f;color:#fff;margin-top:10px;cursor:pointer">進入</button>
+<div id="pwmsg" style="font-size:13px;color:#b3402a;min-height:20px;margin-top:6px"></div></div>
+<div id="app" style="display:none">
 <h1>🛡 提案審核</h1>
 <div class="sub">直接通過＝排程自動改網頁（免審）・需要審核＝先停車＋通知 <span id="cnt"></span></div>
 <div style="text-align:center;margin-bottom:10px"><button onclick="loadQ()" style="border:1px solid #d8d0bd;background:#fff;border-radius:20px;padding:6px 18px;font-size:14px;cursor:pointer">↻ 重新整理</button></div>
 <div id="msg"></div>
 <div id="list"></div>
-<div class="note">管理者專用・版本 20260909-al</div>
+<div class="note">管理者專用・版本 20260909-am</div>
+</div>
 <script>
 var _p1='Z2l0aHViX3BhdF8xMUFISU5ORVEwV1JKV05mNFNvWHZCXzNtTUJVTWRaa0hDQV',_p2='hNbHA3QUFublh0bmNhTDN3NXZYd0tGbXlsYnlacmdVV0dFUTNSVm5KaXVMS1VW';
 var GH_TOKEN=atob(_p1+_p2);
@@ -56,6 +63,10 @@ return '<div class="card"><div class="t">'+esc(p.title)+' <span class="badge st-
 function decide(id,st){say('寫入中…');fetch(GH_API_P+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){PH_SHA=j.sha;var list=[];try{list=JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));}catch(e){}var hit=false;list.forEach(function(p){if(p.id===id){p.status=st;hit=true;}});if(!hit){say('該提案已不在佇列');return null;}var body={message:'admin '+st+' '+id,content:btoa(unescape(encodeURIComponent(JSON.stringify(list))))};if(PH_SHA)body.sha=PH_SHA;
 return fetch(GH_API_P,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)});}).then(function(r){if(!r)return;if(r.status===409){say('有人同時修改，重試一次');loadQ();return;}if(!r.ok){say('寫入失敗');return;}say(st==='confirmed'?'已設直接通過，排程自動改網頁':'已設需要審核，暫停車');loadQ();}).catch(function(){say('寫入失敗');});}
 loadQ();
+async function unlock(){var v=document.getElementById('pw').value.trim();var h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(v));var hex=[...new Uint8Array(h)].map(function(b){return b.toString(16).padStart(2,'0');}).join('');if(hex==='79c24954807c83c719a99fa71958ad1afb7b17a2fe03d4773d383797dfcbfbf3'){sessionStorage.setItem('admin_ok','1');showApp();}else{document.getElementById('pwmsg').textContent='密碼不對';}}
+function showApp(){document.getElementById('lock').style.display='none';document.getElementById('app').style.display='block';}
+if(sessionStorage.getItem('admin_ok')==='1')showApp();
+document.getElementById('pw').addEventListener('keydown',function(e){if(e.key==='Enter')unlock();});
 </script>
 </body>
 </html>
