@@ -57,7 +57,7 @@ if(!open.length){box.innerHTML='<div class="card"><div class="m">佇列是空的
 box.innerHTML=open.map(function(p){var dis=(p.status==='applied'||p.status==='applied-deleted');
 return '<div class="card"><div class="t">'+esc(p.title)+' <span class="badge st-'+p.status+'">'+(STN[p.status]||p.status)+'</span></div>'
 +'<div class="m">'+(KINDN[p.kind]||p.kind)+'・'+(PN[p.place]||p.place)+'・提案人 '+esc(p.by)+'・'+esc((p.ts||'').slice(0,10))+'</div>'
-+(p.intro?'<div class="m">介紹：'+esc(p.intro)+'</div>':'')+(p.where?'<div class="m">哪買：'+esc(p.where)+'</div>':'')+(p.reason?'<div class="m"><b>刪除理由：'+esc(p.reason)+'</b></div>':'')
++(p.intro?'<div class="m">介紹：'+esc(p.intro)+'</div>':'')+(p.items&&p.items.length?'<div class="m">品項：<br>'+p.items.map(function(it,i){return (i+1)+'. '+esc(it.title)+'：'+esc(it.intro);}).join('<br>')+'</div>':'')+(p.where?'<div class="m">哪買：'+esc(p.where)+'</div>':'')+(p.reason?'<div class="m"><b>刪除理由：'+esc(p.reason)+'</b></div>':'')
 +'<div class="btns"><button class="go" '+(dis?'disabled':'')+' onclick="decide(\''+p.id+'\',\'approved\')">✅ 直接通過</button>'
 +'<button class="hold" '+(dis?'disabled':'')+' onclick="decide(\''+p.id+'\',\'needs-review\')">⏸ 需要審核</button></div></div>';}).join('');}
 function decide(id,st){say('寫入中…');fetch(GH_API_P+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){PH_SHA=j.sha;var list=[];try{list=JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));}catch(e){}var hit=false;list.forEach(function(p){if(p.id===id){p.status=st;hit=true;}});if(!hit){say('該提案已不在佇列');return null;}var body={message:'admin '+st+' '+id,content:btoa(unescape(encodeURIComponent(JSON.stringify(list))))};if(PH_SHA)body.sha=PH_SHA;
