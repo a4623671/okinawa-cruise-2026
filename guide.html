@@ -158,7 +158,7 @@ img.ph{cursor:zoom-in}
 <button class="cat cat2" onclick="swCat('souv',this)">🎁 伴手禮</button>
 <button class="cat cat2" onclick="swCat('feat',this)">✨ 當地特色</button>
 </div>
-<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20260909-ag）</div>
+<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20260909-ah）</div>
 <div class="wrap">
 
 <!-- ================= NAHA ================= -->
@@ -789,7 +789,7 @@ img.ph{cursor:zoom-in}
 </div>
 
 <div id="imodal"><div class="ipanel"><span class="ix" onclick="closeItem()">✕</span><div id="iboby"></div></div></div>
-<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20260909-ag<span id="jsok"></span><span id="jsdiag"></span>・有問題請截圖此行</div>
+<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20260909-ah<span id="jsok"></span><span id="jsdiag"></span>・有問題請截圖此行</div>
 <button id="statsBtn" onclick="openStats()">📊</button>
 <button id="chatBtn" onclick="openChat()">💬</button>
 <div id="chatpanel"><div style="display:flex;align-items:center;padding:10px 14px 0"><b style="font-size:16px">💬 小幫手</b><span style="flex:1"></span><button onclick="closeChat()" style="border:1px solid #d8d0bd;background:#fff;border-radius:16px;padding:4px 12px;font-size:13px;cursor:pointer">✕ 關閉</button></div><div id="chatlog"></div><div id="chatbar"><input id="chatinput" maxlength="200" placeholder="小幫手即將開通…" disabled><button onclick="sendChat()">送出</button></div></div>
@@ -853,7 +853,7 @@ var GH_API_P='https://api.github.com/repos/a4623671/cruise-votes/contents/propos
 var PH_SHA=null,PH_KEY='prop_ts_v1';
 function phGet(){return fetch(GH_API_P+'?t='+Date.now(),{headers:ghHeaders(),cache:'no-store'}).then(function(r){if(r.status===404)return [];if(!r.ok)throw new Error('pget '+r.status);return r.json();}).then(function(j){if(Array.isArray(j))return j;PH_SHA=j.sha;try{return JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));}catch(e){return [];}});}
 function phPut(list,sha){var body={message:'proposal '+new Date().toISOString(),content:btoa(unescape(encodeURIComponent(JSON.stringify(list))))};if(sha)body.sha=sha;return fetch(GH_API_P,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){if(r.status===409||r.status===422)throw new Error('conflict');if(!r.ok)throw new Error('pput '+r.status);return r.json();});}
-var CHAT_URL='';
+var CHAT_URL='https://cruise-chat.fan-saxon-bot.workers.dev';
 var CHAT_SESS='',CHAT_HIST=[];
 function chatAdd(cls,html){var d=document.createElement('div');d.className='msg '+cls;d.innerHTML=html;document.getElementById('chatlog').appendChild(d);document.getElementById('chatlog').scrollTop=1e9;}
 var FBPOS='fbtn_pos_v1';
