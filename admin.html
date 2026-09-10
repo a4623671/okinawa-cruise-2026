@@ -46,11 +46,11 @@ var GH_API_P='https://api.github.com/repos/a4623671/cruise-votes/contents/propos
 var PH_SHA=null;
 var KINDN={food:'🍜 餐廳',spot:'📷 景點',shop:'🛍 購物',souv:'🎁 伴手禮',conv:'🏪 超商',del:'🗑 建議刪除'};
 var PN={naha:'🌺 那霸',miyako:'🏝 宮古島',ishigaki:'🪨 石垣島'};
-var STN={pending:'待分流',confirmed:'直接通過', 'needs-review':'需要審核', applied:'已套用', 'applied-deleted':'已刪除', duplicate:'重複', invalid:'無效', 'await-admin':'待審(舊)'};
+var STN={pending:'待分流',confirmed:'待審核',approved:'已批准', 'needs-review':'需要審核', applied:'已套用', 'applied-deleted':'已刪除', duplicate:'重複', invalid:'無效', 'await-admin':'待審(舊)'};
 function esc(s){return String(s||'').replace(/</g,'&lt;');}
 function say(t){document.getElementById('msg').textContent=t;}
 function loadQ(){say('讀取中…');fetch(GH_API_P+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){if(j.message&&j.message.indexOf('Not Found')>=0)return [];PH_SHA=j.sha;try{return JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));}catch(e){return [];}}).then(paint).catch(function(){say('讀取失敗');});}
-function paint(list){window._Q=list;var open=list.filter(function(p){return ['pending','confirmed','needs-review','await-admin'].indexOf(p.status)>=0;});
+function paint(list){window._Q=list;var open=list.filter(function(p){return ['pending','confirmed','approved','needs-review','await-admin'].indexOf(p.status)>=0;});
 document.getElementById('cnt').textContent='（待處理 '+open.length+'／共 '+list.length+'）';
 var box=document.getElementById('list');
 if(!open.length){box.innerHTML='<div class="card"><div class="m">佇列是空的 🎉</div></div>';return;}
@@ -58,7 +58,7 @@ box.innerHTML=open.map(function(p){var dis=(p.status==='applied'||p.status==='ap
 return '<div class="card"><div class="t">'+esc(p.title)+' <span class="badge st-'+p.status+'">'+(STN[p.status]||p.status)+'</span></div>'
 +'<div class="m">'+(KINDN[p.kind]||p.kind)+'・'+(PN[p.place]||p.place)+'・提案人 '+esc(p.by)+'・'+esc((p.ts||'').slice(0,10))+'</div>'
 +(p.intro?'<div class="m">介紹：'+esc(p.intro)+'</div>':'')+(p.where?'<div class="m">哪買：'+esc(p.where)+'</div>':'')+(p.reason?'<div class="m"><b>刪除理由：'+esc(p.reason)+'</b></div>':'')
-+'<div class="btns"><button class="go" '+(dis?'disabled':'')+' onclick="decide(\''+p.id+'\',\'confirmed\')">✅ 直接通過</button>'
++'<div class="btns"><button class="go" '+(dis?'disabled':'')+' onclick="decide(\''+p.id+'\',\'approved\')">✅ 直接通過</button>'
 +'<button class="hold" '+(dis?'disabled':'')+' onclick="decide(\''+p.id+'\',\'needs-review\')">⏸ 需要審核</button></div></div>';}).join('');}
 function decide(id,st){say('寫入中…');fetch(GH_API_P+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){PH_SHA=j.sha;var list=[];try{list=JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));}catch(e){}var hit=false;list.forEach(function(p){if(p.id===id){p.status=st;hit=true;}});if(!hit){say('該提案已不在佇列');return null;}var body={message:'admin '+st+' '+id,content:btoa(unescape(encodeURIComponent(JSON.stringify(list))))};if(PH_SHA)body.sha=PH_SHA;
 return fetch(GH_API_P,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)});}).then(function(r){if(!r)return;if(r.status===409){say('有人同時修改，重試一次');loadQ();return;}if(!r.ok){say('寫入失敗');return;}say(st==='confirmed'?'已設直接通過，排程自動改網頁':'已設需要審核，暫停車');loadQ();}).catch(function(){say('寫入失敗');});}
