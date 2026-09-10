@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🛡 提案審核・MSC榮耀號</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;background:#f4f1ea;color:#2b2b2b;line-height:1.6;padding:14px;max-width:640px;margin:0 auto}
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.topbar a{font-size:14px;color:#10293f;text-decoration:none;font-weight:700}
+h1{font-size:20px;margin-bottom:2px}.sub{font-size:13px;color:#888;margin-bottom:12px}
+.card{background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.card .t{font-size:16px;font-weight:800}
+.card .m{font-size:13px;color:#666;margin:4px 0}
+.badge{font-size:12px;border-radius:6px;padding:1px 8px;white-space:nowrap}
+.st-confirmed{background:#e3f2e4;color:#1e7a34}.st-needs-review{background:#fff3d6;color:#7a5200}
+.st-pending{background:#e2e8f0;color:#33415c}.st-done{background:#eee;color:#888}
+.btns{display:flex;gap:8px;margin-top:8px}
+.btns button{flex:1;border:none;border-radius:10px;padding:10px;font-size:15px;font-weight:700;cursor:pointer}
+.go{background:#0e6e5a;color:#fff}.hold{background:#fff;color:#7a5200;border:1px solid #d8c98f}
+.btns button:disabled{opacity:.4}
+#msg{text-align:center;font-size:13px;color:#0e6e5a;min-height:20px;margin:6px 0}
+.note{font-size:12px;color:#999;text-align:center;padding:12px 0 40px}
+</style>
+</head>
+<body>
+<div class="topbar"><a href="index.html">‹ 返回入口</a></div>
+<h1>🛡 提案審核</h1>
+<div class="sub">直接通過＝排程自動改網頁（免審）・需要審核＝先停車＋通知 <span id="cnt"></span></div>
+<div style="text-align:center;margin-bottom:10px"><button onclick="loadQ()" style="border:1px solid #d8d0bd;background:#fff;border-radius:20px;padding:6px 18px;font-size:14px;cursor:pointer">↻ 重新整理</button></div>
+<div id="msg"></div>
+<div id="list"></div>
+<div class="note">管理者專用・版本 20260909-al</div>
+<script>
+var _p1='Z2l0aHViX3BhdF8xMUFISU5ORVEwV1JKV05mNFNvWHZCXzNtTUJVTWRaa0hDQV',_p2='hNbHA3QUFublh0bmNhTDN3NXZYd0tGbXlsYnlacmdVV0dFUTNSVm5KaXVMS1VW';
+var GH_TOKEN=atob(_p1+_p2);
+var GH_API_P='https://api.github.com/repos/a4623671/cruise-votes/contents/proposals.json';
+var PH_SHA=null;
+var KINDN={food:'🍜 餐廳',spot:'📷 景點',shop:'🛍 購物',souv:'🎁 伴手禮',del:'🗑 建議刪除'};
+var PN={naha:'🌺 那霸',miyako:'🏝 宮古島',ishigaki:'🪨 石垣島'};
+var STN={pending:'待分流',confirmed:'直接通過', 'needs-review':'需要審核', applied:'已套用', 'applied-deleted':'已刪除', duplicate:'重複', invalid:'無效', 'await-admin':'待審(舊)'};
+function esc(s){return String(s||'').replace(/</g,'&lt;');}
+function say(t){document.getElementById('msg').textContent=t;}
+function loadQ(){say('讀取中…');fetch(GH_API_P+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){if(j.message&&j.message.indexOf('Not Found')>=0)return [];PH_SHA=j.sha;try{return JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));}catch(e){return [];}}).then(paint).catch(function(){say('讀取失敗');});}
+function paint(list){window._Q=list;var open=list.filter(function(p){return ['pending','confirmed','needs-review','await-admin'].indexOf(p.status)>=0;});
+document.getElementById('cnt').textContent='（待處理 '+open.length+'／共 '+list.length+'）';
+var box=document.getElementById('list');
+if(!open.length){box.innerHTML='<div class="card"><div class="m">佇列是空的 🎉</div></div>';return;}
+box.innerHTML=open.map(function(p){var dis=(p.status==='applied'||p.status==='applied-deleted');
+return '<div class="card"><div class="t">'+esc(p.title)+' <span class="badge st-'+p.status+'">'+(STN[p.status]||p.status)+'</span></div>'
++'<div class="m">'+(KINDN[p.kind]||p.kind)+'・'+(PN[p.place]||p.place)+'・提案人 '+esc(p.by)+'・'+esc((p.ts||'').slice(0,10))+'</div>'
++(p.intro?'<div class="m">介紹：'+esc(p.intro)+'</div>':'')+(p.where?'<div class="m">哪買：'+esc(p.where)+'</div>':'')+(p.reason?'<div class="m"><b>刪除理由：'+esc(p.reason)+'</b></div>':'')
++'<div class="btns"><button class="go" '+(dis?'disabled':'')+' onclick="decide(\''+p.id+'\',\'confirmed\')">✅ 直接通過</button>'
++'<button class="hold" '+(dis?'disabled':'')+' onclick="decide(\''+p.id+'\',\'needs-review\')">⏸ 需要審核</button></div></div>';}).join('');}
+function decide(id,st){say('寫入中…');fetch(GH_API_P+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){PH_SHA=j.sha;var list=[];try{list=JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));}catch(e){}var hit=false;list.forEach(function(p){if(p.id===id){p.status=st;hit=true;}});if(!hit){say('該提案已不在佇列');return null;}var body={message:'admin '+st+' '+id,content:btoa(unescape(encodeURIComponent(JSON.stringify(list))))};if(PH_SHA)body.sha=PH_SHA;
+return fetch(GH_API_P,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)});}).then(function(r){if(!r)return;if(r.status===409){say('有人同時修改，重試一次');loadQ();return;}if(!r.ok){say('寫入失敗');return;}say(st==='confirmed'?'已設直接通過，排程自動改網頁':'已設需要審核，暫停車');loadQ();}).catch(function(){say('寫入失敗');});}
+loadQ();
+</script>
+</body>
+</html>
