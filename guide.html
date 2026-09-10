@@ -58,6 +58,18 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 .pblock .pi{color:#0e6e5a;font-weight:700}
 #statsBtn{position:fixed;right:14px;bottom:16px;z-index:20;border:none;background:#7a1f2b;color:#fff;border-radius:30px;padding:12px 20px;font-size:15px;font-weight:800;box-shadow:0 4px 12px rgba(0,0,0,.3);cursor:pointer}
 #propBtn{position:fixed;left:14px;bottom:16px;z-index:20;border:none;background:#0e6e5a;color:#fff;border-radius:30px;padding:12px 20px;font-size:15px;font-weight:800;box-shadow:0 4px 12px rgba(0,0,0,.3);cursor:pointer}
+#chatBtn{position:fixed;right:14px;bottom:76px;z-index:20;border:none;background:#10293f;color:#fff;border-radius:30px;padding:12px 20px;font-size:15px;font-weight:800;box-shadow:0 4px 12px rgba(0,0,0,.3);cursor:pointer}
+#chatpanel{position:fixed;left:0;right:0;bottom:0;z-index:60;background:#f4f1ea;border-radius:18px 18px 0 0;box-shadow:0 -4px 20px rgba(0,0,0,.3);display:none;max-height:75vh;flex-direction:column}
+#chatpanel.on{display:flex}
+#chatlog{overflow-y:auto;padding:12px 14px;flex:1;max-height:52vh}
+#chatlog .msg{max-width:85%;border-radius:12px;padding:8px 12px;margin:6px 0;font-size:14px;line-height:1.5}
+#chatlog .msg.bot{background:#fff;color:#222;align-self:flex-start}
+#chatlog .msg.me{background:#10293f;color:#fff;margin-left:auto}
+#chatlog .propok{background:#e3f2e4;border:1px solid #1e7a34;border-radius:12px;padding:10px;margin:6px 0;font-size:14px}
+#chatlog .propok button{width:100%;border:none;border-radius:10px;padding:10px;font-size:15px;font-weight:700;background:#0e6e5a;color:#fff;margin-top:8px;cursor:pointer}
+#chatbar{display:flex;gap:8px;padding:10px 12px 16px}
+#chatbar input{flex:1;border:1px solid #d8d0bd;border-radius:20px;padding:10px 14px;font-size:15px}
+#chatbar button{border:none;background:#10293f;color:#fff;border-radius:20px;padding:10px 18px;font-size:15px;font-weight:700;cursor:pointer}
 .pform label{display:block;font-size:13px;color:#666;margin:8px 0 2px}
 .pform input,.pform select,.pform textarea{width:100%;border:1px solid #d8d0bd;border-radius:8px;padding:8px;font-size:15px;box-sizing:border-box}
 .pform button{width:100%;border:none;border-radius:12px;padding:12px;font-size:16px;font-weight:700;background:#0e6e5a;color:#fff;margin-top:10px;cursor:pointer}
@@ -102,7 +114,7 @@ tr.sdet td{background:#faf7ef}
 .scnt2{font-size:12px;font-weight:800}
 .scmt{border:1px solid #d8d0bd;background:#fff;border-radius:14px;padding:2px 8px;font-size:12px;cursor:pointer;margin-top:4px}
 tr.sdet2 td{background:#faf7ef}
-@media print{#statsBtn,#propBtn,#imodal{display:none}}
+@media print{#statsBtn,#propBtn,#chatBtn,#imodal{display:none}}
 #imodal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:48;display:none;align-items:flex-end;justify-content:center}
 #imodal.on{display:flex}
 #imodal .ipanel{background:#fff;border-radius:18px 18px 0 0;max-width:680px;width:100%;max-height:88vh;overflow-y:auto;padding:18px 16px;position:relative}
@@ -150,7 +162,7 @@ img.ph{cursor:zoom-in}
 <button class="cat cat2" onclick="swCat('souv',this)">🎁 伴手禮</button>
 <button class="cat cat2" onclick="swCat('feat',this)">✨ 當地特色</button>
 </div>
-<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。（版本 20260909-z）</div>
+<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。左下 💬問客服（開通中）。（版本 20260909-ab）</div>
 <div class="wrap">
 
 <!-- ================= NAHA ================= -->
@@ -781,9 +793,11 @@ img.ph{cursor:zoom-in}
 </div>
 
 <div id="imodal"><div class="ipanel"><span class="ix" onclick="closeItem()">✕</span><div id="iboby"></div></div></div>
-<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20260909-z<span id="jsok"></span><span id="jsdiag"></span>・有問題請截圖此行</div>
+<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20260909-ab<span id="jsok"></span><span id="jsdiag"></span>・有問題請截圖此行</div>
 <button id="statsBtn" onclick="openStats()">📊 統計</button>
 <button id="propBtn" onclick="openProposal()">＋ 新增提案</button>
+<button id="chatBtn" onclick="openChat()">💬 問客服</button>
+<div id="chatpanel"><div style="display:flex;align-items:center;padding:10px 14px 0"><b style="font-size:16px">💬 提案客服</b><span style="flex:1"></span><button onclick="closeChat()" style="border:1px solid #d8d0bd;background:#fff;border-radius:16px;padding:4px 12px;font-size:13px;cursor:pointer">✕ 關閉</button></div><div id="chatlog"></div><div id="chatbar"><input id="chatinput" maxlength="200" placeholder="想加什麼行程？直接講…"><button onclick="sendChat()">送出</button></div></div>
 <div id="stats"><div class="panel"><h2>📊 投票統計</h2><div class="sub" id="statsSub"></div><div id="statsBody"></div>
 <div class="sub" id="syncStat">連線中…</div>
 <div class="row"><button class="close" onclick="closeStats()">關閉</button></div>
@@ -846,6 +860,17 @@ function phGet(){return fetch(GH_API_P+'?t='+Date.now(),{headers:ghHeaders(),cac
 function phPut(list,sha){var body={message:'proposal '+new Date().toISOString(),content:btoa(unescape(encodeURIComponent(JSON.stringify(list))))};if(sha)body.sha=sha;return fetch(GH_API_P,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){if(r.status===409||r.status===422)throw new Error('conflict');if(!r.ok)throw new Error('pput '+r.status);return r.json();});}
 function openProposal(){if(!me()){document.getElementById('gate').classList.remove('hide');return;}document.getElementById('iboby').innerHTML='<h3 style="font-size:18px;padding-right:30px">＋ 新增提案（只增不刪）</h3><div class="pform"><label>類型</label><select id="pf_kind"><option value="food">🍜 餐廳</option><option value="spot">📷 景點</option><option value="shop">🛍 購物</option><option value="souv">🎁 伴手禮</option><option value="del">🗑 建議刪除（需管理者確認）</option></select><label>地點</label><select id="pf_place"><option value="naha">🌺 那霸</option><option value="miyako">🏝 宮古島</option><option value="ishigaki">🪨 石垣島</option></select><label>名稱</label><input id="pf_title" maxlength="30" placeholder="例：泊港魚市場"><label>介紹</label><input id="pf_intro" maxlength="140" placeholder="一句話介紹…"><label>哪買／地址（選填）</label><input id="pf_where" maxlength="60" placeholder="例：公設市場一樓"><label>刪除理由（選建議刪除時必填）</label><input id="pf_reason" maxlength="140" placeholder="例：0票又沒人留言"><button onclick="submitProposal()">送出提案</button></div>';document.getElementById('imodal').classList.add('on');}
 function submitProposal(){var k=document.getElementById('pf_kind').value,pl=document.getElementById('pf_place').value,t=document.getElementById('pf_title').value.trim(),intro=document.getElementById('pf_intro').value.trim(),where=document.getElementById('pf_where').value.trim(),reason=document.getElementById('pf_reason').value.trim();if(!t){alert('請填名稱');return;}if(k==='del'&&!reason){alert('建議刪除請填理由');return;}var last=+localStorage.getItem(PH_KEY)||0;if(Date.now()-last<60000){alert('提案太頻繁，休息一下再送');return;}var obj={id:'p'+Date.now().toString(36),ts:new Date().toISOString(),by:me(),kind:k,place:pl,title:t,intro:intro,where:where,reason:reason,status:'pending'};phGet().then(function(list){list.push(obj);return phPut(list,PH_SHA);}).then(function(){localStorage.setItem(PH_KEY,Date.now());closeItem();alert(k==='del'?'已送出刪除建議，待管理者確認':'提案已送出，審核後加入！');}).catch(function(e){alert('送出失敗，請稍後再試');});}
+var CHAT_URL='';
+var CHAT_SESS='',CHAT_HIST=[];
+function chatAdd(cls,html){var d=document.createElement('div');d.className='msg '+cls;d.innerHTML=html;document.getElementById('chatlog').appendChild(d);document.getElementById('chatlog').scrollTop=1e9;}
+function openChat(){document.getElementById('chatpanel').classList.add('on');if(!document.getElementById('chatlog').children.length){if(!CHAT_URL){chatAdd('bot','客服開通中（接 Google Gemini 直連），先用原本的表單提案吧 👇<div class="propok"><button onclick="closeChat();openProposal()">＋ 開啟新增提案表單</button></div>');}else{CHAT_SESS='c'+Date.now().toString(36);CHAT_HIST=[];chatAdd('bot','哈囉！想幫家族加什麼行程？跟我說地點＋想加什麼（餐廳／景點／購物／伴手禮），我幫你整理成提案 📝');}}}
+function closeChat(){document.getElementById('chatpanel').classList.remove('on');}
+function sendChat(){var inp=document.getElementById('chatinput'),t=inp.value.trim();if(!t)return;if(!me()){document.getElementById('gate').classList.remove('hide');return;}if(!CHAT_URL){chatAdd('me',t.replace(/</g,'&lt;'));chatAdd('bot','客服還沒開通，用表單先提案吧 👆');inp.value='';return;}inp.value='';chatAdd('me',t.replace(/</g,'&lt;'));CHAT_HIST.push({role:'user',text:t});if(CHAT_HIST.length>10)CHAT_HIST=CHAT_HIST.slice(-10);fetch(CHAT_URL+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session:CHAT_SESS,history:CHAT_HIST,text:t})}).then(function(r){return r.json();}).then(function(j){CHAT_HIST.push({role:'bot',text:j.reply||''});chatAdd('bot',(j.reply||'嗯…').replace(/\n/g,'<br>'));if(j.proposal)chatProposalCard(j.proposal);}).catch(function(){chatAdd('bot','連線失敗，稍後再試，或改用表單提案。');});}
+function chatProposalCard(p){var d=document.createElement('div');d.className='propok';var kindn={food:'🍜 餐廳',spot:'📷 景點',shop:'🛍 購物',souv:'🎁 伴手禮',del:'🗑 建議刪除'}[p.kind]||p.kind;var placen={naha:'🌺 那霸',miyako:'🏝 宮古島',ishigaki:'🪨 石垣島'}[p.place]||p.place;d.innerHTML='<b>提案確認</b><br>'+kindn+'・'+placen+'<br><b>'+String(p.title||'').replace(/</g,'&lt;')+'</b><br>'+String(p.intro||'').replace(/</g,'&lt;')+(p.reason?'<br>理由：'+String(p.reason).replace(/</g,'&lt;'):'')+'<button>✅ 確認提案</button>';d.querySelector('button').onclick=function(){confirmChatProposal(p,d);};document.getElementById('chatlog').appendChild(d);document.getElementById('chatlog').scrollTop=1e9;}
+function confirmChatProposal(p,cardEl){var btn=cardEl.querySelector('button');btn.disabled=true;btn.textContent='送出中…';var obj={id:'p'+Date.now().toString(36),ts:new Date().toISOString(),by:me(),kind:p.kind,place:p.place,title:String(p.title||'').slice(0,30),intro:String(p.intro||'').slice(0,140),where:String(p.where||'').slice(0,60),reason:String(p.reason||'').slice(0,140),status:'pending'};function done(ok){btn.textContent=ok?'✅ 已送出，待審核':'❌ 失敗請重試';if(ok)btn.disabled=true;else btn.disabled=false;}
+if(CHAT_URL){fetch(CHAT_URL+'/api/propose',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({proposal:obj})}).then(function(r){return r.json();}).then(function(j){done(!!j.ok);if(j.ok)chatAdd('bot','收到！提案已進待審，第二階段會自動排入網頁 🎉');}).catch(function(){done(false);});return;}
+phGet().then(function(list){list.push(obj);return phPut(list,PH_SHA);}).then(function(){done(true);}).catch(function(){done(false);});}
+document.getElementById('chatinput').addEventListener('keydown',function(e){if(e.key==='Enter')sendChat();});
 function paintComments(){var cards=document.querySelectorAll('.card');cards.forEach(function(card){var box=card.querySelector('.cmt');if(!box)return;var id=box.getAttribute('data-id');var arr=CMT[id]||[];var btn=box.querySelector('.cbtn');btn.textContent='💬 留言'+(arr.length?'（'+arr.length+'）':'');var ms=box.querySelector('.msgs');ms.innerHTML=arr.slice(-20).map(function(m){return '<div class="msg"><b>'+m.n+'</b>：'+m.t+'<span class="tm">'+fmtTs(m.ts)+'</span></div>';}).join('');});}
 function toggleCmt(btn){var th=btn.closest('.cmt').querySelector('.thread');th.style.display=th.style.display==='none'?'':'none';}
 function sendComment(id,inputEl,btnEl){var n=me();if(!n){document.getElementById('gate').classList.remove('hide');return;}var t=(inputEl.value||'').trim().slice(0,140);if(!t){alert('先寫點什麼');return;}if(CMT_BUSY)return;CMT_BUSY=true;btnEl.disabled=true;
