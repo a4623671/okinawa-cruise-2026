@@ -56,8 +56,8 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 .pblock h4{font-size:15px;color:#7a1f2b;margin-bottom:4px}
 .pblock .prow{font-size:13px;padding:5px 0;border-top:1px dotted #e3ddd0}
 .pblock .pi{color:#0e6e5a;font-weight:700}
-#statsBtn{position:fixed;right:14px;bottom:16px;z-index:20;border:none;background:#7a1f2b;color:#fff;border-radius:30px;padding:12px 20px;font-size:15px;font-weight:800;box-shadow:0 4px 12px rgba(0,0,0,.3);cursor:pointer}
-#chatBtn{position:fixed;right:14px;bottom:76px;z-index:20;border:none;background:#10293f;color:#fff;border-radius:30px;padding:12px 20px;font-size:15px;font-weight:800;box-shadow:0 4px 12px rgba(0,0,0,.3);cursor:pointer}
+#statsBtn{position:fixed;right:14px;bottom:16px;z-index:20;border:none;background:#7a1f2b;color:#fff;border-radius:50%;width:52px;height:52px;font-size:22px;box-shadow:0 4px 12px rgba(0,0,0,.3);cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none}
+#chatBtn{position:fixed;right:14px;bottom:76px;z-index:20;border:none;background:#10293f;color:#fff;border-radius:50%;width:52px;height:52px;font-size:22px;box-shadow:0 4px 12px rgba(0,0,0,.3);cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none}
 #chatpanel{position:fixed;left:0;right:0;bottom:0;z-index:60;background:#f4f1ea;border-radius:18px 18px 0 0;box-shadow:0 -4px 20px rgba(0,0,0,.3);display:none;max-height:75vh;flex-direction:column}
 #chatpanel.on{display:flex}
 #chatlog{overflow-y:auto;padding:12px 14px;flex:1;max-height:52vh}
@@ -158,7 +158,7 @@ img.ph{cursor:zoom-in}
 <button class="cat cat2" onclick="swCat('souv',this)">🎁 伴手禮</button>
 <button class="cat cat2" onclick="swCat('feat',this)">✨ 當地特色</button>
 </div>
-<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20260909-af）</div>
+<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20260909-ag）</div>
 <div class="wrap">
 
 <!-- ================= NAHA ================= -->
@@ -789,9 +789,9 @@ img.ph{cursor:zoom-in}
 </div>
 
 <div id="imodal"><div class="ipanel"><span class="ix" onclick="closeItem()">✕</span><div id="iboby"></div></div></div>
-<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20260909-af<span id="jsok"></span><span id="jsdiag"></span>・有問題請截圖此行</div>
-<button id="statsBtn" onclick="openStats()">📊 統計</button>
-<button id="chatBtn" onclick="openChat()">💬 小幫手</button>
+<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20260909-ag<span id="jsok"></span><span id="jsdiag"></span>・有問題請截圖此行</div>
+<button id="statsBtn" onclick="openStats()">📊</button>
+<button id="chatBtn" onclick="openChat()">💬</button>
 <div id="chatpanel"><div style="display:flex;align-items:center;padding:10px 14px 0"><b style="font-size:16px">💬 小幫手</b><span style="flex:1"></span><button onclick="closeChat()" style="border:1px solid #d8d0bd;background:#fff;border-radius:16px;padding:4px 12px;font-size:13px;cursor:pointer">✕ 關閉</button></div><div id="chatlog"></div><div id="chatbar"><input id="chatinput" maxlength="200" placeholder="小幫手即將開通…" disabled><button onclick="sendChat()">送出</button></div></div>
 <div id="stats"><div class="panel"><h2>📊 投票統計</h2><div class="sub" id="statsSub"></div><div id="statsBody"></div>
 <div class="sub" id="syncStat">連線中…</div>
@@ -856,6 +856,14 @@ function phPut(list,sha){var body={message:'proposal '+new Date().toISOString(),
 var CHAT_URL='';
 var CHAT_SESS='',CHAT_HIST=[];
 function chatAdd(cls,html){var d=document.createElement('div');d.className='msg '+cls;d.innerHTML=html;document.getElementById('chatlog').appendChild(d);document.getElementById('chatlog').scrollTop=1e9;}
+var FBPOS='fbtn_pos_v1';
+function restoreFbtn(){var p={};try{p=JSON.parse(localStorage.getItem(FBPOS)||'{}');}catch(e){}['statsBtn','chatBtn'].forEach(function(id){if(p[id]){var b=document.getElementById(id);b.style.left=p[id][0]+'px';b.style.top=p[id][1]+'px';b.style.right='auto';b.style.bottom='auto';}});}
+function makeDraggable(id){var b=document.getElementById(id),sx=0,sy=0,ox=0,oy=0,moved=false;function pos(e){return {x:e.clientX,y:e.clientY};}
+b.addEventListener('pointerdown',function(e){moved=false;var r=b.getBoundingClientRect();sx=e.clientX;sy=e.clientY;ox=r.left;oy=r.top;try{b.setPointerCapture(e.pointerId);}catch(x){}});
+b.addEventListener('pointermove',function(e){if(e.buttons===0&&e.pointerType==='mouse')return;var dx=e.clientX-sx,dy=e.clientY-sy;if(Math.abs(dx)+Math.abs(dy)>8)moved=true;if(!moved)return;var nx=Math.min(Math.max(0,ox+dx),window.innerWidth-52),ny=Math.min(Math.max(0,oy+dy),window.innerHeight-52);b.style.left=nx+'px';b.style.top=ny+'px';b.style.right='auto';b.style.bottom='auto';});
+b.addEventListener('pointerup',function(e){if(!moved)return;window.__lastDrag=Date.now();var p={};try{p=JSON.parse(localStorage.getItem(FBPOS)||'{}');}catch(x){}var r=b.getBoundingClientRect();p[id]=[Math.round(r.left),Math.round(r.top)];try{localStorage.setItem(FBPOS,JSON.stringify(p));}catch(y){}});
+b.addEventListener('pointercancel',function(){moved=false;});}
+document.addEventListener('click',function(e){var t=e.target.closest?e.target.closest('#statsBtn,#chatBtn'):null;if(t&&Date.now()-(window.__lastDrag||0)<400){e.stopPropagation();e.preventDefault();}},true);
 function openChat(){document.getElementById('chatpanel').classList.add('on');if(!document.getElementById('chatlog').children.length){if(!CHAT_URL){chatAdd('bot','小幫手即將開通，到時直接在這裡用聊的提案，不用填表單 😌');}else{CHAT_SESS='c'+Date.now().toString(36);CHAT_HIST=[];document.getElementById('chatinput').disabled=false;document.getElementById('chatinput').placeholder='想加什麼行程？直接講…';chatAdd('bot','哈囉！想幫家族加什麼行程？跟我說地點＋想加什麼（餐廳／景點／購物／伴手禮），我幫你整理成提案 📝');}}}
 function closeChat(){document.getElementById('chatpanel').classList.remove('on');}
 function sendChat(){var inp=document.getElementById('chatinput');if(inp.disabled)return;var t=inp.value.trim();if(!t)return;if(!me()){document.getElementById('gate').classList.remove('hide');return;}inp.value='';chatAdd('me',t.replace(/</g,'&lt;'));CHAT_HIST.push({role:'user',text:t});if(CHAT_HIST.length>10)CHAT_HIST=CHAT_HIST.slice(-10);fetch(CHAT_URL+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session:CHAT_SESS,history:CHAT_HIST,text:t})}).then(function(r){return r.json();}).then(function(j){CHAT_HIST.push({role:'bot',text:j.reply||''});chatAdd('bot',(j.reply||'嗯…').replace(/\n/g,'<br>'));if(j.proposal)chatProposalCard(j.proposal);}).catch(function(){chatAdd('bot','連線失敗，稍後再試，或改用表單提案。');});}
@@ -1043,7 +1051,7 @@ ov.querySelector('.gn').onclick=function(e){e.stopPropagation();show(idx+1);};
 ov.onclick=function(e){if(e.target===ov)ov.classList.remove('on');};
 var tx=0;ov.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;},{passive:true});
 ov.addEventListener('touchend',function(e){var dx=e.changedTouches[0].clientX-tx;if(dx>50)show(idx-1);else if(dx<-50)show(idx+1);});}
-safe(renderRanks);safe(renderDonki);safe(applyFilter);safe(initGal);safe(initSwipe);safe(paintTW);safe(renderNameBtns);try{if(me())document.getElementById('gate').classList.add('hide');}catch(e){}safe(refreshVotes);safe(syncFromRemote);setInterval(function(){syncFromRemote(true);},15000);try{var js=document.getElementById('jsok');if(js)js.textContent='·JS正常';}catch(e){}
+safe(renderRanks);safe(renderDonki);safe(applyFilter);safe(initGal);safe(initSwipe);safe(paintTW);safe(restoreFbtn);safe(function(){makeDraggable('statsBtn');makeDraggable('chatBtn');});safe(renderNameBtns);try{if(me())document.getElementById('gate').classList.add('hide');}catch(e){}safe(refreshVotes);safe(syncFromRemote);setInterval(function(){syncFromRemote(true);},15000);try{var js=document.getElementById('jsok');if(js)js.textContent='·JS正常';}catch(e){}
 </script>
 </body>
 </html>
