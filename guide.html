@@ -69,6 +69,10 @@ h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 #chatbar{display:flex;gap:8px;padding:10px 12px 16px}
 #chatbar input{flex:1;border:1px solid #d8d0bd;border-radius:20px;padding:10px 14px;font-size:15px}
 #chatbar button{border:none;background:#10293f;color:#fff;border-radius:20px;padding:10px 18px;font-size:15px;font-weight:700;cursor:pointer}
+#chatlog .thinking span{display:inline-block;animation:tblink 1.2s infinite}
+#chatlog .thinking span:nth-child(2){animation-delay:.2s}
+#chatlog .thinking span:nth-child(3){animation-delay:.4s}
+@keyframes tblink{0%,60%,100%{opacity:.2}30%{opacity:1}}
 #stats{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40;display:none;align-items:flex-end;justify-content:center}
 #stats.on{display:flex}
 #stats .panel{background:#fff;border-radius:18px 18px 0 0;max-width:680px;width:100%;max-height:85vh;overflow-y:auto;padding:18px 16px}
@@ -158,7 +162,7 @@ img.ph{cursor:zoom-in}
 <button class="cat cat2" onclick="swCat('souv',this)">🎁 伴手禮</button>
 <button class="cat cat2" onclick="swCat('feat',this)">✨ 當地特色</button>
 </div>
-<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20260909-ah）</div>
+<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20260909-ai）</div>
 <div class="wrap">
 
 <!-- ================= NAHA ================= -->
@@ -789,7 +793,7 @@ img.ph{cursor:zoom-in}
 </div>
 
 <div id="imodal"><div class="ipanel"><span class="ix" onclick="closeItem()">✕</span><div id="iboby"></div></div></div>
-<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20260909-ah<span id="jsok"></span><span id="jsdiag"></span>・有問題請截圖此行</div>
+<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20260909-ai<span id="jsok"></span><span id="jsdiag"></span>・有問題請截圖此行</div>
 <button id="statsBtn" onclick="openStats()">📊</button>
 <button id="chatBtn" onclick="openChat()">💬</button>
 <div id="chatpanel"><div style="display:flex;align-items:center;padding:10px 14px 0"><b style="font-size:16px">💬 小幫手</b><span style="flex:1"></span><button onclick="closeChat()" style="border:1px solid #d8d0bd;background:#fff;border-radius:16px;padding:4px 12px;font-size:13px;cursor:pointer">✕ 關閉</button></div><div id="chatlog"></div><div id="chatbar"><input id="chatinput" maxlength="200" placeholder="小幫手即將開通…" disabled><button onclick="sendChat()">送出</button></div></div>
@@ -855,7 +859,7 @@ function phGet(){return fetch(GH_API_P+'?t='+Date.now(),{headers:ghHeaders(),cac
 function phPut(list,sha){var body={message:'proposal '+new Date().toISOString(),content:btoa(unescape(encodeURIComponent(JSON.stringify(list))))};if(sha)body.sha=sha;return fetch(GH_API_P,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){if(r.status===409||r.status===422)throw new Error('conflict');if(!r.ok)throw new Error('pput '+r.status);return r.json();});}
 var CHAT_URL='https://cruise-chat.fan-saxon-bot.workers.dev';
 var CHAT_SESS='',CHAT_HIST=[];
-function chatAdd(cls,html){var d=document.createElement('div');d.className='msg '+cls;d.innerHTML=html;document.getElementById('chatlog').appendChild(d);document.getElementById('chatlog').scrollTop=1e9;}
+function chatAdd(cls,html){var d=document.createElement('div');d.className='msg '+cls;if(cls==='bot'){html=html.replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" style="color:#0e6e5a;word-break:break-all">$1</a>');}d.innerHTML=html;document.getElementById('chatlog').appendChild(d);document.getElementById('chatlog').scrollTop=1e9;}
 var FBPOS='fbtn_pos_v1';
 function restoreFbtn(){var p={};try{p=JSON.parse(localStorage.getItem(FBPOS)||'{}');}catch(e){}['statsBtn','chatBtn'].forEach(function(id){if(p[id]){var b=document.getElementById(id);b.style.left=p[id][0]+'px';b.style.top=p[id][1]+'px';b.style.right='auto';b.style.bottom='auto';}});}
 function makeDraggable(id){var b=document.getElementById(id),sx=0,sy=0,ox=0,oy=0,moved=false;function pos(e){return {x:e.clientX,y:e.clientY};}
@@ -866,7 +870,7 @@ b.addEventListener('pointercancel',function(){moved=false;});}
 document.addEventListener('click',function(e){var t=e.target.closest?e.target.closest('#statsBtn,#chatBtn'):null;if(t&&Date.now()-(window.__lastDrag||0)<400){e.stopPropagation();e.preventDefault();}},true);
 function openChat(){document.getElementById('chatpanel').classList.add('on');if(!document.getElementById('chatlog').children.length){if(!CHAT_URL){chatAdd('bot','小幫手即將開通，到時直接在這裡用聊的提案，不用填表單 😌');}else{CHAT_SESS='c'+Date.now().toString(36);CHAT_HIST=[];document.getElementById('chatinput').disabled=false;document.getElementById('chatinput').placeholder='想加什麼行程？直接講…';chatAdd('bot','哈囉！想幫家族加什麼行程？跟我說地點＋想加什麼（餐廳／景點／購物／伴手禮），我幫你整理成提案 📝');}}}
 function closeChat(){document.getElementById('chatpanel').classList.remove('on');}
-function sendChat(){var inp=document.getElementById('chatinput');if(inp.disabled)return;var t=inp.value.trim();if(!t)return;if(!me()){document.getElementById('gate').classList.remove('hide');return;}inp.value='';chatAdd('me',t.replace(/</g,'&lt;'));CHAT_HIST.push({role:'user',text:t});if(CHAT_HIST.length>10)CHAT_HIST=CHAT_HIST.slice(-10);fetch(CHAT_URL+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session:CHAT_SESS,history:CHAT_HIST,text:t})}).then(function(r){return r.json();}).then(function(j){CHAT_HIST.push({role:'bot',text:j.reply||''});chatAdd('bot',(j.reply||'嗯…').replace(/\n/g,'<br>'));if(j.proposal)chatProposalCard(j.proposal);}).catch(function(){chatAdd('bot','連線失敗，稍後再試，或改用表單提案。');});}
+function sendChat(){var inp=document.getElementById('chatinput');if(inp.disabled)return;var t=inp.value.trim();if(!t)return;if(!me()){document.getElementById('gate').classList.remove('hide');return;}inp.value='';chatAdd('me',t.replace(/</g,'&lt;'));var searching=/查|搜尋|上網|網路上|評價|好吃嗎|推嗎|PTT|Dcard|部落客|食記|排名/.test(t);var th=document.createElement('div');th.className='msg bot thinking';th.id='thinking';th.innerHTML=(searching?'🔍 上網調查中':'💭 思考中')+'<span>.</span><span>.</span><span>.</span>';document.getElementById('chatlog').appendChild(th);document.getElementById('chatlog').scrollTop=1e9;CHAT_HIST.push({role:'user',text:t});if(CHAT_HIST.length>10)CHAT_HIST=CHAT_HIST.slice(-10);fetch(CHAT_URL+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session:CHAT_SESS,history:CHAT_HIST,text:t})}).then(function(r){return r.json();}).then(function(j){CHAT_HIST.push({role:'bot',text:j.reply||''});var th0=document.getElementById('thinking');if(th0)th0.remove();chatAdd('bot',(j.reply||'嗯…').replace(/\n/g,'<br>'));if(j.proposal)chatProposalCard(j.proposal);}).catch(function(){var th1=document.getElementById('thinking');if(th1){th1.classList.remove('thinking');th1.textContent='連線失敗，稍後再試。';}else{chatAdd('bot','連線失敗，稍後再試。');}});}
 function chatLockOld(except){document.querySelectorAll('#chatlog .propok.ai button').forEach(function(b){if(b!==except&&!b.disabled){b.disabled=true;b.textContent='已被新版本取代';}});}
 function chatProposalCard(p){chatLockOld(null);var d=document.createElement('div');d.className='propok ai';var kindn={food:'🍜 餐廳',spot:'📷 景點',shop:'🛍 購物',souv:'🎁 伴手禮',del:'🗑 建議刪除'}[p.kind]||p.kind;var placen={naha:'🌺 那霸',miyako:'🏝 宮古島',ishigaki:'🪨 石垣島'}[p.place]||p.place;d.innerHTML='<b>提案確認</b><br>'+kindn+'・'+placen+'<br><b>'+String(p.title||'').replace(/</g,'&lt;')+'</b><br>'+String(p.intro||'').replace(/</g,'&lt;')+(p.reason?'<br>理由：'+String(p.reason).replace(/</g,'&lt;'):'')+'<button>✅ 確認提案</button>';d.querySelector('button').onclick=function(){confirmChatProposal(p,d);};document.getElementById('chatlog').appendChild(d);document.getElementById('chatlog').scrollTop=1e9;}
 function confirmChatProposal(p,cardEl){var btn=cardEl.querySelector('button');btn.disabled=true;btn.textContent='送出中…';var obj={id:'p'+Date.now().toString(36),ts:new Date().toISOString(),by:me(),kind:p.kind,place:p.place,title:String(p.title||'').slice(0,30),intro:String(p.intro||'').slice(0,140),where:String(p.where||'').slice(0,60),reason:String(p.reason||'').slice(0,140),status:'confirmed'};function done(ok){btn.textContent=ok?'✅ 已送出，直接改網頁':'❌ 失敗請重試';if(ok){btn.disabled=true;chatLockOld(btn);}else btn.disabled=false;}
