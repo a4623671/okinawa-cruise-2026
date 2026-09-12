@@ -58,13 +58,16 @@ var box=document.getElementById('list');
 if(!open.length){box.innerHTML='<div class="card"><div class="m">佇列是空的 🎉</div></div>';}
 else{box.innerHTML=open.map(function(p){var dis=(p.status==='applied'||p.status==='applied-deleted');
 return '<div class="card"><div class="t">'+esc(p.title)+' <span class="badge st-'+p.status+'">'+(STN[p.status]||p.status)+'</span></div>'
-+'<div class="m">'+(KINDN[p.kind]||p.kind)+'・'+(PN[p.place]||p.place)+'・提案人 '+esc(p.by)+'・'+esc((p.ts||'').slice(0,10))+'</div>'
++'<div class="m">分類：<select id="kind-'+p.id+'" style="font-size:14px;padding:4px;border-radius:6px">'
++['food','spot','shop','souv','feat'].map(function(k){return '<option value="'+k+'"'+(p.kind===k?' selected':'')+'>'+(KINDN[k]||k)+'</option>';}).join('')+'</select>'
++'　圖片URL：<input id="img-'+p.id+'" value="'+esc(p.img||'')+'" placeholder="https://…" style="width:60%;font-size:13px;padding:4px;border:1px solid #d8d0bd;border-radius:6px"></div>'
++'<div class="m">'+(PN[p.place]||p.place)+'・提案人 '+esc(p.by)+'・'+esc((p.ts||'').slice(0,10))+'</div>'
 +(p.intro?'<div class="m">介紹：'+esc(p.intro)+'</div>':'')+(p.items&&p.items.length?'<div class="m">品項：<br>'+p.items.map(function(it,i){return (i+1)+'. '+esc(it.title)+'：'+esc(it.intro);}).join('<br>')+'</div>':'')+(p.where?'<div class="m">哪買：'+esc(p.where)+'</div>':'')+(p.reason?'<div class="m"><b>刪除理由：'+esc(p.reason)+'</b></div>':'')
 +'<div class="btns"><button class="go" '+(dis?'disabled':'')+' onclick="decide(\''+p.id+'\',\'approved\')">✅ 直接通過</button>'
 +'<button class="hold" '+(dis?'disabled':'')+' onclick="decide(\''+p.id+'\',\'needs-review\')">⏸ 需要審核</button></div></div>';}).join('');}
 if(done.length){box.innerHTML+='<div class="card"><div class="t" style="font-size:14px">已處理（'+done.length+'）</div>'+done.map(function(p){return '<div class="m">'+esc(p.title||((p.items||[{}])[0].title||''))+' <span class="badge st-done">'+(STN[p.status]||p.status)+'</span> <span style="color:#999">'+esc(p.by)+'・'+esc((p.ts||'').slice(0,10))+'</span></div>';}).join('')+'</div>';}
 say('');}
-function decide(id,st){say('寫入中…');fetch(GH_API_P+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){PH_SHA=j.sha;var list=[];try{list=JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));}catch(e){}var hit=false;list.forEach(function(p){if(p.id===id){p.status=st;hit=true;}});if(!hit){say('該提案已不在佇列');return null;}var body={message:'admin '+st+' '+id,content:btoa(unescape(encodeURIComponent(JSON.stringify(list))))};if(PH_SHA)body.sha=PH_SHA;
+function decide(id,st){say('寫入中…');fetch(GH_API_P+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){PH_SHA=j.sha;var list=[];try{list=JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));}catch(e){}var hit=false;list.forEach(function(p){if(p.id===id){p.status=st;var ks=document.getElementById('kind-'+id);if(ks)p.kind=ks.value;var im=document.getElementById('img-'+id);if(im&&im.value.trim())p.img=im.value.trim();hit=true;}});if(!hit){say('該提案已不在佇列');return null;}var body={message:'admin '+st+' '+id,content:btoa(unescape(encodeURIComponent(JSON.stringify(list))))};if(PH_SHA)body.sha=PH_SHA;
 return fetch(GH_API_P,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)});}).then(function(r){if(!r)return;if(r.status===409){say('有人同時修改，重試一次');loadQ();return;}if(!r.ok){say('寫入失敗');return;}say(st==='approved'?'已設直接通過，排程自動改網頁':'已設需要審核，暫停車');loadQ();}).catch(function(){say('寫入失敗');});}
 var CFG_API='https://api.github.com/repos/a4623671/cruise-votes/contents/admin-cfg.json';
 var CFG_SHA=null;
