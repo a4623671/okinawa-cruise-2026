@@ -37,6 +37,8 @@ h1{font-size:20px;margin-bottom:2px}.sub{font-size:13px;color:#888;margin-bottom
 <div class="card"><div class="m">自動通過模式：<b id="modeTxt">讀取中…</b></div><div class="m" style="font-size:12px">開＝小幫手確認後排程直接改網頁免審；關＝每筆都要在這裡按通過</div><div class="btns"><button class="go" id="modeBtn" onclick="flipMode()">切換</button></div></div>
 <div style="text-align:center;margin-bottom:10px"><button onclick="loadQ()" style="border:1px solid #d8d0bd;background:#fff;border-radius:20px;padding:6px 18px;font-size:14px;cursor:pointer">↻ 重新整理</button></div>
 <div id="msg"></div>
+<div class="card"><div class="t" style="font-size:14px">💬 小幫手使用狀況 <span id="useCnt" style="color:#999;font-weight:400"></span></div><div id="useStat" class="m">讀取中…</div><div id="useList"></div>
+<div class="m" style="font-size:12px;color:#999">只記部署後的對話（30天），跟投票一樣公開可見</div></div>
 <div id="list"></div>
 <div class="note">管理者專用・版本 20260909-am</div>
 </div>
@@ -73,7 +75,18 @@ var CFG_API='https://api.github.com/repos/a4623671/cruise-votes/contents/admin-c
 var CFG_SHA=null;
 function loadMode(){fetch(CFG_API+'?t='+Date.now(),{cache:'no-store'}).then(function(r){if(r.status===404)return {auto:false};return r.json();}).then(function(j){if(j.auto!==undefined)return j;CFG_SHA=j.sha;try{return JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));}catch(e){return {auto:false};}}).then(function(c){document.getElementById('modeTxt').textContent=c.auto?'開（確認後免審直改）':'關（每筆都要按通過）';document.getElementById('modeBtn').textContent=c.auto?'關閉自動通過':'開啟自動通過';}).catch(function(){});}
 function flipMode(){say('切換中…');fetch(CFG_API+'?t='+Date.now(),{cache:'no-store'}).then(function(r){if(r.status===404)return {cfg:{auto:false},sha:null};return r.json().then(function(j){CFG_SHA=j.sha;try{return {cfg:JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,''))))),sha:j.sha};}catch(e){return {cfg:{auto:false},sha:j.sha};}});}).then(function(o){var nu={auto:!o.cfg.auto};var body={message:'admin auto='+nu.auto,content:btoa(unescape(encodeURIComponent(JSON.stringify(nu))))};if(o.sha)body.sha=o.sha;return fetch(CFG_API,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)});}).then(function(r){if(!r.ok){say('切換失敗');return;}say('已切換');loadMode();loadQ();}).catch(function(){say('切換失敗');});}
+function loadUse(){fetch('https://cruise-chat.fan-saxon-bot.workers.dev/api/logs?limit=100').then(function(r){return r.json();}).then(function(j){paintUse(j.logs||[]);}).catch(function(){document.getElementById('useStat').textContent='讀取失敗';});}
+function paintUse(logs){document.getElementById('useCnt').textContent='（'+logs.length+'則）';
+var by={};logs.forEach(function(l){by[l.by||'?']=(by[l.by||'?']||0)+1;});
+document.getElementById('useStat').textContent=Object.keys(by).map(function(k){return k+'×'+by[k];}).join('、')||'尚無紀錄';
+var sess={},order=[];
+logs.forEach(function(l){if(!sess[l.sess]){sess[l.sess]=[];order.push(l.sess);}sess[l.sess].push(l);});
+document.getElementById('useList').innerHTML=order.slice(0,10).map(function(s,i){var ms=sess[s];var first=ms[ms.length-1];
+return '<div class="m" style="border-top:1px dashed #ddd;padding-top:6px"><b>'+esc(first.by||'?')+'</b> <span style="color:#999">'+new Date(first.ts).toLocaleString('zh-TW',{hour12:false}).slice(5,16)+'</span> <span style="color:#999">（'+ms.length+'則）</span><br>Q：'+esc(ms.map(function(m){return m.q;}).join('／').slice(0,120))+'<br><a href="#" onclick="useDetail(\''+s+'\');return false;" style="font-size:12px">展開對話</a><div id="ud-'+s+'" style="display:none;font-size:13px;background:#f8f6f0;border-radius:8px;padding:6px;margin-top:4px"></div></div>';}).join('');
+window._sess=sess;}
+function useDetail(s){var d=document.getElementById('ud-'+s);if(d.style.display!=='none'){d.style.display='none';return;}d.innerHTML=(window._sess[s]||[]).slice().reverse().map(function(m){return '<div><b>問：</b>'+esc(m.q)+'</div><div style="color:#444">答：'+esc(m.a).slice(0,200)+(m.prop?' <b>✅有提案</b>':'')+'</div>';}).join('<hr style="border:none;border-top:1px solid #e3ddd0;margin:4px 0">');d.style.display='block';}
 loadQ();
+loadMode();
 async function unlock(){var v=document.getElementById('pw').value.trim();var h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(v));var hex=[...new Uint8Array(h)].map(function(b){return b.toString(16).padStart(2,'0');}).join('');if(hex==='79c24954807c83c719a99fa71958ad1afb7b17a2fe03d4773d383797dfcbfbf3'){sessionStorage.setItem('admin_ok','1');showApp();}else{document.getElementById('pwmsg').textContent='密碼不對';}}
 function showApp(){document.getElementById('lock').style.display='none';document.getElementById('app').style.display='block';}
 if(sessionStorage.getItem('admin_ok')==='1')showApp();
