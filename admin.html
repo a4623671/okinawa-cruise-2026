@@ -87,6 +87,7 @@ window._sess=sess;}
 function useDetail(s){var d=document.getElementById('ud-'+s);if(d.style.display!=='none'){d.style.display='none';return;}d.innerHTML=(window._sess[s]||[]).slice().reverse().map(function(m){return '<div><b>問：</b>'+esc(m.q)+'</div><div style="color:#444">答：'+esc(m.a).slice(0,200)+(m.prop?' <b>✅有提案</b>':'')+'</div>';}).join('<hr style="border:none;border-top:1px solid #e3ddd0;margin:4px 0">');d.style.display='block';}
 loadQ();
 loadMode();
+loadUse();
 async function unlock(){var v=document.getElementById('pw').value.trim();var h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(v));var hex=[...new Uint8Array(h)].map(function(b){return b.toString(16).padStart(2,'0');}).join('');if(hex==='79c24954807c83c719a99fa71958ad1afb7b17a2fe03d4773d383797dfcbfbf3'){sessionStorage.setItem('admin_ok','1');showApp();}else{document.getElementById('pwmsg').textContent='密碼不對';}}
 function showApp(){document.getElementById('lock').style.display='none';document.getElementById('app').style.display='block';}
 if(sessionStorage.getItem('admin_ok')==='1')showApp();
