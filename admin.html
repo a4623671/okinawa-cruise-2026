@@ -34,6 +34,7 @@ h1{font-size:20px;margin-bottom:2px}.sub{font-size:13px;color:#888;margin-bottom
 <div id="app" style="display:none">
 <h1>🛡 提案審核</h1>
 <div class="sub">直接通過＝排程自動改網頁（免審）・需要審核＝先停車＋通知 <span id="cnt"></span></div>
+<div class="card"><div class="m">自動通過模式：<b id="modeTxt">讀取中…</b></div><div class="m" style="font-size:12px">開＝小幫手確認後排程直接改網頁免審；關＝每筆都要在這裡按通過</div><div class="btns"><button class="go" id="modeBtn" onclick="flipMode()">切換</button></div></div>
 <div style="text-align:center;margin-bottom:10px"><button onclick="loadQ()" style="border:1px solid #d8d0bd;background:#fff;border-radius:20px;padding:6px 18px;font-size:14px;cursor:pointer">↻ 重新整理</button></div>
 <div id="msg"></div>
 <div id="list"></div>
@@ -51,22 +52,30 @@ function esc(s){return String(s||'').replace(/</g,'&lt;');}
 function say(t){document.getElementById('msg').textContent=t;}
 function loadQ(){say('讀取中…');fetch(GH_API_P+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){if(j.message&&j.message.indexOf('Not Found')>=0)return [];PH_SHA=j.sha;try{return JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));}catch(e){return [];}}).then(paint).catch(function(){say('讀取失敗');});}
 function paint(list){window._Q=list;var open=list.filter(function(p){return ['pending','confirmed','approved','needs-review','await-admin'].indexOf(p.status)>=0;});
+var done=list.filter(function(p){return open.indexOf(p)<0;});
 document.getElementById('cnt').textContent='（待處理 '+open.length+'／共 '+list.length+'）';
 var box=document.getElementById('list');
-if(!open.length){box.innerHTML='<div class="card"><div class="m">佇列是空的 🎉</div></div>';return;}
-box.innerHTML=open.map(function(p){var dis=(p.status==='applied'||p.status==='applied-deleted');
+if(!open.length){box.innerHTML='<div class="card"><div class="m">佇列是空的 🎉</div></div>';}
+else{box.innerHTML=open.map(function(p){var dis=(p.status==='applied'||p.status==='applied-deleted');
 return '<div class="card"><div class="t">'+esc(p.title)+' <span class="badge st-'+p.status+'">'+(STN[p.status]||p.status)+'</span></div>'
 +'<div class="m">'+(KINDN[p.kind]||p.kind)+'・'+(PN[p.place]||p.place)+'・提案人 '+esc(p.by)+'・'+esc((p.ts||'').slice(0,10))+'</div>'
 +(p.intro?'<div class="m">介紹：'+esc(p.intro)+'</div>':'')+(p.items&&p.items.length?'<div class="m">品項：<br>'+p.items.map(function(it,i){return (i+1)+'. '+esc(it.title)+'：'+esc(it.intro);}).join('<br>')+'</div>':'')+(p.where?'<div class="m">哪買：'+esc(p.where)+'</div>':'')+(p.reason?'<div class="m"><b>刪除理由：'+esc(p.reason)+'</b></div>':'')
 +'<div class="btns"><button class="go" '+(dis?'disabled':'')+' onclick="decide(\''+p.id+'\',\'approved\')">✅ 直接通過</button>'
 +'<button class="hold" '+(dis?'disabled':'')+' onclick="decide(\''+p.id+'\',\'needs-review\')">⏸ 需要審核</button></div></div>';}).join('');}
+if(done.length){box.innerHTML+='<div class="card"><div class="t" style="font-size:14px">已處理（'+done.length+'）</div>'+done.map(function(p){return '<div class="m">'+esc(p.title||((p.items||[{}])[0].title||''))+' <span class="badge st-done">'+(STN[p.status]||p.status)+'</span> <span style="color:#999">'+esc(p.by)+'・'+esc((p.ts||'').slice(0,10))+'</span></div>';}).join('')+'</div>';}
+say('');}
 function decide(id,st){say('寫入中…');fetch(GH_API_P+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){PH_SHA=j.sha;var list=[];try{list=JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));}catch(e){}var hit=false;list.forEach(function(p){if(p.id===id){p.status=st;hit=true;}});if(!hit){say('該提案已不在佇列');return null;}var body={message:'admin '+st+' '+id,content:btoa(unescape(encodeURIComponent(JSON.stringify(list))))};if(PH_SHA)body.sha=PH_SHA;
-return fetch(GH_API_P,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)});}).then(function(r){if(!r)return;if(r.status===409){say('有人同時修改，重試一次');loadQ();return;}if(!r.ok){say('寫入失敗');return;}say(st==='confirmed'?'已設直接通過，排程自動改網頁':'已設需要審核，暫停車');loadQ();}).catch(function(){say('寫入失敗');});}
+return fetch(GH_API_P,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)});}).then(function(r){if(!r)return;if(r.status===409){say('有人同時修改，重試一次');loadQ();return;}if(!r.ok){say('寫入失敗');return;}say(st==='approved'?'已設直接通過，排程自動改網頁':'已設需要審核，暫停車');loadQ();}).catch(function(){say('寫入失敗');});}
+var CFG_API='https://api.github.com/repos/a4623671/cruise-votes/contents/admin-cfg.json';
+var CFG_SHA=null;
+function loadMode(){fetch(CFG_API+'?t='+Date.now(),{cache:'no-store'}).then(function(r){if(r.status===404)return {auto:false};return r.json();}).then(function(j){if(j.auto!==undefined)return j;CFG_SHA=j.sha;try{return JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));}catch(e){return {auto:false};}}).then(function(c){document.getElementById('modeTxt').textContent=c.auto?'開（確認後免審直改）':'關（每筆都要按通過）';document.getElementById('modeBtn').textContent=c.auto?'關閉自動通過':'開啟自動通過';}).catch(function(){});}
+function flipMode(){say('切換中…');fetch(CFG_API+'?t='+Date.now(),{cache:'no-store'}).then(function(r){if(r.status===404)return {cfg:{auto:false},sha:null};return r.json().then(function(j){CFG_SHA=j.sha;try{return {cfg:JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,''))))),sha:j.sha};}catch(e){return {cfg:{auto:false},sha:j.sha};}});}).then(function(o){var nu={auto:!o.cfg.auto};var body={message:'admin auto='+nu.auto,content:btoa(unescape(encodeURIComponent(JSON.stringify(nu))))};if(o.sha)body.sha=o.sha;return fetch(CFG_API,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)});}).then(function(r){if(!r.ok){say('切換失敗');return;}say('已切換');loadMode();loadQ();}).catch(function(){say('切換失敗');});}
 loadQ();
 async function unlock(){var v=document.getElementById('pw').value.trim();var h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(v));var hex=[...new Uint8Array(h)].map(function(b){return b.toString(16).padStart(2,'0');}).join('');if(hex==='79c24954807c83c719a99fa71958ad1afb7b17a2fe03d4773d383797dfcbfbf3'){sessionStorage.setItem('admin_ok','1');showApp();}else{document.getElementById('pwmsg').textContent='密碼不對';}}
 function showApp(){document.getElementById('lock').style.display='none';document.getElementById('app').style.display='block';}
 if(sessionStorage.getItem('admin_ok')==='1')showApp();
 document.getElementById('pw').addEventListener('keydown',function(e){if(e.key==='Enter')unlock();});
+loadMode();
 </script>
 </body>
 </html>
