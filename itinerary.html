@@ -375,5 +375,9 @@ _wxPaint();locateNowSilent();
 function locateNowSilent(){try{var now=Date.now();var tS=Date.parse('2026-12-16T00:00:00+08:00');var line=document.getElementById('nowline');if(now<tS){line.textContent='⌛ 行程 12/16 開始，還有 '+Math.ceil((tS-now)/86400000)+' 天（回船：宮古17:00／那霸石垣18:00前）';return;}line.textContent='📍 按右下 📍 按鈕定位目前行程';}catch(e){}}
 setInterval(function(){try{var l=document.getElementById('nowline');if(l&&l.textContent.indexOf('剩')>0)locateNow;}catch(e){}},60000);
 </script>
+<script>
+/* 管理導航：僅有 admin_ok 旗標才建出「管理首頁」鈕（無旗標時 DOM 不存在） */
+try{if(sessionStorage.getItem('admin_ok')==='1'){var t=document.querySelector('.topbar');if(t){var a=document.createElement('a');a.href='https://a4623671.github.io/trips-hub/';a.textContent='‹‹ 管理';a.style.cssText='font-size:14px;color:#10293f;text-decoration:none;font-weight:700;border:1px solid #d8d0bd;border-radius:20px;padding:6px 14px';t.insertBefore(a,t.firstChild);}}}catch(e){}
+</script>
 </body>
 </html>

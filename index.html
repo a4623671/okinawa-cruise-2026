@@ -25,7 +25,11 @@ a.card p{font-size:13px;color:#666}
 <a class="card" href="prep.html"><h2>🧳 搭船準備事項</h2><p>證件／磁鐵掛勾／服裝／網路／酒水・勾選式行前清單</p></a>
 <a href="admin.html" style="position:fixed;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:rgba(16,41,63,.55);display:flex;align-items:center;justify-content:center;font-size:17px;text-decoration:none;box-shadow:0 1px 6px rgba(0,0,0,.2)">🔑</a>
 <div class="note">圖片來自 Wikimedia Commons・價格時間出發前請複查</div>
-<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 40px">版本 20260909-an・有問題請截圖此行</div>
+<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 40px">版本 20261002-ao・有問題請截圖此行</div>
 </div>
+<script>
+/* 管理導航：僅 sessionStorage 有 admin_ok 才建出「管理首頁」連結（無旗標時 DOM 不存在） */
+try{if(sessionStorage.getItem('admin_ok')==='1'){var a=document.createElement('a');a.href='https://a4623671.github.io/trips-hub/';a.textContent='‹‹ 管理首頁';a.style.cssText='position:fixed;top:14px;left:14px;background:rgba(16,41,63,.55);color:#fff;border-radius:20px;padding:8px 14px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 1px 6px rgba(0,0,0,.2)';document.body.appendChild(a);}}catch(e){}
+</script>
 </body>
 </html>
