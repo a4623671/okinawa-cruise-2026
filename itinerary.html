@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <title>MSC榮耀號・5天岸上觀光初稿（A/B計畫＋圖）</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -53,6 +54,27 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .cfg .btn.ghost{background:#fff;color:#10293f;border:1px solid #d8d0bd}
 .cfg .rule{font-size:13px;color:#555;margin:4px 0}.cfg .rule b{color:#b3541e}
 #cfgmsg{font-size:13px;color:#0e6e5a;text-align:center;min-height:20px}
+.nowline{margin-top:10px;background:#10293f;color:#ffe9b0;border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:8px 12px;font-size:13px;font-weight:700}
+.wxband{background:linear-gradient(135deg,#0ea5e9,#1d4ed8);color:#fff;border-radius:12px;padding:10px 14px;margin:0 0 10px;font-size:13px;font-weight:700}
+.wxband small{font-weight:400;opacity:.85}
+.wxstrip{display:flex;gap:6px;overflow-x:auto;margin-top:8px;padding-bottom:2px}
+.wxh{flex:0 0 auto;min-width:46px;text-align:center;background:rgba(255,255,255,.14);border-radius:8px;padding:5px 4px;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:1px;color:#fff}
+.wxh i{font-style:normal;font-size:17px}.wxh b{font-weight:700}.wxh small{font-size:10px;opacity:.85}
+.wxh.past{opacity:.45}.wxh.now{background:rgba(255,255,255,.32);outline:2px solid #fff}
+.stop.now{outline:3px solid #e05307}
+.transbar{background:#fff;border:1px dashed #cfc5ab;border-radius:12px;padding:8px 12px;margin:0 0 10px;font-size:13px}
+.transbar a{color:#0e6e8a;font-weight:700}
+.fab{position:fixed;right:12px;bottom:76px;z-index:30;display:flex;flex-direction:column;gap:8px}
+.fab button{width:48px;height:48px;border-radius:50%;border:1px solid #d8d0bd;background:#fff;font-size:22px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+.mov{position:fixed;inset:0;z-index:50;display:none;background:rgba(0,0,0,.45)}
+.mov.open{display:block}
+.movcard{position:absolute;left:8px;right:8px;top:6%;bottom:6%;max-width:640px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.movhead{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#10293f;color:#fff;font-weight:800}
+.movhead button{margin-left:auto;border:none;border-radius:16px;padding:6px 14px;cursor:pointer}
+#movMap{flex:1;min-height:280px}
+.movfoot{padding:10px 14px;font-size:13px;border-top:1px solid #eee;max-height:38%;overflow:auto}
+.movfoot a{display:inline-block;margin:3px 6px 3px 0;background:#eef4ff;border:1px solid #9db8e8;color:#2b4d8f;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;text-decoration:none}
+#nowtoast{position:fixed;left:12px;right:12px;bottom:140px;z-index:60;display:none;background:#10293f;color:#fff;border-radius:12px;padding:10px 14px;font-size:14px;font-weight:700;text-align:center}
 .backbtn{border:1px solid #d8d0bd;background:#fff;border-radius:20px;padding:6px 14px;font-size:14px;cursor:pointer;margin-bottom:10px}
 </style>
 </head>
@@ -61,6 +83,7 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 <div class="hero">
 <h1>2026 MSC榮耀號・5天4夜岸上觀光初稿</h1>
 <div class="meta">12/16基隆18:00啟航 → 12/17宮古島08:00–18:00 → 12/18那霸07:00–19:00 → 12/19石垣島09:00–19:00 → 12/20基隆07:00抵達</div>
+<div class="nowline" id="nowline">⌛ 讀取行程狀態…</div>
 <div class="warn">⚠️ 各港「回船時間」以船上公告為準（多為起航前1小時）。本初稿已倒推緩衝。圖片來自Wikimedia Commons，需連網載入。</div>
 </div>
 <div class="days">
@@ -301,8 +324,12 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 <div class="cfg"><h3>🛡 管理者</h3>
 <p class="rule">待審清單在首頁「提案審核」決定（直接通過／需要審核），確認後由排程器套用＋push。每日 08:00 自動產出投票加權排程 digest。</p></div>
 </div>
-<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20260909-aa・有問題請截圖此行</div>
+<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20261002-wx1・有問題請截圖此行</div>
 <div class="summary"><div class="grow" id="sumtxt">已選 0 項・合計 0 分</div><button id="btnCopy" onclick="copyPlan()">複製初稿</button><button id="btnPrint" onclick="showSheet()">檢視</button></div>
+<div class="fab"><button id="fabNow" title="目前行程" onclick="locateNow()">📍</button><button id="fabWx" title="港口天氣" onclick="scrollWx()">🌤</button><button id="fabMap" title="港口地圖導航" onclick="openPortMap()">🗺</button></div>
+<div class="mov" id="mov"><div class="movcard"><div class="movhead"><span id="movTitle">港口地圖</span><button onclick="closePortMap()">✕ 關閉</button></div><div id="movMap"></div><div class="movfoot" id="movFoot"></div></div></div>
+<div id="nowtoast"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 var curDay=2,curPlan={1:'A',2:'A',3:'A'};
 function visPlan(){var p='day'+curDay;if(curDay===1||curDay===2||curDay===3)p+=curPlan[curDay];return p;}
@@ -323,6 +350,28 @@ function resetCfg(){localStorage.removeItem(CFGKEY);paintCfg();document.getEleme
 function openSettings(){document.querySelectorAll('.days,.abrow,.plan,.sheet').forEach(s=>{s.style.display='none';});var sp=document.getElementById('setpage');sp.style.display='block';sp.classList.add('on');paintCfg();window.scrollTo({top:0});}
 function closeSettings(){var sp=document.getElementById('setpage');sp.classList.remove('on');document.querySelectorAll('.days,.abrow,.plan,.sheet').forEach(s=>{s.style.display='';});refresh();window.scrollTo({top:0});}
 refresh();
+</script>
+<script>
+/* ===== 上海頁移植：天氣＋目前行程＋浮動地圖＋交通加強（20261002-wx1，加法 patch，原邏輯不動） ===== */
+var CRUISE=[{d:'2026-12-16',p:'基隆',la:25.155,ln:121.744,ret:null,q:'基隆港務大樓'},{d:'2026-12-17',p:'宮古島',la:24.830,ln:125.282,ret:'17:00',q:'宮古島平良港'},{d:'2026-12-18',p:'那霸',la:26.224,ln:127.672,ret:'18:00',q:'那霸港若狹碼頭'},{d:'2026-12-19',p:'石垣島',la:24.338,ln:124.155,ret:'18:00',q:'石垣港離島碼頭'},{d:'2026-12-20',p:'基隆返抵',la:25.155,ln:121.744,ret:null,q:'基隆港務大樓'}];
+function _wxIcon(c){c=+c;if(c===0)return['☀','晴'];if(c===1)return['🌤','大致晴'];if(c===2)return['⛅','多雲'];if(c===3)return['☁','陰'];if(c===45||c===48)return['🌫','霧'];if(c===95||c===96||c===99)return['⛈','雷雨'];if((c>=71&&c<=77)||c===85||c===86)return['🌨','雪'];if((c>=51&&c<=67)||(c>=80&&c<=82))return['🌧','雨'];return['☁','陰'];}
+var _wxC={};
+function _wxFetch(i){var c=CRUISE[i];var u='https://api.open-meteo.com/v1/forecast?latitude='+c.la+'&longitude='+c.ln+'&daily=temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max&timezone=Asia%2FTaipei&start_date=2026-12-16&end_date=2026-12-20';var to=null,ctl=null;try{ctl=new AbortController();to=setTimeout(function(){try{ctl.abort();}catch(e){}},12000);}catch(e){}return fetch(u,ctl?{signal:ctl.signal}:{}).then(function(r){return r.json();}).then(function(j){return {i:i,j:(j&&!j.error)?j:null};}).catch(function(){return {i:i,j:null};}).then(function(r){if(to)clearTimeout(to);return r;});}
+function _wxPaint(){var plans={day0:0,day1A:1,day1B:1,day2A:2,day2B:2,day3A:3,day3B:3,day4:4};Object.keys(plans).forEach(function(pid){var el=document.getElementById(pid);if(!el||el.querySelector('.wxband'))return;var di=plans[pid],c=CRUISE[di];var band=document.createElement('div');band.className='wxband';band.setAttribute('data-wxday',di);var d=_wxC[di];if(!d||!d.daily||!d.daily.time){band.innerHTML='🌤 '+c.p+' '+c.d.slice(5)+' 天氣：預報尚未發布（出發前14天自動顯示）<br><small>12月東海風大，保暖＋暈船藥；時間價格出發前複查</small>';}else{var k=d.daily.time.indexOf(c.d);if(k<0){band.innerHTML='🌤 '+c.p+' 天氣暫無';}else{var ic=_wxIcon(d.daily.weathercode[k]);band.innerHTML='🌤 '+c.p+' '+c.d.slice(5)+' '+ic[0]+' '+Math.round(d.daily.temperature_2m_max[k])+'°/'+Math.round(d.daily.temperature_2m_min[k])+'° 降雨'+d.daily.precipitation_probability_max[k]+'%<br><small>回船'+(c.ret?c.ret+'前返船':'—')+'・以船上公告為準</small>';}}el.insertBefore(band,el.firstChild);});}
+function scrollWx(){var cur=document.querySelector('.plan.on .wxband')||document.querySelector('.wxband');if(cur)cur.scrollIntoView({behavior:'smooth',block:'center'});}
+function wgs2gcj(lat,lng){var a=6378245.0,ee=0.00669342162296594323,PI=Math.PI;if(lng<72.004||lng>137.8347||lat<0.8293||lat>55.8271)return [lat,lng];function tL(x,y){var r=-100+2*x+3*y+0.2*y*y+0.1*x*y+0.2*Math.sqrt(Math.abs(x));r+=(20*Math.sin(6*x*PI)+20*Math.sin(2*x*PI))*2/3;r+=(20*Math.sin(y*PI)+40*Math.sin(y/3*PI))*2/3;r+=(160*Math.sin(y/12*PI)+320*Math.sin(y*PI/30))*2/3;return r;}function tG(x,y){var r=300+x+2*y+0.1*x*x+0.1*x*y+0.1*Math.sqrt(Math.abs(x));r+=(20*Math.sin(6*x*PI)+20*Math.sin(2*x*PI))*2/3;r+=(20*Math.sin(x*PI)+40*Math.sin(x/3*PI))*2/3;r+=(150*Math.sin(x/12*PI)+300*Math.sin(x/30*PI))*2/3;return r;}var dLa=tL(lng-105,lat-35),dLn=tG(lng-105,lat-35);var rad=lat/180*PI;var mg=Math.sin(rad);mg=1-ee*mg*mg;var sq=Math.sqrt(mg);dLa=dLa*180/((a*(1-ee))/(mg*sq)*PI);dLn=dLn*180/(a/sq*Math.cos(rad)*PI);return [lat+dLa,lng+dLn];}
+function navLinks(c){var g='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(c.q);var ap='https://maps.apple.com/?q='+encodeURIComponent(c.q);var G=wgs2gcj(c.la,c.ln);var am='https://uri.amap.com/marker?position='+G[1].toFixed(6)+','+G[0].toFixed(6)+'&name='+encodeURIComponent(c.q)+'&coordinate=gcj02&callnative=1';return '<a target="_blank" href="'+g+'">Google 導航</a><a target="_blank" href="'+am+'">高德導航</a><a target="_blank" href="'+ap+'">Apple 地圖</a>';}
+var _pmap=null,_pmarkers=[];
+function openPortMap(){document.getElementById('mov').classList.add('open');document.getElementById('movTitle').textContent='港口地圖（代表點）';if(!window.L){document.getElementById('movFoot').innerHTML='地圖載入失敗，請檢查連網';return;}if(!_pmap){_pmap=L.map('movMap');L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(_pmap);setTimeout(function(){try{_pmap.invalidateSize();}catch(e){}},300);}var bounds=[];var names=['基隆港務大樓','宮古島平良港','那霸港','石垣港'];[[25.155,121.744],[24.830,125.282],[26.224,127.672],[24.338,124.155]].forEach(function(ll,i){bounds.push(ll);L.marker(ll).addTo(_pmap).bindPopup('<b>'+names[i]+'</b><br>'+CRUISE[i].d);});try{_pmap.fitBounds(bounds,{padding:[30,30]});}catch(e){_pmap.setView([24.8,124.5],5);}var fh='';CRUISE.forEach(function(c){fh+='<div style="margin-bottom:8px"><b>'+c.d.slice(5)+' '+c.p+'</b>'+(c.ret?'（'+c.ret+'前返船）':'')+'<br>'+navLinks(c)+'</div>';});document.getElementById('movFoot').innerHTML=fh;}
+function closePortMap(){document.getElementById('mov').classList.remove('open');}
+function _toast(m){var t=document.getElementById('nowtoast');t.textContent=m;t.style.display='block';clearTimeout(window._nowTT);window._nowTT=setTimeout(function(){t.style.display='none';},4500);}
+function _parseT(s){var m=(s||'').match(/(\d{1,2}):(\d{2})/g)||[];return m.map(function(x){var p=x.split(':');return (+p[0])*60+(+p[1]);});}
+function _fmtD(ms){var m=Math.max(0,Math.floor(ms/60000));if(m<=0)return '不到1分';if(m>=1440)return Math.floor(m/1440)+'天'+Math.floor((m%1440)/60)+'小時';if(m>=60)return Math.floor(m/60)+'小時'+(m%60?m%60+'分':'');return m+'分';}
+function locateNow(){document.querySelectorAll('.stop.now').forEach(function(x){x.classList.remove('now');});var now=Date.now();var tS=Date.parse('2026-12-16T00:00:00+08:00'),tE=Date.parse('2026-12-20T23:59:59+08:00');var line=document.getElementById('nowline');if(now<tS){line.textContent='⌛ 行程 12/16 開始，還有 '+Math.ceil((tS-now)/86400000)+' 天（回船：宮古17:00／那霸石垣18:00前）';_toast(line.textContent);return;}if(now>tE){line.textContent='🎉 行程已結束';_toast(line.textContent);return;}var planIds=['day0','day1A','day1B','day2A','day2B','day3A','day3B','day4'];var planDate={day0:0,day1A:1,day1B:1,day2A:2,day2B:2,day3A:3,day3B:3,day4:4};var found=null;planIds.forEach(function(pid){var el=document.getElementById(pid);if(!el)return;var di=planDate[pid];var base=Date.parse(CRUISE[di].d+'T00:00:00+08:00');var stops=el.querySelectorAll('.stop');stops.forEach(function(st){var tm=st.querySelector('.time');var mm=_parseT(tm?tm.textContent:'');if(mm.length===2){var s=base+mm[0]*60000,e=base+mm[1]*60000;if(!found&&now>=s&&now<e)found={st:st,pid:pid,di:di,kind:'cur',ts:e};if(!found&&now<s)found=found||{st:st,pid:pid,di:di,kind:'next',ts:s};}});});if(!found){line.textContent='今日行程已結束';_toast(line.textContent);return;}found.st.classList.add('now');var c=CRUISE[found.di];var ret='';if(c.ret){var rb=Date.parse(c.d+'T'+c.ret+':00+08:00');var left=rb-now;ret=left>0?'・回船倒數'+_fmtD(left):'・⚠️已過回船時間';}if(found.kind==='cur')line.textContent='📍 目前行程：'+c.d.slice(5)+' '+c.p+'（行程中，剩'+_fmtD(found.ts-now)+'）'+ret;else line.textContent='⏳ 下一段：'+c.d.slice(5)+' '+c.p+' '+_fmtD(found.ts-now)+'後開始'+ret;var dayBtn=found.di;try{var btns=document.querySelectorAll('.day');if(btns[dayBtn])swDay(dayBtn,btns[dayBtn]);}catch(e){}found.st.scrollIntoView({behavior:'smooth',block:'center'});_toast(line.textContent);}
+Promise.all([0,1,2,3,4].map(_wxFetch)).then(function(rs){rs.forEach(function(r){if(r.j)_wxC[r.i]=r.j;});_wxPaint();}).catch(function(){_wxPaint();});
+_wxPaint();locateNowSilent();
+function locateNowSilent(){try{var now=Date.now();var tS=Date.parse('2026-12-16T00:00:00+08:00');var line=document.getElementById('nowline');if(now<tS){line.textContent='⌛ 行程 12/16 開始，還有 '+Math.ceil((tS-now)/86400000)+' 天（回船：宮古17:00／那霸石垣18:00前）';return;}line.textContent='📍 按右下 📍 按鈕定位目前行程';}catch(e){}}
+setInterval(function(){try{var l=document.getElementById('nowline');if(l&&l.textContent.indexOf('剩')>0)locateNow;}catch(e){}},60000);
 </script>
 </body>
 </html>
