@@ -64,7 +64,7 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .stop.now{outline:3px solid #e05307}
 .transbar{background:#fff;border:1px dashed #cfc5ab;border-radius:12px;padding:8px 12px;margin:0 0 10px;font-size:13px}
 .transbar a{color:#0e6e8a;font-weight:700}
-.mlegend{font-size:12px;padding:8px 14px;background:#f8fafc;color:#33415c}.mlegend b{color:#b3541e}.msw{ display:inline-block;width:26px;height:0;border-top:4px solid #555;vertical-align:middle;margin:0 4px}.fab{position:fixed;right:12px;bottom:76px;z-index:30;display:flex;flex-direction:column;gap:8px}
+.mlegend{font-size:12px;padding:8px 14px;background:#f8fafc;color:#33415c}.mlegend b{color:#b3541e}.msw{ display:inline-block;width:26px;height:0;border-top:4px solid #555;vertical-align:middle;margin:0 4px}.voteinfo{display:block;margin-top:6px;font-size:12px;color:#0b6e5f;font-weight:700}.voteinfo.none{color:#999;font-weight:400}.fab{position:fixed;right:12px;bottom:76px;z-index:30;display:flex;flex-direction:column;gap:8px}
 .fab button{width:48px;height:48px;border-radius:50%;border:1px solid #d8d0bd;background:#fff;font-size:22px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.25)}
 .mov{position:fixed;inset:0;z-index:50;display:none;background:rgba(0,0,0,.45)}
 .mov.open{display:block}
@@ -324,7 +324,7 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 <div class="cfg"><h3>🛡 管理者</h3>
 <p class="rule">待審清單在首頁「提案審核」決定（直接通過／需要審核），確認後由排程器套用＋push。每日 08:00 自動產出投票加權排程 digest。</p></div>
 </div>
-<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20261002-wx2・有問題請截圖此行</div>
+<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20261002-wx3・有問題請截圖此行</div>
 <div class="summary"><div class="grow" id="sumtxt">已選 0 項・合計 0 分</div><button id="btnCopy" onclick="copyPlan()">複製初稿</button><button id="btnPrint" onclick="showSheet()">檢視</button></div>
 <div class="fab"><button id="fabNow" title="目前行程" onclick="locateNow()">📍</button><button id="fabWx" title="港口天氣" onclick="scrollWx()">🌤</button><button id="fabMap" title="港口地圖導航" onclick="openPortMap()">🗺</button></div>
 <div class="mov" id="mov"><div class="movcard"><div class="movhead"><span id="movTitle">港口地圖</span><button onclick="closePortMap()">✕ 關閉</button></div><div id="movMap"></div><div class="movfoot" id="movFoot"></div></div></div>
@@ -378,6 +378,13 @@ setInterval(function(){try{var l=document.getElementById('nowline');if(l&&l.text
 <script>
 /* 管理導航：僅有 admin_ok 旗標才建出「管理首頁」鈕（無旗標時 DOM 不存在） */
 try{if(sessionStorage.getItem('admin_ok')==='1'){var t=document.querySelector('.topbar');if(t){var a=document.createElement('a');a.href='https://a4623671.github.io/trips-hub/';a.textContent='‹‹ 管理';a.style.cssText='font-size:14px;color:#10293f;text-decoration:none;font-weight:700;border:1px solid #d8d0bd;border-radius:20px;padding:6px 14px';t.insertBefore(a,t.firstChild);}}}catch(e){}
+</script>
+<script>
+/* 初稿投票顯示：data-n → 投票卡ID，對應投票人＋留言數（公開讀取，失敗靜默） */
+var VOTEMAP={"D2 前浜海灘": ["s-miyako#0"], "D2 雪塩ミュージアム": ["s-miyako#3"], "D2 宮古そば午餐": ["s-miyako#5"], "D2 東平安名岬": ["s-miyako#1"], "D2B 雪塩館": ["s-miyako#3"], "D2B 島の駅": ["s-miyako#7"], "D2B 伊良部大橋": ["s-miyako#4"], "D3 波上宮＋波之上海灘": ["s-naha#11"], "D3 第一牧志公設市場": ["s-naha#13"], "D3 午餐": ["s-naha#0", "s-naha#1"], "D3 國際通購物": ["s-naha#14"], "D3 下午茶": ["s-naha#7", "s-naha#3"], "D3B 博物館・美術館": ["s-naha#15"], "D3B DFS＋午餐": ["s-naha#21"], "D3B 市場＋平和通": ["s-naha#13", "s-naha#24"], "D3B 百貨＋唐吉訶德": ["s-naha#20", "s-naha#23"], "D4 川平湾玻璃船": ["s-ishigaki#0"], "D4 八重山そば午餐": ["s-ishigaki#4"], "D4 やいま村": ["s-ishigaki#1"], "D4 市場購物": ["s-ishigaki#9"], "D4B 午餐": ["s-ishigaki#4"], "D4B やいま村": ["s-ishigaki#1"], "D4B 市場購物": ["s-ishigaki#9"]};
+function paintVotes(votes,cmts){document.querySelectorAll('.pick input[data-n]').forEach(function(inp){var box=inp.closest('.pick');if(!box||box.querySelector('.voteinfo'))return;var ids=VOTEMAP[inp.getAttribute('data-n')];if(!ids)return;var names=[];ids.forEach(function(id){(votes[id]||[]).forEach(function(n){if(names.indexOf(n)<0)names.push(n);});});var cN=0;ids.forEach(function(id){cN+=((cmts[id]||[]).length);});var sp=document.createElement('span');sp.className='voteinfo'+(names.length?'':' none');sp.textContent=names.length?('🗳 '+names.join('・')+'（'+names.length+'票'+(cN?'＋'+cN+'則留言':'')+'）'):'（尚未投票）';box.appendChild(sp);});}
+function loadVotes(){var t='?t='+Date.now();Promise.all([fetch('https://raw.githubusercontent.com/a4623671/cruise-votes/main/votes.json'+t).then(function(r){return r.json();}).catch(function(){return null;}),fetch('https://raw.githubusercontent.com/a4623671/cruise-votes/main/comments.json'+t).then(function(r){return r.json();}).catch(function(){return null;})]).then(function(rs){if(rs[0])paintVotes(rs[0],rs[1]||{});});}
+loadVotes();setInterval(loadVotes,300000);
 </script>
 </body>
 </html>
