@@ -8,9 +8,12 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;background:#f4f1ea;color:#2b2b2b;line-height:1.6}
-.topbar{background:#fff;border-bottom:1px solid #e3ddd0;padding:10px 14px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:10}
-.topbar .logo{font-weight:800;font-size:18px}.topbar .sp{flex:1}
-.topbar button{border:1px solid #d8d0bd;background:#fff;border-radius:20px;padding:6px 14px;font-size:14px;cursor:pointer}
+.topbar{background:#fff;border-bottom:1px solid #e3ddd0;padding:10px 12px;display:flex;align-items:center;gap:8px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;position:sticky;top:0;z-index:10}
+.topbar::-webkit-scrollbar{display:none}
+.topbar .logo{font-weight:800;font-size:16px;white-space:nowrap;flex:none}
+.topbar>a{flex:none;white-space:nowrap}
+.topbar .sp{flex:1;min-width:2px}
+.topbar button{border:1px solid #d8d0bd;background:#fff;border-radius:20px;padding:6px 12px;font-size:14px;cursor:pointer;flex:none;white-space:nowrap}
 .hero{background:linear-gradient(135deg,#0e3a5d,#146b8c);color:#fff;padding:18px 16px}
 .hero h1{font-size:20px;margin-bottom:4px}.hero .meta{font-size:14px;opacity:.92}
 .hero .warn{margin-top:10px;background:#fff3d6;color:#7a5200;border-radius:10px;padding:8px 12px;font-size:13px}
@@ -324,7 +327,7 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 <div class="cfg"><h3>🛡 管理者</h3>
 <p class="rule">待審清單在首頁「提案審核」決定（直接通過／需要審核），確認後由排程器套用＋push。每日 08:00 自動產出投票加權排程 digest。</p></div>
 </div>
-<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20261002-wx3・有問題請截圖此行</div>
+<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20261002-wx4・有問題請截圖此行</div>
 <div class="summary"><div class="grow" id="sumtxt">已選 0 項・合計 0 分</div><button id="btnCopy" onclick="copyPlan()">複製初稿</button><button id="btnPrint" onclick="showSheet()">檢視</button></div>
 <div class="fab"><button id="fabNow" title="目前行程" onclick="locateNow()">📍</button><button id="fabWx" title="港口天氣" onclick="scrollWx()">🌤</button><button id="fabMap" title="港口地圖導航" onclick="openPortMap()">🗺</button></div>
 <div class="mov" id="mov"><div class="movcard"><div class="movhead"><span id="movTitle">港口地圖</span><button onclick="closePortMap()">✕ 關閉</button></div><div id="movMap"></div><div class="movfoot" id="movFoot"></div></div></div>
@@ -377,7 +380,7 @@ setInterval(function(){try{var l=document.getElementById('nowline');if(l&&l.text
 </script>
 <script>
 /* 管理導航：僅有 admin_ok 旗標才建出「管理首頁」鈕（無旗標時 DOM 不存在） */
-try{if(sessionStorage.getItem('admin_ok')==='1'){var t=document.querySelector('.topbar');if(t){var a=document.createElement('a');a.href='https://a4623671.github.io/trips-hub/';a.textContent='‹‹ 管理';a.style.cssText='font-size:14px;color:#10293f;text-decoration:none;font-weight:700;border:1px solid #d8d0bd;border-radius:20px;padding:6px 14px';t.insertBefore(a,t.firstChild);}}}catch(e){}
+try{if(sessionStorage.getItem('admin_ok')==='1'){var t=document.querySelector('.topbar');if(t){var a=document.createElement('a');a.href='https://a4623671.github.io/trips-hub/';a.textContent='‹‹ 管理';a.style.cssText='font-size:13px;color:#10293f;text-decoration:none;font-weight:700;border:1px solid #d8d0bd;border-radius:20px;padding:6px 12px;flex:none;white-space:nowrap';t.insertBefore(a,t.firstChild);}}}catch(e){}
 </script>
 <script>
 /* 初稿投票顯示：data-n → 投票卡ID，對應投票人＋留言數（公開讀取，失敗靜默） */
