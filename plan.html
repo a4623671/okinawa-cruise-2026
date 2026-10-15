@@ -72,10 +72,25 @@ button.ghost{border:1px solid #d8d0bd;background:#fff;border-radius:16px;padding
 .pvote{font-size:12px;color:#6b7a89;margin-top:2px}
 .pvote b{color:#b3541e}
 .prow button{border:1px solid #cde3d3;background:#f4fbf6;color:#1e6b32;border-radius:12px;font-size:12px;padding:5px 12px;font-weight:700;cursor:pointer;flex:none}
+.prow{cursor:pointer}
+.mask{position:fixed;inset:0;background:rgba(8,20,32,.55);z-index:60;display:none;padding:16px;overflow:auto}
+.mask.on{display:flex;align-items:center;justify-content:center}
+.pd{background:#fff;border-radius:16px;width:100%;max-width:560px;max-height:88vh;overflow:auto;position:relative}
+.pd .pdclose{position:absolute;top:8px;right:8px;border:none;background:rgba(0,0,0,.5);color:#fff;border-radius:50%;width:34px;height:34px;font-size:16px;line-height:1;cursor:pointer;z-index:3}
+.pd .pdbig{width:100%;max-height:300px;object-fit:cover;display:block;border-radius:16px 16px 0 0;background:#eef2f6}
+.pd .pdbody{padding:12px 14px 16px}
+.pd h3{font-size:18px;margin-bottom:2px}
+.pd .pden{font-size:12px;color:#8a97a6}
+.pd .pdstars{font-size:13px;margin:4px 0}
+.pd .pddesc{font-size:14px;line-height:1.7;margin:5px 0}
+.pd .pdmap{display:inline-block;font-size:13px;margin:2px 0 6px}
+.pd .pdvote{font-size:13px;background:#fff6e0;border:1px solid #ecd79a;color:#8a5a00;border-radius:10px;padding:6px 10px;margin:8px 0;font-weight:700}
+.pd .pdacts{display:flex;gap:8px;margin-top:6px}
+.pd .pdacts button{flex:1;white-space:nowrap}
 .tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:8px;scrollbar-width:none}
 .tabs button{flex:none;border:1px solid #dbe3ec;background:#fff;border-radius:14px;padding:5px 12px;font-size:13px;cursor:pointer}
 .tabs button.on{background:#10293f;color:#fff;border-color:#10293f;font-weight:700}
-#toast{position:fixed;left:12px;right:12px;bottom:70px;background:#10293f;color:#fff;border-radius:12px;padding:9px 14px;font-size:13px;z-index:50;display:none;text-align:center;font-weight:700}
+#toast{position:fixed;left:12px;right:12px;bottom:70px;background:#10293f;color:#fff;border-radius:12px;padding:9px 14px;font-size:13px;z-index:70;display:none;text-align:center;font-weight:700}
 body.locked .ops,body.locked .leg .row button,body.locked #addBtn{display:none!important}
 @media print{.topbar,.days,.bar,.status,.ops,.hnd,.tabs,button{display:none!important}.slot,.leg{break-inside:avoid}}
 </style>
@@ -96,7 +111,7 @@ body.locked .ops,body.locked .leg .row button,body.locked #addBtn{display:none!i
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261015-p6</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261015-p7</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -111,6 +126,7 @@ body.locked .ops,body.locked .leg .row button,body.locked #addBtn{display:none!i
 </div></div>
 
 <div class="sheet" id="sheet"><div class="card" id="sheetbody"></div></div>
+<div class="mask" id="pdetail" onclick="if(event.target===this)closePdetail()"><div class="pd" id="pdetailbody"></div></div>
 <div id="toast"></div>
 
 <script>
@@ -205,9 +221,19 @@ function parseCatalog(html){
   var parts=html.slice(i,j).split(/<div class="card/);parts.shift();
   parts.forEach(function(p,idx){
    var tm=p.match(/<h3>([\s\S]*?)<\/h3>/);if(!tm)return;
+   var clean=function(s){return String(s||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();};
    var im=p.match(/<img[^>]+src="([^"]+)"/);
-   var title=tm[1].replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();
-   out.push({id:sid+'#'+idx,t:title,kind:(CARDMAP[sid]||[])[idx]||'',place:sid.replace('s-',''),img:im?im[1]:''});
+   var imgs=[],rx=/<img[^>]+src="([^"]+)"/g,x;while((x=rx.exec(p)))imgs.push(x[1]);
+   var en=p.match(/<div class="en">([\s\S]*?)<\/div>/);
+   var desc=[],rp=/<p(?:\s+class="kv")?>([\s\S]*?)<\/p>/g,d;
+   while((d=rp.exec(p)))desc.push(clean(d[1]));
+   var shop=p.match(/<div class="shop">([\s\S]*?)<\/div>/);if(shop)desc.push(clean(shop[1]));
+   var map=p.match(/<a class="map"[^>]*href="([^"]+)"/);
+   var st=p.match(/<div class="stars">([\s\S]*?)<\/div>/);
+   var title=clean(tm[1]);
+   out.push({id:sid+'#'+idx,t:title,kind:(CARDMAP[sid]||[])[idx]||'',place:sid.replace('s-',''),
+    img:im?im[1]:'',imgs:imgs,en:en?clean(en[1]):'',desc:desc.filter(function(z){return z;}),
+    map:map?map[1]:'',stars:st?clean(st[1]):''});
   });
  });
  return out;}
@@ -412,32 +438,72 @@ var KINDS=[
  {k:'feat',n:'✨ 特色',bg:'#f3ecfb',fg:'#6b3fa0',bd:'#d5c2ee'}];
 function dayPlace(){var p=d0().port;return p==='那霸'?'naha':p==='宮古島'?'miyako':p==='石垣島'?'ishigaki':null;}
 function votesOf(id){return (VOTES&&VOTES[id])||[];}
+function isAdded(id){var f=false;DAYS.forEach(function(d){SLOTS.forEach(function(s){(PLAN.items[d.k].slots[s[0]]||[]).forEach(function(o){if(o.id===id)f=true;});});});return f;}
+function poolList(){
+ var dp=dayPlace();
+ var list=CATALOG.filter(function(c){return !dp||c.place===dp;});
+ var flat=[];
+ KINDS.forEach(function(K){
+  var arr=list.filter(function(c){return c.kind===K.k;});
+  arr.sort(function(a,b){return votesOf(b.id).length-votesOf(a.id).length||a.id.localeCompare(b.id,undefined,{numeric:true});});
+  arr.forEach(function(c){flat.push(c);});
+ });
+ return flat;}
 function openPool(){if(frozen()){toast('已唯讀');return;}
  document.getElementById('pool').classList.add('on');renderPool();}
-function closePool(){document.getElementById('pool').classList.remove('on');}
+function closePool(){document.getElementById('pool').classList.remove('on');closePdetail();}
+var POOL_LIST=[];
 function renderPool(){
  var dp=dayPlace();
  document.querySelector('#pool h2').textContent='＋ 加入項目（'+(dp?d0().port+'當天':'全部港口')+'）';
- var added={};DAYS.forEach(function(d){SLOTS.forEach(function(s){(PLAN.items[d.k].slots[s[0]]||[]).forEach(function(o){added[o.id]=1;});});});
- var list=CATALOG.filter(function(c){return !dp||c.place===dp;});
+ POOL_LIST=poolList();
  var h='';
  KINDS.forEach(function(K){
-  var arr=list.filter(function(c){return c.kind===K.k;});
+  var arr=POOL_LIST.filter(function(c){return c.kind===K.k;});
   if(!arr.length)return;
-  arr.sort(function(a,b){return votesOf(b.id).length-votesOf(a.id).length||a.id.localeCompare(b.id,undefined,{numeric:true});});
   h+='<div class="pblock" style="border-color:'+K.bd+'"><h4 style="background:'+K.bg+';color:'+K.fg+'">'+K.n+'（'+arr.length+'）</h4>';
   h+=arr.map(function(c){
-   var vs=votesOf(c.id);
+   var vs=votesOf(c.id);var ad=isAdded(c.id);
    var thumb=c.img?'<div class="pthumb"><img loading="lazy" src="'+esc(c.img)+'" onerror="this.parentNode.textContent=\''+KINDN[c.kind]+'\';"></div>':'<div class="pthumb">'+KINDN[c.kind]+'</div>';
    var vt=vs.length?('<b>'+vs.length+' 票</b>・'+esc(vs.join('、'))):'尚無投票';
-   return '<div class="prow'+(added[c.id]?' off':'')+'">'+thumb
+   return '<div class="prow'+(ad?' off':'')+'" onclick="openPdetail(\''+c.id+'\')">'+thumb
     +'<div class="pbody"><div class="pname">'+esc(c.t)+'</div><div class="pvote">'+vt+'</div></div>'
-    +'<button onclick="addItem(\''+c.id+'\')">'+(added[c.id]?'再加':'加入')+'</button></div>';}).join('');
+    +'<button onclick="event.stopPropagation();addItem(\''+c.id+'\')">'+(ad?'再加':'加入')+'</button></div>';}).join('');
   h+='</div>';
  });
  if(!h)h='<div class="poolitem">此港口沒有可加入的項目</div>';
  document.getElementById('poolbody').innerHTML=h;
 }
+/* ---- 浮動詳情視窗（圖／介紹／投票＋上下瀏覽＋加入） ---- */
+var PD_I=0;
+function openPdetail(id){
+ if(!POOL_LIST.length)POOL_LIST=poolList();
+ var i=-1;POOL_LIST.forEach(function(c,n){if(c.id===id)i=n;});
+ if(i<0)return;PD_I=i;renderPdetail();
+ document.getElementById('pdetail').classList.add('on');
+}
+function closePdetail(){document.getElementById('pdetail').classList.remove('on');}
+function renderPdetail(){
+ var c=POOL_LIST[PD_I];if(!c){closePdetail();return;}
+ var vs=votesOf(c.id);var ad=isAdded(c.id);
+ var h='<button class="pdclose" onclick="closePdetail()">✕</button>';
+ if(c.img)h+='<img class="pdbig" loading="lazy" src="'+esc(c.img)+'" onerror="this.style.display=\'none\'">';
+ h+='<div class="pdbody"><h3>'+esc(c.t)+'</h3>';
+ if(c.en)h+='<div class="pden">'+esc(c.en)+'</div>';
+ if(c.stars)h+='<div class="pdstars">'+esc(c.stars)+'</div>';
+ (c.desc||[]).forEach(function(d){h+='<p class="pddesc">'+esc(d)+'</p>';});
+ if(c.map)h+='<a class="map pdmap" href="'+esc(c.map)+'" target="_blank">🗺 地圖</a>';
+ h+='<div class="pdvote">👥 '+(vs.length?(vs.length+' 票・'+esc(vs.join('、'))):'尚無投票')+'</div>';
+ h+='<div class="pdacts">'
+  +'<button class="ghost" onclick="pdNav(-1)">‹ 上一個</button>'
+  +'<button class="go" onclick="pdAdd()">'+(ad?'再加':'加入')+'</button>'
+  +'<button class="ghost" onclick="pdNav(1)">下一個 ›</button></div>';
+ h+='</div>';
+ document.getElementById('pdetailbody').innerHTML=h;
+}
+function pdNav(d){var n=PD_I+d;if(n<0||n>=POOL_LIST.length){toast(d<0?'已是第一項':'已是最後一項');return;}
+ PD_I=n;renderPdetail();document.getElementById('pdetailbody').scrollTop=0;}
+function pdAdd(){var c=POOL_LIST[PD_I];if(!c)return;addItem(c.id);renderPdetail();}
 function addItem(id){
  if(guard())return;
  var c=CATALOG.filter(function(x){return x.id===id;})[0];if(!c)return;
@@ -445,7 +511,8 @@ function addItem(id){
  var o={id:c.id,t:c.t,kind:c.kind,place:c.place,min:(c.kind==='food'?60:c.kind==='spot'?90:45),
   src:'user',by:me()||'?',endorse:[]};
  var g=geo[c.id];if(g&&g.lat!=null){o.lat=g.lat;o.lng=g.lng;}
- a.push(o);closePool();
+ a.push(o);
+ if(document.getElementById('pool').classList.contains('on'))renderPool();
  if(o.lat!=null){toast('已加入「'+c.t.slice(0,12)+'」');recompute();}
  else{renderBoard();saveQuiet();toast('已加入（未定位，正在查座標…）');}
  if(o.lat==null)resolveGeo({t:c.t,place:c.place,id:c.id}).then(function(cc){
