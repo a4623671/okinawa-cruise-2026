@@ -37,14 +37,15 @@ body.ov .card.ov:not(.ovopen) .ovbody>a.map,
 body.ov .card.ov:not(.ovopen) .ovbody .credit,
 body.ov .card.ov:not(.ovopen) .ovbody .cmt,
 body.ov .card.ov:not(.ovopen) .ovbody .gal,
-body.ov .card.ov:not(.ovopen) .ovorig{display:none}
+body.ov .card.ov:not(.ovopen) .ovorig,
+body.ov .card.ov:not(.ovopen) .imgbox{display:none}
 body.ov .card.ov:not(.ovopen) .ovbody .vote{margin-top:4px;padding-top:0;border-top:none}
 body.ov .card.ov.ovopen{display:block;cursor:default}
 body.ov .card.ov.ovopen .ovthumb{display:none}
 body.ov .card.ov.ovopen .ovorig{display:block}
 body.ov .card.ov.ovopen .ovbody{display:block}
-.secthead{background:#10293f;color:#fff;border-radius:12px;padding:10px 14px;margin:16px 0 10px;font-size:17px;font-weight:800;display:flex;align-items:center;gap:8px;cursor:pointer}
-.secthead .arw{margin-left:auto;font-size:14px;font-weight:400;opacity:.85}
+.sectblock{position:relative}.secthead{background:#10293f;color:#fff;border-radius:12px;padding:10px 16px;margin:16px 0 10px;font-size:18px;font-weight:800;display:flex;align-items:center;gap:8px;cursor:pointer;min-height:54px;position:sticky;top:var(--ovtop,100px);z-index:8;box-shadow:0 2px 10px rgba(0,0,0,.18)}
+.secthead .arw{margin-left:auto;font-size:14px;font-weight:700;opacity:.95;border:1px solid rgba(255,255,255,.4);border-radius:14px;padding:5px 12px;white-space:nowrap}
 .cats{display:flex;flex-direction:column;gap:8px;padding:10px 12px;background:#fff;border-bottom:1px solid #e3ddd0;position:sticky;top:51px;z-index:9}
 .catrow{display:flex;gap:8px;align-items:center;overflow-x:auto;scrollbar-width:none}
 .catrow::-webkit-scrollbar{display:none}
@@ -197,7 +198,7 @@ img.ph{cursor:zoom-in}
 <button class="cat cat2" onclick="swCat('souv',this)">🎁 伴手禮</button>
 <button class="cat cat2" onclick="swCat('feat',this)">✨ 當地特色</button>
 </div>
-<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20261015-ax）</div>
+<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20261015-ba）</div>
 </div>
 <div class="wrap">
 
@@ -889,20 +890,23 @@ function buildOverview(){
   var im=cardImg(c),keep=im?(im.closest('.gal')||im):null;
   if(keep)keep.classList.add('ovorig');
   var th=document.createElement('div');th.className='ovthumb';
-  if(im){var gi=im.cloneNode(true);gi.removeAttribute('class');gi.className='';gi.removeAttribute('onerror');th.appendChild(gi);}
+  if(im){var gi=im.cloneNode(true);gi.removeAttribute('class');gi.className='';gi.onerror=function(){th.style.display='none';};th.appendChild(gi);}
   var bd=document.createElement('div');bd.className='ovbody';
   [].slice.call(c.children).forEach(function(ch){if(ch!==keep)bd.appendChild(ch);});
   c.insertBefore(th,c.firstChild);c.appendChild(bd);c.classList.add('ov');
   c.addEventListener('click',function(e){if(e.target.closest('a,button,input,select,textarea,.gal'))return;c.classList.toggle('ovopen');});
  });
  document.querySelectorAll('.sect').forEach(function(s){
-  if(s.querySelector('.secthead'))return;
-  var t=s.querySelector('h1,h2.st'),label=s.id==='s-naha'?'🌺 那霸':s.id==='s-miyako'?'🏝 宮古島':'🪨 石垣島';
+  var block=s.parentElement.classList.contains('sectblock')?s.parentElement:null;
+  if(!block){block=document.createElement('div');block.className='sectblock';s.parentNode.insertBefore(block,s);block.appendChild(s);}
+  if(block.querySelector('.secthead'))return;
+  var label=s.id==='s-naha'?'🌺 那霸':s.id==='s-miyako'?'🏝 宮古島':'🪨 石垣島';
   var hd=document.createElement('div');hd.className='secthead';hd.setAttribute('data-s',s.id);
-  hd.innerHTML=label+'<span class="arw"></span>';
-  hd.onclick=function(){var on=s.classList.toggle('ovshow');hd.querySelector('.arw').textContent=on?'收合':'展開';};
-  s.parentNode.insertBefore(hd,s);
+  hd.innerHTML=label+'<span class="arw">'+(s.classList.contains('ovshow')?'收合 ▲':'展開 ▼')+'</span>';
+  hd.onclick=function(){var on=s.classList.toggle('ovshow');hd.querySelector('.arw').textContent=on?'收合 ▲':'展開 ▼';hd.scrollIntoView({block:'nearest'});};
+  block.insertBefore(hd,s);
  });
+ setOvTop();
  document.querySelectorAll('.sect').forEach(function(s){[].slice.call(s.querySelectorAll('.card')).forEach(function(c,i){mountImgChg(c,s.id+'#'+i);});});
 }
 function applyOvMode(){
@@ -913,9 +917,9 @@ function applyOvMode(){
   if(mode==='ov'){var show=(ovPlace==='all'||ovPlace===s.id);s.classList.toggle('ovshow',show);}
   else{s.classList.toggle('ovshow',s.id===curP);}
  });
- document.querySelectorAll('.secthead').forEach(function(hd){hd.style.display=mode==='ov'?'flex':'none';hd.querySelector('.arw').textContent=document.getElementById(hd.getAttribute('data-s')).classList.contains('ovshow')?'收合':'展開';});
+ document.querySelectorAll('.secthead').forEach(function(hd){hd.style.display=mode==='ov'?'flex':'none';hd.querySelector('.arw').textContent=document.getElementById(hd.getAttribute('data-s')).classList.contains('ovshow')?'收合 ▲':'展開 ▼';});
  var tb=document.getElementById('ovtoggle');if(tb)tb.textContent=mode==='ov'?'切到分類模式':'切到總覽';
- var ob=document.getElementById('ovbar');if(ob)ob.style.display=mode==='ov'?'flex':'none';
+ var ob=document.getElementById('ovbar');if(ob)ob.style.display=mode==='ov'?'flex':'none'; setOvTop();
  if(mode==='ov')applyOvFilter();else applyFilter();
 }
 function applyOvFilter(){
@@ -928,6 +932,8 @@ function applyOvFilter(){
  var em=document.getElementById('ovempty');if(!em){em=document.createElement('div');em.id='ovempty';em.className='card';em.textContent='此分類目前沒有項目';document.querySelector('.wrap').appendChild(em);}
  em.style.display=anyVisible?'none':'block';
 }
+function setOvTop(){try{var t=document.querySelector('.topbar'),b=document.getElementById('ovbar');var y=(t?t.offsetHeight:0)+((b&&b.offsetParent!==null)?b.offsetHeight:0);document.documentElement.style.setProperty('--ovtop',(y+2)+'px');}catch(e){}}
+window.addEventListener('resize',function(){setOvTop();});
 function initOv(){
  var bar=document.createElement('div');bar.id='ovbar';
  bar.innerHTML='<button data-p="all" class="on">全部</button><button data-p="s-naha">🌺 那霸</button><button data-p="s-miyako">🏝 宮古島</button><button data-p="s-ishigaki">🪨 石垣島</button>'
