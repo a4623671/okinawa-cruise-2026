@@ -33,7 +33,7 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .vote{display:flex;gap:8px;align-items:center;margin-top:10px;border-top:1px dashed #ddd;padding-top:10px}
 .vote button{border:1px solid #0e6e5a;background:#fff;color:#0e6e5a;border-radius:20px;padding:6px 16px;font-size:14px;font-weight:700;cursor:pointer}
 .vote button.voted{background:#0e6e5a;color:#fff}
-.vote .cnt{font-size:14px;font-weight:800}
+.vote .cnt{font-size:14px;font-weight:800} .vote button.im{border-color:#b9a86a;color:#7a5200;font-size:13px;padding:3px 10px} .imgwho{font-size:11px;color:#0e6e5a;margin-left:6px}
 .shop{font-size:13px;background:#faf7ef;border-radius:8px;padding:8px 10px;margin-top:8px}.shop li{margin-left:18px}
 h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 .note{font-size:12px;color:#888;margin:12px 2px}
@@ -165,7 +165,7 @@ img.ph{cursor:zoom-in}
 <button class="cat cat2" onclick="swCat('souv',this)">🎁 伴手禮</button>
 <button class="cat cat2" onclick="swCat('feat',this)">✨ 當地特色</button>
 </div>
-<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20260909-as）</div>
+<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20261015-au）</div>
 <div class="wrap">
 
 <!-- ================= NAHA ================= -->
@@ -493,6 +493,11 @@ img.ph{cursor:zoom-in}
 
 
 <h2 class="st" id="newprop-s-naha">✨ 家人新增提案</h2>
+<div class="card"><h3>美國村 ✅</h3><div class="en">Mihama American Village</div>
+<div class="gal"><div class="trk"><img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Mihama_AV_D_Japan.jpg/960px-Mihama_AV_D_Japan.jpg" onerror="imgRetry(this)" alt="美國村"></div><button class="gl">‹</button><button class="gr">›</button><div class="gdot"></div></div><div class="credit">圖：Wikimedia Commons（提案人 帆，2026-10-15）</div>
+<p>介紹：擁有濃厚美式風情與大型摩天輪，是適合漫步夕陽與挑選異國雜貨的熱門海濱商場。</p>
+<p class="kv"><b>停留：</b>約2小時｜<b>費用：</b>免費入場｜<b>位置：</b>沖縄県中頭郡北谷町美浜（那霸市區約40–50分車程）</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E7%BE%8E%E5%9C%8B%E6%9D%91%20%E6%B2%96%E7%B8%84" target="_blank">🗺 地圖</a></div>
 
 </div>
 
@@ -814,7 +819,7 @@ var PLACES=[['s-naha','那霸'],['s-miyako','宮古島'],['s-ishigaki','石垣�
 var CATS=['food','spot','shop','souv','feat'];
 var CATN={food:'餐廳',spot:'景點',shop:'購物',souv:'伴手禮',feat:'當地特色'};
 var CARDMAP={
-'s-naha':['food','food','food','food','food','food','food','food','food','food','food','spot','spot','spot','spot','spot','spot','spot','spot','spot','shop','shop','shop','shop','shop','shop','shop','spot','spot','spot','spot','souv','souv','souv','souv','souv','souv','souv','feat','spot','spot'],
+'s-naha':['food','food','food','food','food','food','food','food','food','food','food','spot','spot','spot','spot','spot','spot','spot','spot','spot','shop','shop','shop','shop','shop','shop','shop','spot','spot','spot','spot','souv','souv','souv','souv','souv','souv','souv','feat','spot','spot','spot'],
 's-miyako':['spot','spot','spot','spot','spot','food','food','shop','spot','spot','spot','spot','spot','shop','shop','souv','souv','souv','souv','souv','feat'],
 's-ishigaki':['spot','spot','spot','spot','food','food','food','food','food','shop','spot','spot','spot','spot','shop','souv','souv','souv','souv','souv','feat']};
 var GROUPS=[];PLACES.forEach(function(s){CATS.forEach(function(c){GROUPS.push(s[1]+CATN[c]);});});
@@ -840,11 +845,20 @@ function cleanT(s){return (s||'').replace(/\s*[✅⚠️]\s*$/,'').trim();}
 function imgRetry(el){try{var n=+(el.getAttribute('data-r')||0);if(n<3){el.setAttribute('data-r',n+1);var s=el.getAttribute('data-s')||el.src;if(!el.getAttribute('data-s'))el.setAttribute('data-s',s);setTimeout(function(){el.src=s+(s.indexOf('?')>=0?'&':'?')+'r='+(n+1);},700*(n+1));}else{el.style.display='none';}}catch(e){try{el.style.display='none';}catch(x){}}}
 function titles(){var m={};PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){var h=c.querySelector('h3');var cat=(CARDMAP[s[0]]||[])[i]||'spot';m[s[0]+'#'+i]={t:h?cleanT(h.textContent):'項目'+(i+1),g:s[1]+CATN[cat]};});document.querySelectorAll('#'+s[0]+' tr.srow').forEach(function(r){m[r.getAttribute('data-id')]={t:r.getAttribute('data-t')||'項目',g:r.getAttribute('data-g')||s[1]};});});return m;}
 function cardCat(sectId,idx){return (CARDMAP[sectId]||[])[idx]||'spot';}
-function buildVoteUI(){PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){if(c.querySelector('.vote'))return;var d=document.createElement('div');d.className='vote';d.innerHTML='<button>👍 投票</button><span class="cnt">0票</span>';c.appendChild(d);var btn=d.querySelector('button');btn.onclick=(function(id){return function(){toggle(id);};})(s[0]+'#'+i);var cid=s[0]+'#'+i;var h3t=c.querySelector('h3');if(h3t&&!c.querySelector('a.revw')){var rv=document.createElement('a');rv.className='map revw';rv.target='_blank';rv.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(cleanT(h3t.textContent));rv.textContent='💬 評論';rv.style.marginLeft='6px';var mp0=c.querySelector('a.map');if(mp0)mp0.after(rv);else h3t.after(rv);}if(!c.querySelector('.cmt')){var cm=document.createElement('div');cm.className='cmt';cm.setAttribute('data-id',cid);cm.innerHTML='<button class="cbtn" onclick="toggleCmt(this)">💬 留言</button><div class="thread" style="display:none"><div class="msgs"></div><div class="crow"><input maxlength="140" placeholder="寫下建議…"><button>送出</button></div></div>';c.appendChild(cm);var inp=cm.querySelector('input'),snd=cm.querySelector('.crow button');snd.onclick=(function(id2,in2,s2){return function(){sendComment(id2,in2,s2);};})(cid,inp,snd);inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();snd.click();}});}});});}
+function buildVoteUI(){PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){if(c.querySelector('.vote'))return;var d=document.createElement('div');d.className='vote';d.innerHTML='<button>👍 投票</button><span class="cnt">0票</span>';c.appendChild(d);var btn=d.querySelector('button');btn.onclick=(function(id){return function(){toggle(id);};})(s[0]+'#'+i);var ib=document.createElement('button');ib.className='im';ib.textContent='🖼 換圖';ib.title='換這張圖';ib.onclick=(function(id2,cx){return function(){changeImg(id2,cx);};})(s[0]+'#'+i,c);d.appendChild(ib);var cid=s[0]+'#'+i;var h3t=c.querySelector('h3');if(h3t&&!c.querySelector('a.revw')){var rv=document.createElement('a');rv.className='map revw';rv.target='_blank';rv.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(cleanT(h3t.textContent));rv.textContent='💬 評論';rv.style.marginLeft='6px';var mp0=c.querySelector('a.map');if(mp0)mp0.after(rv);else h3t.after(rv);}if(!c.querySelector('.cmt')){var cm=document.createElement('div');cm.className='cmt';cm.setAttribute('data-id',cid);cm.innerHTML='<button class="cbtn" onclick="toggleCmt(this)">💬 留言</button><div class="thread" style="display:none"><div class="msgs"></div><div class="crow"><input maxlength="140" placeholder="寫下建議…"><button>送出</button></div></div>';c.appendChild(cm);var inp=cm.querySelector('input'),snd=cm.querySelector('.crow button');snd.onclick=(function(id2,in2,s2){return function(){sendComment(id2,in2,s2);};})(cid,inp,snd);inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();snd.click();}});}});});}
 var GH_API='https://api.github.com/repos/a4623671/cruise-votes/contents/votes.json';
 var _p1='Z2l0aHViX3BhdF8xMUFISU5ORVEwV1JKV05mNFNvWHZCXzNtTUJVTWRaa0hDQV',_p2='hNbHA3QUFublh0bmNhTDN3NXZYd0tGbXlsYnlacmdVV0dFUTNSVm5KaXVMS1VW';
 var GH_TOKEN=atob(_p1+_p2);
 var GH_SHA=null,GH_BUSY=false,GH_UPKEY='gh_uploaded_v1',GH_DIRTY='gh_dirty_v1';
+var IM_API='https://api.github.com/repos/a4623671/cruise-votes/contents/images.json';var IM_SHA=null;
+function imGet(){return fetch(IM_API+'?t='+Date.now(),{headers:ghHeaders(),cache:'no-store'}).then(function(r){if(r.status===404)return {};if(!r.ok)throw new Error('imget '+r.status);return r.json();}).then(function(j){IM_SHA=j.sha;try{return JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));}catch(e){return {};}}).catch(function(){return {};});}
+function imPut(o){var body={message:'images '+new Date().toISOString(),content:btoa(unescape(encodeURIComponent(JSON.stringify(o))))};if(IM_SHA)body.sha=IM_SHA;return fetch(IM_API,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){if(r.status===409||r.status===422)throw new Error('conflict');if(!r.ok)throw new Error('put '+r.status);return r.json();}).then(function(j){IM_SHA=j.content.sha;return o;});}
+function cardByCid(cid){var p=String(cid).split('#');var cs=document.querySelectorAll('#'+p[0]+' .card');return cs[+p[1]]||null;}
+function cardImg(c){return c.querySelector('.gal .trk img.ph')||c.querySelector('img.ph');}
+function applyImg(cid,url,by){var c=cardByCid(cid);if(!c||!url)return;var im=cardImg(c);if(!im)return;im.removeAttribute('data-s');im.removeAttribute('data-r');im.style.display='';im.src=url;var cr=c.querySelector('.credit');if(cr&&by)cr.innerHTML='圖：'+by+' 更換（原 Wikimedia Commons）';}
+function loadImgs(){return imGet().then(function(m){window._IMG=m||{};Object.keys(window._IMG).forEach(function(k){var v=window._IMG[k]||{};applyImg(k,v.url||v,v.by||'');});});}
+function changeImg(cid,c){if(!me()){alert('請先填名字再換圖');return;}var im=cardImg(c),cur=((window._IMG||{})[cid]||{}).url||'';if(!cur&&im)cur=im.getAttribute('data-s')||im.src;var u=prompt('貼上新圖片網址（https://…）\n目前：'+(cur||'（無）'),cur||'');if(u===null)return;u=u.trim();if(!/^https?:\/\//i.test(u)){alert('請輸入 http(s) 開頭的圖片網址');return;}var by=me(),m=window._IMG||{},prev=((m[cid]||{}).url)||'';m[cid]={url:u,by:by,ts:new Date().toISOString(),prev:prev};imPut(m).then(function(){window._IMG=m;applyImg(cid,u,by);alert('✅ 圖片已更新（'+by+'）');}).catch(function(e){alert('更新失敗：'+(e&&e.message?e.message:'網路錯誤'));});}
+
 function ghHeaders(){return {'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN};}
 function ghGet(){return fetch(GH_API+'?t='+Date.now(),{headers:ghHeaders(),cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('get '+r.status);return r.json();}).then(function(j){GH_SHA=j.sha;try{return JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));}catch(e){return {};}});}
 function ghPut(v,sha){return fetch(GH_API,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify({message:'votes '+new Date().toISOString(),content:btoa(unescape(encodeURIComponent(JSON.stringify(v)))),sha:sha})}).then(function(r){if(r.status===409||r.status===422)throw new Error('conflict');if(!r.ok)throw new Error('put '+r.status);return r.json();}).then(function(j){GH_SHA=j.content.sha;return v;});}
@@ -1051,7 +1065,7 @@ function importVotes(){var s=prompt('貼上家人傳來的投票碼');if(!s)retu
 document.getElementById('nameInput').addEventListener('keydown',function(e){if(e.key==='Enter')enter();});
 function safe(f){try{f();}catch(e){try{console.error(e);}catch(x){}try{var j=document.getElementById('jsok');if(j)j.textContent+='·ERR:'+String(e&&e.message||e).slice(0,40);}catch(y){}}}
 function diagFilter(){try{var info=curP+'/'+curC;var vis=0;document.querySelectorAll('.sect.on .card').forEach(function(c){if(c.offsetParent!==null)vis++;});var rk=0;document.querySelectorAll('.sect.on .rankcard').forEach(function(r){if(r.offsetParent!==null)rk++;});var j=document.getElementById('jsdiag');if(j)j.textContent='·'+info+'·卡'+vis+'/排'+rk;}catch(e){}}
-buildVoteUI();paintWho();
+buildVoteUI();paintWho();loadImgs();
 var TWRATE={'s-naha#0':5,'s-naha#1':5,'s-naha#2':4,'s-naha#3':5,'s-naha#4':3,'s-naha#5':4,'s-naha#6':3,'s-naha#7':4,'s-naha#8':4,'s-naha#9':2,'s-naha#10':4,'s-naha#11':5,'s-naha#12':4,'s-naha#13':5,'s-naha#14':5,'s-naha#15':2,'s-naha#16':4,'s-naha#17':3,'s-naha#18':2,'s-naha#19':1,'s-naha#20':3,'s-naha#21':4,'s-naha#22':2,'s-naha#23':4,'s-naha#24':5,'s-naha#25':3,'s-naha#26':2,'s-naha#27':5,'s-naha#28':2,'s-naha#29':1,'s-naha#30':1,'s-naha#31':5,'s-naha#32':5,'s-naha#33':4,'s-naha#34':4,'s-naha#35':3,'s-naha#36':3,'s-naha#37':3,'s-naha#39':2,'s-naha#40':1,'s-miyako#0':5,'s-miyako#1':5,'s-miyako#2':4,'s-miyako#3':4,'s-miyako#4':4,'s-miyako#5':4,'s-miyako#6':4,'s-miyako#7':4,'s-miyako#8':2,'s-miyako#9':2,'s-miyako#10':1,'s-miyako#11':2,'s-miyako#12':3,'s-miyako#13':3,'s-miyako#14':3,'s-miyako#15':5,'s-miyako#16':4,'s-miyako#17':4,'s-miyako#18':3,'s-miyako#19':4,'s-ishigaki#0':5,'s-ishigaki#1':3,'s-ishigaki#2':2,'s-ishigaki#3':3,'s-ishigaki#4':4,'s-ishigaki#5':4,'s-ishigaki#6':5,'s-ishigaki#7':5,'s-ishigaki#8':3,'s-ishigaki#9':4,'s-ishigaki#10':2,'s-ishigaki#11':2,'s-ishigaki#12':2,'s-ishigaki#13':3,'s-ishigaki#14':3,'s-ishigaki#15':4,'s-ishigaki#16':3,'s-ishigaki#17':3,'s-ishigaki#18':5,'s-ishigaki#19':3};
 function paintTW(){PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){var v=TWRATE[s[0]+'#'+i];if(!v||c.querySelector('.tw'))return;var st=c.querySelector('.stars');if(!st)return;var sp=document.createElement('span');sp.className='tw';sp.textContent='🇹🇼×'+v;st.appendChild(sp);});});}
 function initSwipe(){document.querySelectorAll('.gal').forEach(function(g){if(g.closest('.rankcard'))return;var trk=g.querySelector('.trk'),n=trk.children.length,idx=0,dots=g.querySelector('.gdot');
