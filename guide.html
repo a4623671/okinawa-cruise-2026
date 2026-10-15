@@ -13,15 +13,13 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .topbar button{border:1px solid #d8d0bd;background:#fff;border-radius:50%;width:34px;height:34px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .hero{background:linear-gradient(135deg,#7a1f2b,#c25e3a);color:#fff;padding:18px 16px}
 .hero h1{font-size:20px}.hero p{font-size:13px;opacity:.92;margin-top:4px}
-#ovbar{display:none;gap:6px;align-items:center;padding:8px 10px;background:#fff;border-bottom:1px solid #e3ddd0;position:sticky;top:51px;z-index:9;overflow-x:auto;scrollbar-width:none}
+#ovbar{display:none;gap:6px;align-items:center;padding:8px 10px;background:#fff;border-bottom:1px solid #e3ddd0;position:sticky;top:51px;z-index:9;overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap}
 #ovbar::-webkit-scrollbar{display:none}
 #ovbar button{flex:none;border:1px solid #d8d0bd;border-radius:20px;padding:6px 12px;font-size:14px;background:#fff;cursor:pointer;white-space:nowrap}
 #ovbar button.on{background:#10293f;color:#fff;border-color:#10293f;font-weight:700}
-#ovbar select{flex:none;border:1px solid #d8d0bd;border-radius:20px;padding:6px 10px;font-size:14px;background:#fff}
+#ovbar select{flex:1 1 0;min-width:0;border:1px solid #d8d0bd;border-radius:20px;padding:7px 8px;font-size:14px;background:#fff} #ovbar #ovtoggle{flex:0 0 auto;border:1px solid #b9a86a;border-radius:20px;background:#fffdf3;color:#7a5200;font-size:13px;font-weight:700;padding:7px 10px;cursor:pointer;white-space:nowrap}
 #ovbar #ovtoggle{margin-left:auto;border-color:#b9a86a;color:#7a5200}
 body.ov #ovbar{display:flex}
-#ovhint{display:none;font-size:12px;color:#7a6a3a;background:#fffdf3;border-bottom:1px solid #efe6cf;padding:6px 12px}
-body.ov #ovhint{display:block}
 body.ov .cats{display:none}
 body.ov .sect{display:none}
 body.ov .sect.ovshow{display:block}
@@ -198,7 +196,7 @@ img.ph{cursor:zoom-in}
 <button class="cat cat2" onclick="swCat('souv',this)">🎁 伴手禮</button>
 <button class="cat cat2" onclick="swCat('feat',this)">✨ 當地特色</button>
 </div>
-<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20261015-bd）</div>
+<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20261015-be）</div>
 </div>
 <div class="wrap">
 
@@ -922,7 +920,7 @@ function applyOvMode(){
   else{s.classList.toggle('ovshow',s.id===curP);}
  });
  document.querySelectorAll('.secthead').forEach(function(hd){hd.style.display=mode==='ov'?'flex':'none';hd.querySelector('.arw').textContent=document.getElementById(hd.getAttribute('data-s')).classList.contains('ovshow')?'收合 ▲':'展開 ▼';});
- var tb=document.getElementById('ovtoggle');if(tb)tb.textContent=mode==='ov'?'切到分類模式':'切到總覽';
+ var tb=document.getElementById('ovtoggle');if(tb)tb.textContent=mode==='ov'?'分類／伴手禮':'回總覽';var sp=document.getElementById('ovplace');if(sp)sp.value=ovPlace;var sc=document.getElementById('ovcat');if(sc)sc.value=ovCat;
  var ob=document.getElementById('ovbar');if(ob)ob.style.display=mode==='ov'?'flex':'none'; setOvTop();
  if(mode==='ov')applyOvFilter();else applyFilter();
 }
@@ -940,13 +938,11 @@ function setOvTop(){try{var t=document.querySelector('.topbar'),b=document.getEl
 window.addEventListener('resize',function(){setOvTop();});
 function initOv(){
  var bar=document.createElement('div');bar.id='ovbar';
- bar.innerHTML='<button data-p="all" class="on">全部</button><button data-p="s-naha">🌺 那霸</button><button data-p="s-miyako">🏝 宮古島</button><button data-p="s-ishigaki">🪨 石垣島</button>'
-  +'<select id="ovcat"><option value="all">全部分類</option><option value="food">🍜 餐廳</option><option value="spot">📷 景點</option><option value="shop">🛍 購物</option><option value="souv">🎁 伴手禮</option><option value="feat">✨ 當地特色</option></select>'
-  +'<button id="ovtoggle"></button>';
+ var PL='<option value="all">全部港口</option><option value="s-naha">🌺 那霸</option><option value="s-miyako">🏝 宮古島</option><option value="s-ishigaki">🪨 石垣島</option>';
+ var CT='<option value="all">全部分類</option><option value="food">🍜 餐廳</option><option value="spot">📷 景點</option><option value="shop">🛍 購物</option><option value="souv">🎁 伴手禮</option><option value="feat">✨ 當地特色</option>';
+ bar.innerHTML='<select id="ovplace">'+PL+'</select><select id="ovcat">'+CT+'</select><button id="ovtoggle"></button>';
  var catsEl=document.querySelector('.cats');catsEl.parentNode.insertBefore(bar,catsEl);
- var hint=document.createElement('div');hint.id='ovhint';hint.textContent='🔥熱門 💚推薦・點卡片看細節・🖼 可換圖・切到分類模式看伴手禮排行';
- catsEl.parentNode.insertBefore(hint,bar.nextSibling);
- bar.querySelectorAll('button[data-p]').forEach(function(b){b.onclick=function(){ovPlace=b.getAttribute('data-p');bar.querySelectorAll('button[data-p]').forEach(function(x){x.classList.toggle('on',x===b);});applyOvMode();};});
+ document.getElementById('ovplace').onchange=function(){ovPlace=this.value;applyOvMode();};
  document.getElementById('ovcat').onchange=function(){ovCat=this.value;applyOvMode();};
  document.getElementById('ovtoggle').onclick=function(){setOvState(ovState()==='ov'?'cat':'ov');};
  buildOverview();
