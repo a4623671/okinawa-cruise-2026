@@ -65,7 +65,7 @@ body.ov .card.ov.ovopen .ovbody{display:block}
 .vote{display:flex;gap:8px;align-items:center;margin-top:10px;border-top:1px dashed #ddd;padding-top:10px}
 .vote button{border:1px solid #0e6e5a;background:#fff;color:#0e6e5a;border-radius:20px;padding:6px 16px;font-size:14px;font-weight:700;cursor:pointer}
 .vote button.voted{background:#0e6e5a;color:#fff}
-.vote .cnt{font-size:14px;font-weight:800} .vote button.im{border-color:#b9a86a;color:#7a5200;font-size:13px;padding:3px 10px} .imgwho{font-size:11px;color:#0e6e5a;margin-left:6px}
+.vote .cnt{font-size:14px;font-weight:800} .imgchg{position:absolute;top:8px;right:8px;z-index:6;border:none;border-radius:9px;background:rgba(0,0,0,.34);color:#fff;font-size:12px;font-weight:700;padding:4px 9px;cursor:pointer;opacity:.55;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)} .imgchg:hover,.imgchg:active{opacity:1} .imgbox{position:relative;display:block} #galov .imgchg{top:46px;right:18px;font-size:14px;padding:7px 13px;opacity:.5}
 .shop{font-size:13px;background:#faf7ef;border-radius:8px;padding:8px 10px;margin-top:8px}.shop li{margin-left:18px}
 h2.st{font-size:16px;margin:16px 2px 8px;color:#7a1f2b}
 .note{font-size:12px;color:#888;margin:12px 2px}
@@ -197,7 +197,7 @@ img.ph{cursor:zoom-in}
 <button class="cat cat2" onclick="swCat('souv',this)">🎁 伴手禮</button>
 <button class="cat cat2" onclick="swCat('feat',this)">✨ 當地特色</button>
 </div>
-<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20261015-aw）</div>
+<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20261015-ax）</div>
 </div>
 <div class="wrap">
 
@@ -903,6 +903,7 @@ function buildOverview(){
   hd.onclick=function(){var on=s.classList.toggle('ovshow');hd.querySelector('.arw').textContent=on?'收合':'展開';};
   s.parentNode.insertBefore(hd,s);
  });
+ document.querySelectorAll('.sect').forEach(function(s){[].slice.call(s.querySelectorAll('.card')).forEach(function(c,i){mountImgChg(c,s.id+'#'+i);});});
 }
 function applyOvMode(){
  var mode=ovState();
@@ -941,7 +942,7 @@ function initOv(){
  buildOverview();
  applyOvMode();
 }
-function buildVoteUI(){PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){if(c.querySelector('.vote'))return;var d=document.createElement('div');d.className='vote';d.innerHTML='<button>👍 投票</button><span class="cnt">0票</span>';c.appendChild(d);var btn=d.querySelector('button');btn.onclick=(function(id){return function(){toggle(id);};})(s[0]+'#'+i);var ib=document.createElement('button');ib.className='im';ib.textContent='🖼 換圖';ib.title='換這張圖';ib.onclick=(function(id2,cx){return function(){changeImg(id2,cx);};})(s[0]+'#'+i,c);d.appendChild(ib);var cid=s[0]+'#'+i;var h3t=c.querySelector('h3');if(h3t&&!c.querySelector('a.revw')){var rv=document.createElement('a');rv.className='map revw';rv.target='_blank';rv.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(cleanT(h3t.textContent));rv.textContent='💬 評論';rv.style.marginLeft='6px';var mp0=c.querySelector('a.map');if(mp0)mp0.after(rv);else h3t.after(rv);}if(!c.querySelector('.cmt')){var cm=document.createElement('div');cm.className='cmt';cm.setAttribute('data-id',cid);cm.innerHTML='<button class="cbtn" onclick="toggleCmt(this)">💬 留言</button><div class="thread" style="display:none"><div class="msgs"></div><div class="crow"><input maxlength="140" placeholder="寫下建議…"><button>送出</button></div></div>';c.appendChild(cm);var inp=cm.querySelector('input'),snd=cm.querySelector('.crow button');snd.onclick=(function(id2,in2,s2){return function(){sendComment(id2,in2,s2);};})(cid,inp,snd);inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();snd.click();}});}});});}
+function buildVoteUI(){PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){if(c.querySelector('.vote'))return;var d=document.createElement('div');d.className='vote';d.innerHTML='<button>👍 投票</button><span class="cnt">0票</span>';c.appendChild(d);var btn=d.querySelector('button');btn.onclick=(function(id){return function(){toggle(id);};})(s[0]+'#'+i);var cid=s[0]+'#'+i;var h3t=c.querySelector('h3');if(h3t&&!c.querySelector('a.revw')){var rv=document.createElement('a');rv.className='map revw';rv.target='_blank';rv.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(cleanT(h3t.textContent));rv.textContent='💬 評論';rv.style.marginLeft='6px';var mp0=c.querySelector('a.map');if(mp0)mp0.after(rv);else h3t.after(rv);}if(!c.querySelector('.cmt')){var cm=document.createElement('div');cm.className='cmt';cm.setAttribute('data-id',cid);cm.innerHTML='<button class="cbtn" onclick="toggleCmt(this)">💬 留言</button><div class="thread" style="display:none"><div class="msgs"></div><div class="crow"><input maxlength="140" placeholder="寫下建議…"><button>送出</button></div></div>';c.appendChild(cm);var inp=cm.querySelector('input'),snd=cm.querySelector('.crow button');snd.onclick=(function(id2,in2,s2){return function(){sendComment(id2,in2,s2);};})(cid,inp,snd);inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();snd.click();}});}});});}
 var GH_API='https://api.github.com/repos/a4623671/cruise-votes/contents/votes.json';
 var _p1='Z2l0aHViX3BhdF8xMUFISU5ORVEwV1JKV05mNFNvWHZCXzNtTUJVTWRaa0hDQV',_p2='hNbHA3QUFublh0bmNhTDN3NXZYd0tGbXlsYnlacmdVV0dFUTNSVm5KaXVMS1VW';
 var GH_TOKEN=atob(_p1+_p2);
@@ -951,6 +952,8 @@ function imGet(){return fetch(IM_API+'?t='+Date.now(),{headers:ghHeaders(),cache
 function imPut(o){var body={message:'images '+new Date().toISOString(),content:btoa(unescape(encodeURIComponent(JSON.stringify(o))))};if(IM_SHA)body.sha=IM_SHA;return fetch(IM_API,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){if(r.status===409||r.status===422)throw new Error('conflict');if(!r.ok)throw new Error('put '+r.status);return r.json();}).then(function(j){IM_SHA=j.content.sha;return o;});}
 function cardByCid(cid){var p=String(cid).split('#');var cs=document.querySelectorAll('#'+p[0]+' .card');return cs[+p[1]]||null;}
 function cardImg(c){return c.querySelector('.gal .trk img.ph')||c.querySelector('img.ph');}
+function cidOf(card){if(!card)return null;var s=card.closest('.sect');if(!s)return null;var cs=[].slice.call(s.querySelectorAll('.card'));var i=cs.indexOf(card);return i<0?null:s.id+'#'+i;}
+function mountImgChg(c,cid){if(!c||!cid||c.querySelector('.imgchg'))return;var im=cardImg(c);if(!im)return;var box=im.closest('.gal');if(!box){if(im.parentElement===c){box=document.createElement('div');box.className='imgbox';c.insertBefore(box,im);box.appendChild(im);}else{box=im.parentElement;box.classList.add('imgbox');}}var b=document.createElement('button');b.type='button';b.className='imgchg';b.textContent='🖼 換圖';b.title='換這張圖';b.onclick=function(e){e.stopPropagation();e.preventDefault();changeImg(cid,c);};box.appendChild(b);}
 function applyImg(cid,url,by){var c=cardByCid(cid);if(!c||!url)return;var im=cardImg(c);if(!im)return;im.removeAttribute('data-s');im.removeAttribute('data-r');im.style.display='';im.src=url;var tt=c.querySelector('.ovthumb img');if(tt)tt.src=url;var cr=c.querySelector('.credit');if(cr&&by)cr.innerHTML='圖：'+by+' 更換（原 Wikimedia Commons）';}
 function loadImgs(){return imGet().then(function(m){window._IMG=m||{};Object.keys(window._IMG).forEach(function(k){var v=window._IMG[k]||{};applyImg(k,v.url||v,v.by||'');});});}
 function changeImg(cid,c){if(!me()){alert('請先填名字再換圖');return;}var im=cardImg(c),cur=((window._IMG||{})[cid]||{}).url||'';if(!cur&&im)cur=im.getAttribute('data-s')||im.src;var u=prompt('貼上新圖片網址（https://…）\n目前：'+(cur||'（無）'),cur||'');if(u===null)return;u=u.trim();if(!/^https?:\/\//i.test(u)){alert('請輸入 http(s) 開頭的圖片網址');return;}var by=me(),m=window._IMG||{},prev=((m[cid]||{}).url)||'';m[cid]={url:u,by:by,ts:new Date().toISOString(),prev:prev};imPut(m).then(function(){window._IMG=m;applyImg(cid,u,by);alert('✅ 圖片已更新（'+by+'）');}).catch(function(e){alert('更新失敗：'+(e&&e.message?e.message:'網路錯誤'));});}
@@ -1173,10 +1176,11 @@ var tx=0;trk.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;}
 trk.addEventListener('touchend',function(e){var dx=e.changedTouches[0].clientX-tx;if(dx>40)go(idx-1);else if(dx<-40)go(idx+1);});
 dr();});}
 function visImgs(){return Array.prototype.slice.call(document.querySelectorAll('img.ph')).filter(function(im){return im.style.display!=='none'&&im.offsetParent!==null&&im.src;});}
-function initGal(){var ov=document.createElement('div');ov.id='galov';ov.innerHTML='<span class="gx">✕</span><span class="gp">‹</span><img class="gi"><span class="gn">›</span><div class="gc"></div>';document.body.appendChild(ov);var idx=0,gi=ov.querySelector('.gi'),gc=ov.querySelector('.gc');
+function initGal(){var ov=document.createElement('div');ov.id='galov';ov.innerHTML='<span class="gx">✕</span><span class="gp">‹</span><img class="gi"><span class="gn">›</span><div class="gc"></div>'+'<button class="imgchg" type="button">🖼 換圖</button>';document.body.appendChild(ov);var idx=0,gi=ov.querySelector('.gi'),gc=ov.querySelector('.gc');
 function show(i){var L=visImgs();if(!L.length)return;idx=(i+L.length)%L.length;gi.src=L[idx].src;gi.alt=L[idx].alt||'';gc.textContent=(idx+1)+'/'+L.length+' '+(L[idx].alt||'');ov.classList.add('on');}
 document.addEventListener('click',function(e){if(e.target&&e.target.classList&&e.target.classList.contains('ph')){var L=visImgs();show(L.indexOf(e.target));}});
 ov.querySelector('.gx').onclick=function(){ov.classList.remove('on');};
+ov.querySelector('.imgchg').onclick=function(e){e.stopPropagation();var L=visImgs();var im=L[idx];if(!im)return;var card=im.closest('.card');var cid=cidOf(card);if(!cid){alert('找不到對應的卡片，請直接按卡片上的換圖');return;}changeImg(cid,card);};
 ov.querySelector('.gp').onclick=function(e){e.stopPropagation();show(idx-1);};
 ov.querySelector('.gn').onclick=function(e){e.stopPropagation();show(idx+1);};
 ov.onclick=function(e){if(e.target===ov)ov.classList.remove('on');};
