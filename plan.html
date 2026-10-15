@@ -171,10 +171,11 @@ function hav(a,b){var R=6371,dLa=(b[0]-a[0])*Math.PI/180,dLn=(b[1]-a[1])*Math.PI
  var s=Math.sin(dLa/2)*Math.sin(dLa/2)+Math.cos(a[0]*Math.PI/180)*Math.cos(b[0]*Math.PI/180)*Math.sin(dLn/2)*Math.sin(dLn/2);
  return 2*R*Math.asin(Math.sqrt(s));}
 function estMode(mode,km,drive){
- if(mode==='taxi'){if(drive)return {min:drive.min,km:drive.km,src:'OSRM實測'};return {min:km*1.3/28*60,km:km*1.3,src:'估算'};}
- if(mode==='walk'){if(drive)return {min:drive.km/4.5*60,km:drive.km,src:'OSRM距離+步速'};return {min:km*1.35/4.5*60,km:km*1.35,src:'估算'};}
- if(mode==='bus')return {min:km*1.4/16*60+6,km:km*1.4,src:'估算(含等車)'};
- return {min:km*1.25/28*60+5,km:km*1.25,src:'估算(含等車)'};}
+ function pack(wait,ride,kms,src){return {wait:wait,ride:ride,min:ride+wait,km:kms,src:src};}
+ if(mode==='walk'){if(drive)return pack(0,drive.km/4.5*60,drive.km,'OSRM距離+步速');return pack(0,km*1.35/4.5*60,km*1.35,'估算');}
+ if(mode==='taxi'){var w=2;if(drive)return pack(w,drive.min,drive.km,'OSRM實測');return pack(w,km*1.3/28*60,km*1.3,'估算');}
+ if(mode==='bus')return pack(6,km*1.4/16*60,km*1.4,'等車6分+車速估');
+ return pack(5,km*1.25/28*60,km*1.25,'等車5分+車速估');}
 var DRIVE={};
 function queryDrive(a,b){var key=a[0].toFixed(4)+','+a[1].toFixed(4)+'>'+b[0].toFixed(4)+','+b[1].toFixed(4);
  if(DRIVE[key])return Promise.resolve(DRIVE[key]);
@@ -225,7 +226,7 @@ function computeAll(){
   for(var i=0;i<seq.length-1;i++){
    var L=PLAN.items[d.k].legs[i]||{};var mode=L.prop||L.mode||'taxi';
    var ca=coordOf(seq[i]),cb=coordOf(seq[i+1]);var k=d.k+':'+i;
-   if(!ca||!cb){cache.legs[k]={min:null,km:null,src:'無座標',mode:mode};continue;}
+   if(!ca||!cb){cache.legs[k]={min:null,km:null,src:'無座標',mode:mode,wait:null,ride:null};continue;}
    var km=hav(ca,cb);
    if(mode==='taxi'||mode==='walk'){
     (function(kk,mm,kmv,a2,b2){jobs.push(queryDrive(a2,b2).then(function(dr){var e=estMode(mm,kmv,dr);e.mode=mm;cache.legs[kk]=e;}));})(k,mode,km,ca,cb);
@@ -314,7 +315,8 @@ function renderBoard(){
    var L=it.legs[i]||{};var C=cache.legs[curDay+':'+i]||{};var cur=L.prop||L.mode||'taxi';
    out+='<div class="leg"><div style="font-weight:700">'+(i+1)+'. '+esc(seq[i].t.slice(0,14))+' → '+esc(seq[i+1].t.slice(0,14))+'</div><div class="row" style="margin-top:4px">';
    out+=['walk','taxi','bus','mono'].map(function(m){return '<button class="'+(cur===m?'on':'')+'" onclick="setLeg('+i+',\''+m+'\')">'+MODEN[m]+'</button>';}).join('');
-   out+='<span class="est">'+(C.min==null?'時間未知':'約 '+fmtMin(C.min)+(C.km?'・'+C.km.toFixed(1)+'km':''))+'</span>';
+   var brk=(C.min==null||!C.wait)?'':('（等 '+Math.round(C.wait)+'＋搭 '+Math.round(C.ride)+' 分）');
+   out+='<span class="est">'+(C.min==null?'時間未知':'約 '+fmtMin(C.min)+brk+(C.km?'・'+C.km.toFixed(1)+'km':''))+'</span>';
    if(L.prop){
     out+='<span class="prop">（'+esc(L.by||'?')+' 提議・原 '+(MODEN[L.mode]||L.mode)+'・附議 '+((L.endorse||[]).length)+'/'+roster().length+'）</span>';
     out+='<button onclick="endorseLeg('+i+')">'+(agreed(L)?'✅ 已附議':'附議')+'</button>';
@@ -441,7 +443,7 @@ function dayPlan(d){
   if(i<seq.length-1){
    var L=cache.legs[d.k+':'+i];
    if(!L||L.min==null){out.miss=true;continue;}
-   out.rows.push({t:hm2s(t),n:MODEN[L.mode]||L.mode,min:L.min,kind:'leg'});t+=L.min;}
+   out.rows.push({t:hm2s(t),n:(MODEN[L.mode]||L.mode)+(L.wait?('（等'+Math.round(L.wait)+'＋搭'+Math.round(L.ride)+'）'):''),min:L.min,kind:'leg'});t+=L.min;}
  }
  out.end=t;
  var meal=(+PLAN.items[d.k].mealMin)||0;if(meal)t+=meal;
