@@ -43,10 +43,15 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .src.user{background:#fdf0d5;color:#8a5a00}
 .item .ops{display:flex;gap:4px;flex:none;flex-wrap:wrap;justify-content:flex-end}
 .item .ops button{border:1px solid #dbe3ec;background:#fff;border-radius:8px;font-size:12px;padding:3px 7px;cursor:pointer;white-space:nowrap}
+.item .ops button.st.on{background:#0e6e5a;color:#fff;border-color:#0e6e5a;font-weight:800}
+.item .ops button.st.no.on{background:#b3541e;color:#fff;border-color:#b3541e;font-weight:800}
+.tag-ok{display:inline-block;font-size:11px;font-weight:800;background:#e9f6ec;color:#1e6b32;border:1px solid #b6ddc0;border-radius:8px;padding:1px 6px;margin-left:5px}
 .leg{border:1px dashed #c8d6e4;border-radius:10px;padding:6px 9px;margin:2px 0 6px;font-size:12px;background:#f7fbfe}
 .leg .row{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
 .leg button{border:1px solid #c8d6e4;background:#fff;border-radius:12px;font-size:12px;padding:3px 9px;cursor:pointer}
 .leg button.on{background:#10293f;color:#fff;border-color:#10293f;font-weight:700}
+.leg button.st.on{background:#0e6e5a;color:#fff;border-color:#0e6e5a}
+.leg button.st.no.on{background:#b3541e;color:#fff;border-color:#b3541e}
 .leg .est{font-weight:800;color:#b3541e}
 .leg .prop{color:#7a5200;font-weight:700}
 button.go{border:none;border-radius:16px;background:#0e6e5a;color:#fff;font-weight:800;padding:8px 16px;font-size:14px;cursor:pointer}
@@ -111,7 +116,7 @@ body.locked .ops,body.locked .leg .row button,body.locked #addBtn{display:none!i
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261015-p7</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261015-p8</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -177,6 +182,11 @@ function frozen(){return !!(PLAN&&PLAN.finalized)||Date.now()>planDeadline();}
 function guard(){if(PLAN&&PLAN.finalized){toast('已定案，唯讀');return true;}if(Date.now()>planDeadline()){toast('已過定案截止（唯讀）');return true;}return false;}
 function needs(o){var ro=roster();if(!ro.length)return 0;return ro.filter(function(r){return (o.endorse||[]).indexOf(r)<0;}).length;}
 function agreed(o){return roster().length>0&&needs(o)===0;}
+function stanceOf(o){var n=me()||'?';if((o.endorse||[]).indexOf(n)>=0)return 'yes';if((o.hold||[]).indexOf(n)>=0)return 'no';return '';}
+function setStance(o,st){var n=me()||'?';o.endorse=o.endorse||[];o.hold=o.hold||[];
+ var ei=o.endorse.indexOf(n),hi=o.hold.indexOf(n);
+ if(st==='yes'){if(ei>=0)o.endorse.splice(ei,1);else{o.endorse.push(n);if(hi>=0)o.hold.splice(hi,1);}}
+ else{if(hi>=0)o.hold.splice(hi,1);else{o.hold.push(n);if(ei>=0)o.endorse.splice(ei,1);}}}
 
 /* ================= GitHub 讀寫 ================= */
 function ghH(){return {'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN};}
@@ -333,14 +343,15 @@ function renderBoard(){
   out+='<div class="slot" data-slot="'+s[0]+'"><h3>'+s[1]+' <span class="cnt">('+arr.length+')</span></h3>';
   if(!arr.length)out+='<div class="meta" style="font-size:12px;color:#9fb0c0">（拖曳項目進來，或按上方「＋ 加入項目」）</div>';
   arr.forEach(function(o,idx){
-   var end=(o.endorse||[]);
+   var end=(o.endorse||[]),hold=(o.hold||[]),st=stanceOf(o);
    out+='<div class="item" data-idx="'+idx+'" data-slot="'+s[0]+'"><div class="hnd">⠿</div><div class="body">'
-    +'<div class="nm">'+esc(o.t)+(o.src==='user'?'<span class="src user">'+esc(o.by||'?')+' 提議</span>':'<span class="src ai">候選</span>')+(agreed(o)?' ✅':'')+'</div>'
-    +'<div class="meta">停留 '+fmtMin(o.min||60)+(o.lat!=null?'・📍已定位':'・⚠️未定位')+'・附議 '+end.length+'/'+roster().length+(end.length?'（'+esc(end.join('、'))+'）':'')+'</div>'
+    +'<div class="nm">'+esc(o.t)+(o.src==='user'?'<span class="src user">'+esc(o.by||'?')+' 提議</span>':'<span class="src ai">候選</span>')+(agreed(o)?'<span class="tag-ok">✅ 已確認</span>':'')+'</div>'
+    +'<div class="meta">停留 '+fmtMin(o.min||60)+(o.lat!=null?'・📍已定位':'・⚠️未定位')+'・附議 '+end.length+'/'+roster().length+(end.length?'（'+esc(end.join('、'))+'）':'')+(hold.length?'・再考慮 '+hold.length+'（'+esc(hold.join('、'))+'）':'')+'</div>'
     +'</div><div class="ops">'
     +'<button onclick="setMin(\''+s[0]+'\','+idx+')">⏱</button>'
     +(o.lat==null?'<button onclick="locate(\''+s[0]+'\','+idx+')">📍</button>':'')
-    +'<button onclick="toggleAgree(\''+s[0]+'\','+idx+')">'+(agreed(o)?'✅':'附議')+'</button>'
+    +'<button class="st'+(st==='yes'?' on':'')+'" onclick="toggleAgree(\''+s[0]+'\','+idx+')">附議</button>'
+    +'<button class="st no'+(st==='no'?' on':'')+'" onclick="holdItem(\''+s[0]+'\','+idx+')">再考慮</button>'
     +'<button onclick="rmItem(\''+s[0]+'\','+idx+')">✕</button>'
     +'</div></div>';
   });
@@ -356,8 +367,11 @@ function renderBoard(){
    var brk=(C.min==null||!C.wait)?'':('（等 '+Math.round(C.wait)+'＋搭 '+Math.round(C.ride)+' 分）');
    out+='<span class="est">'+(C.min==null?'時間未知':'約 '+fmtMin(C.min)+brk+(C.km?'・'+C.km.toFixed(1)+'km':''))+'</span>';
    if(L.prop){
-    out+='<span class="prop">（'+esc(L.by||'?')+' 提議・原 '+(MODEN[L.mode]||L.mode)+'・附議 '+((L.endorse||[]).length)+'/'+roster().length+'）</span>';
-    out+='<button onclick="endorseLeg('+i+')">'+(agreed(L)?'✅ 已附議':'附議')+'</button>';
+    var lst=stanceOf(L);
+    out+='<span class="prop">（'+esc(L.by||'?')+' 提議・原 '+(MODEN[L.mode]||L.mode)+'・附議 '+((L.endorse||[]).length)+'/'+roster().length+((L.hold||[]).length?'・再考慮 '+(L.hold||[]).length:'')+'）</span>';
+    if(agreed(L))out+='<span class="tag-ok">✅ 已確認</span>';
+    out+='<button class="st'+(lst==='yes'?' on':'')+'" onclick="endorseLeg('+i+')">附議</button>';
+    out+='<button class="st no'+(lst==='no'?' on':'')+'" onclick="holdLeg('+i+')">再考慮</button>';
    }else if(L.mode){out+='<span class="prop">AI/原定</span>';}
    out+='</div></div>';
   }
@@ -372,16 +386,16 @@ function arr0(slot){return it0().slots[slot];}
 function setMeal(){if(guard())return;var it=it0();var v=prompt('這天要扣多少用餐時間（分鐘）？',it.mealMin==null?60:it.mealMin);if(v===null)return;var n=parseInt(v,10);if(isNaN(n)||n<0){toast('請輸入 0 或正整數');return;}it.mealMin=n;recompute();}
 function setMin(slot,idx){if(guard())return;var o=arr0(slot)[idx];var v=prompt('停留幾分鐘？',o.min||60);if(v===null)return;var n=parseInt(v,10);if(!(n>0)){toast('請輸入分鐘數');return;}o.min=n;recompute();}
 function rmItem(slot,idx){if(guard())return;var a=arr0(slot);var o=a[idx];if(!confirm('移除「'+o.t+'」？'))return;a.splice(idx,1);recompute();}
-function toggleAgree(slot,idx){if(guard())return;var o=arr0(slot)[idx];o.endorse=o.endorse||[];var n=me()||'?';var i=o.endorse.indexOf(n);
- if(i>=0)o.endorse.splice(i,1);else o.endorse.push(n);recompute();}
+function toggleAgree(slot,idx){if(guard())return;setStance(arr0(slot)[idx],'yes');recompute();}
+function holdItem(slot,idx){if(guard())return;setStance(arr0(slot)[idx],'no');recompute();}
 function locate(slot,idx){if(guard())return;var o=arr0(slot)[idx];toast('查座標…');
  resolveGeo({t:o.t,place:o.place||null,id:o.id}).then(function(c){if(!c){toast('查不到座標（維持未知）');return;}o.lat=c[0];o.lng=c[1];recompute();});}
 function setLeg(i,mode){if(guard())return;var it=it0();var L=it.legs[i]||(it.legs[i]={});if(!L.mode)L.mode='taxi';
- if((L.prop||L.mode)===mode){delete L.prop;delete L.by;delete L.endorse;L.mode=mode;}
- else{L.prop=mode;L.by=me()||'?';L.endorse=[me()||'?'];}
- recompute();}
-function endorseLeg(i){if(guard())return;var L=it0().legs[i];if(!L||!L.prop){toast('這段沒有提議');return;}
- L.endorse=L.endorse||[];var n=me()||'?';var k=L.endorse.indexOf(n);if(k>=0)L.endorse.splice(k,1);else L.endorse.push(n);recompute();}
+ if((L.prop||L.mode)===mode){delete L.prop;delete L.by;delete L.endorse;delete L.hold;L.mode=mode;}
+  else{L.prop=mode;L.by=me()||'?';L.endorse=[me()||'?'];delete L.hold;}
+  recompute();}
+function endorseLeg(i){if(guard())return;var L=it0().legs[i];if(!L||!L.prop){toast('這段沒有提議');return;}setStance(L,'yes');recompute();}
+function holdLeg(i){if(guard())return;var L=it0().legs[i];if(!L||!L.prop){toast('這段沒有提議');return;}setStance(L,'no');recompute();}
 function recompute(){saveQuiet();return computeAll().then(function(){renderBoard();});}
 
 /* ================= 拖拉（pointer events，手機可用） ================= */
