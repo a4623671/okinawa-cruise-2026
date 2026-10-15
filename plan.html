@@ -110,7 +110,7 @@ function toast(m){var t=document.getElementById('toast');t.textContent=m;t.style
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function fmtMin(m){m=Math.round(m||0);if(m<=0)return '0分';return (m>=60?Math.floor(m/60)+'時':'')+(m%60?(m%60)+'分':'');}
 function hm(s){var p=String(s||'').split(':');return p.length===2?((+p[0])*60+(+p[1])):null;}
-function hm2s(m){return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');}
+function hm2s(m){m=Math.round(m||0);return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');}
 
 var _p1='Z2l0aHViX3BhdF8xMUFISU5ORVEwV1JKV05mNFNvWHZCXzNtTUJVTWRaa0hDQV',_p2='hNbHA3QUFublh0bmNhTDN3NXZYd0tGbXlsYnlacmdVV0dFUTNSVm5KaXVMS1VW';
 var GH_TOKEN=atob(_p1+_p2);
