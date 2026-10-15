@@ -28,7 +28,7 @@ body.ov .sect.ovshow{display:block}
 body.ov .card.ov{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;margin-bottom:8px;cursor:pointer}
 body.ov .card.ov .ovthumb{flex:0 0 62px;width:62px;height:62px;border-radius:8px;overflow:hidden;background:#f1f1f1}
 body.ov .card.ov .ovthumb img{width:100%;height:100%;object-fit:cover;display:block;margin:0;border-radius:0}
-body.ov .card.ov .ovbody{flex:1;min-width:0}
+body.ov .card.ov .ovbody{flex:1;min-width:0;position:relative} body.ov .card.ov .ovbody>h3{padding-right:96px} .ovdet{position:absolute;top:0;right:0;border:none;border-radius:16px;background:#10293f;color:#fff;font-size:13px;font-weight:800;padding:6px 14px;cursor:pointer;white-space:nowrap}
 body.ov .card.ov .ovbody>h3{font-size:15px;margin:0 0 2px;line-height:1.35}
 body.ov .card.ov:not(.ovopen) .ovbody .en,
 body.ov .card.ov:not(.ovopen) .ovbody .stars,
@@ -198,7 +198,7 @@ img.ph{cursor:zoom-in}
 <button class="cat cat2" onclick="swCat('souv',this)">🎁 伴手禮</button>
 <button class="cat cat2" onclick="swCat('feat',this)">✨ 當地特色</button>
 </div>
-<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20261015-ba）</div>
+<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20261015-bb）</div>
 </div>
 <div class="wrap">
 
@@ -884,6 +884,7 @@ function cardCat(sectId,idx){return (CARDMAP[sectId]||[])[idx]||'spot';}
 var OVKEY='discuss_view_v1',ovPlace='all',ovCat='all';
 function ovState(){return localStorage.getItem(OVKEY)||'ov';}
 function setOvState(s){try{localStorage.setItem(OVKEY,s);}catch(e){}applyOvMode();}
+function setOpen(c,on){c.classList.toggle('ovopen',on);var b=c.querySelector('.ovdet');if(b)b.textContent=on?'收合 ▴':'詳細 ▾';}
 function buildOverview(){
  document.querySelectorAll('.sect .card').forEach(function(c){
   if(c.querySelector('.ovbody'))return;
@@ -894,7 +895,10 @@ function buildOverview(){
   var bd=document.createElement('div');bd.className='ovbody';
   [].slice.call(c.children).forEach(function(ch){if(ch!==keep)bd.appendChild(ch);});
   c.insertBefore(th,c.firstChild);c.appendChild(bd);c.classList.add('ov');
-  c.addEventListener('click',function(e){if(e.target.closest('a,button,input,select,textarea,.gal'))return;c.classList.toggle('ovopen');});
+  var db=document.createElement('button');db.type='button';db.className='ovdet';db.textContent='詳細 ▾';
+  db.onclick=function(e){e.stopPropagation();setOpen(c,!c.classList.contains('ovopen'));};
+  bd.appendChild(db);
+  c.addEventListener('click',function(e){if(e.target.closest('a,button,input,select,textarea,.gal'))return;setOpen(c,!c.classList.contains('ovopen'));});
  });
  document.querySelectorAll('.sect').forEach(function(s){
   var block=s.parentElement.classList.contains('sectblock')?s.parentElement:null;
