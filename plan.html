@@ -61,6 +61,17 @@ button.ghost{border:1px solid #d8d0bd;background:#fff;border-radius:16px;padding
 .poolitem .grow{flex:1;min-width:0}
 .poolitem button{border:1px solid #cde3d3;background:#f4fbf6;color:#1e6b32;border-radius:12px;font-size:12px;padding:4px 10px;font-weight:700;cursor:pointer}
 .poolitem.off{opacity:.45}
+.pblock{border:1px solid #dbe3ec;border-radius:12px;overflow:hidden;margin-bottom:10px}
+.pblock>h4{font-size:14px;margin:0;padding:7px 11px;font-weight:800}
+.prow{display:flex;gap:9px;align-items:center;padding:7px 10px;border-top:1px solid #eef2f6;background:#fff}
+.prow.off{opacity:.5}
+.pthumb{flex:none;width:52px;height:52px;border-radius:9px;overflow:hidden;background:#eef2f6;display:flex;align-items:center;justify-content:center;font-size:22px;color:#95a3b2}
+.pthumb img{width:100%;height:100%;object-fit:cover;display:block}
+.pbody{flex:1;min-width:0}
+.pname{font-weight:800;font-size:14px;line-height:1.3}
+.pvote{font-size:12px;color:#6b7a89;margin-top:2px}
+.pvote b{color:#b3541e}
+.prow button{border:1px solid #cde3d3;background:#f4fbf6;color:#1e6b32;border-radius:12px;font-size:12px;padding:5px 12px;font-weight:700;cursor:pointer;flex:none}
 .tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:8px;scrollbar-width:none}
 .tabs button{flex:none;border:1px solid #dbe3ec;background:#fff;border-radius:14px;padding:5px 12px;font-size:13px;cursor:pointer}
 .tabs button.on{background:#10293f;color:#fff;border-color:#10293f;font-weight:700}
@@ -85,7 +96,7 @@ body.locked .ops,body.locked .leg .row button,body.locked #addBtn{display:none!i
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261015-p5</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261015-p6</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -95,7 +106,6 @@ body.locked .ops,body.locked .leg .row button,body.locked #addBtn{display:none!i
 
 <div class="sheet" id="pool"><div class="card">
   <h2>＋ 加入項目（候選池）</h2>
-  <div class="tabs" id="pooltabs"></div>
   <div id="poolbody"></div>
   <div style="margin-top:10px"><button class="ghost" onclick="closePool()">關閉</button></div>
 </div></div>
@@ -133,7 +143,7 @@ var MODEN={walk:'🚶走路',taxi:'🚕計程車',bus:'🚌公車',mono:'🚝單
 var DEADLINE='2026-12-02T22:00:00+08:00';
 
 /* ================= 狀態 ================= */
-var PLAN=null, curDay='2026-12-17', CATALOG=[], geo={};
+var PLAN=null, curDay='2026-12-17', CATALOG=[], geo={}, VOTES={};
 var cache={legs:{},totals:{}};
 
 function blankDay(){var o={slots:{},legs:{},mealMin:null};SLOTS.forEach(function(s){o.slots[s[0]]=[];});o.legs={};return o;}
@@ -192,11 +202,13 @@ function parseCatalog(html){
  ['s-naha','s-miyako','s-ishigaki'].forEach(function(sid){
   var i=html.indexOf('id="'+sid+'"');if(i<0)return;
   var j=html.indexOf('id="s-',i+10);if(j<0)j=html.indexOf('<!-- ================= MIYAKO',i);if(j<0)j=html.length;
-  var seg=html.slice(i,j);var re=/<div class="card[^"]*"><h3>([\s\S]*?)<\/h3>/g,t,idx=0;
-  while((t=re.exec(seg))){
-   var title=t[1].replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();
-   out.push({id:sid+'#'+idx,t:title,kind:(CARDMAP[sid]||[])[idx]||'',place:sid.replace('s-','')});
-   idx++;}
+  var parts=html.slice(i,j).split(/<div class="card/);parts.shift();
+  parts.forEach(function(p,idx){
+   var tm=p.match(/<h3>([\s\S]*?)<\/h3>/);if(!tm)return;
+   var im=p.match(/<img[^>]+src="([^"]+)"/);
+   var title=tm[1].replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();
+   out.push({id:sid+'#'+idx,t:title,kind:(CARDMAP[sid]||[])[idx]||'',place:sid.replace('s-',''),img:im?im[1]:''});
+  });
  });
  return out;}
 
@@ -274,7 +286,7 @@ function renderStatus(){
 }
 function renderDays(){document.getElementById('days').innerHTML=DAYS.map(function(d){
  return '<button class="day'+(d.k===curDay?' on':'')+'" onclick="pickDay(\''+d.k+'\')">'+d.t.slice(0,5)+'<small>'+esc(d.port)+'</small></button>';}).join('');}
-function pickDay(k){curDay=k;renderDays();renderBoard();if(document.getElementById('pool').classList.contains('on')){poolFilter=dayPlace()||'all';renderPool();}}
+function pickDay(k){curDay=k;renderDays();renderBoard();if(document.getElementById('pool').classList.contains('on'))renderPool();}
 function renderBoard(){
  var d=d0(),it=it0();
  document.body.classList.toggle('locked',frozen());
@@ -390,32 +402,41 @@ function bindDrag(){
 }
 
 /* ================= 候選池 UI ================= */
-var poolFilter='all';
 var PLACEN={naha:'🌺那霸',miyako:'🏝宮古島',ishigaki:'🪨石垣島'};
+var KINDN={spot:'景',food:'餐',shop:'購',souv:'禮',feat:'特'};
+var KINDS=[
+ {k:'spot',n:'📷 景點',bg:'#e8f0fb',fg:'#2b4d8f',bd:'#b9cdf0'},
+ {k:'food',n:'🍜 餐廳',bg:'#fdeeea',fg:'#b3541e',bd:'#f0c9bd'},
+ {k:'shop',n:'🛍 購物',bg:'#eafaf1',fg:'#1e6b32',bd:'#bfe6cd'},
+ {k:'souv',n:'🎁 伴手禮',bg:'#fff6e0',fg:'#8a5a00',bd:'#ecd79a'},
+ {k:'feat',n:'✨ 特色',bg:'#f3ecfb',fg:'#6b3fa0',bd:'#d5c2ee'}];
 function dayPlace(){var p=d0().port;return p==='那霸'?'naha':p==='宮古島'?'miyako':p==='石垣島'?'ishigaki':null;}
-function poolTabs(){var dp=dayPlace();
- var base=dp?[[dp,PLACEN[dp]],['all','其他港口']]:[['all','全部'],['naha','🌺那霸'],['miyako','🏝宮古島'],['ishigaki','🪨石垣島']];
- return base.concat([['food','🍜'],['spot','📷'],['shop','🛍'],['souv','🎁']]);}
+function votesOf(id){return (VOTES&&VOTES[id])||[];}
 function openPool(){if(frozen()){toast('已唯讀');return;}
- var dp=dayPlace();poolFilter=dp||'all';
  document.getElementById('pool').classList.add('on');renderPool();}
 function closePool(){document.getElementById('pool').classList.remove('on');}
-function setPool(p){poolFilter=p;renderPool();}
 function renderPool(){
  var dp=dayPlace();
  document.querySelector('#pool h2').textContent='＋ 加入項目（'+(dp?d0().port+'當天':'全部港口')+'）';
- document.getElementById('pooltabs').innerHTML=poolTabs()
-  .map(function(p){return '<button class="'+(poolFilter===p[0]?'on':'')+'" onclick="setPool(\''+p[0]+'\')">'+p[1]+'</button>';}).join('');
  var added={};DAYS.forEach(function(d){SLOTS.forEach(function(s){(PLAN.items[d.k].slots[s[0]]||[]).forEach(function(o){added[o.id]=1;});});});
- var list=CATALOG.filter(function(c){
-  if(poolFilter==='all')return true;
-  if(['naha','miyako','ishigaki'].indexOf(poolFilter)>=0)return c.place===poolFilter;
-  return c.kind===poolFilter;});
- document.getElementById('poolbody').innerHTML=list.length?list.map(function(c){
-  return '<div class="poolitem'+(added[c.id]?' off':'')+'"><div class="grow">'+esc(c.t)
-   +'<span class="src ai" style="margin-left:6px">'+({food:'餐',spot:'景',shop:'購',souv:'禮',feat:'特'}[c.kind]||'')+'</span></div>'
-   +'<button onclick="addItem(\''+c.id+'\')">'+(added[c.id]?'再加':'加入')+'</button></div>';}).join('')
-  :'<div class="poolitem">沒有符合的項目</div>';
+ var list=CATALOG.filter(function(c){return !dp||c.place===dp;});
+ var h='';
+ KINDS.forEach(function(K){
+  var arr=list.filter(function(c){return c.kind===K.k;});
+  if(!arr.length)return;
+  arr.sort(function(a,b){return votesOf(b.id).length-votesOf(a.id).length||a.id.localeCompare(b.id,undefined,{numeric:true});});
+  h+='<div class="pblock" style="border-color:'+K.bd+'"><h4 style="background:'+K.bg+';color:'+K.fg+'">'+K.n+'（'+arr.length+'）</h4>';
+  h+=arr.map(function(c){
+   var vs=votesOf(c.id);
+   var thumb=c.img?'<div class="pthumb"><img loading="lazy" src="'+esc(c.img)+'" onerror="this.parentNode.textContent=\''+KINDN[c.kind]+'\';"></div>':'<div class="pthumb">'+KINDN[c.kind]+'</div>';
+   var vt=vs.length?('<b>'+vs.length+' 票</b>・'+esc(vs.join('、'))):'尚無投票';
+   return '<div class="prow'+(added[c.id]?' off':'')+'">'+thumb
+    +'<div class="pbody"><div class="pname">'+esc(c.t)+'</div><div class="pvote">'+vt+'</div></div>'
+    +'<button onclick="addItem(\''+c.id+'\')">'+(added[c.id]?'再加':'加入')+'</button></div>';}).join('');
+  h+='</div>';
+ });
+ if(!h)h='<div class="poolitem">此港口沒有可加入的項目</div>';
+ document.getElementById('poolbody').innerHTML=h;
 }
 function addItem(id){
  if(guard())return;
@@ -506,9 +527,14 @@ function boot(){
  .catch(function(e){ensure();renderDays();renderBoard();toast('讀取失敗：'+(e.message||e));});
 }
 fetch('guide.html',{cache:'no-store'}).then(function(r){return r.text();}).then(function(h){CATALOG=parseCatalog(h);}).catch(function(){});
-fetch('https://raw.githubusercontent.com/a4623671/cruise-votes/main/geo.json?t='+Date.now(),{cache:'no-store'})
- .then(function(r){return r.ok?r.json():{};}).catch(function(){return {};})
- .then(function(g){geo=(g&&typeof g==='object')?g:{};boot();});
+var _geoP=fetch('https://raw.githubusercontent.com/a4623671/cruise-votes/main/geo.json?t='+Date.now(),{cache:'no-store'})
+ .then(function(r){return r.ok?r.json():{};}).catch(function(){return {};});
+var _votesP=fetch('https://raw.githubusercontent.com/a4623671/cruise-votes/main/votes.json?t='+Date.now(),{cache:'no-store'})
+ .then(function(r){return r.ok?r.json():{};}).catch(function(){return {};});
+Promise.all([_geoP,_votesP]).then(function(res){
+ geo=(res[0]&&typeof res[0]==='object')?res[0]:{};
+ VOTES=(res[1]&&typeof res[1]==='object')?res[1]:{};
+ boot();});
 </script>
 </body>
 </html>
