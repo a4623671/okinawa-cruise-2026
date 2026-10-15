@@ -273,7 +273,7 @@ function renderStatus(){
 }
 function renderDays(){document.getElementById('days').innerHTML=DAYS.map(function(d){
  return '<button class="day'+(d.k===curDay?' on':'')+'" onclick="pickDay(\''+d.k+'\')">'+d.t.slice(0,5)+'<small>'+esc(d.port)+'</small></button>';}).join('');}
-function pickDay(k){curDay=k;renderDays();renderBoard();}
+function pickDay(k){curDay=k;renderDays();renderBoard();if(document.getElementById('pool').classList.contains('on')){poolFilter=dayPlace()||'all';renderPool();}}
 function renderBoard(){
  var d=d0(),it=it0();
  document.body.classList.toggle('locked',frozen());
@@ -385,11 +385,20 @@ function bindDrag(){
 
 /* ================= 候選池 UI ================= */
 var poolFilter='all';
-function openPool(){if(frozen()){toast('已唯讀');return;}document.getElementById('pool').classList.add('on');renderPool();}
+var PLACEN={naha:'🌺那霸',miyako:'🏝宮古島',ishigaki:'🪨石垣島'};
+function dayPlace(){var p=d0().port;return p==='那霸'?'naha':p==='宮古島'?'miyako':p==='石垣島'?'ishigaki':null;}
+function poolTabs(){var dp=dayPlace();
+ var base=dp?[[dp,PLACEN[dp]],['all','其他港口']]:[['all','全部'],['naha','🌺那霸'],['miyako','🏝宮古島'],['ishigaki','🪨石垣島']];
+ return base.concat([['food','🍜'],['spot','📷'],['shop','🛍'],['souv','🎁']]);}
+function openPool(){if(frozen()){toast('已唯讀');return;}
+ var dp=dayPlace();poolFilter=dp||'all';
+ document.getElementById('pool').classList.add('on');renderPool();}
 function closePool(){document.getElementById('pool').classList.remove('on');}
 function setPool(p){poolFilter=p;renderPool();}
 function renderPool(){
- document.getElementById('pooltabs').innerHTML=[['all','全部'],['naha','🌺那霸'],['miyako','🏝宮古島'],['ishigaki','🪨石垣島'],['food','🍜'],['spot','📷'],['shop','🛍'],['souv','🎁']]
+ var dp=dayPlace();
+ document.querySelector('#pool h2').textContent='＋ 加入項目（'+(dp?d0().port+'當天':'全部港口')+'）';
+ document.getElementById('pooltabs').innerHTML=poolTabs()
   .map(function(p){return '<button class="'+(poolFilter===p[0]?'on':'')+'" onclick="setPool(\''+p[0]+'\')">'+p[1]+'</button>';}).join('');
  var added={};DAYS.forEach(function(d){SLOTS.forEach(function(s){(PLAN.items[d.k].slots[s[0]]||[]).forEach(function(o){added[o.id]=1;});});});
  var list=CATALOG.filter(function(c){
