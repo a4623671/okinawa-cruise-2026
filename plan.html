@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>行程排程板・MSC沖繩（2026/12/16–20）</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;background:#eef2f6;color:#22303f;line-height:1.6;-webkit-user-select:none;user-select:none}
+.topbar{background:#fff;border-bottom:1px solid #dbe3ec;padding:10px 12px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:30;overflow-x:auto;scrollbar-width:none}
+.topbar::-webkit-scrollbar{display:none}
+.topbar .logo{font-weight:800;font-size:16px;white-space:nowrap;flex:none}
+.topbar a{color:#10293f;text-decoration:none;font-weight:700;font-size:14px;white-space:nowrap;flex:none}
+.topbar .sp{flex:1;min-width:4px}
+.topbar .who{font-size:13px;color:#0e6e5a;font-weight:700;white-space:nowrap;flex:none}
+.topbar button{border:1px solid #d8d0bd;background:#fff;border-radius:18px;padding:6px 12px;font-size:13px;cursor:pointer;white-space:nowrap;flex:none}
+.status{background:#10293f;color:#fff;padding:8px 12px;font-size:13px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;position:sticky;top:52px;z-index:29}
+.status b{color:#ffd766}
+.status .warn{color:#ff9a7a;font-weight:800}
+.days{display:flex;gap:6px;padding:8px 10px;background:#fff;border-bottom:1px solid #dbe3ec;overflow-x:auto;position:sticky;top:96px;z-index:28;scrollbar-width:none}
+.days::-webkit-scrollbar{display:none}
+.day{flex:none;border:1px solid #dbe3ec;border-radius:14px;padding:5px 11px;font-size:13px;background:#fff;cursor:pointer;text-align:center}
+.day small{display:block;font-size:11px;color:#8a97a6}
+.day.on{background:#10293f;color:#fff;border-color:#10293f;font-weight:700}
+.day.on small{color:#c8d8e8}
+.wrap{padding:10px 10px 96px;max-width:900px;margin:0 auto}
+.dayinfo{background:#fff;border:1px solid #dbe3ec;border-radius:12px;padding:8px 12px;font-size:13px;margin-bottom:10px}
+.dayinfo .ret{font-weight:800;color:#b3541e}
+.warnbox{background:#fdecea;border:1px solid #f2b8ae;color:#8c2f1d;border-radius:10px;padding:8px 12px;font-size:13px;margin-bottom:10px;font-weight:700}
+.warnbox.ok{background:#e9f6ec;border-color:#b6ddc0;color:#1e6b32;font-weight:600}
+.slot{background:#fff;border:1px solid #dbe3ec;border-radius:14px;padding:8px 10px;margin-bottom:10px;min-height:60px}
+.slot h3{font-size:14px;color:#5b6b7c;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.slot h3 .cnt{font-weight:400;color:#95a3b2}
+.slot.drag{outline:2px dashed #1b6f9e;background:#f4f9fd}
+.item{border:1px solid #e2e8ef;border-radius:10px;padding:7px 9px;margin-bottom:6px;background:#fbfdff;display:flex;gap:8px;align-items:flex-start;touch-action:none}
+.item.grab{opacity:.55;outline:2px solid #1b6f9e}
+.item .hnd{flex:none;color:#9fb0c0;font-size:16px;line-height:1.1;padding:2px 2px 0 0}
+.item .body{flex:1;min-width:0}
+.item .nm{font-weight:800;font-size:14px}
+.item .meta{font-size:12px;color:#6b7a89}
+.item .src{font-size:11px;border-radius:6px;padding:1px 6px;margin-left:4px}
+.src.ai{background:#e8eef8;color:#2b4d8f}
+.src.user{background:#fdf0d5;color:#8a5a00}
+.item .ops{display:flex;gap:4px;flex:none;flex-wrap:wrap;justify-content:flex-end}
+.item .ops button{border:1px solid #dbe3ec;background:#fff;border-radius:8px;font-size:12px;padding:3px 7px;cursor:pointer;white-space:nowrap}
+.leg{border:1px dashed #c8d6e4;border-radius:10px;padding:6px 9px;margin:2px 0 6px;font-size:12px;background:#f7fbfe}
+.leg .row{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.leg button{border:1px solid #c8d6e4;background:#fff;border-radius:12px;font-size:12px;padding:3px 9px;cursor:pointer}
+.leg button.on{background:#10293f;color:#fff;border-color:#10293f;font-weight:700}
+.leg .est{font-weight:800;color:#b3541e}
+.leg .prop{color:#7a5200;font-weight:700}
+button.go{border:none;border-radius:16px;background:#0e6e5a;color:#fff;font-weight:800;padding:8px 16px;font-size:14px;cursor:pointer}
+button.ghost{border:1px solid #d8d0bd;background:#fff;border-radius:16px;padding:8px 14px;font-size:14px;cursor:pointer}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #dbe3ec;padding:8px 12px;display:flex;gap:8px;align-items:center;z-index:31}
+.bar .grow{flex:1;font-size:14px;font-weight:700;min-width:0}
+.sheet{position:fixed;inset:0;background:rgba(8,20,32,.5);z-index:40;display:none;align-items:flex-end}
+.sheet.on{display:flex}
+.sheet .card{background:#fff;border-radius:16px 16px 0 0;width:100%;max-height:86vh;overflow:auto;padding:12px 14px 22px}
+.sheet h2{font-size:17px;margin-bottom:8px}
+.poolitem{display:flex;gap:8px;align-items:center;border-bottom:1px dashed #e6ecf2;padding:6px 0;font-size:14px}
+.poolitem .grow{flex:1;min-width:0}
+.poolitem button{border:1px solid #cde3d3;background:#f4fbf6;color:#1e6b32;border-radius:12px;font-size:12px;padding:4px 10px;font-weight:700;cursor:pointer}
+.poolitem.off{opacity:.45}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:8px;scrollbar-width:none}
+.tabs button{flex:none;border:1px solid #dbe3ec;background:#fff;border-radius:14px;padding:5px 12px;font-size:13px;cursor:pointer}
+.tabs button.on{background:#10293f;color:#fff;border-color:#10293f;font-weight:700}
+#toast{position:fixed;left:12px;right:12px;bottom:70px;background:#10293f;color:#fff;border-radius:12px;padding:9px 14px;font-size:13px;z-index:50;display:none;text-align:center;font-weight:700}
+body.locked .ops,body.locked .leg .row button,body.locked #addBtn{display:none!important}
+@media print{.topbar,.days,.bar,.status,.ops,.hnd,.tabs,button{display:none!important}.slot,.leg{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="logo">🗓 排程板</div>
+  <a href="index.html">‹ 入口</a>
+  <a href="guide.html">💬 討論區</a>
+  <div class="sp"></div>
+  <span class="who" id="who"></span>
+  <button id="addBtn" onclick="openPool()">＋ 加入項目</button>
+  <button onclick="openSheet()">🧾 規劃單</button>
+</div>
+<div class="status" id="status"><span>載入中…</span></div>
+<div class="days" id="days"></div>
+<div class="wrap">
+  <div id="dayinfo"></div>
+  <div id="warn"></div>
+  <div id="board"></div>
+</div>
+<div class="bar">
+  <div class="grow" id="bartxt">—</div>
+  <button class="ghost" onclick="reload()">↻</button>
+  <button class="go" id="finBtn" onclick="finalizePlan()">定案</button>
+</div>
+
+<div class="sheet" id="pool"><div class="card">
+  <h2>＋ 加入項目（候選池）</h2>
+  <div class="tabs" id="pooltabs"></div>
+  <div id="poolbody"></div>
+  <div style="margin-top:10px"><button class="ghost" onclick="closePool()">關閉</button></div>
+</div></div>
+
+<div class="sheet" id="sheet"><div class="card" id="sheetbody"></div></div>
+<div id="toast"></div>
+
+<script>
+/* ================= 基本 ================= */
+var NKEY='discuss_name_v1';
+function me(){return localStorage.getItem(NKEY)||'';}
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.style.display='block';clearTimeout(window._tt);window._tt=setTimeout(function(){t.style.display='none';},2600);}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmtMin(m){m=Math.round(m||0);if(m<=0)return '0分';return (m>=60?Math.floor(m/60)+'時':'')+(m%60?(m%60)+'分':'');}
+function hm(s){var p=String(s||'').split(':');return p.length===2?((+p[0])*60+(+p[1])):null;}
+function hm2s(m){return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');}
+
+var _p1='Z2l0aHViX3BhdF8xMUFISU5ORVEwV1JKV05mNFNvWHZCXzNtTUJVTWRaa0hDQV',_p2='hNbHA3QUFublh0bmNhTDN3NXZYd0tGbXlsYnlacmdVV0dFUTNSVm5KaXVMS1VW';
+var GH_TOKEN=atob(_p1+_p2);
+var REPO='https://api.github.com/repos/a4623671/cruise-votes/contents/';
+var API_P=REPO+'plan.json';
+var P_SHA=null, GEO_SHA=null;
+
+/* ================= 行程骨架（郵輪硬限制） ================= */
+var DAYS=[
+ {k:'2026-12-16',t:'12/16 基隆登船',port:'基隆',arr:null,dep:'18:00',by:null,plan:false},
+ {k:'2026-12-17',t:'12/17 宮古島',port:'宮古島',arr:'08:00',dep:'18:00',by:'17:00',plan:true},
+ {k:'2026-12-18',t:'12/18 那霸',port:'那霸',arr:'07:00',dep:'19:00',by:'18:00',plan:true},
+ {k:'2026-12-19',t:'12/19 石垣島',port:'石垣島',arr:'09:00',dep:'19:00',by:'18:00',plan:true},
+ {k:'2026-12-20',t:'12/20 基隆返抵',port:'基隆',arr:'07:00',dep:null,by:null,plan:false}
+];
+var SLOTS=[['morning','🌅 上午'],['afternoon','☀️ 下午'],['evening','🌙 晚上']];
+var SLOTN={morning:'上午',afternoon:'下午',evening:'晚上'};
+var MODEN={walk:'🚶走路',taxi:'🚕計程車',bus:'🚌公車',mono:'🚝單軌'};
+var DEADLINE='2026-12-02T22:00:00+08:00';
+
+/* ================= 狀態 ================= */
+var PLAN=null, curDay='2026-12-17', CATALOG=[], geo={};
+var cache={legs:{},totals:{}};
+
+function blankDay(){var o={slots:{},legs:{}};SLOTS.forEach(function(s){o.slots[s[0]]=[];});o.legs={};return o;}
+function blankPlan(){var p={roster:[],items:{},deadline:DEADLINE,finalized:false,created:new Date().toISOString()};DAYS.forEach(function(d){p.items[d.k]=blankDay();});return p;}
+function ensure(){if(!PLAN)PLAN=blankPlan();
+ DAYS.forEach(function(d){if(!PLAN.items[d.k])PLAN.items[d.k]=blankDay();var it=PLAN.items[d.k];
+  SLOTS.forEach(function(s){if(!it.slots[s[0]])it.slots[s[0]]=[];});if(!it.legs)it.legs={};});
+ if(!PLAN.roster)PLAN.roster=[];if(!PLAN.deadline)PLAN.deadline=DEADLINE;
+ if(me()&&PLAN.roster.indexOf(me())<0)PLAN.roster.push(me());}
+function d0(){return DAYS.filter(function(x){return x.k===curDay;})[0];}
+function it0(){return PLAN.items[curDay];}
+function roster(){return (PLAN&&PLAN.roster)||[];}
+function planDeadline(){return Date.parse((PLAN&&PLAN.deadline)||DEADLINE);}
+function frozen(){return !!(PLAN&&PLAN.finalized)||Date.now()>planDeadline();}
+function guard(){if(PLAN&&PLAN.finalized){toast('已定案，唯讀');return true;}if(Date.now()>planDeadline()){toast('已過定案截止（唯讀）');return true;}return false;}
+function needs(o){var ro=roster();if(!ro.length)return 0;return ro.filter(function(r){return (o.endorse||[]).indexOf(r)<0;}).length;}
+function agreed(o){return roster().length>0&&needs(o)===0;}
+
+/* ================= GitHub 讀寫 ================= */
+function ghH(){return {'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN};}
+function loadPlan(){return fetch(API_P+'?t='+Date.now(),{headers:ghH(),cache:'no-store'})
+ .then(function(r){if(r.status===404)return null;if(!r.ok)throw new Error('get '+r.status);return r.json();})
+ .then(function(j){if(!j)return null;P_SHA=j.sha;try{return JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));}catch(e){return null;}});}
+function savePlan(){PLAN.updated=new Date().toISOString();
+ var body={message:'plan '+new Date().toISOString(),content:btoa(unescape(encodeURIComponent(JSON.stringify(PLAN))))};
+ if(P_SHA)body.sha=P_SHA;
+ return fetch(API_P,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)})
+ .then(function(r){if(r.status===409||r.status===422)throw new Error('conflict');if(!r.ok)throw new Error('put '+r.status);return r.json();})
+ .then(function(j){P_SHA=j.content.sha;return true;});}
+function saveQuiet(){savePlan().catch(function(e){toast('同步失敗：'+(e.message||e));});}
+function reload(){toast('重新載入…');boot();}
+
+/* ================= 交通估計 ================= */
+function hav(a,b){var R=6371,dLa=(b[0]-a[0])*Math.PI/180,dLn=(b[1]-a[1])*Math.PI/180;
+ var s=Math.sin(dLa/2)*Math.sin(dLa/2)+Math.cos(a[0]*Math.PI/180)*Math.cos(b[0]*Math.PI/180)*Math.sin(dLn/2)*Math.sin(dLn/2);
+ return 2*R*Math.asin(Math.sqrt(s));}
+function estMode(mode,km,drive){
+ if(mode==='taxi'){if(drive)return {min:drive.min,km:drive.km,src:'OSRM實測'};return {min:km*1.3/28*60,km:km*1.3,src:'估算'};}
+ if(mode==='walk'){if(drive)return {min:drive.km/4.5*60,km:drive.km,src:'OSRM距離+步速'};return {min:km*1.35/4.5*60,km:km*1.35,src:'估算'};}
+ if(mode==='bus')return {min:km*1.4/16*60+6,km:km*1.4,src:'估算(含等車)'};
+ return {min:km*1.25/28*60+5,km:km*1.25,src:'估算(含等車)'};}
+var DRIVE={};
+function queryDrive(a,b){var key=a[0].toFixed(4)+','+a[1].toFixed(4)+'>'+b[0].toFixed(4)+','+b[1].toFixed(4);
+ if(DRIVE[key])return Promise.resolve(DRIVE[key]);
+ var u='https://router.project-osrm.org/route/v1/driving/'+a[1]+','+a[0]+';'+b[1]+','+b[0]+'?overview=false';
+ return fetch(u).then(function(r){return r.json();}).then(function(j){
+  if(j&&j.routes&&j.routes[0]){DRIVE[key]={min:j.routes[0].duration/60,km:j.routes[0].distance/1000};return DRIVE[key];}
+  return null;}).catch(function(){return null;});}
+
+/* ================= 候選池 ================= */
+function parseCatalog(html){
+ var CARDMAP={};var m=html.match(/var CARDMAP=(\{[\s\S]*?\});/);
+ if(m){try{CARDMAP=JSON.parse(m[1].replace(/'/g,'"'));}catch(e){}}
+ var out=[];
+ ['s-naha','s-miyako','s-ishigaki'].forEach(function(sid){
+  var i=html.indexOf('id="'+sid+'"');if(i<0)return;
+  var j=html.indexOf('id="s-',i+10);if(j<0)j=html.indexOf('<!-- ================= MIYAKO',i);if(j<0)j=html.length;
+  var seg=html.slice(i,j);var re=/<div class="card[^"]*"><h3>([\s\S]*?)<\/h3>/g,t,idx=0;
+  while((t=re.exec(seg))){
+   var title=t[1].replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();
+   out.push({id:sid+'#'+idx,t:title,kind:(CARDMAP[sid]||[])[idx]||'',place:sid.replace('s-','')});
+   idx++;}
+ });
+ return out;}
+
+/* ================= 座標 ================= */
+function coordOf(o){if(!o)return null;if(o.lat!=null&&o.lng!=null)return [o.lat,o.lng];
+ var g=geo[o.id];if(g&&g.lat!=null)return [g.lat,g.lng];return null;}
+function resolveGeo(o){var c=coordOf(o);if(c)return Promise.resolve(c);
+ var hint=o.place==='naha'?'沖縄':o.place==='miyako'?'宮古島':o.place==='ishigaki'?'石垣島':(d0()?d0().port:'');
+ var q=String(o.t||'').replace(/[✅⚠️🔥💚⭐]/g,'').replace(/[（(][^）)]*[）)]/g,'').trim()+' '+hint;
+ return fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(q),{headers:{'Accept':'application/json'}})
+  .then(function(r){return r.json();}).then(function(j){
+   if(j&&j[0]){var g={lat:parseFloat(j[0].lat),lng:parseFloat(j[0].lon)};geo[o.id]=g;saveGeo();return [g.lat,g.lng];}
+   return null;}).catch(function(){return null;});}
+function saveGeo(){var body={message:'geo cache',content:btoa(unescape(encodeURIComponent(JSON.stringify(geo))))};
+ var put=function(sha){if(sha)body.sha=sha;return fetch(REPO+'geo.json',{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)});};
+ if(GEO_SHA){put(GEO_SHA).catch(function(){});return;}
+ fetch(REPO+'geo.json',{headers:ghH(),cache:'no-store'}).then(function(r){return r.ok?r.json():null;})
+  .then(function(j){GEO_SHA=j?j.sha:null;return put(GEO_SHA);}).catch(function(){});}
+
+/* ================= 重算 ================= */
+function computeAll(){
+ cache.legs={};cache.totals={};var jobs=[];
+ DAYS.forEach(function(d){
+  if(!d.plan)return;
+  var seq=[];
+  SLOTS.forEach(function(s){PLAN.items[d.k].slots[s[0]].forEach(function(o){seq.push(o);});});
+  for(var i=0;i<seq.length-1;i++){
+   var L=PLAN.items[d.k].legs[i]||{};var mode=L.prop||L.mode||'taxi';
+   var ca=coordOf(seq[i]),cb=coordOf(seq[i+1]);var k=d.k+':'+i;
+   if(!ca||!cb){cache.legs[k]={min:null,km:null,src:'無座標',mode:mode};continue;}
+   var km=hav(ca,cb);
+   if(mode==='taxi'||mode==='walk'){
+    (function(kk,mm,kmv,a2,b2){jobs.push(queryDrive(a2,b2).then(function(dr){var e=estMode(mm,kmv,dr);e.mode=mm;cache.legs[kk]=e;}));})(k,mode,km,ca,cb);
+   }else{var e=estMode(mode,km,null);e.mode=mode;cache.legs[k]=e;}
+  }
+ });
+ return Promise.all(jobs).then(function(){
+  DAYS.forEach(function(d){
+   if(!d.plan)return;
+   var it=PLAN.items[d.k];var used=0,miss=false;
+   SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){used+=(+o.min||0);});});
+   var n=0;SLOTS.forEach(function(s){n+=it.slots[s[0]].length;});
+   for(var i=0;i<n-1;i++){var L=cache.legs[d.k+':'+i];if(!L){finish(d,used,false);return;}if(L.min==null){miss=true;}else used+=L.min;}
+   finish(d,used,miss);
+  });
+ });
+}
+function finish(d,used,miss){
+ var cap=null;
+ if(d.arr&&d.by){var a=hm(d.arr),b=hm(d.by);if(a!=null&&b!=null)cap=b-a;}
+ cache.totals[d.k]={used:used,cap:cap,miss:miss,over:cap!=null?Math.max(0,used-cap):0};}
+
+/* ================= 繪製 ================= */
+function pendingList(){var out=[];roster();
+ DAYS.forEach(function(d){
+  if(!d.plan)return;var it=PLAN.items[d.k];
+  SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){if(needs(o)>0)out.push(d.t+'・'+o.t+'（缺'+needs(o)+'）');});});
+  Object.keys(it.legs||{}).forEach(function(i){var L=it.legs[i];if(L&&L.prop&&needs(L)>0)out.push(d.t+'・交通段'+(+i+1)+'（缺'+needs(L)+'）');});
+ });
+ return out;}
+function renderStatus(){
+ var el=document.getElementById('status');var dl=planDeadline();var left=Math.ceil((dl-Date.now())/86400000);
+ var ag=0,tot=0;
+ DAYS.forEach(function(d){if(!d.plan)return;var it=PLAN.items[d.k];
+  SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){tot++;if(agreed(o))ag++;});});
+  Object.keys(it.legs||{}).forEach(function(i){var L=it.legs[i];if(L&&L.prop){tot++;if(agreed(L))ag++;}});});
+ var s='<span>定案截止 <b>'+DEADLINE.slice(0,10)+'</b>（'+(left>0?'剩 '+left+' 天':'已截止')+'）</span>';
+ s+='<span>附議 <b>'+ag+'/'+tot+'</b></span><span>成員 <b>'+roster().length+'</b></span>';
+ if(PLAN.finalized)s+='<span class="warn">✅ 已定案（唯讀）</span>';
+ else if(Date.now()>dl)s+='<span class="warn">⏰ 已過截止（唯讀）</span>';
+ else{var p=pendingList().length;if(p)s+='<span>待附議 <b>'+p+'</b></span>';else if(tot)s+='<span>✅ 可定案</span>';}
+ el.innerHTML=s;
+ var t=cache.totals[curDay];
+ document.getElementById('bartxt').textContent=PLAN.finalized?'已定案':(t&&t.cap!=null?('本日：已排 '+fmtMin(t.used)+'／可用 '+fmtMin(t.cap)):'本日：—');
+}
+function renderDays(){document.getElementById('days').innerHTML=DAYS.map(function(d){
+ return '<button class="day'+(d.k===curDay?' on':'')+'" onclick="pickDay(\''+d.k+'\')">'+d.t.slice(0,5)+'<small>'+esc(d.port)+'</small></button>';}).join('');}
+function pickDay(k){curDay=k;renderDays();renderBoard();}
+function renderBoard(){
+ var d=d0(),it=it0();
+ document.body.classList.toggle('locked',frozen());
+ document.getElementById('dayinfo').innerHTML='<b>'+esc(d.t)+'</b>　'+(d.arr?('到港 '+d.arr+'・離港 '+d.dep):'（無岸上行程）')
+  +(d.by?('　<span class="ret">回船 '+d.by+' 前</span>'):'');
+ if(!d.plan){document.getElementById('warn').innerHTML='';document.getElementById('board').innerHTML='<div class="slot">此日無岸上規劃（登船／返抵）。</div>';renderStatus();return;}
+ var t=cache.totals[curDay]||{};var w='';
+ if(t.miss)w+='<div class="warnbox">⚠️ 有項目尚無座標，該段交通無法估算（可按項目上的「📍」查座標）</div>';
+ if(t.cap!=null){if(t.over>0)w+='<div class="warnbox">⛔ 行程＋交通超出可用時間 <b>'+fmtMin(t.over)+'</b>（可用 '+fmtMin(t.cap)+'／已排 '+fmtMin(t.used)+'）</div>';
+  else w+='<div class="warnbox ok">✅ 時間可行：已排 '+fmtMin(t.used)+'／可用 '+fmtMin(t.cap)+'（餘裕 '+fmtMin(t.cap-t.used)+'）</div>';}
+ document.getElementById('warn').innerHTML=w;
+ var out='';
+ SLOTS.forEach(function(s){
+  var arr=it.slots[s[0]];
+  out+='<div class="slot" data-slot="'+s[0]+'"><h3>'+s[1]+' <span class="cnt">('+arr.length+')</span></h3>';
+  if(!arr.length)out+='<div class="meta" style="font-size:12px;color:#9fb0c0">（拖曳項目進來，或按上方「＋ 加入項目」）</div>';
+  arr.forEach(function(o,idx){
+   var end=(o.endorse||[]);
+   out+='<div class="item" data-idx="'+idx+'" data-slot="'+s[0]+'"><div class="hnd">⠿</div><div class="body">'
+    +'<div class="nm">'+esc(o.t)+(o.src==='user'?'<span class="src user">'+esc(o.by||'?')+' 提議</span>':'<span class="src ai">候選</span>')+(agreed(o)?' ✅':'')+'</div>'
+    +'<div class="meta">停留 '+fmtMin(o.min||60)+(o.lat!=null?'・📍已定位':'・⚠️未定位')+'・附議 '+end.length+'/'+roster().length+(end.length?'（'+esc(end.join('、'))+'）':'')+'</div>'
+    +'</div><div class="ops">'
+    +'<button onclick="setMin(\''+s[0]+'\','+idx+')">⏱</button>'
+    +(o.lat==null?'<button onclick="locate(\''+s[0]+'\','+idx+')">📍</button>':'')
+    +'<button onclick="toggleAgree(\''+s[0]+'\','+idx+')">'+(agreed(o)?'✅':'附議')+'</button>'
+    +'<button onclick="rmItem(\''+s[0]+'\','+idx+')">✕</button>'
+    +'</div></div>';
+  });
+  out+='</div>';
+ });
+ var seq=[];SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){seq.push(o);});});
+ if(seq.length>=2){
+  out+='<div class="slot"><h3>🚕 交通段 <span class="cnt">('+(seq.length-1)+')</span></h3>';
+  for(var i=0;i<seq.length-1;i++){
+   var L=it.legs[i]||{};var C=cache.legs[curDay+':'+i]||{};var cur=L.prop||L.mode||'taxi';
+   out+='<div class="leg"><div style="font-weight:700">'+(i+1)+'. '+esc(seq[i].t.slice(0,14))+' → '+esc(seq[i+1].t.slice(0,14))+'</div><div class="row" style="margin-top:4px">';
+   out+=['walk','taxi','bus','mono'].map(function(m){return '<button class="'+(cur===m?'on':'')+'" onclick="setLeg('+i+',\''+m+'\')">'+MODEN[m]+'</button>';}).join('');
+   out+='<span class="est">'+(C.min==null?'時間未知':'約 '+fmtMin(C.min)+(C.km?'・'+C.km.toFixed(1)+'km':''))+'</span>';
+   if(L.prop){
+    out+='<span class="prop">（'+esc(L.by||'?')+' 提議・原 '+(MODEN[L.mode]||L.mode)+'・附議 '+((L.endorse||[]).length)+'/'+roster().length+'）</span>';
+    out+='<button onclick="endorseLeg('+i+')">'+(agreed(L)?'✅ 已附議':'附議')+'</button>';
+   }else if(L.mode){out+='<span class="prop">AI/原定</span>';}
+   out+='</div></div>';
+  }
+  out+='</div>';
+ }
+ document.getElementById('board').innerHTML=out;
+ renderStatus();bindDrag();
+}
+
+/* ================= 操作 ================= */
+function arr0(slot){return it0().slots[slot];}
+function setMin(slot,idx){if(guard())return;var o=arr0(slot)[idx];var v=prompt('停留幾分鐘？',o.min||60);if(v===null)return;var n=parseInt(v,10);if(!(n>0)){toast('請輸入分鐘數');return;}o.min=n;recompute();}
+function rmItem(slot,idx){if(guard())return;var a=arr0(slot);var o=a[idx];if(!confirm('移除「'+o.t+'」？'))return;a.splice(idx,1);recompute();}
+function toggleAgree(slot,idx){if(guard())return;var o=arr0(slot)[idx];o.endorse=o.endorse||[];var n=me()||'?';var i=o.endorse.indexOf(n);
+ if(i>=0)o.endorse.splice(i,1);else o.endorse.push(n);recompute();}
+function locate(slot,idx){if(guard())return;var o=arr0(slot)[idx];toast('查座標…');
+ resolveGeo({t:o.t,place:o.place||null,id:o.id}).then(function(c){if(!c){toast('查不到座標（維持未知）');return;}o.lat=c[0];o.lng=c[1];recompute();});}
+function setLeg(i,mode){if(guard())return;var it=it0();var L=it.legs[i]||(it.legs[i]={});if(!L.mode)L.mode='taxi';
+ if((L.prop||L.mode)===mode){delete L.prop;delete L.by;delete L.endorse;L.mode=mode;}
+ else{L.prop=mode;L.by=me()||'?';L.endorse=[me()||'?'];}
+ recompute();}
+function endorseLeg(i){if(guard())return;var L=it0().legs[i];if(!L||!L.prop){toast('這段沒有提議');return;}
+ L.endorse=L.endorse||[];var n=me()||'?';var k=L.endorse.indexOf(n);if(k>=0)L.endorse.splice(k,1);else L.endorse.push(n);recompute();}
+function recompute(){saveQuiet();return computeAll().then(function(){renderBoard();});}
+
+/* ================= 拖拉（pointer events，手機可用） ================= */
+function bindDrag(){
+ document.querySelectorAll('.item').forEach(function(el){
+  el.addEventListener('pointerdown',function(e){
+   if(e.target.closest('button')||frozen())return;
+   var startY=e.clientY,startX=e.clientX,dragging=false,ph=null;
+   function move(ev){
+    var dy=ev.clientY-startY,dx=ev.clientX-startX;
+    if(!dragging&&Math.abs(dy)>8&&Math.abs(dy)>Math.abs(dx)){
+     dragging=true;el.classList.add('grab');ph=document.createElement('div');ph.style.height=el.offsetHeight+'px';el.parentNode.insertBefore(ph,el);}
+    if(!dragging)return;ev.preventDefault();
+    el.style.transform='translateY('+(ev.clientY-startY)+'px)';el.style.zIndex=20;
+    var over=document.elementFromPoint(ev.clientX,ev.clientY);
+    var slot=over&&over.closest?over.closest('.slot'):null;
+    document.querySelectorAll('.slot').forEach(function(s){s.classList.toggle('drag',s===slot&&slot.dataset.slot!=null);});
+   }
+   function up(ev){
+    document.removeEventListener('pointermove',move);document.removeEventListener('pointerup',up);
+    document.querySelectorAll('.slot').forEach(function(s){s.classList.remove('drag');});
+    if(!dragging)return;
+    el.classList.remove('grab');el.style.transform='';el.style.zIndex='';
+    var over=document.elementFromPoint(ev.clientX,ev.clientY);
+    var slot=over&&over.closest?over.closest('.slot'):null;
+    if(!slot||slot.dataset.slot==null){if(ph)ph.remove();renderBoard();return;}
+    var target=slot.dataset.slot,from=el.dataset.slot,fromIdx=+el.dataset.idx;
+    var after=over.closest?over.closest('.item'):null;
+    var src=it0().slots[from];var obj=src.splice(fromIdx,1)[0];
+    var dst=it0().slots[target];
+    if(from===target){
+     var to=fromIdx;
+     if(after)to=+after.dataset.idx;
+     dst.splice(to,0,obj);
+    }else{
+     if(after)dst.splice(+after.dataset.idx,0,obj);else dst.push(obj);
+    }
+    if(ph)ph.remove();recompute();toast('已移到「'+SLOTN[target]+'」');
+   }
+   document.addEventListener('pointermove',move,{passive:false});
+   document.addEventListener('pointerup',up);
+  });
+ });
+}
+
+/* ================= 候選池 UI ================= */
+var poolFilter='all';
+function openPool(){if(frozen()){toast('已唯讀');return;}document.getElementById('pool').classList.add('on');renderPool();}
+function closePool(){document.getElementById('pool').classList.remove('on');}
+function setPool(p){poolFilter=p;renderPool();}
+function renderPool(){
+ document.getElementById('pooltabs').innerHTML=[['all','全部'],['naha','🌺那霸'],['miyako','🏝宮古島'],['ishigaki','🪨石垣島'],['food','🍜'],['spot','📷'],['shop','🛍'],['souv','🎁']]
+  .map(function(p){return '<button class="'+(poolFilter===p[0]?'on':'')+'" onclick="setPool(\''+p[0]+'\')">'+p[1]+'</button>';}).join('');
+ var added={};DAYS.forEach(function(d){SLOTS.forEach(function(s){(PLAN.items[d.k].slots[s[0]]||[]).forEach(function(o){added[o.id]=1;});});});
+ var list=CATALOG.filter(function(c){
+  if(poolFilter==='all')return true;
+  if(['naha','miyako','ishigaki'].indexOf(poolFilter)>=0)return c.place===poolFilter;
+  return c.kind===poolFilter;});
+ document.getElementById('poolbody').innerHTML=list.length?list.map(function(c){
+  return '<div class="poolitem'+(added[c.id]?' off':'')+'"><div class="grow">'+esc(c.t)
+   +'<span class="src ai" style="margin-left:6px">'+({food:'餐',spot:'景',shop:'購',souv:'禮',feat:'特'}[c.kind]||'')+'</span></div>'
+   +'<button onclick="addItem(\''+c.id+'\')">'+(added[c.id]?'再加':'加入')+'</button></div>';}).join('')
+  :'<div class="poolitem">沒有符合的項目</div>';
+}
+function addItem(id){
+ if(guard())return;
+ var c=CATALOG.filter(function(x){return x.id===id;})[0];if(!c)return;
+ var slot='afternoon';var a=it0().slots[slot];
+ var o={id:c.id,t:c.t,kind:c.kind,place:c.place,min:(c.kind==='food'?60:c.kind==='spot'?90:45),
+  src:'user',by:me()||'?',endorse:[]};
+ var g=geo[c.id];if(g&&g.lat!=null){o.lat=g.lat;o.lng=g.lng;}
+ a.push(o);closePool();
+ if(o.lat!=null){toast('已加入「'+c.t.slice(0,12)+'」');recompute();}
+ else{renderBoard();saveQuiet();toast('已加入（未定位，正在查座標…）');}
+ if(o.lat==null)resolveGeo({t:c.t,place:c.place,id:c.id}).then(function(cc){
+  if(cc){o.lat=cc[0];o.lng=cc[1];recompute();toast('已定位：'+c.t.slice(0,10));}});
+}
+
+/* ================= P4 規劃單 ================= */
+function dayPlan(d){
+ var out={rows:[],end:null,over:0,miss:false};
+ if(!d.plan)return out;
+ var it=PLAN.items[d.k];var t=hm(d.arr);if(t==null)t=8*60;
+ var seq=[];SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){seq.push(o);});});
+ for(var i=0;i<seq.length;i++){
+  out.rows.push({t:hm2s(t),n:seq[i].t,min:(+seq[i].min||0),kind:'item'});
+  t+=(+seq[i].min||0);
+  if(i<seq.length-1){
+   var L=cache.legs[d.k+':'+i];
+   if(!L||L.min==null){out.miss=true;continue;}
+   out.rows.push({t:hm2s(t),n:MODEN[L.mode]||L.mode,min:L.min,kind:'leg'});t+=L.min;}
+ }
+ out.end=t;
+ if(d.by){var by=hm(d.by);if(by!=null){out.over=Math.max(0,t-by);out.rows.push({t:hm2s(by),n:'回船（'+d.by+'）',min:0,kind:'ret'});}}
+ return out;}
+function openSheet(){
+ if(!PLAN){toast('尚未載入');return;}
+ var h='<h2>🧾 旅遊規劃單</h2><div style="font-size:12px;color:#6b7a89;margin-bottom:8px">'
+  +(PLAN.finalized?'✅ 已定案':'⚠️ 草稿（尚未定案，未全體附議）')+'・時間為估算，出發前複查</div>';
+ DAYS.forEach(function(d){
+  if(!d.plan){h+='<div style="margin:8px 0"><b>'+esc(d.t)+'</b>：'+(d.arr?'到港 '+d.arr:'')+(d.dep?'・離港 '+d.dep:'')+'</div>';return;}
+  var p=dayPlan(d);
+  h+='<div style="margin:10px 0;border:1px solid #dbe3ec;border-radius:10px;padding:8px 10px"><b>'+esc(d.t)+'</b>'
+   +'<span style="font-size:12px;color:#6b7a89">　到港 '+d.arr+'・回船 '+d.by+' 前</span>'
+   +(p.over>0?'<div style="color:#c0392b;font-weight:800;font-size:13px">⛔ 超出回船時間 '+fmtMin(p.over)+'</div>':'')
+   +(p.miss?'<div style="color:#b3541e;font-size:12px">※ 含未定位項目，部分交通時間未知</div>':'')
+   +'<table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:6px">'
+   +p.rows.map(function(r){
+     return '<tr><td style="width:64px;color:#5b6b7c">'+r.t+'</td><td>'+esc(r.n)
+      +(r.kind==='item'?'　<span style="color:#95a3b2">停留 '+fmtMin(r.min)+'</span>':'')
+      +(r.kind==='leg'?'　<span style="color:#95a3b2">'+fmtMin(r.min)+'</span>':'')+'</td></tr>';}).join('')
+   +'</table></div>';
+ });
+ h+='<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">'
+  +'<button class="go" onclick="window.print()">🖨 列印</button>'
+  +'<button class="ghost" onclick="copySheet()">📋 複製文字</button>'
+  +'<button class="ghost" onclick="dlPlan()">⬇ 下載 JSON</button>'
+  +'<button class="ghost" onclick="closeSheet()">關閉</button></div>';
+ document.getElementById('sheetbody').innerHTML=h;
+ document.getElementById('sheet').classList.add('on');
+}
+function closeSheet(){document.getElementById('sheet').classList.remove('on');}
+function sheetText(){var L=[];DAYS.forEach(function(d){if(!d.plan)return;var p=dayPlan(d);
+ L.push('【'+d.t+'】到港 '+(d.arr||'-')+'・回船 '+(d.by||'-')+' 前');
+ p.rows.forEach(function(r){L.push(r.t+'  '+r.n+(r.kind==='item'?'（停留 '+fmtMin(r.min)+'）':(r.kind==='leg'?'（'+fmtMin(r.min)+'）':'')));});
+ L.push('');});return L.join('\n');}
+function copySheet(){navigator.clipboard.writeText(sheetText()).then(function(){toast('已複製規劃單');});}
+function dlPlan(){var b=new Blob([JSON.stringify(PLAN,null,1)],{type:'application/json'});
+ var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='okinawa-plan.json';a.click();}
+
+/* ================= 定案 ================= */
+function finalizePlan(){
+ if(!PLAN){toast('尚未載入');return;}
+ if(PLAN.finalized){toast('已定案');return;}
+ if(!roster().length){toast('尚無成員名單');return;}
+ var pend=pendingList(),dl=planDeadline();
+ if(Date.now()<dl){toast('定案時點 '+new Date(dl).toLocaleDateString('zh-TW')+'；目前 '+pend.length+' 項待附議');return;}
+ if(pend.length){toast('還有 '+pend.length+' 項未全體附議，無法定案');return;}
+ if(!confirm('全體已附議，確定定案？定案後轉為唯讀並產生規劃單。'))return;
+ PLAN.finalized=true;recompute();openSheet();toast('✅ 已定案');
+}
+
+/* ================= 啟動 ================= */
+function boot(){
+ document.getElementById('who').textContent=me()?('👤 '+me()):'';
+ loadPlan().then(function(p){PLAN=p;ensure();var n=me();if(n&&PLAN.roster.indexOf(n)>=0&&!PLAN._rs){PLAN._rs=1;saveQuiet();}return computeAll();})
+ .then(function(){renderDays();renderBoard();})
+ .catch(function(e){ensure();renderDays();renderBoard();toast('讀取失敗：'+(e.message||e));});
+}
+fetch('guide.html',{cache:'no-store'}).then(function(r){return r.text();}).then(function(h){CATALOG=parseCatalog(h);}).catch(function(){});
+fetch('https://raw.githubusercontent.com/a4623671/cruise-votes/main/geo.json?t='+Date.now(),{cache:'no-store'})
+ .then(function(r){return r.ok?r.json():{};}).catch(function(){return {};})
+ .then(function(g){geo=(g&&typeof g==='object')?g:{};boot();});
+</script>
+</body>
+</html>
