@@ -110,8 +110,11 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
 .menu .moverow{display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
 .menu .moverow>span{font-size:13px;color:#6b7a89}
 .menu .moverow button{display:inline-block;width:auto;margin-bottom:0;padding:8px 10px;font-size:14px;flex:1;text-align:center}
-#mapov{position:fixed;inset:0;background:#fff;z-index:70;display:none;flex-direction:column}
+#mapfab{position:fixed;right:12px;bottom:74px;z-index:32;width:54px;height:54px;border-radius:50%;border:1px solid #d8d0bd;background:#fff;font-size:24px;line-height:1;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.25)}
+#mapfab:active{background:#f2f6fa}
+#mapov{position:fixed;inset:0;background:rgba(8,20,32,.45);z-index:70;display:none;align-items:center;justify-content:center;padding:10px}
 #mapov.on{display:flex}
+#mapcard{background:#fff;border-radius:16px;width:100%;max-width:720px;height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.4)}
 #mapbar{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid #dbe3ec;overflow-x:auto;scrollbar-width:none;flex:none}
 #mapbar::-webkit-scrollbar{display:none}
 #mapbar .day{flex:none;border:1px solid #d8d0bd;border-radius:14px;padding:5px 10px;font-size:13px;background:#fff;cursor:pointer;white-space:nowrap}
@@ -134,7 +137,6 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <a href="guide.html">💬 討論區</a>
   <div class="sp"></div>
   <span class="who" id="who"></span>
-  <button id="mapBtn" onclick="openPlanMap()">🗺 地圖</button>
   <button id="addBtn" onclick="openPool()">＋ 加入項目</button>
   <button onclick="openSheet()">🧾 規劃單</button>
 </div>
@@ -144,7 +146,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p15</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p16</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -159,10 +161,13 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
 
 <div class="sheet" id="sheet"><div class="card" id="sheetbody"></div></div>
 <div class="sheet" id="imenu"><div class="card" id="imenubody"></div></div>
-<div id="mapov">
+<button id="mapfab" onclick="openPlanMap()" title="行程地圖">🗺</button>
+<div id="mapov" onclick="if(event.target===this)closePlanMap()">
+ <div id="mapcard">
   <div id="mapbar"><span class="t">🗺 行程地圖</span><span id="mapdays"></span><div class="sp" style="flex:1"></div><button class="xbtn" onclick="closePlanMap()">✕</button></div>
   <div id="mapwrap"></div>
   <div id="mapfoot"></div>
+ </div>
 </div>
 <div class="mask" id="pdetail" onclick="if(event.target===this)closePdetail()"><div class="pd" id="pdetailbody"></div></div>
 <div id="toast"></div>
@@ -785,17 +790,22 @@ function drawPlanMap(){
     .addTo(PMAP).bindPopup('<b>'+esc(d.t)+'・'+esc(d.port)+'</b><br>'+(i+1)+'. '+esc(p.n)+'<br><a target="_blank" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(p.n.replace(/^港口 /,''))+'">Google 導航</a>');
    bounds.push([p.lat,p.lng]);
   });
-  legend.push({d:d,col:col,n:pts.length-(pc?1:0)});
-  if(!showAll||wk)links.push({d:d,pts:pts.slice(pc?1:0)});
+  legend.push({d:d,col:col,n:pts.length});
+  links.push({d:d,pts:pts});
  });
  var f='';
  if(!anyPts)f='<span class="warn">還沒有可定位的行程（用「＋ 加入項目」加入，缺座標用 ⋯ → 📍 補）</span>';
  else{
   f='<div>'+legend.map(function(x){return '<span style="display:inline-flex;align-items:center;gap:4px;margin:2px 10px 2px 0;white-space:nowrap"><span style="width:10px;height:10px;border-radius:50%;background:'+x.col+';display:inline-block"></span>'+esc(x.d.t.slice(0,5))+' '+esc(x.d.port)+'（'+x.n+' 項）</span>';}).join('')+'</div>';
-  f+='<div style="margin-top:3px;color:#6b7a89">號碼＝該日順序・虛線＝當日路線（港口→…→回港口）・座標 © OpenStreetMap'+(showAll?'・目前加粗顯示 '+esc(d0().t.slice(0,5)):'')+'</div>';
+  f+='<div style="margin-top:3px;color:#6b7a89">號碼＝圖上釘點編號（1＝港口）・虛線＝當日路線（港口→…→回港口）・座標 © OpenStreetMap'+(showAll?'・目前加粗顯示 '+esc(d0().t.slice(0,5)):'')+'</div>';
   if(!showAll){var t=cache.totals[MAPBYK]||{};if(t.cap!=null)f+='<div>已排 '+fmtMin(t.used)+'／可用 '+fmtMin(t.cap)+'</div>';}
-  var lk=[];links.forEach(function(x){x.pts.forEach(function(p,i){lk.push('<a target="_blank" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(p.n.replace(/^港口 /,''))+'">'+(i+1)+'. '+esc(p.n.slice(0,12))+'</a>');});});
-  if(lk.length)f+='<div style="margin-top:4px">'+lk.join('')+'</div>';
+  var lk=[];
+  links.forEach(function(x){
+   var pts2=x.pts;if(!pts2.length)return;
+   var head=(showAll?('<span style="display:inline-block;margin:6px 6px 0 0;font-weight:800;color:'+DAYC[x.d.k]+'">'+esc(x.d.t.slice(0,5))+' '+esc(x.d.port)+'</span>'):'');
+   lk.push(head+pts2.map(function(p,i){return '<a target="_blank" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(p.n.replace(/^港口 /,''))+'">'+(i+1)+'. '+esc(p.n.replace(/^港口 /,'').slice(0,12))+'</a>';}).join(''));
+  });
+  if(lk.length)f+='<div style="margin-top:2px">'+lk.join('<br>')+'</div>';
  }
  if(missing)f+='<div class="warn">⚠️ 有 '+missing+' 項未定位，不會出現在地圖（用 ⋯ → 📍 可手動補）</div>';
  document.getElementById('mapfoot').innerHTML=f;
