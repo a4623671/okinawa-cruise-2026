@@ -120,7 +120,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
 #mapbar .day{flex:none;border:1px solid #d8d0bd;border-radius:14px;padding:5px 10px;font-size:13px;background:#fff;cursor:pointer;white-space:nowrap}
 #mapbar .day.on{background:#10293f;color:#fff;border-color:#10293f;font-weight:700}
 #mapbar .t{font-weight:800;font-size:14px;white-space:nowrap;margin-right:4px}
-#mapwrap{flex:1;min-height:0}
+#mapwrap{flex:1;min-height:220px}
 #mapfoot{flex:none;max-height:24vh;overflow:auto;padding:8px 12px;border-top:1px solid #dbe3ec;font-size:12px;background:#fff}
 #mapfoot a{display:inline-block;margin:2px 8px 2px 0;color:#10293f}
 #mapfoot .warn{color:#b3402a;font-weight:700}
@@ -130,8 +130,8 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
 #candbar select{flex:1;min-width:0;border:1px solid #d8d0bd;border-radius:10px;padding:6px;font-size:14px;background:#fff}
 #candbar button{border:1px solid #d8d0bd;background:#fff;border-radius:10px;padding:6px 12px;font-size:14px;cursor:pointer;flex:none}
 #candbar .ghost{color:#6b7a89}
-#mappanel{flex:none;max-height:22vh;overflow:auto;border-top:1px solid #dbe3ec;background:#fff;display:none}
-#mapact{position:sticky;top:0;z-index:2;background:#fff;display:flex;align-items:center;gap:6px;padding:6px 10px;border-bottom:1px solid #eef2f6;flex-wrap:wrap}
+#mappanel{flex:none;max-height:none;overflow:visible;border-top:1px solid #dbe3ec;background:#fff;display:none}
+#mapact{position:relative;z-index:2;background:#fff;display:flex;align-items:center;gap:6px;padding:5px 10px;border-bottom:1px solid #eef2f6;flex-wrap:wrap}
 #mapact>button{border:1px solid #b9a86a;background:#fffdf3;color:#7a5200;border-radius:10px;padding:5px 10px;font-size:13px;font-weight:700;cursor:pointer}
 #mapact .mlbl{margin-left:auto;font-size:12px;color:#6b7a89}
 #mapact .mchip{border:1px solid #d8d0bd;border-radius:12px;padding:4px 8px;font-size:12.5px;background:#fff;cursor:pointer;white-space:nowrap}
@@ -153,8 +153,8 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
 .mapleg .me{color:#b3541e;font-weight:700}
 .mapleg .msw{margin-left:auto;font-size:11px;color:#9fb0c0}
 #maplist{padding:0}
-.mtot{padding:4px 10px 0;font-size:12px}
-.mstrip{display:flex;overflow-x:auto;padding:4px 8px 8px;align-items:stretch;scrollbar-width:thin;gap:0}
+.mtot{padding:4px 10px;font-size:12px}
+.mstrip{display:flex;overflow-x:auto;padding:4px 8px 6px;align-items:stretch;scrollbar-width:thin;gap:0}
 .mcard{flex:none;width:118px;border:1px solid #dbe3ec;border-radius:10px;padding:6px;background:#fff;cursor:pointer;display:flex;flex-direction:column;gap:3px}
 .mcard.port{background:#10293f;color:#fff;border-color:#10293f;width:84px;justify-content:center}
 .mcard.port .sub{color:#cfe0ee}
@@ -193,7 +193,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p22</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p24</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -215,7 +215,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="candbar"><select id="candKind"></select><button onclick="showCand()">顯示</button><button class="ghost" onclick="hideCand()">清除</button></div>
   <div id="mapwrap"></div>
   <div id="mappanel">
-   <div id="mapact"><button onclick="autoOrderMap()">🔀 最佳排序</button><button id="shipArr" onclick="mapSetShip('arr')">🚢 下船</button><button id="shipBy" onclick="mapSetShip('by')">🚢 上船</button><span class="mlbl">全部交通</span><span id="modes"></span></div>
+   <div id="mapact"><button onclick="autoOrderMap()">🔀 最佳排序</button><button id="shipArr" onclick="mapSetShip('off')">🚢 下船</button><button id="shipBy" onclick="mapSetShip('board')">🚢 上船</button><span class="mlbl">全部交通</span><span id="modes"></span></div>
    <div id="maplist"></div>
   </div>
   <div id="mapfoot"></div>
@@ -268,12 +268,16 @@ function blankPlan(){var p={roster:[],items:{},deadline:DEADLINE,finalized:false
 function ensure(){if(!PLAN)PLAN=blankPlan();
  DAYS.forEach(function(d){if(!PLAN.items[d.k])PLAN.items[d.k]=blankDay();var it=PLAN.items[d.k];
   SLOTS.forEach(function(s){if(!it.slots[s[0]])it.slots[s[0]]=[];});if(!it.legs)it.legs={};if(it.mealMin==null)it.mealMin=d.plan?60:0;
-  Object.keys(it.legs).forEach(function(k){var L=it.legs[k];if(L&&L.prop){L.mode=L.prop;delete L.prop;delete L.by;delete L.endorse;delete L.hold;}});});
+  Object.keys(it.legs).forEach(function(k){var L=it.legs[k];if(L&&L.prop){L.mode=L.prop;delete L.prop;delete L.by;delete L.endorse;delete L.hold;}});
+  if(it.arr){if(!it.off)it.off=it.arr;delete it.arr;}
+  if(it.by){if(!it.board)it.board=it.by;delete it.by;}});
  if(!PLAN.roster)PLAN.roster=[];if(!PLAN.deadline)PLAN.deadline=DEADLINE;
  if(me()&&PLAN.roster.indexOf(me())<0)PLAN.roster.push(me());}
 function d0(){return DAYS.filter(function(x){return x.k===curDay;})[0];}
-function dayArr(d){var it=d&&PLAN&&PLAN.items[d.k];return (it&&it.arr)||(d&&d.arr);}
-function dayBy(d){var it=d&&PLAN&&PLAN.items[d.k];return (it&&it.by)||(d&&d.by);}
+function dayArr(d){return d&&d.arr;}
+function dayBy(d){return d&&d.by;}
+function dayOff(d){var it=d&&PLAN&&PLAN.items[d.k];return (it&&it.off)||(d&&d.arr);}
+function dayBoard(d){var it=d&&PLAN&&PLAN.items[d.k];return (it&&it.board)||(d&&d.by);}
 function it0(){return PLAN.items[curDay];}
 function roster(){return (PLAN&&PLAN.roster)||[];}
 function planDeadline(){return Date.parse((PLAN&&PLAN.deadline)||DEADLINE);}
@@ -477,7 +481,7 @@ function computeAll(){
 }
 function finish(d,used,miss){
  var cap=null,raw=null,meal=+(PLAN.items[d.k]&&PLAN.items[d.k].mealMin)||0;
- var _a=dayArr(d),_b=dayBy(d);
+ var _a=dayOff(d),_b=dayBoard(d);
  if(_a&&_b){var a=hm(_a),b=hm(_b);if(a!=null&&b!=null){raw=b-a;cap=raw-meal;}}
  cache.totals[d.k]={used:used,cap:cap,raw:raw,meal:meal,miss:miss,over:cap!=null?Math.max(0,used-cap):0};}
 
@@ -521,8 +525,8 @@ function renderBoard(){
  var ts='';
  if(d.plan&&t.cap!=null)ts='<div class="timesum">可用 <b>'+fmtMin(t.cap)+'</b>・已排 <b>'+fmtMin(t.used)+'</b>・餘 <b>'+fmtMin(Math.max(0,t.cap-t.used))+'</b>'+(t.miss?'・含未知段':'')+'</div>';
  document.getElementById('dayinfo').innerHTML='<b>'+esc(d.t)+'</b>'
-  +(dayArr(d)?('・下船 '+dayArr(d)):'')
-  +(dayBy(d)?('・上船 '+dayBy(d)+' 前'):'')
+  +(d.arr?('・到港 '+d.arr):'')+(d.dep?('・離港 '+d.dep):'')
+  +(dayOff(d)?('・下船 '+dayOff(d)):'')+(dayBoard(d)?('・上船 '+dayBoard(d)+' 前'):'')
   +(d.plan?('・用餐 −'+fmtMin(meal0)+' <button class="ghost" style="padding:1px 7px;font-size:11px" onclick="setMeal()">改</button>'):'')
   +ts;
  if(!d.plan){document.getElementById('warn').innerHTML='';document.getElementById('board').innerHTML='<div class="slot">此日無岸上規劃（登船／返抵）。</div>';renderStatus();return;}
@@ -722,7 +726,7 @@ function addItem(id){
 function dayPlan(d){
  var out={rows:[],end:null,over:0,miss:false};
  if(!d.plan)return out;
- var it=PLAN.items[d.k];var t=hm(dayArr(d));if(t==null)t=8*60;
+ var it=PLAN.items[d.k];var t=hm(dayOff(d));if(t==null)t=8*60;
  var seq=[];SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){seq.push(o);});});
  var pc=PORT[d.port];
  if(seq.length){var LI=cache.legs[d.k+':in'];
@@ -739,19 +743,19 @@ function dayPlan(d){
   if(LO&&LO.min!=null){out.rows.push({t:hm2s(t),n:'回港口（'+(pc?pc.n:d.port)+'）',min:LO.min,kind:'leg'});t+=LO.min;}else out.miss=true;}
  out.end=t;
  var meal=(+PLAN.items[d.k].mealMin)||0;if(meal)t+=meal;
- if(dayBy(d)){var by=hm(dayBy(d));if(by!=null){out.over=Math.max(0,t-by);
+ if(dayBoard(d)){var by=hm(dayBoard(d));if(by!=null){out.over=Math.max(0,t-by);
   if(meal&&out.rows.length)out.rows.push({t:'用餐',n:'用餐（扣抵）',min:meal,kind:'meal'});
-  out.rows.push({t:hm2s(by),n:'上船（'+dayBy(d)+'）',min:0,kind:'ret'});}}
+  out.rows.push({t:hm2s(by),n:'上船（'+dayBoard(d)+'）',min:0,kind:'ret'});}}
  return out;}
 function openSheet(){
  if(!PLAN){toast('尚未載入');return;}
  var h='<h2>🧾 旅遊規劃單</h2><div style="font-size:12px;color:#6b7a89;margin-bottom:8px">'
   +(PLAN.finalized?'✅ 已定案':'⚠️ 草稿（尚未定案，未全體附議）')+'・時間為估算，出發前複查</div>';
  DAYS.forEach(function(d){
-  if(!d.plan){h+='<div style="margin:8px 0"><b>'+esc(d.t)+'</b>：'+(dayArr(d)?'下船 '+dayArr(d):'')+(d.dep?'・離港 '+d.dep:'')+'</div>';return;}
+  if(!d.plan){h+='<div style="margin:8px 0"><b>'+esc(d.t)+'</b>：'+(d.arr?'到港 '+d.arr:'')+(d.dep?'・離港 '+d.dep:'')+'</div>';return;}
   var p=dayPlan(d);
   h+='<div style="margin:10px 0;border:1px solid #dbe3ec;border-radius:10px;padding:8px 10px"><b>'+esc(d.t)+'</b>'
-   +'<span style="font-size:12px;color:#6b7a89">　下船 '+dayArr(d)+'・上船 '+dayBy(d)+' 前</span>'
+   +'<span style="font-size:12px;color:#6b7a89">　到港 '+d.arr+'・離港 '+d.dep+'・下船 '+dayOff(d)+'・上船 '+dayBoard(d)+' 前</span>'
    +(p.over>0?'<div style="color:#c0392b;font-weight:800;font-size:13px">⛔ 超出回船時間 '+fmtMin(p.over)+'</div>':'')
    +(p.miss?'<div style="color:#b3541e;font-size:12px">※ 含未定位項目，部分交通時間未知</div>':'')
    +'<table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:6px">'
@@ -771,7 +775,7 @@ function openSheet(){
 }
 function closeSheet(){document.getElementById('sheet').classList.remove('on');}
 function sheetText(){var L=[];DAYS.forEach(function(d){if(!d.plan)return;var p=dayPlan(d);
- L.push('【'+d.t+'】到港 '+(d.arr||'-')+'・回船 '+(d.by||'-')+' 前');
+ L.push('【'+d.t+'】到港 '+(d.arr||'-')+'・離港 '+(d.dep||'-')+'・下船 '+(dayOff(d)||'-')+'・上船 '+(dayBoard(d)||'-')+' 前');
  p.rows.forEach(function(r){L.push(r.t+'  '+r.n+(r.kind==='item'?'（停留 '+fmtMin(r.min)+'）':(r.kind==='leg'?'（'+fmtMin(r.min)+'）':'')));});
  L.push('');});return L.join('\n');}
 function copySheet(){navigator.clipboard.writeText(sheetText()).then(function(){toast('已複製規劃單');});}
@@ -882,8 +886,8 @@ function drawOneDay(){
  });
  if(MCAND)candPins();
  document.getElementById('modes').innerHTML=modesHTML();
- var _sa=document.getElementById('shipArr');if(_sa)_sa.textContent='🚢 下船 '+(dayArr(d0())||'--:--');
- var _sb=document.getElementById('shipBy');if(_sb)_sb.textContent='🚢 上船 '+(dayBy(d0())||'--:--');
+ var _sa=document.getElementById('shipArr');if(_sa)_sa.textContent='🚢 到港 '+(d0().arr||'--:--')+'｜下船 '+(dayOff(d0())||'--:--');
+ var _sb=document.getElementById('shipBy');if(_sb)_sb.textContent='🚢 離港 '+(d0().dep||'--:--')+'｜上船 '+(dayBoard(d0())||'--:--');
  document.getElementById('maplist').innerHTML=mapPanelHTML(seq,pc,it);
  var b=pts.map(function(p){return [p.lat,p.lng];});
  if(b.length){try{PMAP.fitBounds(b,{padding:[40,40]});}catch(e){PMAP.setView(b[0],12);}}
@@ -924,11 +928,11 @@ function setAllMode(m){
  recompute().then(function(){drawPlanMap();});
 }
 function mapPanelHTML(seq,pc,it){
- var d=d0(),t=cache.totals[curDay]||{},tm=hm(dayArr(d));if(tm==null)tm=8*60;
- var by=dayBy(d),byt=by?hm(by):null;
+ var d=d0(),t=cache.totals[curDay]||{},tm=hm(dayOff(d));if(tm==null)tm=8*60;
+ var by=dayBoard(d),byt=by?hm(by):null;
  var h='<div class="mtot">已排 <b>'+fmtMin(t.used)+'</b>／可用 <b>'+(t.cap!=null?fmtMin(t.cap):'—')+'</b>'+(t.cap!=null?('・餘 '+fmtMin(Math.max(0,t.cap-t.used))):'')+(t.over>0?(' <span style="color:#b3402a">超過 '+fmtMin(t.over)+'</span>'):'')+'</div>';
  h+='<div class="mstrip">';
- h+='<div class="mcard port"><div class="nm">🚢 下船</div><div class="sub">'+hm2s(tm)+'</div></div>';
+ h+='<div class="mcard port"><div class="nm">🚢 下船</div><div class="sub">'+hm2s(tm)+'</div><div style="font-size:9.5px;color:#cfe0ee">到港 '+(d.arr||'--:--')+'</div></div>';
  var key='in';
  seq.forEach(function(x,k){
   var C=cache.legs[curDay+':'+key];
@@ -950,7 +954,7 @@ function mapPanelHTML(seq,pc,it){
  var CO=cache.legs[curDay+':'+key];
  if(CO&&CO.min!=null)tm+=CO.min;
  h+=legChip(key,CO);
- h+='<div class="mcard port"><div class="nm">🚢 上船</div><div class="sub">'+(by||'--:--')+'</div><div style="font-size:10px;color:'+(byt!=null&&tm>byt?'#ffb4a8':'#cfe0ee')+'">預估 '+hm2s(tm)+'</div></div>';
+ h+='<div class="mcard port"><div class="nm">🚢 上船</div><div class="sub">'+(by||'--:--')+'</div><div style="font-size:9.5px;color:'+(byt!=null&&tm>byt?'#ffb4a8':'#cfe0ee')+'">預估 '+hm2s(tm)+'・離港 '+(d.dep||'--:--')+'</div></div>';
  h+='</div>';
  return h;
 }
@@ -978,8 +982,8 @@ function mapMinCustom(slot,idx){
 function mapSetShip(which){
  if(guard())return;
  var d=d0(),it=PLAN.items[curDay];
- var cur=which==='arr'?(dayArr(d)||''):(dayBy(d)||'');
- var v=prompt((which==='arr'?'下船時間':'上船時間')+'（HH:MM）',cur);
+ var cur=which==='off'?(dayOff(d)||''):(dayBoard(d)||'');
+ var v=prompt((which==='off'?'下船時間':'上船時間')+'（HH:MM）',cur);
  if(v===null)return;
  var m=String(v).trim().match(/^(\d{1,2})[:：.](\d{1,2})$/);
  if(!m){toast('請輸入 HH:MM，例如 08:00');return;}
