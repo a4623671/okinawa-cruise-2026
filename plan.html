@@ -47,6 +47,9 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .item .ops button.st.on{background:#0e6e5a;color:#fff;border-color:#0e6e5a;font-weight:800}
 .item .ops button.st.no.on{background:#b3541e;color:#fff;border-color:#b3541e;font-weight:800}
 .tag-ok{display:inline-block;font-size:11px;font-weight:800;background:#e9f6ec;color:#1e6b32;border:1px solid #b6ddc0;border-radius:8px;padding:1px 6px;margin-left:5px}
+.tag-skip{display:inline-block;font-size:11px;font-weight:800;background:#eef2f6;color:#5b6b7c;border:1px solid #dbe3ec;border-radius:8px;padding:1px 6px;margin-left:5px}
+.item.skipped{opacity:.55}
+.mcard.skip{opacity:.5;background:#f7fafc}
 .tag-warn{display:inline-block;font-size:11px;font-weight:800;background:#fdecea;color:#8c2f1d;border:1px solid #f2b8ae;border-radius:8px;padding:1px 6px;margin-left:5px}
 .leg{border:1px dashed #c8d6e4;border-radius:10px;padding:6px 9px;margin:2px 0 6px;font-size:12px;background:#f7fbfe}
 .leg .row{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
@@ -200,7 +203,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p30</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p31</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -463,24 +466,29 @@ function computeAll(){
   var seq=[];SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){seq.push(o);});});
   if(!seq.length)return;
   var pm=it.portMode||(it.portMode={in:'mono',out:'mono'});
-  if(pc&&samePort(seq[0],d))leg(d.k+':in',pm.in||'mono',[pc.lat,pc.lng],coordOf(seq[0]));
-  else cache.legs[d.k+':in']={min:null,km:null,src:'跨港',mode:'taxi',wait:null,ride:null,cross:true};
-  for(var i=0;i<seq.length-1;i++){
+  var act=[];seq.forEach(function(o,i){if(!o.skip)act.push(i);});
+  if(!act.length)return;
+  var f=act[0];
+  if(pc&&samePort(seq[f],d))leg(d.k+':in',pm.in||'mono',[pc.lat,pc.lng],coordOf(seq[f]));
+  else cache.legs[d.k+':in']={min:null,km:null,src:'跨港',mode:'mono',wait:null,ride:null,cross:true};
+  for(var k2=0;k2<act.length-1;k2++){
+   var i=act[k2],j=act[k2+1];
    var mode=(it.legs[i]||{}).mode||'mono';
-   if(!samePort(seq[i],d)||!samePort(seq[i+1],d)){cache.legs[d.k+':'+i]={min:null,km:null,src:'跨港',mode:mode,wait:null,ride:null,cross:true};continue;}
-   leg(d.k+':'+i,mode,coordOf(seq[i]),coordOf(seq[i+1]));
+   if(!samePort(seq[i],d)||!samePort(seq[j],d)){cache.legs[d.k+':'+i]={min:null,km:null,src:'跨港',mode:mode,wait:null,ride:null,cross:true};continue;}
+   leg(d.k+':'+i,mode,coordOf(seq[i]),coordOf(seq[j]));
   }
-  if(pc&&samePort(seq[seq.length-1],d))leg(d.k+':out',pm.out||'mono',coordOf(seq[seq.length-1]),[pc.lat,pc.lng]);
-  else cache.legs[d.k+':out']={min:null,km:null,src:'跨港',mode:'taxi',wait:null,ride:null,cross:true};
+  var lastI=act[act.length-1];
+  if(pc&&samePort(seq[lastI],d))leg(d.k+':out',pm.out||'mono',coordOf(seq[lastI]),[pc.lat,pc.lng]);
+  else cache.legs[d.k+':out']={min:null,km:null,src:'跨港',mode:'mono',wait:null,ride:null,cross:true};
  });
  return Promise.all(jobs).then(function(){
   DAYS.forEach(function(d){
    if(!d.plan)return;
    var it=PLAN.items[d.k];var used=0,miss=false;
    var seq=[];SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){seq.push(o);});});
-   seq.forEach(function(o){used+=(+o.min||0);});
+   var act2=[];seq.forEach(function(o,i){if(!o.skip)act2.push(i);else return;used+=(+o.min||0);});
    var keys=[];
-   if(seq.length){keys.push(d.k+':in');for(var j=0;j<seq.length-1;j++)keys.push(d.k+':'+j);keys.push(d.k+':out');}
+   if(act2.length){keys.push(d.k+':in');for(var j=0;j<act2.length-1;j++)keys.push(d.k+':'+act2[j]);keys.push(d.k+':out');}
    keys.forEach(function(k){var L=cache.legs[k];if(!L){miss=true;return;}if(L.min==null){miss=true;}else used+=L.min;});
    finish(d,used,miss);
   });
@@ -548,8 +556,8 @@ function renderBoard(){
   out+='<div class="slot" data-slot="'+s[0]+'"><h3>'+s[1]+' <span class="cnt">('+arr.length+')</span></h3>';
   arr.forEach(function(o,idx){
    var end=(o.endorse||[]),hold=(o.hold||[]),st=stanceOf(o);
-   out+='<div class="item" data-idx="'+idx+'" data-slot="'+s[0]+'"><div class="mv"><button onclick="moveUp(\''+s[0]+'\','+idx+')">▲</button><button onclick="moveDown(\''+s[0]+'\','+idx+')">▼</button></div><div class="body">'
-    +'<div class="nm">'+esc(o.t)+(o.src==='user'?'<span class="src user">'+esc(o.by||'?')+' 提議</span>':'<span class="src ai">候選</span>')+((o.place&&dayPlaceOf(d)&&o.place!==dayPlaceOf(d))?'<span class="tag-warn">⚠️非本港</span>':'')+(agreed(o)?'<span class="tag-ok">✅ 已確認</span>':'')+'</div>'
+   out+='<div class="item'+(o.skip?' skipped':'')+'" data-idx="'+idx+'" data-slot="'+s[0]+'"><div class="mv"><button onclick="moveUp(\''+s[0]+'\','+idx+')">▲</button><button onclick="moveDown(\''+s[0]+'\','+idx+')">▼</button></div><div class="body">'
+    +'<div class="nm">'+esc(o.t)+(o.src==='user'?'<span class="src user">'+esc(o.by||'?')+' 提議</span>':'<span class="src ai">候選</span>')+((o.place&&dayPlaceOf(d)&&o.place!==dayPlaceOf(d))?'<span class="tag-warn">⚠️非本港</span>':'')+(o.skip?'<span class="tag-skip">⏭ 已跳過</span>':'')+(agreed(o)?'<span class="tag-ok">✅ 已確認</span>':'')+'</div>'
     +'<div class="meta">停留 '+fmtMin(o.min||60)+(o.lat!=null?'・📍':'・⚠️未定位')+'・附議 '+end.length+'/'+roster().length+(end.length?'（'+esc(end.join('、'))+'）':'')+(hold.length?'・再考慮 '+hold.length+'（'+esc(hold.join('、'))+'）':'')+'</div>'
     +'</div><div class="ops">'
     +'<button class="st'+(st==='yes'?' on':'')+'" onclick="toggleAgree(\''+s[0]+'\','+idx+')">附議</button>'
@@ -562,16 +570,18 @@ function renderBoard(){
  var seq=[];SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){seq.push(o);});});
  if(seq.length){
   var pc=PORT[d.port];var pm=it.portMode||{in:'mono',out:'mono'};
-  var keys=[curDay+':in'];for(var j2=0;j2<seq.length-1;j2++)keys.push(curDay+':'+j2);keys.push(curDay+':out');
+  var actB=[];seq.forEach(function(o,i){if(!o.skip)actB.push(i);});
+  var keys=[curDay+':in'];for(var j2=0;j2<actB.length-1;j2++)keys.push(curDay+':'+actB[j2]);keys.push(curDay+':out');
   var tmin=0,unk=false;
   keys.forEach(function(k){var C=cache.legs[k];if(!C||C.min==null)unk=true;else tmin+=C.min;});
   var open=!!legOpen[curDay];
   out+='<div class="slot"><h3 class="leghead" onclick="toggleLegs()">🚕 交通 '+keys.length+' 段・'+(unk?'部分未知':'約 '+fmtMin(tmin))+' <span class="chev">'+(open?'▾ 收合':'▸ 展開')+'</span></h3>';
   if(open){
    out+=portLegRow('in','港口（'+(pc?pc.n:d.port)+'） → '+esc(seq[0].t.slice(0,14)),cache.legs[curDay+':in'],pm.in||'mono');
-   for(var i=0;i<seq.length-1;i++){
+   for(var ai=0;ai<actB.length-1;ai++){
+    var i=actB[ai],nx=actB[ai+1];
     var L=it.legs[i]||{};var C=cache.legs[curDay+':'+i]||{};var cur=L.mode||'mono';
-    out+='<div class="leg"><div style="font-weight:700">'+(i+1)+'. '+esc(seq[i].t.slice(0,14))+' → '+esc(seq[i+1].t.slice(0,14))+'</div><div class="row" style="margin-top:4px">';
+    out+='<div class="leg"><div style="font-weight:700">'+(ai+1)+'. '+esc(seq[i].t.slice(0,14))+' → '+esc(seq[nx].t.slice(0,14))+'</div><div class="row" style="margin-top:4px">';
     out+=['walk','taxi','bus','mono'].map(function(m){return '<button class="'+(cur===m?'on':'')+'" onclick="setLeg('+i+',\''+m+'\')">'+MODEN[m]+'</button>';}).join('');
     out+=legEst(C);
     out+='</div></div>';
@@ -605,6 +615,7 @@ function openItemMenu(slot,idx){
  h+='<div class="moverow"><span>移到：</span>'+others.map(function(x){return '<button onclick="closeItemMenu();moveToSlot(\''+slot+'\','+idx+',\''+x[0]+'\')">'+x[1]+'</button>';}).join('')+'</div>';
  h+='<button onclick="closeItemMenu();setMin(\''+slot+'\','+idx+')">⏱ 停留時間（目前 '+fmtMin(o.min||60)+'）</button>';
  if(o.lat==null)h+='<button onclick="closeItemMenu();locate(\''+slot+'\','+idx+')">📍 查座標</button>';
+ h+='<button onclick="closeItemMenu();toggleSkip(\''+slot+'\','+idx+')">'+(o.skip?'↩︎ 取消跳過':'⏭ 跳過此項')+'</button>';
  h+='<button class="danger" onclick="closeItemMenu();rmItem(\''+slot+'\','+idx+')">🗑 移除此項</button>';
  h+='<button onclick="closeItemMenu()">取消</button></div>';
  document.getElementById('imenubody').innerHTML=h;
@@ -618,6 +629,7 @@ function closeItemMenu(){document.getElementById('imenu').classList.remove('on')
 /* ================= 操作 ================= */
 function arr0(slot){return it0().slots[slot];}
 function setMeal(){if(guard())return;var it=it0();var v=prompt('這天要扣多少用餐時間（分鐘）？',it.mealMin==null?60:it.mealMin);if(v===null)return;var n=parseInt(v,10);if(isNaN(n)||n<0){toast('請輸入 0 或正整數');return;}it.mealMin=n;recompute();}
+function toggleSkip(slot,idx){if(guard())return;var o=arr0(slot)[idx];if(!o)return;o.skip=!o.skip;if(!o.skip)delete o.skip;recompute().then(function(){drawPlanMap();});}
 function setMin(slot,idx){if(guard())return;var o=arr0(slot)[idx];var v=prompt('停留幾分鐘？',o.min||60);if(v===null)return;var n=parseInt(v,10);if(!(n>0)){toast('請輸入分鐘數');return;}o.min=n;recompute();}
 function rmItem(slot,idx){if(guard())return;var a=arr0(slot);var o=a[idx];if(!confirm('移除「'+o.t+'」？'))return;a.splice(idx,1);recompute();}
 function toggleAgree(slot,idx){if(guard())return;setStance(arr0(slot)[idx],'yes');recompute();}
@@ -882,10 +894,14 @@ function drawAllDays(){
 function drawOneDay(){
  var d=d0(),it=it0(),pc=PORT[d.port],col=DAYC[d.k]||'#e05307';
  var seq=[];SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o,i){seq.push({o:o,s:s[0],i:i});});});
- var pts=[],missing=0;
+ var pts=[],ptsSkip=[],missing=0;
  if(pc&&seq.length)pts.push({lat:pc.lat,lng:pc.lng,port:true});
- seq.forEach(function(x){var c=coordOf(x.o);if(!c){missing++;return;}pts.push({lat:c[0],lng:c[1],x:x});});
+ seq.forEach(function(x){var c=coordOf(x.o);if(!c){missing++;return;}if(!x.o.skip)pts.push({lat:c[0],lng:c[1],x:x});else ptsSkip.push({lat:c[0],lng:c[1],x:x});});
  if(pts.length>1){var line=pts.map(function(p){return [p.lat,p.lng];});if(pc)line.push([pc.lat,pc.lng]);L.polyline(line,{color:col,weight:4,opacity:.85,dashArray:'8 6'}).addTo(PMAP);}
+ ptsSkip.forEach(function(p){
+  L.marker([p.lat,p.lng],{icon:L.divIcon({className:'',html:'<div style="background:#b8c4d0;color:#fff;min-width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;border:2px solid #fff;opacity:.75">⏭</div>',iconSize:[24,24]})})
+   .addTo(PMAP).bindPopup('<b>'+esc(p.x.o.t)+'</b><br>已跳過（不列入路線）<br><button onclick="toggleSkip(\''+p.x.s+'\','+p.x.i+')" style="margin-top:6px;border:none;background:#0e6e5a;color:#fff;border-radius:10px;padding:5px 10px;font-weight:700">↩︎ 恢復</button>');
+ });
  pts.forEach(function(p,i){
   var isPort=!!p.port;
   var mk=L.marker([p.lat,p.lng],{icon:L.divIcon({className:'',html:pinHTML(isPort?'🚢':(p.x?seq.indexOf(p.x)+2:''),isPort?'#10293f':col,isPort?30:28),iconSize:[isPort?30:28,isPort?30:28]})})
@@ -968,32 +984,32 @@ function setAllMode(m){
 }
 function mapPanelHTML(seq,pc,it){
  var d=d0(),t=cache.totals[curDay]||{},tm=hm(dayOff(d));if(tm==null)tm=8*60;
+ var act=[];seq.forEach(function(o,i){if(!o.skip)act.push(i);});
  var by=dayBoard(d),byt=by?hm(by):null;
  var h='<div class="mtot">已排 <b>'+fmtMin(t.used)+'</b>／可用 <b>'+(t.cap!=null?fmtMin(t.cap):'—')+'</b>'+(t.cap!=null?('・餘 '+fmtMin(Math.max(0,t.cap-t.used))):'')+(t.over>0?(' <span style="color:#b3402a">超過 '+fmtMin(t.over)+'</span>'):'')+'</div>';
  h+='<div class="mstrip">';
  h+='<div class="mcard port" onclick="mapSetShip(\'off\')" title="點擊調整下船時間"><div class="nm">🚢 下船</div><div class="sub">'+hm2s(tm)+'</div><div style="font-size:9.5px;color:#cfe0ee">到港 '+(d.arr||'--:--')+'</div></div>';
  var key='in';
  seq.forEach(function(x,k){
-  var C=cache.legs[curDay+':'+key];
-  if(C&&C.min!=null)tm+=C.min;
-  h+=legChip(key,C);
-  var late=(byt!=null&&(tm+(+x.o.min||0))>byt);
-  h+='<div class="mcard" onclick="mapFocus(\''+x.s+'\','+x.i+')">'
+  var isAct=!x.o.skip;
+  if(isAct){var C=cache.legs[curDay+':'+key];if(C&&C.min!=null)tm+=C.min;h+=legChip(key,C);}
+  var late=(isAct&&byt!=null&&(tm+(+x.o.min||0))>byt);
+  h+='<div class="mcard'+(isAct?'':' skip')+'" onclick="mapFocus(\''+x.s+'\','+x.i+')">'
    +'<div class="nm">'+(k+2)+'. '+esc(x.o.t)+'</div>'
    +'<div class="sub"'+ (late?' style="color:#b3402a"':'') +'>'+hm2s(tm)+'・停留 '+fmtMin(x.o.min||0)+'</div>'
    +'<div class="act">'
    +'<button onclick="event.stopPropagation();mapMove(\''+x.s+'\','+x.i+',-1)">◀</button>'
    +'<button onclick="event.stopPropagation();mapMove(\''+x.s+'\','+x.i+',1)">▶</button>'
    +'<button onclick="event.stopPropagation();mapSetMin(\''+x.s+'\','+x.i+')">⏱</button>'
+   +'<button onclick="event.stopPropagation();toggleSkip(\''+x.s+'\','+x.i+')">'+(isAct?'⏭':'↩︎')+'</button>'
    +'<button onclick="event.stopPropagation();openSub(\''+x.s+'\','+x.i+')">🧭</button>'
    +'<button class="del" onclick="event.stopPropagation();mapRemove(\''+x.s+'\','+x.i+')">✕</button>'
    +'</div></div>';
-  tm+=(+x.o.min||0);
-  key=(k<seq.length-1)?String(k):'out';
+  if(isAct){tm+=(+x.o.min||0);key=(k<seq.length-1)?String(k):'out';}
  });
- var CO=cache.legs[curDay+':'+key];
+ var CO=cache.legs[curDay+':out'];
  if(CO&&CO.min!=null)tm+=CO.min;
- h+=legChip(key,CO);
+ h+=legChip('out',CO);
  h+='<div class="mcard port" onclick="mapSetShip(\'board\')" title="點擊調整上船時間"><div class="nm">🚢 上船</div><div class="sub">'+(by||'--:--')+'</div><div style="font-size:9.5px;color:'+(byt!=null&&tm>byt?'#ffb4a8':'#cfe0ee')+'">預估 '+hm2s(tm)+'・離港 '+(d.dep||'--:--')+'</div></div>';
  h+='</div>';
  return h;
