@@ -115,11 +115,13 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
 #mapov{position:fixed;inset:0;background:rgba(8,20,32,.45);z-index:70;display:none;align-items:center;justify-content:center;padding:6px}
 #mapov.on{display:flex}
 #mapcard{background:#fff;border-radius:16px;width:100%;max-width:760px;height:94vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.4)}
-#mapbar{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid #dbe3ec;overflow-x:auto;scrollbar-width:none;flex:none}
-#mapbar::-webkit-scrollbar{display:none}
-#mapbar .day{flex:none;border:1px solid #d8d0bd;border-radius:14px;padding:5px 10px;font-size:13px;background:#fff;cursor:pointer;white-space:nowrap}
+#mapbar{display:flex;flex-wrap:nowrap;align-items:center;gap:5px;padding:6px 8px;border-bottom:1px solid #dbe3ec;overflow:hidden;flex:none}
+#mapbar::-webkit-scrollbar{display:none}#mapdays::-webkit-scrollbar{display:none}
+#mapbar .day{flex:none;border:1px solid #d8d0bd;border-radius:12px;padding:4px 8px;font-size:12px;background:#fff;cursor:pointer;white-space:nowrap}
+#mapdays{display:flex;flex:1;min-width:0;flex-wrap:nowrap;gap:5px;overflow-x:auto;scrollbar-width:none}
+#candBtn{white-space:nowrap;padding:4px 8px;font-size:12px;border-radius:12px}
 #mapbar .day.on{background:#10293f;color:#fff;border-color:#10293f;font-weight:700}
-#mapbar .t{font-weight:800;font-size:14px;white-space:nowrap;margin-right:4px}
+#mapbar .t{font-weight:800;font-size:13px;white-space:nowrap;margin-right:2px}
 #mapwrap{flex:1;min-height:220px}
 #mapfoot{flex:none;max-height:24vh;overflow:auto;padding:8px 12px;border-top:1px solid #dbe3ec;font-size:12px;background:#fff}
 #mapfoot a{display:inline-block;margin:2px 8px 2px 0;color:#10293f}
@@ -131,10 +133,11 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
 #candbar button{border:1px solid #d8d0bd;background:#fff;border-radius:10px;padding:6px 12px;font-size:14px;cursor:pointer;flex:none}
 #candbar .ghost{color:#6b7a89}
 #mappanel{flex:none;max-height:none;overflow:visible;border-top:1px solid #dbe3ec;background:#fff;display:none}
-#mapact{position:relative;z-index:2;background:#fff;display:flex;align-items:center;gap:6px;padding:5px 10px;border-bottom:1px solid #eef2f6;flex-wrap:wrap}
-#mapact>button{border:1px solid #b9a86a;background:#fffdf3;color:#7a5200;border-radius:10px;padding:5px 10px;font-size:13px;font-weight:700;cursor:pointer}
-#mapact .mlbl{margin-left:auto;font-size:12px;color:#6b7a89}
-#mapact .mchip{border:1px solid #d8d0bd;border-radius:12px;padding:4px 8px;font-size:12.5px;background:#fff;cursor:pointer;white-space:nowrap}
+#mapact{position:relative;z-index:2;background:#fff;display:flex;flex-wrap:nowrap;align-items:center;gap:5px;padding:5px 8px;border-bottom:1px solid #eef2f6;overflow-x:auto;scrollbar-width:none}
+#mapact>button{flex:none;border:1px solid #b9a86a;background:#fffdf3;color:#7a5200;border-radius:9px;padding:4px 8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+#mapact .mlbl{flex:none;font-size:11px;color:#6b7a89;margin-left:2px}
+#modes{display:flex;flex:none;flex-wrap:nowrap;gap:4px}
+#mapact .mchip{flex:none;border:1px solid #d8d0bd;border-radius:10px;padding:3px 7px;font-size:12px;background:#fff;cursor:pointer;white-space:nowrap}
 #mapact .mchip.on{background:#10293f;color:#fff;border-color:#10293f;font-weight:700}
 #maplist{padding:6px 10px 12px}
 .mtot{font-size:13px;color:#5b6b7c;padding:3px 4px 7px}
@@ -193,7 +196,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p24</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p25</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -821,7 +824,8 @@ var MCYCLE={walk:'taxi',taxi:'bus',bus:'mono',mono:'walk'};
 function mapDays(){
  var h='<button class="day'+(MAPBYK==='all'?' on':'')+'" onclick="mapPick(\'all\')">🌏 全部</button>';
  h+=DAYS.map(function(d){return '<button class="day'+(d.k===MAPBYK?' on':'')+'" onclick="mapPick(\''+d.k+'\')">'+d.t.slice(0,5)+' '+esc(d.port)+'</button>';}).join('');
- document.getElementById('mapdays').innerHTML=h;}
+ var _md=document.getElementById('mapdays');_md.innerHTML=h;
+ setTimeout(function(){var on=_md.querySelector('.day.on');if(on){var r=on.getBoundingClientRect(),rb=_md.getBoundingClientRect();_md.scrollLeft+=(r.left-rb.left)-(_md.clientWidth-r.width)/2;}},60);}
 function mapPick(k){if(k!=='all')curDay=k;MAPBYK=k;MCANDL=[];MCAND=false;renderDays();renderBoard();mapDays();drawPlanMap();}
 function openPlanMap(){document.getElementById('mapov').classList.add('on');mapDays();
  setTimeout(function(){
