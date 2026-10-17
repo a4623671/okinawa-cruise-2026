@@ -46,6 +46,7 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .item .ops button.st.on{background:#0e6e5a;color:#fff;border-color:#0e6e5a;font-weight:800}
 .item .ops button.st.no.on{background:#b3541e;color:#fff;border-color:#b3541e;font-weight:800}
 .tag-ok{display:inline-block;font-size:11px;font-weight:800;background:#e9f6ec;color:#1e6b32;border:1px solid #b6ddc0;border-radius:8px;padding:1px 6px;margin-left:5px}
+.tag-warn{display:inline-block;font-size:11px;font-weight:800;background:#fdecea;color:#8c2f1d;border:1px solid #f2b8ae;border-radius:8px;padding:1px 6px;margin-left:5px}
 .leg{border:1px dashed #c8d6e4;border-radius:10px;padding:6px 9px;margin:2px 0 6px;font-size:12px;background:#f7fbfe}
 .leg .row{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
 .leg button{border:1px solid #c8d6e4;background:#fff;border-radius:12px;font-size:12px;padding:3px 9px;cursor:pointer}
@@ -116,7 +117,7 @@ body.locked .ops,body.locked .leg .row button,body.locked #addBtn{display:none!i
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261015-p8</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261015-p9</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -162,6 +163,12 @@ var SLOTS=[['morning','🌅 上午'],['afternoon','☀️ 下午'],['evening','�
 var SLOTN={morning:'上午',afternoon:'下午',evening:'晚上'};
 var MODEN={walk:'🚶走路',taxi:'🚕計程車',bus:'🚌公車',mono:'🚝單軌'};
 var DEADLINE='2026-12-02T22:00:00+08:00';
+/* 郵輪停靠碼頭座標（OSM 實查；非一般漁港/離島渡輪碼頭） */
+var PORT={
+ '那霸':{n:'那霸郵輪碼頭',lat:26.22557,lng:127.67464},
+ '宮古島':{n:'平良港郵輪碼頭',lat:24.81409,lng:125.28174},
+ '石垣島':{n:'石垣港新港郵輪碼頭',lat:24.32717,lng:124.14158}
+};
 
 /* ================= 狀態 ================= */
 var PLAN=null, curDay='2026-12-17', CATALOG=[], geo={}, VOTES={};
@@ -267,27 +274,38 @@ function saveGeo(){var body={message:'geo cache',content:btoa(unescape(encodeURI
 /* ================= 重算 ================= */
 function computeAll(){
  cache.legs={};cache.totals={};var jobs=[];
+ function leg(k,mode,ca,cb){
+  if(!ca||!cb){cache.legs[k]={min:null,km:null,src:'無座標',mode:mode,wait:null,ride:null};return;}
+  var km=hav(ca,cb);
+  if(mode==='taxi'||mode==='walk'){
+   jobs.push(queryDrive(ca,cb).then(function(dr){var e=estMode(mode,km,dr);e.mode=mode;cache.legs[k]=e;}));
+  }else{var e=estMode(mode,km,null);e.mode=mode;cache.legs[k]=e;}
+ }
  DAYS.forEach(function(d){
   if(!d.plan)return;
-  var seq=[];
-  SLOTS.forEach(function(s){PLAN.items[d.k].slots[s[0]].forEach(function(o){seq.push(o);});});
+  var it=PLAN.items[d.k];var pc=PORT[d.port];
+  var seq=[];SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){seq.push(o);});});
+  if(!seq.length)return;
+  var pm=it.portMode||(it.portMode={in:'taxi',out:'taxi'});
+  if(pc&&samePort(seq[0],d))leg(d.k+':in',pm.in||'taxi',[pc.lat,pc.lng],coordOf(seq[0]));
+  else cache.legs[d.k+':in']={min:null,km:null,src:'跨港',mode:'taxi',wait:null,ride:null,cross:true};
   for(var i=0;i<seq.length-1;i++){
-   var L=PLAN.items[d.k].legs[i]||{};var mode=L.prop||L.mode||'taxi';
-   var ca=coordOf(seq[i]),cb=coordOf(seq[i+1]);var k=d.k+':'+i;
-   if(!ca||!cb){cache.legs[k]={min:null,km:null,src:'無座標',mode:mode,wait:null,ride:null};continue;}
-   var km=hav(ca,cb);
-   if(mode==='taxi'||mode==='walk'){
-    (function(kk,mm,kmv,a2,b2){jobs.push(queryDrive(a2,b2).then(function(dr){var e=estMode(mm,kmv,dr);e.mode=mm;cache.legs[kk]=e;}));})(k,mode,km,ca,cb);
-   }else{var e=estMode(mode,km,null);e.mode=mode;cache.legs[k]=e;}
+   var L=it.legs[i]||{};var mode=L.prop||L.mode||'taxi';
+   if(!samePort(seq[i],d)||!samePort(seq[i+1],d)){cache.legs[d.k+':'+i]={min:null,km:null,src:'跨港',mode:mode,wait:null,ride:null,cross:true};continue;}
+   leg(d.k+':'+i,mode,coordOf(seq[i]),coordOf(seq[i+1]));
   }
+  if(pc&&samePort(seq[seq.length-1],d))leg(d.k+':out',pm.out||'taxi',coordOf(seq[seq.length-1]),[pc.lat,pc.lng]);
+  else cache.legs[d.k+':out']={min:null,km:null,src:'跨港',mode:'taxi',wait:null,ride:null,cross:true};
  });
  return Promise.all(jobs).then(function(){
   DAYS.forEach(function(d){
    if(!d.plan)return;
    var it=PLAN.items[d.k];var used=0,miss=false;
-   SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){used+=(+o.min||0);});});
-   var n=0;SLOTS.forEach(function(s){n+=it.slots[s[0]].length;});
-   for(var i=0;i<n-1;i++){var L=cache.legs[d.k+':'+i];if(!L){finish(d,used,false);return;}if(L.min==null){miss=true;}else used+=L.min;}
+   var seq=[];SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){seq.push(o);});});
+   seq.forEach(function(o){used+=(+o.min||0);});
+   var keys=[];
+   if(seq.length){keys.push(d.k+':in');for(var j=0;j<seq.length-1;j++)keys.push(d.k+':'+j);keys.push(d.k+':out');}
+   keys.forEach(function(k){var L=cache.legs[k];if(!L){miss=true;return;}if(L.min==null){miss=true;}else used+=L.min;});
    finish(d,used,miss);
   });
  });
@@ -332,7 +350,7 @@ function renderBoard(){
   +(d.plan?('　<span style="color:#6b7a89">用餐扣抵 '+fmtMin(meal0)+'</span> <button class="ghost" style="padding:2px 8px;font-size:12px" onclick="setMeal()">改</button>'):'');
  if(!d.plan){document.getElementById('warn').innerHTML='';document.getElementById('board').innerHTML='<div class="slot">此日無岸上規劃（登船／返抵）。</div>';renderStatus();return;}
  var t=cache.totals[curDay]||{};var w='';
- if(t.miss)w+='<div class="warnbox">⚠️ 有項目尚無座標，該段交通無法估算（可按項目上的「📍」查座標）</div>';
+ if(t.miss)w+='<div class="warnbox">⚠️ 有跨港／非本港項目或尚無座標，該段交通無法估算（跨港項請移到正確港口那天，或按「📍」查座標）</div>';
  if(t.cap!=null){var basis='（到港→回船 '+fmtMin(t.raw)+' − 用餐 '+fmtMin(t.meal)+'）';
   if(t.over>0)w+='<div class="warnbox">⛔ 行程＋交通超出可用時間 <b>'+fmtMin(t.over)+'</b>（可用 '+fmtMin(t.cap)+'／已排 '+fmtMin(t.used)+'）'+basis+'</div>';
   else w+='<div class="warnbox ok">✅ 時間可行：已排 '+fmtMin(t.used)+'／可用 '+fmtMin(t.cap)+'（餘裕 '+fmtMin(t.cap-t.used)+'）'+basis+'</div>';}
@@ -345,7 +363,7 @@ function renderBoard(){
   arr.forEach(function(o,idx){
    var end=(o.endorse||[]),hold=(o.hold||[]),st=stanceOf(o);
    out+='<div class="item" data-idx="'+idx+'" data-slot="'+s[0]+'"><div class="hnd">⠿</div><div class="body">'
-    +'<div class="nm">'+esc(o.t)+(o.src==='user'?'<span class="src user">'+esc(o.by||'?')+' 提議</span>':'<span class="src ai">候選</span>')+(agreed(o)?'<span class="tag-ok">✅ 已確認</span>':'')+'</div>'
+    +'<div class="nm">'+esc(o.t)+(o.src==='user'?'<span class="src user">'+esc(o.by||'?')+' 提議</span>':'<span class="src ai">候選</span>')+((o.place&&dayPlaceOf(d)&&o.place!==dayPlaceOf(d))?'<span class="tag-warn">⚠️非本港</span>':'')+(agreed(o)?'<span class="tag-ok">✅ 已確認</span>':'')+'</div>'
     +'<div class="meta">停留 '+fmtMin(o.min||60)+(o.lat!=null?'・📍已定位':'・⚠️未定位')+'・附議 '+end.length+'/'+roster().length+(end.length?'（'+esc(end.join('、'))+'）':'')+(hold.length?'・再考慮 '+hold.length+'（'+esc(hold.join('、'))+'）':'')+'</div>'
     +'</div><div class="ops">'
     +'<button onclick="setMin(\''+s[0]+'\','+idx+')">⏱</button>'
@@ -358,14 +376,15 @@ function renderBoard(){
   out+='</div>';
  });
  var seq=[];SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){seq.push(o);});});
- if(seq.length>=2){
-  out+='<div class="slot"><h3>🚕 交通段 <span class="cnt">('+(seq.length-1)+')</span></h3>';
+ if(seq.length){
+  var pc=PORT[d.port];var pm=it.portMode||{in:'taxi',out:'taxi'};
+  out+='<div class="slot"><h3>🚕 交通段 <span class="cnt">('+(seq.length+1)+')</span></h3>';
+  out+=portLegRow('in','港口（'+(pc?pc.n:d.port)+'） → '+esc(seq[0].t.slice(0,14)),cache.legs[curDay+':in'],pm.in||'taxi');
   for(var i=0;i<seq.length-1;i++){
    var L=it.legs[i]||{};var C=cache.legs[curDay+':'+i]||{};var cur=L.prop||L.mode||'taxi';
    out+='<div class="leg"><div style="font-weight:700">'+(i+1)+'. '+esc(seq[i].t.slice(0,14))+' → '+esc(seq[i+1].t.slice(0,14))+'</div><div class="row" style="margin-top:4px">';
    out+=['walk','taxi','bus','mono'].map(function(m){return '<button class="'+(cur===m?'on':'')+'" onclick="setLeg('+i+',\''+m+'\')">'+MODEN[m]+'</button>';}).join('');
-   var brk=(C.min==null||!C.wait)?'':('（等 '+Math.round(C.wait)+'＋搭 '+Math.round(C.ride)+' 分）');
-   out+='<span class="est">'+(C.min==null?'時間未知':'約 '+fmtMin(C.min)+brk+(C.km?'・'+C.km.toFixed(1)+'km':''))+'</span>';
+   out+=legEst(C);
    if(L.prop){
     var lst=stanceOf(L);
     out+='<span class="prop">（'+esc(L.by||'?')+' 提議・原 '+(MODEN[L.mode]||L.mode)+'・附議 '+((L.endorse||[]).length)+'/'+roster().length+((L.hold||[]).length?'・再考慮 '+(L.hold||[]).length:'')+'）</span>';
@@ -375,10 +394,23 @@ function renderBoard(){
    }else if(L.mode){out+='<span class="prop">AI/原定</span>';}
    out+='</div></div>';
   }
+  out+=portLegRow('out',esc(seq[seq.length-1].t.slice(0,14))+' → 港口（'+(pc?pc.n:d.port)+'）',cache.legs[curDay+':out'],pm.out||'taxi');
   out+='</div>';
  }
  document.getElementById('board').innerHTML=out;
  renderStatus();bindDrag();
+}
+
+function legEst(C){
+ if(C&&C.cross)return '<span class="est" style="color:#c0392b">⚠️ 跨港／非本港，無法估算</span>';
+ var brk=(!C||C.min==null||!C.wait)?'':('（等 '+Math.round(C.wait)+'＋搭 '+Math.round(C.ride)+' 分）');
+ return '<span class="est">'+((C&&C.min!=null)?('約 '+fmtMin(C.min)+brk+(C.km?'・'+C.km.toFixed(1)+'km':'')):'時間未知')+'</span>';
+}
+function portLegRow(which,label,C,cur){
+ var h='<div class="leg"><div style="font-weight:700">'+label+'</div><div class="row" style="margin-top:4px">';
+ h+=['walk','taxi','bus','mono'].map(function(m){return '<button class="'+(cur===m?'on':'')+'" onclick="setPortMode(\''+which+'\',\''+m+'\')">'+MODEN[m]+'</button>';}).join('');
+ h+=legEst(C)+'</div></div>';
+ return h;
 }
 
 /* ================= 操作 ================= */
@@ -396,6 +428,7 @@ function setLeg(i,mode){if(guard())return;var it=it0();var L=it.legs[i]||(it.leg
   recompute();}
 function endorseLeg(i){if(guard())return;var L=it0().legs[i];if(!L||!L.prop){toast('這段沒有提議');return;}setStance(L,'yes');recompute();}
 function holdLeg(i){if(guard())return;var L=it0().legs[i];if(!L||!L.prop){toast('這段沒有提議');return;}setStance(L,'no');recompute();}
+function setPortMode(which,mode){if(guard())return;var it=it0();it.portMode=it.portMode||{in:'taxi',out:'taxi'};it.portMode[which]=mode;recompute();}
 function recompute(){saveQuiet();return computeAll().then(function(){renderBoard();});}
 
 /* ================= 拖拉（pointer events，手機可用） ================= */
@@ -450,7 +483,9 @@ var KINDS=[
  {k:'shop',n:'🛍 購物',bg:'#eafaf1',fg:'#1e6b32',bd:'#bfe6cd'},
  {k:'souv',n:'🎁 伴手禮',bg:'#fff6e0',fg:'#8a5a00',bd:'#ecd79a'},
  {k:'feat',n:'✨ 特色',bg:'#f3ecfb',fg:'#6b3fa0',bd:'#d5c2ee'}];
-function dayPlace(){var p=d0().port;return p==='那霸'?'naha':p==='宮古島'?'miyako':p==='石垣島'?'ishigaki':null;}
+function dayPlaceOf(d){var p=d&&d.port;return p==='那霸'?'naha':p==='宮古島'?'miyako':p==='石垣島'?'ishigaki':null;}
+function dayPlace(){return dayPlaceOf(d0());}
+function samePort(o,d){var dp=dayPlaceOf(d);return !o.place||!dp||o.place===dp;}
 function votesOf(id){return (VOTES&&VOTES[id])||[];}
 function isAdded(id){var f=false;DAYS.forEach(function(d){SLOTS.forEach(function(s){(PLAN.items[d.k].slots[s[0]]||[]).forEach(function(o){if(o.id===id)f=true;});});});return f;}
 function poolList(){
@@ -539,6 +574,9 @@ function dayPlan(d){
  if(!d.plan)return out;
  var it=PLAN.items[d.k];var t=hm(d.arr);if(t==null)t=8*60;
  var seq=[];SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){seq.push(o);});});
+ var pc=PORT[d.port];
+ if(seq.length){var LI=cache.legs[d.k+':in'];
+  if(LI&&LI.min!=null){out.rows.push({t:hm2s(t),n:'從港口出發（'+(pc?pc.n:d.port)+'）',min:LI.min,kind:'leg'});t+=LI.min;}else out.miss=true;}
  for(var i=0;i<seq.length;i++){
   out.rows.push({t:hm2s(t),n:seq[i].t,min:(+seq[i].min||0),kind:'item'});
   t+=(+seq[i].min||0);
@@ -547,6 +585,8 @@ function dayPlan(d){
    if(!L||L.min==null){out.miss=true;continue;}
    out.rows.push({t:hm2s(t),n:(MODEN[L.mode]||L.mode)+(L.wait?('（等'+Math.round(L.wait)+'＋搭'+Math.round(L.ride)+'）'):''),min:L.min,kind:'leg'});t+=L.min;}
  }
+ if(seq.length){var LO=cache.legs[d.k+':out'];
+  if(LO&&LO.min!=null){out.rows.push({t:hm2s(t),n:'回港口（'+(pc?pc.n:d.port)+'）',min:LO.min,kind:'leg'});t+=LO.min;}else out.miss=true;}
  out.end=t;
  var meal=(+PLAN.items[d.k].mealMin)||0;if(meal)t+=meal;
  if(d.by){var by=hm(d.by);if(by!=null){out.over=Math.max(0,t-by);
