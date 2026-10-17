@@ -22,7 +22,7 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 body.ov #ovbar{display:flex}
 body.ov .cats{display:none}
 body.ov .sect{display:none}
-body.ov .sect.ovshow{display:block}
+body.ov .sect.ovshow{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;align-items:start;margin-bottom:8px}
 body.ov .card.ov{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;margin-bottom:8px;cursor:pointer}
 body.ov .card.ov .ovthumb{flex:0 0 62px;width:62px;height:62px;border-radius:8px;overflow:hidden;background:#f1f1f1}
 body.ov .card.ov .ovthumb img{width:100%;height:100%;object-fit:cover;display:block;margin:0;border-radius:0}
@@ -44,6 +44,17 @@ body.ov .card.ov.ovopen .ovorig{display:block}
 body.ov .card.ov.ovopen .ovbody{display:block}
 body.catmode .ovthumb,body.catmode .ovdet{display:none!important}
 body.catmode .card.ov .ovbody>h3{padding-right:0}
+/* 總覽：港口按鈕列（取代三段展開/收合）＋卡片多欄格狀（2–4 欄） */
+#portrow{display:flex;gap:6px;flex:none}
+#portrow button{flex:none;border:1px solid #d8d0bd;border-radius:20px;padding:6px 10px;font-size:13px;background:#fff;cursor:pointer;white-space:nowrap}
+#portrow button.on{background:#10293f;color:#fff;border-color:#10293f;font-weight:700}
+body.ov .secthead{display:none!important}
+body.ov .sect.ovshow>h2.st,body.ov .sect.ovshow>.note,body.ov .sect.ovshow>.rankcard{grid-column:1/-1}
+body.ov .card.ov{flex-direction:column;align-items:stretch;gap:6px}
+body.ov .card.ov .ovthumb{flex:none;width:100%;height:104px}
+body.ov .card.ov:not(.ovopen) .ovbody>h3{padding-right:0;font-size:13px}
+body.ov .card.ov:not(.ovopen) .ovdet{display:none}
+body.ov .card.ov.ovopen{grid-column:1/-1}
 .sectblock{position:relative}.secthead{background:#fff;color:#10293f;border:1px solid #dfd7c4;border-radius:12px;padding:8px 14px;margin:14px 0 8px;font-size:16px;font-weight:800;display:flex;align-items:center;gap:8px;cursor:pointer;min-height:46px}
 .secthead .arw{margin-left:auto;font-size:13px;font-weight:700;color:#7a5200;border:1px solid #d8c98f;border-radius:14px;padding:4px 12px;white-space:nowrap;background:#fffdf3}
 .cats{display:flex;flex-direction:column;gap:8px;padding:10px 12px;background:#fff;border-bottom:1px solid #e3ddd0;position:sticky;top:51px;z-index:9}
@@ -198,7 +209,7 @@ img.ph{cursor:zoom-in}
 <button class="cat cat2" onclick="swCat('souv',this)">🎁 伴手禮</button>
 <button class="cat cat2" onclick="swCat('feat',this)">✨ 當地特色</button>
 </div>
-<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20261017-bh）</div>
+<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20261017-bi）</div>
 </div>
 <div class="wrap">
 
@@ -924,7 +935,8 @@ function applyOvMode(){
   else{s.classList.toggle('ovshow',s.id===curP);}
  });
  document.querySelectorAll('.secthead').forEach(function(hd){hd.style.display=mode==='ov'?'flex':'none';hd.querySelector('.arw').textContent=document.getElementById(hd.getAttribute('data-s')).classList.contains('ovshow')?'收合 ▲':'展開 ▼';});
- var tb=document.getElementById('ovtoggle');if(tb)tb.textContent=mode==='ov'?'分類':'總覽';var sp=document.getElementById('ovplace');if(sp)sp.value=ovPlace;var sc=document.getElementById('ovcat');if(sc)sc.value=ovCat;
+ var tb=document.getElementById('ovtoggle');if(tb)tb.textContent=mode==='ov'?'分類':'總覽';var sc=document.getElementById('ovcat');if(sc)sc.value=ovCat;
+ var pr=document.getElementById('portrow');if(pr)pr.querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-p')===ovPlace);});
  var ob=document.getElementById('ovbar');if(ob)ob.style.display=mode==='ov'?'flex':'none'; setOvTop();
  if(mode==='ov')applyOvFilter();else applyFilter();
 }
@@ -945,11 +957,10 @@ window.addEventListener('scroll',function(){setOvTop();},{passive:true});
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){setOvTop();});
 function initOv(){
  var bar=document.createElement('div');bar.id='ovbar';
- var PL='<option value="all">全部港口</option><option value="s-naha">🌺 那霸</option><option value="s-miyako">🏝 宮古島</option><option value="s-ishigaki">🪨 石垣島</option>';
  var CT='<option value="all">全部分類</option><option value="food">🍜 餐廳</option><option value="spot">📷 景點</option><option value="shop">🛍 購物</option><option value="souv">🎁 伴手禮</option><option value="feat">✨ 當地特色</option>';
- bar.innerHTML='<select id="ovplace">'+PL+'</select><select id="ovcat">'+CT+'</select>';
+ bar.innerHTML='<div id="portrow"><button data-p="all">全部</button><button data-p="s-naha">🌺 那霸</button><button data-p="s-miyako">🏝 宮古島</button><button data-p="s-ishigaki">🪨 石垣島</button></div><select id="ovcat">'+CT+'</select>';
  var catsEl=document.querySelector('.cats');catsEl.parentNode.insertBefore(bar,catsEl);
- document.getElementById('ovplace').onchange=function(){ovPlace=this.value;applyOvMode();};
+ bar.querySelectorAll('#portrow button').forEach(function(b){b.onclick=function(){ovPlace=this.getAttribute('data-p');applyOvMode();};});
  document.getElementById('ovcat').onchange=function(){ovCat=this.value;applyOvMode();};
  document.getElementById('ovtoggle').onclick=function(){setOvState(ovState()==='ov'?'cat':'ov');};
  buildOverview();
