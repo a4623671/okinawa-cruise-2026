@@ -112,9 +112,9 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
 .menu .moverow button{display:inline-block;width:auto;margin-bottom:0;padding:8px 10px;font-size:14px;flex:1;text-align:center}
 #mapfab{position:fixed;right:12px;bottom:74px;z-index:32;width:54px;height:54px;border-radius:50%;border:1px solid #d8d0bd;background:#fff;font-size:24px;line-height:1;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.25)}
 #mapfab:active{background:#f2f6fa}
-#mapov{position:fixed;inset:0;background:rgba(8,20,32,.45);z-index:70;display:none;align-items:center;justify-content:center;padding:10px}
+#mapov{position:fixed;inset:0;background:rgba(8,20,32,.45);z-index:70;display:none;align-items:center;justify-content:center;padding:6px}
 #mapov.on{display:flex}
-#mapcard{background:#fff;border-radius:16px;width:100%;max-width:720px;height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.4)}
+#mapcard{background:#fff;border-radius:16px;width:100%;max-width:760px;height:94vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.4)}
 #mapbar{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid #dbe3ec;overflow-x:auto;scrollbar-width:none;flex:none}
 #mapbar::-webkit-scrollbar{display:none}
 #mapbar .day{flex:none;border:1px solid #d8d0bd;border-radius:14px;padding:5px 10px;font-size:13px;background:#fff;cursor:pointer;white-space:nowrap}
@@ -129,7 +129,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
 #candbar select{flex:1;min-width:0;border:1px solid #d8d0bd;border-radius:10px;padding:6px;font-size:14px;background:#fff}
 #candbar button{border:1px solid #d8d0bd;background:#fff;border-radius:10px;padding:6px 12px;font-size:14px;cursor:pointer;flex:none}
 #candbar .ghost{color:#6b7a89}
-#mappanel{flex:none;max-height:42vh;overflow:auto;border-top:1px solid #dbe3ec;background:#fff;display:none}
+#mappanel{flex:none;max-height:31vh;overflow:auto;border-top:1px solid #dbe3ec;background:#fff;display:none}
 #mapact{position:sticky;top:0;z-index:2;background:#fff;display:flex;align-items:center;gap:6px;padding:6px 10px;border-bottom:1px solid #eef2f6;flex-wrap:wrap}
 #mapact>button{border:1px solid #b9a86a;background:#fffdf3;color:#7a5200;border-radius:10px;padding:5px 10px;font-size:13px;font-weight:700;cursor:pointer}
 #mapact .mlbl{margin-left:auto;font-size:12px;color:#6b7a89}
@@ -141,15 +141,17 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
 .mport{display:flex;align-items:center;gap:8px;padding:6px 8px;font-weight:800;font-size:14px;background:#f4f8fb;border-radius:8px;margin:4px 0}
 .mport.back{background:#eef7f1}
 .maprow{display:flex;align-items:center;gap:8px;padding:6px 4px;border-bottom:1px dashed #eef2f6;background:#fff;touch-action:pan-y}
-.maprow .mh{flex:none;color:#9fb0c0;font-size:16px;cursor:grab;padding:0 4px;touch-action:none}
+.maprow{cursor:pointer}
+.maprow .mv{flex:none;display:flex;flex-direction:column;gap:2px}
+.maprow .mv button{border:1px solid #dbe3ec;background:#fff;border-radius:6px;width:26px;height:19px;font-size:10px;line-height:1;cursor:pointer;color:#4a5b6c;padding:0}
 .maprow .mn{flex:1;min-width:0;font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .maprow .md{font-size:12px;color:#b3541e;white-space:nowrap}
 .maprow .mx{flex:none;border:none;background:none;color:#b3402a;font-size:15px;cursor:pointer;padding:0 2px}
-.maprow.mdrag{opacity:.7;background:#f4f9fd;box-shadow:0 4px 14px rgba(0,0,0,.18);border-radius:8px;position:relative}
-.maprow.mtarget{outline:2px dashed #1b6f9e}
 .mapleg{display:flex;align-items:center;gap:6px;padding:4px 4px 4px 26px;font-size:12.5px;color:#5b6b7c;cursor:pointer}
 .mapleg .me{color:#b3541e;font-weight:700}
 .mapleg .msw{margin-left:auto;font-size:11px;color:#9fb0c0}
+.leaflet-tooltip.porttip{background:#10293f;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;padding:2px 7px;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.leaflet-tooltip.porttip:before{display:none}
 .sheethead{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .sheethead h2{margin:0;flex:1}
 .xbtn{border:1px solid #d8d0bd;background:#fff;border-radius:50%;width:34px;height:34px;font-size:17px;line-height:1;cursor:pointer;flex:none;color:#4a5b6c}
@@ -172,7 +174,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p17</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p18</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -233,9 +235,9 @@ var MODEN={walk:'🚶走路',taxi:'🚕計程車',bus:'🚌公車',mono:'🚝單
 var DEADLINE='2026-12-02T22:00:00+08:00';
 /* 郵輪停靠碼頭座標（OSM 實查；非一般漁港/離島渡輪碼頭） */
 var PORT={
- '那霸':{n:'那霸郵輪碼頭',lat:26.22557,lng:127.67464},
- '宮古島':{n:'平良港郵輪碼頭',lat:24.81409,lng:125.28174},
- '石垣島':{n:'石垣港新港郵輪碼頭',lat:24.32717,lng:124.14158}
+ '那霸':{n:'安謝新港（那覇港新港ふ頭）',lat:26.2364909,lng:127.6777349},
+ '宮古島':{n:'平良港國際郵輪碼頭',lat:24.81409,lng:125.28174},
+ '石垣島':{n:'石垣港新港國際旅客船碼頭',lat:24.3276299,lng:124.1415995}
 };
 
 /* ================= 狀態 ================= */
@@ -787,7 +789,7 @@ Promise.all([_geoP,_votesP]).then(function(res){
 </script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-var PMAP=null,MAPBYK=curDay,MCAND=false,MCANDK='food',MCANDL=[],MDRAG=null,MCANDBUSY=false;
+var PMAP=null,MAPBYK=curDay,MMARK={},MCAND=false,MCANDK='food',MCANDL=[],MDRAG=null,MCANDBUSY=false;
 var DAYC={'2026-12-16':'#64748b','2026-12-17':'#e05307','2026-12-18':'#1b6f9e','2026-12-19':'#7a3fa0','2026-12-20':'#0e6e5a'};
 var MCYCLE={walk:'taxi',taxi:'bus',bus:'mono',mono:'walk'};
 function mapDays(){
@@ -805,7 +807,7 @@ function openPlanMap(){document.getElementById('mapov').classList.add('on');mapD
  },80);}
 function closePlanMap(){document.getElementById('mapov').classList.remove('on');}
 function pinHTML(txt,bg,size){return '<div style="background:'+bg+';color:#fff;min-width:'+size+'px;height:'+size+'px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:'+(size>=30?15:12)+'px;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35)">'+txt+'</div>';}
-function mapClear(){PMAP.eachLayer(function(l){if(l instanceof L.Marker||l instanceof L.Polyline)PMAP.removeLayer(l);});}
+function mapClear(){PMAP.eachLayer(function(l){if(l instanceof L.Marker||l instanceof L.Polyline)PMAP.removeLayer(l);});MMARK={};}
 function drawPlanMap(){
  if(!PMAP)return;mapClear();
  var showAll=(MAPBYK==='all');
@@ -850,8 +852,10 @@ function drawOneDay(){
  if(pts.length>1){var line=pts.map(function(p){return [p.lat,p.lng];});if(pc)line.push([pc.lat,pc.lng]);L.polyline(line,{color:col,weight:4,opacity:.85,dashArray:'8 6'}).addTo(PMAP);}
  pts.forEach(function(p,i){
   var isPort=!!p.port;
-  L.marker([p.lat,p.lng],{icon:L.divIcon({className:'',html:pinHTML(isPort?'🚢':(p.x?seq.indexOf(p.x)+2:''),isPort?'#10293f':col,isPort?30:28),iconSize:[isPort?30:28,isPort?30:28]})})
+  var mk=L.marker([p.lat,p.lng],{icon:L.divIcon({className:'',html:pinHTML(isPort?'🚢':(p.x?seq.indexOf(p.x)+2:''),isPort?'#10293f':col,isPort?30:28),iconSize:[isPort?30:28,isPort?30:28]})})
    .addTo(PMAP).bindPopup(isPort?('<b>港口 '+esc(pc.n)+'</b>'):planPopup(p.x));
+  if(isPort)mk.bindTooltip('🚢 港口',{permanent:true,direction:'top',offset:[0,-14],className:'porttip'});
+  if(p.x)MMARK[p.x.s+':'+p.x.i]=mk;
  });
  if(MCAND)candPins();
  document.getElementById('modes').innerHTML=modesHTML();
@@ -900,51 +904,34 @@ function mapPanelHTML(seq,pc,it){
  h+='<div class="mport">🚢 港口 '+(pc?esc(pc.n):esc(d0().port))+'</div>';
  h+=legRow('in',cache.legs[curDay+':in']);
  seq.forEach(function(x,k){
-  h+='<div class="maprow" data-slot="'+x.s+'" data-idx="'+x.i+'"><span class="mh" onpointerdown="mapDragStart(event,\''+x.s+'\','+x.i+')">⠿</span><span class="mn">'+esc(x.o.t)+'</span><span class="md">'+fmtMin(x.o.min||0)+'</span><button class="mx" onclick="mapRemove(\''+x.s+'\','+x.i+')">✕</button></div>';
+  h+='<div class="maprow" data-slot="'+x.s+'" data-idx="'+x.i+'" onclick="mapFocus(\''+x.s+'\','+x.i+')">'
+   +'<span class="mv"><button onclick="event.stopPropagation();mapMove(\''+x.s+'\','+x.i+',-1)">▲</button><button onclick="event.stopPropagation();mapMove(\''+x.s+'\','+x.i+',1)">▼</button></span>'
+   +'<span class="mn">'+esc(x.o.t)+'</span><span class="md">'+fmtMin(x.o.min||0)+'</span>'
+   +'<button class="mx" onclick="event.stopPropagation();mapRemove(\''+x.s+'\','+x.i+')">✕</button></div>';
   var key=(k<seq.length-1)?String(k):'out';
   h+=legRow(key,cache.legs[curDay+':'+key]);
  });
  h+='<div class="mport back">🚢 回港口</div>';
  return h;
 }
-function mapDragStart(e,slot,idx){
+function mapMove(slot,idx,dir){
  if(guard())return;
- var row=e.currentTarget.closest('.maprow');if(!row)return;
- e.preventDefault();
- MDRAG={slot:slot,idx:idx,row:row,y:e.clientY};
- row.classList.add('mdrag');
- document.addEventListener('pointermove',mapDragMove,{passive:false});
- document.addEventListener('pointerup',mapDragEnd);
-}
-function mapDragMove(e){
- if(!MDRAG)return;
- e.preventDefault();
- MDRAG.row.style.transform='translateY('+(e.clientY-MDRAG.y)+'px)';
- var el=document.elementFromPoint(e.clientX,e.clientY);
- var r=el&&el.closest?el.closest('.maprow'):null;
- document.querySelectorAll('.maprow').forEach(function(x){x.classList.toggle('mtarget',x===r&&x!==MDRAG.row);});
-}
-function mapDragEnd(e){
- document.removeEventListener('pointermove',mapDragMove);
- document.removeEventListener('pointerup',mapDragEnd);
- if(!MDRAG)return;
- var row=MDRAG.row;row.style.transform='';row.classList.remove('mdrag');
- document.querySelectorAll('.maprow').forEach(function(x){x.classList.remove('mtarget');});
- var el=document.elementFromPoint(e.clientX,e.clientY);
- var r=el&&el.closest?el.closest('.maprow'):null;
- var from=MDRAG;MDRAG=null;
- if(!r||r===row)return;
- var tSlot=r.getAttribute('data-slot'),tIdx=+r.getAttribute('data-idx');
- var rect=r.getBoundingClientRect();
- var after=(e.clientY>rect.top+rect.height/2);
- if(after)tIdx++;
- var src=it0().slots[from.slot];var obj=src.splice(from.idx,1)[0];
- if(!obj)return;
- if(from.slot===tSlot&&from.idx<tIdx)tIdx--;
- var dst=it0().slots[tSlot];
- if(tIdx<0)tIdx=0;if(tIdx>dst.length)tIdx=dst.length;
- dst.splice(tIdx,0,obj);
+ var it=it0(),flat=[];
+ SLOTS.forEach(function(sl){it.slots[sl[0]].forEach(function(o,i){flat.push({s:sl[0],i:i});});});
+ var cur=-1;flat.forEach(function(x,k){if(x.s===slot&&x.i===idx)cur=k;});
+ var tgt=cur+dir;
+ if(cur<0||tgt<0||tgt>=flat.length){toast(dir<0?'已在最前面':'已在最後面');return;}
+ var obj=it.slots[slot].splice(idx,1)[0];
+ var T=flat[tgt];
+ if(T.s===slot){var a=it.slots[slot];a.splice(Math.min(T.i,a.length),0,obj);}
+ else if(dir<0){it.slots[T.s].splice(T.i+1,0,obj);}
+ else{it.slots[T.s].splice(T.i,0,obj);}
  recompute().then(function(){drawPlanMap();});
+}
+function mapFocus(slot,idx){
+ var m=MMARK[slot+':'+idx];if(!m)return;
+ try{PMAP.setView(m.getLatLng(),Math.max(PMAP.getZoom(),15),{animate:true});}catch(e){}
+ m.openPopup();
 }
 function autoOrderMap(){
  if(guard())return;

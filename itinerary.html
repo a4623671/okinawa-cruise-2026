@@ -327,7 +327,7 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 <div class="cfg"><h3>🛡 管理者</h3>
 <p class="rule">待審清單在首頁「提案審核」決定（直接通過／需要審核），確認後由排程器套用＋push。每日 08:00 自動產出投票加權排程 digest。</p></div>
 </div>
-<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20261017-it1（新增「📋 依排程板產生行程」）・有問題請截圖此行</div>
+<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20261017-it2（新增「📋 依排程板產生行程」）・有問題請截圖此行</div>
 <div class="summary"><div class="grow" id="sumtxt">已選 0 項・合計 0 分</div><button id="btnCopy" onclick="copyPlan()">複製初稿</button><button id="btnPrint" onclick="showSheet()">檢視</button></div>
 <div class="fab"><button id="fabNow" title="目前行程" onclick="locateNow()">📍</button><button id="fabAuto" title="依排程板產生行程" onclick="openAuto()">📋</button><button id="fabWx" title="港口天氣" onclick="scrollWx()">🌤</button><button id="fabMap" title="港口地圖導航" onclick="openPortMap()">🗺</button></div>
 <div class="mov" id="mov"><div class="movcard"><div class="movhead"><span id="movTitle">港口地圖</span><button onclick="closePortMap()">✕ 關閉</button></div><div id="movMap"></div><div class="movfoot" id="movFoot"></div></div></div>
@@ -418,7 +418,7 @@ var A_DAYS=[{k:'2026-12-16',t:'12/16',port:'基隆',arr:null,by:null,plan:false}
  {k:'2026-12-18',t:'12/18',port:'那霸',arr:'07:00',by:'18:00',plan:true},
  {k:'2026-12-19',t:'12/19',port:'石垣島',arr:'09:00',by:'18:00',plan:true},
  {k:'2026-12-20',t:'12/20',port:'基隆',arr:null,by:null,plan:false}];
-var A_PORT={'那霸':{n:'那霸郵輪碼頭',lat:26.22557,lng:127.67464},'宮古島':{n:'平良港郵輪碼頭',lat:24.81409,lng:125.28174},'石垣島':{n:'石垣港新港郵輪碼頭',lat:24.32717,lng:124.14158}};
+var A_PORT={'那霸':{n:'安謝新港',lat:26.2364909,lng:127.6777349},'宮古島':{n:'平良港國際郵輪碼頭',lat:24.81409,lng:125.28174},'石垣島':{n:'石垣港新港國際旅客船碼頭',lat:24.3276299,lng:124.1415995}};
 var A_MODE={walk:'🚶 走路',taxi:'🚕 計程車',bus:'🚌 公車',mono:'🚝 單軌'};
 var A_SLOTS=['morning','afternoon','evening'];
 var A_PLAN=null,A_GEO={},A_MAP=null,A_CUR='2026-12-17',A_DR={},A_BUSY=false;
