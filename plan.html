@@ -144,7 +144,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p14</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p15</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -747,10 +747,13 @@ Promise.all([_geoP,_votesP]).then(function(res){
 </script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-var PMAP=null;
-function mapDays(){document.getElementById('mapdays').innerHTML=DAYS.map(function(d){
- return '<button class="day'+(d.k===curDay?' on':'')+'" onclick="mapPick(\''+d.k+'\')">'+d.t.slice(0,5)+' '+esc(d.port)+'</button>';}).join('');}
-function mapPick(k){curDay=k;renderDays();renderBoard();mapDays();drawPlanMap();}
+var PMAP=null,MAPBYK='all';
+var DAYC={'2026-12-16':'#64748b','2026-12-17':'#e05307','2026-12-18':'#1b6f9e','2026-12-19':'#7a3fa0','2026-12-20':'#0e6e5a'};
+function mapDays(){
+ var h='<button class="day'+(MAPBYK==='all'?' on':'')+'" onclick="mapPick(\'all\')">🌏 全部</button>';
+ h+=DAYS.map(function(d){return '<button class="day'+(d.k===MAPBYK?' on':'')+'" onclick="mapPick(\''+d.k+'\')">'+d.t.slice(0,5)+' '+esc(d.port)+'</button>';}).join('');
+ document.getElementById('mapdays').innerHTML=h;}
+function mapPick(k){if(k!=='all')curDay=k;MAPBYK=k;renderDays();renderBoard();mapDays();drawPlanMap();}
 function openPlanMap(){document.getElementById('mapov').classList.add('on');mapDays();
  setTimeout(function(){
   if(!window.L){document.getElementById('mapfoot').innerHTML='<span class="warn">地圖元件載入失敗（需連網）</span>';return;}
@@ -762,31 +765,41 @@ function closePlanMap(){document.getElementById('mapov').classList.remove('on');
 function drawPlanMap(){
  if(!PMAP)return;
  PMAP.eachLayer(function(l){if(l instanceof L.Marker||l instanceof L.Polyline)PMAP.removeLayer(l);});
- var d=d0(),it=PLAN.items[curDay],pc=PORT[d.port];
- var foot='';
- if(!d.plan){document.getElementById('mapfoot').innerHTML='此日無岸上規劃（登船／返抵）';return;}
- var seq=[];SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){seq.push(o);});});
- var pts=[],missing=0,line=[];
- if(pc){pts.push({n:'港口 '+pc.n,lat:pc.lat,lng:pc.lng,k:'port'});line.push([pc.lat,pc.lng]);}
- seq.forEach(function(o){var c=coordOf(o);if(!c){missing++;return;}pts.push({n:o.t,lat:c[0],lng:c[1],k:o.kind||''});line.push(c);});
- if(pc&&line.length>1)line.push([pc.lat,pc.lng]);
- if(!pts.length){document.getElementById('mapfoot').innerHTML='此日還沒有可定位的項目（用「＋ 加入項目」或 ⋯ → 📍）';return;}
- L.polyline(line,{color:'#1b6f9e',weight:3,opacity:.75,dashArray:'6 6'}).addTo(PMAP);
- var mode={port:'#10293f',spot:'#1e7a34',food:'#b3541e',shop:'#5b4a9e',souv:'#9a6200',feat:'#0b6e5f'};
- var bounds=[];
- pts.forEach(function(p,i){
-  var bg=mode[p.k]||'#1b6f9e';
-  L.marker([p.lat,p.lng],{icon:L.divIcon({className:'',html:'<div style="background:'+bg+';color:#fff;min-width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35)">'+(i+1)+'</div>',iconSize:[28,28]})})
-   .addTo(PMAP).bindPopup('<b>'+(i+1)+'. '+esc(p.n)+'</b><br><a target="_blank" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(p.n.replace(/^港口 /,''))+'">Google 導航</a>');
-  bounds.push([p.lat,p.lng]);
+ var showAll=(MAPBYK==='all');
+ var list=showAll?DAYS:[DAYS.filter(function(x){return x.k===MAPBYK;})[0]];
+ var bounds=[],legend=[],missing=0,anyPts=false,links=[];
+ list.forEach(function(d){
+  if(!d)return;
+  var it=PLAN.items[d.k]||{},pc=PORT[d.port],col=DAYC[d.k]||'#1b6f9e',wk=(d.k===curDay);
+  var seq=[];SLOTS.forEach(function(s){((it.slots||{})[s[0]]||[]).forEach(function(o){seq.push(o);});});
+  var pts=[];
+  if(pc&&seq.length)pts.push({n:'港口 '+pc.n,lat:pc.lat,lng:pc.lng});
+  seq.forEach(function(o){var c=coordOf(o);if(!c){missing++;return;}pts.push({n:o.t,lat:c[0],lng:c[1]});});
+  if(!pts.length)return;anyPts=true;
+  var line=pts.map(function(p){return [p.lat,p.lng];});
+  if(pc&&line.length>1)line.push([pc.lat,pc.lng]);
+  L.polyline(line,{color:col,weight:wk?4:3,opacity:wk?.85:.6,dashArray:'7 6'}).addTo(PMAP);
+  pts.forEach(function(p,i){
+   var w=wk?30:26;
+   L.marker([p.lat,p.lng],{icon:L.divIcon({className:'',html:'<div style="background:'+col+';color:#fff;min-width:'+w+'px;height:'+w+'px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:'+(wk?15:13)+'px;border:'+(wk?'3px':'2px')+' solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35)">'+(i+1)+'</div>',iconSize:[w,w]})})
+    .addTo(PMAP).bindPopup('<b>'+esc(d.t)+'・'+esc(d.port)+'</b><br>'+(i+1)+'. '+esc(p.n)+'<br><a target="_blank" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(p.n.replace(/^港口 /,''))+'">Google 導航</a>');
+   bounds.push([p.lat,p.lng]);
+  });
+  legend.push({d:d,col:col,n:pts.length-(pc?1:0)});
+  if(!showAll||wk)links.push({d:d,pts:pts.slice(pc?1:0)});
  });
- try{PMAP.fitBounds(bounds,{padding:[40,40]});}catch(e){PMAP.setView(bounds[0],12);}
- var t=cache.totals[curDay]||{};
- foot='<div><b>1–'+pts.length+'</b>＝順序（港口→景點→…→回港口）・座標 © OpenStreetMap'
-  +(t.cap!=null?('・已排 '+fmtMin(t.used)+'／可用 '+fmtMin(t.cap)):'')+'</div>';
- if(missing)foot+='<div class="warn">⚠️ 有 '+missing+' 項未定位，不會出現在地圖（用 ⋯ → 📍 可手動定位）</div>';
- foot+='<div style="margin-top:4px">'+pts.map(function(p,i){return '<a target="_blank" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(p.n.replace(/^港口 /,''))+'">'+(i+1)+'. '+esc(p.n.slice(0,14))+'</a>';}).join('')+'</div>';
- document.getElementById('mapfoot').innerHTML=foot;
+ var f='';
+ if(!anyPts)f='<span class="warn">還沒有可定位的行程（用「＋ 加入項目」加入，缺座標用 ⋯ → 📍 補）</span>';
+ else{
+  f='<div>'+legend.map(function(x){return '<span style="display:inline-flex;align-items:center;gap:4px;margin:2px 10px 2px 0;white-space:nowrap"><span style="width:10px;height:10px;border-radius:50%;background:'+x.col+';display:inline-block"></span>'+esc(x.d.t.slice(0,5))+' '+esc(x.d.port)+'（'+x.n+' 項）</span>';}).join('')+'</div>';
+  f+='<div style="margin-top:3px;color:#6b7a89">號碼＝該日順序・虛線＝當日路線（港口→…→回港口）・座標 © OpenStreetMap'+(showAll?'・目前加粗顯示 '+esc(d0().t.slice(0,5)):'')+'</div>';
+  if(!showAll){var t=cache.totals[MAPBYK]||{};if(t.cap!=null)f+='<div>已排 '+fmtMin(t.used)+'／可用 '+fmtMin(t.cap)+'</div>';}
+  var lk=[];links.forEach(function(x){x.pts.forEach(function(p,i){lk.push('<a target="_blank" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(p.n.replace(/^港口 /,''))+'">'+(i+1)+'. '+esc(p.n.slice(0,12))+'</a>');});});
+  if(lk.length)f+='<div style="margin-top:4px">'+lk.join('')+'</div>';
+ }
+ if(missing)f+='<div class="warn">⚠️ 有 '+missing+' 項未定位，不會出現在地圖（用 ⋯ → 📍 可手動補）</div>';
+ document.getElementById('mapfoot').innerHTML=f;
+ if(bounds.length){try{PMAP.fitBounds(bounds,{padding:[40,40]});}catch(e){PMAP.setView(bounds[0],11);}}
 }
 </script>
 </body>
