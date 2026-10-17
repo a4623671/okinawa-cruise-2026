@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>行程排程板・MSC沖繩（2026/12/16–20）</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;background:#eef2f6;color:#22303f;line-height:1.6;-webkit-user-select:none;user-select:none}
@@ -109,6 +110,17 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
 .menu .moverow{display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
 .menu .moverow>span{font-size:13px;color:#6b7a89}
 .menu .moverow button{display:inline-block;width:auto;margin-bottom:0;padding:8px 10px;font-size:14px;flex:1;text-align:center}
+#mapov{position:fixed;inset:0;background:#fff;z-index:70;display:none;flex-direction:column}
+#mapov.on{display:flex}
+#mapbar{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid #dbe3ec;overflow-x:auto;scrollbar-width:none;flex:none}
+#mapbar::-webkit-scrollbar{display:none}
+#mapbar .day{flex:none;border:1px solid #d8d0bd;border-radius:14px;padding:5px 10px;font-size:13px;background:#fff;cursor:pointer;white-space:nowrap}
+#mapbar .day.on{background:#10293f;color:#fff;border-color:#10293f;font-weight:700}
+#mapbar .t{font-weight:800;font-size:14px;white-space:nowrap;margin-right:4px}
+#mapwrap{flex:1;min-height:0}
+#mapfoot{flex:none;max-height:24vh;overflow:auto;padding:8px 12px;border-top:1px solid #dbe3ec;font-size:12px;background:#fff}
+#mapfoot a{display:inline-block;margin:2px 8px 2px 0;color:#10293f}
+#mapfoot .warn{color:#b3402a;font-weight:700}
 .sheethead{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .sheethead h2{margin:0;flex:1}
 .xbtn{border:1px solid #d8d0bd;background:#fff;border-radius:50%;width:34px;height:34px;font-size:17px;line-height:1;cursor:pointer;flex:none;color:#4a5b6c}
@@ -122,6 +134,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <a href="guide.html">💬 討論區</a>
   <div class="sp"></div>
   <span class="who" id="who"></span>
+  <button id="mapBtn" onclick="openPlanMap()">🗺 地圖</button>
   <button id="addBtn" onclick="openPool()">＋ 加入項目</button>
   <button onclick="openSheet()">🧾 規劃單</button>
 </div>
@@ -131,7 +144,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p13</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p14</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -146,6 +159,11 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
 
 <div class="sheet" id="sheet"><div class="card" id="sheetbody"></div></div>
 <div class="sheet" id="imenu"><div class="card" id="imenubody"></div></div>
+<div id="mapov">
+  <div id="mapbar"><span class="t">🗺 行程地圖</span><span id="mapdays"></span><div class="sp" style="flex:1"></div><button class="xbtn" onclick="closePlanMap()">✕</button></div>
+  <div id="mapwrap"></div>
+  <div id="mapfoot"></div>
+</div>
 <div class="mask" id="pdetail" onclick="if(event.target===this)closePdetail()"><div class="pd" id="pdetailbody"></div></div>
 <div id="toast"></div>
 
@@ -726,6 +744,50 @@ Promise.all([_geoP,_votesP]).then(function(res){
  geo=(res[0]&&typeof res[0]==='object')?res[0]:{};
  VOTES=(res[1]&&typeof res[1]==='object')?res[1]:{};
  boot();});
+</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+var PMAP=null;
+function mapDays(){document.getElementById('mapdays').innerHTML=DAYS.map(function(d){
+ return '<button class="day'+(d.k===curDay?' on':'')+'" onclick="mapPick(\''+d.k+'\')">'+d.t.slice(0,5)+' '+esc(d.port)+'</button>';}).join('');}
+function mapPick(k){curDay=k;renderDays();renderBoard();mapDays();drawPlanMap();}
+function openPlanMap(){document.getElementById('mapov').classList.add('on');mapDays();
+ setTimeout(function(){
+  if(!window.L){document.getElementById('mapfoot').innerHTML='<span class="warn">地圖元件載入失敗（需連網）</span>';return;}
+  if(!PMAP){PMAP=L.map('mapwrap');L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(PMAP);}
+  drawPlanMap();
+  setTimeout(function(){try{PMAP.invalidateSize();}catch(e){}},250);
+ },80);}
+function closePlanMap(){document.getElementById('mapov').classList.remove('on');}
+function drawPlanMap(){
+ if(!PMAP)return;
+ PMAP.eachLayer(function(l){if(l instanceof L.Marker||l instanceof L.Polyline)PMAP.removeLayer(l);});
+ var d=d0(),it=PLAN.items[curDay],pc=PORT[d.port];
+ var foot='';
+ if(!d.plan){document.getElementById('mapfoot').innerHTML='此日無岸上規劃（登船／返抵）';return;}
+ var seq=[];SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){seq.push(o);});});
+ var pts=[],missing=0,line=[];
+ if(pc){pts.push({n:'港口 '+pc.n,lat:pc.lat,lng:pc.lng,k:'port'});line.push([pc.lat,pc.lng]);}
+ seq.forEach(function(o){var c=coordOf(o);if(!c){missing++;return;}pts.push({n:o.t,lat:c[0],lng:c[1],k:o.kind||''});line.push(c);});
+ if(pc&&line.length>1)line.push([pc.lat,pc.lng]);
+ if(!pts.length){document.getElementById('mapfoot').innerHTML='此日還沒有可定位的項目（用「＋ 加入項目」或 ⋯ → 📍）';return;}
+ L.polyline(line,{color:'#1b6f9e',weight:3,opacity:.75,dashArray:'6 6'}).addTo(PMAP);
+ var mode={port:'#10293f',spot:'#1e7a34',food:'#b3541e',shop:'#5b4a9e',souv:'#9a6200',feat:'#0b6e5f'};
+ var bounds=[];
+ pts.forEach(function(p,i){
+  var bg=mode[p.k]||'#1b6f9e';
+  L.marker([p.lat,p.lng],{icon:L.divIcon({className:'',html:'<div style="background:'+bg+';color:#fff;min-width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35)">'+(i+1)+'</div>',iconSize:[28,28]})})
+   .addTo(PMAP).bindPopup('<b>'+(i+1)+'. '+esc(p.n)+'</b><br><a target="_blank" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(p.n.replace(/^港口 /,''))+'">Google 導航</a>');
+  bounds.push([p.lat,p.lng]);
+ });
+ try{PMAP.fitBounds(bounds,{padding:[40,40]});}catch(e){PMAP.setView(bounds[0],12);}
+ var t=cache.totals[curDay]||{};
+ foot='<div><b>1–'+pts.length+'</b>＝順序（港口→景點→…→回港口）・座標 © OpenStreetMap'
+  +(t.cap!=null?('・已排 '+fmtMin(t.used)+'／可用 '+fmtMin(t.cap)):'')+'</div>';
+ if(missing)foot+='<div class="warn">⚠️ 有 '+missing+' 項未定位，不會出現在地圖（用 ⋯ → 📍 可手動定位）</div>';
+ foot+='<div style="margin-top:4px">'+pts.map(function(p,i){return '<a target="_blank" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(p.n.replace(/^港口 /,''))+'">'+(i+1)+'. '+esc(p.n.slice(0,14))+'</a>';}).join('')+'</div>';
+ document.getElementById('mapfoot').innerHTML=foot;
+}
 </script>
 </body>
 </html>
