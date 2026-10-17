@@ -31,10 +31,10 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .slot{background:#fff;border:1px solid #dbe3ec;border-radius:14px;padding:8px 10px;margin-bottom:10px;min-height:60px}
 .slot h3{font-size:14px;color:#5b6b7c;margin-bottom:6px;display:flex;align-items:center;gap:6px}
 .slot h3 .cnt{font-weight:400;color:#95a3b2}
-.slot.drag{outline:2px dashed #1b6f9e;background:#f4f9fd}
-.item{border:1px solid #e2e8ef;border-radius:10px;padding:7px 9px;margin-bottom:6px;background:#fbfdff;display:flex;gap:8px;align-items:flex-start;touch-action:none}
-.item.grab{opacity:.55;outline:2px solid #1b6f9e}
-.item .hnd{flex:none;color:#9fb0c0;font-size:16px;line-height:1.1;padding:2px 2px 0 0}
+.item{border:1px solid #e2e8ef;border-radius:10px;padding:7px 9px;margin-bottom:6px;background:#fbfdff;display:flex;gap:8px;align-items:flex-start}
+.item .mv{flex:none;display:flex;flex-direction:column;gap:3px;padding-top:1px}
+.item .mv button{border:1px solid #dbe3ec;background:#fff;border-radius:6px;width:28px;height:22px;font-size:11px;line-height:1;cursor:pointer;color:#4a5b6c;padding:0}
+.item .mv button:active{background:#eef2f6}
 .item .body{flex:1;min-width:0}
 .item .nm{font-weight:800;font-size:14px}
 .item .meta{font-size:12px;color:#6b7a89}
@@ -97,7 +97,7 @@ button.ghost{border:1px solid #d8d0bd;background:#fff;border-radius:16px;padding
 .tabs button{flex:none;border:1px solid #dbe3ec;background:#fff;border-radius:14px;padding:5px 12px;font-size:13px;cursor:pointer}
 .tabs button.on{background:#10293f;color:#fff;border-color:#10293f;font-weight:700}
 #toast{position:fixed;left:12px;right:12px;bottom:70px;background:#10293f;color:#fff;border-radius:12px;padding:9px 14px;font-size:13px;z-index:70;display:none;text-align:center;font-weight:700}
-body.locked .ops,body.locked .leg .row button,body.locked #addBtn{display:none!important}
+body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBtn{display:none!important}
 .slot.empty{min-height:0;padding:8px 11px;color:#95a3b2;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .slot.empty .hint{color:#b8c4d0}
 .timesum{font-size:12px;color:#5b6b7c;margin-top:4px}
@@ -106,6 +106,12 @@ body.locked .ops,body.locked .leg .row button,body.locked #addBtn{display:none!i
 .leghead .chev{margin-left:auto;color:#8a97a6;font-weight:700;font-size:12px}
 .menu button{display:block;width:100%;text-align:left;border:1px solid #dbe3ec;background:#fff;border-radius:12px;padding:12px 14px;font-size:15px;margin-bottom:8px;cursor:pointer}
 .menu button.danger{color:#b3402a;border-color:#f2b8ae;background:#fdf4f2}
+.menu .moverow{display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.menu .moverow>span{font-size:13px;color:#6b7a89}
+.menu .moverow button{display:inline-block;width:auto;margin-bottom:0;padding:8px 10px;font-size:14px;flex:1;text-align:center}
+.sheethead{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.sheethead h2{margin:0;flex:1}
+.xbtn{border:1px solid #d8d0bd;background:#fff;border-radius:50%;width:34px;height:34px;font-size:17px;line-height:1;cursor:pointer;flex:none;color:#4a5b6c}
 @media print{.topbar,.days,.bar,.status,.ops,.hnd,.tabs,button{display:none!important}.slot,.leg{break-inside:avoid}}
 </style>
 </head>
@@ -125,7 +131,7 @@ body.locked .ops,body.locked .leg .row button,body.locked #addBtn{display:none!i
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p10</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p11</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -134,9 +140,8 @@ body.locked .ops,body.locked .leg .row button,body.locked #addBtn{display:none!i
 </div>
 
 <div class="sheet" id="pool"><div class="card">
-  <h2>＋ 加入項目（候選池）</h2>
+  <div class="sheethead"><h2>＋ 加入項目（候選池）</h2><button class="xbtn" onclick="closePool()">✕</button></div>
   <div id="poolbody"></div>
-  <div style="margin-top:10px"><button class="ghost" onclick="closePool()">關閉</button></div>
 </div></div>
 
 <div class="sheet" id="sheet"><div class="card" id="sheetbody"></div></div>
@@ -383,7 +388,7 @@ function renderBoard(){
   out+='<div class="slot" data-slot="'+s[0]+'"><h3>'+s[1]+' <span class="cnt">('+arr.length+')</span></h3>';
   arr.forEach(function(o,idx){
    var end=(o.endorse||[]),hold=(o.hold||[]),st=stanceOf(o);
-   out+='<div class="item" data-idx="'+idx+'" data-slot="'+s[0]+'"><div class="hnd">⠿</div><div class="body">'
+   out+='<div class="item" data-idx="'+idx+'" data-slot="'+s[0]+'"><div class="mv"><button onclick="moveUp(\''+s[0]+'\','+idx+')">▲</button><button onclick="moveDown(\''+s[0]+'\','+idx+')">▼</button></div><div class="body">'
     +'<div class="nm">'+esc(o.t)+(o.src==='user'?'<span class="src user">'+esc(o.by||'?')+' 提議</span>':'<span class="src ai">候選</span>')+((o.place&&dayPlaceOf(d)&&o.place!==dayPlaceOf(d))?'<span class="tag-warn">⚠️非本港</span>':'')+(agreed(o)?'<span class="tag-ok">✅ 已確認</span>':'')+'</div>'
     +'<div class="meta">停留 '+fmtMin(o.min||60)+(o.lat!=null?'・📍':'・⚠️未定位')+'・附議 '+end.length+'/'+roster().length+(end.length?'（'+esc(end.join('、'))+'）':'')+(hold.length?'・再考慮 '+hold.length+'（'+esc(hold.join('、'))+'）':'')+'</div>'
     +'</div><div class="ops">'
@@ -423,7 +428,7 @@ function renderBoard(){
   out+='</div>';
  }
  document.getElementById('board').innerHTML=out;
- renderStatus();bindDrag();
+ renderStatus();
 }
 
 function legEst(C){
@@ -443,6 +448,8 @@ function toggleLegs(){legOpen[curDay]=!legOpen[curDay];renderBoard();}
 function openItemMenu(slot,idx){
  var o=arr0(slot)[idx];if(!o)return;
  var h='<h2>'+esc(o.t)+'</h2><div class="menu">';
+ var others=SLOTS.filter(function(x){return x[0]!==slot;});
+ h+='<div class="moverow"><span>移到：</span>'+others.map(function(x){return '<button onclick="closeItemMenu();moveToSlot(\''+slot+'\','+idx+',\''+x[0]+'\')">'+x[1]+'</button>';}).join('')+'</div>';
  h+='<button onclick="closeItemMenu();setMin(\''+slot+'\','+idx+')">⏱ 停留時間（目前 '+fmtMin(o.min||60)+'）</button>';
  if(o.lat==null)h+='<button onclick="closeItemMenu();locate(\''+slot+'\','+idx+')">📍 查座標</button>';
  h+='<button class="danger" onclick="closeItemMenu();rmItem(\''+slot+'\','+idx+')">🗑 移除此項</button>';
@@ -450,6 +457,9 @@ function openItemMenu(slot,idx){
  document.getElementById('imenubody').innerHTML=h;
  document.getElementById('imenu').classList.add('on');
 }
+function moveUp(slot,idx){if(guard())return;var a=arr0(slot);if(idx<=0){toast('已在最前面');return;}var t=a[idx-1];a[idx-1]=a[idx];a[idx]=t;recompute();}
+function moveDown(slot,idx){if(guard())return;var a=arr0(slot);if(idx>=a.length-1){toast('已在最後面');return;}var t=a[idx+1];a[idx+1]=a[idx];a[idx]=t;recompute();}
+function moveToSlot(slot,idx,target){if(guard())return;if(slot===target)return;var a=arr0(slot);var o=a.splice(idx,1)[0];it0().slots[target].push(o);recompute();toast('已移到「'+SLOTN[target]+'」');}
 function closeItemMenu(){document.getElementById('imenu').classList.remove('on');}
 
 /* ================= 操作 ================= */
@@ -469,49 +479,6 @@ function endorseLeg(i){if(guard())return;var L=it0().legs[i];if(!L||!L.prop){toa
 function holdLeg(i){if(guard())return;var L=it0().legs[i];if(!L||!L.prop){toast('這段沒有提議');return;}setStance(L,'no');recompute();}
 function setPortMode(which,mode){if(guard())return;var it=it0();it.portMode=it.portMode||{in:'taxi',out:'taxi'};it.portMode[which]=mode;recompute();}
 function recompute(){saveQuiet();return computeAll().then(function(){renderBoard();});}
-
-/* ================= 拖拉（pointer events，手機可用） ================= */
-function bindDrag(){
- document.querySelectorAll('.item').forEach(function(el){
-  el.addEventListener('pointerdown',function(e){
-   if(e.target.closest('button')||frozen())return;
-   var startY=e.clientY,startX=e.clientX,dragging=false,ph=null;
-   function move(ev){
-    var dy=ev.clientY-startY,dx=ev.clientX-startX;
-    if(!dragging&&Math.abs(dy)>8&&Math.abs(dy)>Math.abs(dx)){
-     dragging=true;el.classList.add('grab');ph=document.createElement('div');ph.style.height=el.offsetHeight+'px';el.parentNode.insertBefore(ph,el);}
-    if(!dragging)return;ev.preventDefault();
-    el.style.transform='translateY('+(ev.clientY-startY)+'px)';el.style.zIndex=20;
-    var over=document.elementFromPoint(ev.clientX,ev.clientY);
-    var slot=over&&over.closest?over.closest('.slot'):null;
-    document.querySelectorAll('.slot').forEach(function(s){s.classList.toggle('drag',s===slot&&slot.dataset.slot!=null);});
-   }
-   function up(ev){
-    document.removeEventListener('pointermove',move);document.removeEventListener('pointerup',up);
-    document.querySelectorAll('.slot').forEach(function(s){s.classList.remove('drag');});
-    if(!dragging)return;
-    el.classList.remove('grab');el.style.transform='';el.style.zIndex='';
-    var over=document.elementFromPoint(ev.clientX,ev.clientY);
-    var slot=over&&over.closest?over.closest('.slot'):null;
-    if(!slot||slot.dataset.slot==null){if(ph)ph.remove();renderBoard();return;}
-    var target=slot.dataset.slot,from=el.dataset.slot,fromIdx=+el.dataset.idx;
-    var after=over.closest?over.closest('.item'):null;
-    var src=it0().slots[from];var obj=src.splice(fromIdx,1)[0];
-    var dst=it0().slots[target];
-    if(from===target){
-     var to=fromIdx;
-     if(after)to=+after.dataset.idx;
-     dst.splice(to,0,obj);
-    }else{
-     if(after)dst.splice(+after.dataset.idx,0,obj);else dst.push(obj);
-    }
-    if(ph)ph.remove();recompute();toast('已移到「'+SLOTN[target]+'」');
-   }
-   document.addEventListener('pointermove',move,{passive:false});
-   document.addEventListener('pointerup',up);
-  });
- });
-}
 
 /* ================= 候選池 UI ================= */
 var PLACEN={naha:'🌺那霸',miyako:'🏝宮古島',ishigaki:'🪨石垣島'};
