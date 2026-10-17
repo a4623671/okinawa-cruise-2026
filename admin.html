@@ -41,7 +41,7 @@ h1{font-size:20px;margin-bottom:2px}.sub{font-size:13px;color:#888;margin-bottom
 <div class="card"><div class="t" style="font-size:14px">💬 小幫手使用狀況 <span id="useCnt" style="color:#999;font-weight:400"></span></div><div id="useStat" class="m">讀取中…</div><div id="useList"></div>
 <div class="m" style="font-size:12px;color:#999">只記部署後的對話（30天），跟投票一樣公開可見</div></div>
 <div id="list"></div>
-<div class="note">管理者專用・版本 20261017-aq</div>
+<div class="note">管理者專用・版本 20261017-ar</div>
 </div>
 <script>
 var _p1='Z2l0aHViX3BhdF8xMUFISU5ORVEwV1JKV05mNFNvWHZCXzNtTUJVTWRaa0hDQV',_p2='hNbHA3QUFublh0bmNhTDN3NXZYd0tGbXlsYnlacmdVV0dFUTNSVm5KaXVMS1VW';
@@ -98,10 +98,28 @@ function _insertGuide(g,port,cardsHtml,kindN){
  var has=g.indexOf('id="newprop-'+port+'"')>=0;
  var block=(has?'':'\n<h2 class="st" id="newprop-'+port+'">✨ 家人新增提案</h2>')+'\n'+cardsHtml+'\n';
  g=g.slice(0,close)+block+g.slice(close);
- var re=new RegExp("('"+port+"':\\[[^\\]]*)");
- if(!re.test(g))throw new Error('找不到 CARDMAP '+port);
- g=g.replace(re,function(m,grp){return grp+','+kindN.map(function(k){return "'"+k+"'";}).join(',');});
- return g;}
+ var re=new RegExp("('"+port+"':\\[)([^\\]]*)");
+ var mm=g.match(re);if(!mm)throw new Error('找不到 CARDMAP '+port);
+ var idx=mm[2].split(',').filter(function(s){return s.trim();}).length;
+ g=g.replace(new RegExp("('"+port+"':\\[[^\\]]*)"),function(m,grp){return grp+','+kindN.map(function(k){return "'"+k+"'";}).join(',');});
+ return {g:g,idx:idx};}
+var GEO_API='https://cruise-chat.fan-saxon-bot.workers.dev/api/geo';
+function workerGeoA(q,place){
+ return fetch(GEO_API+'?q='+encodeURIComponent(String(q||'').slice(0,60))+'&place='+encodeURIComponent(place||''),{cache:'no-store'})
+  .then(function(r){return r.ok?r.json():null;})
+  .then(function(j){return (j&&j.ok&&j.lat!=null)?{lat:j.lat,lng:j.lng,src:j.src||'worker'}:null;})
+  .catch(function(){return null;});}
+function _geoPut(cid,lat,lng,src){
+ var api='https://api.github.com/repos/a4623671/cruise-votes/contents/geo.json';
+ var H={'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'};
+ return fetch(api+'?t='+Date.now(),{headers:H,cache:'no-store'}).then(function(r){return r.ok?r.json():null;})
+  .then(function(j){
+   var geo={},sha=null;
+   if(j&&j.content){sha=j.sha;try{geo=JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));}catch(e){}}
+   geo[cid]={lat:lat,lng:lng,src:src||'proposal'};
+   var body={message:'geo: '+cid,content:btoa(unescape(encodeURIComponent(JSON.stringify(geo))))};if(sha)body.sha=sha;
+   return fetch(api,{method:'PUT',headers:H,body:JSON.stringify(body)});
+  }).then(function(r){return !!(r&&r.ok);});}
 function applyProposal(id){
  var p=(window._Q||[]).filter(function(x){return x.id===id;})[0];if(!p){say('找不到提案');return;}
  if(p.kind==='del'){say('刪除類提案需人工處理');return;}
@@ -113,13 +131,15 @@ function applyProposal(id){
   var kind=p.kind||'spot',intro=p.intro||'',where=p.where||'',by=p.by||'?',cards,kinds;
   if(p.items&&p.items.length){cards=p.items.map(function(it,i){return _card(it.title,it.intro||intro,where,i===0?(p.img||''):'',by);}).join('\n');kinds=p.items.map(function(){return kind;});}
   else{cards=_card(p.title,intro,where,p.img||'',by);kinds=[kind];}
-  say('寫入 guide.html…');
+  var pg=(p.lat!=null)?Promise.resolve():workerGeoA(p.title,p.place).then(function(g){if(g){p.lat=g.lat;p.lng=g.lng;p.geo_src=g.src;}});
+  return pg.then(function(){say('寫入 guide.html…');
   return fetch(DEP_API+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
    DEP_SHA=j.sha;var g;try{g=decodeURIComponent(escape(atob(j.content.replace(/\s/g,''))));}catch(e){throw new Error('guide 解碼失敗');}
-   g=_insertGuide(g,'s-'+p.place,cards,kinds);
+   var ins=_insertGuide(g,'s-'+p.place,cards,kinds);g=ins.g;window._lastIdx=ins.idx;
    var body={message:'apply proposal '+id+' ('+p.title+')',content:btoa(unescape(encodeURIComponent(g)))};if(DEP_SHA)body.sha=DEP_SHA;
    return fetch(DEP_API,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)});
   }).then(function(r){if(!r||!r.ok)throw new Error('guide 寫入失敗 '+((r&&r.status)||''));return true;});
+  });
  }).then(function(){
   say('更新提案狀態…');
   return fetch(GH_API_P+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){PH_SHA=j.sha;var list=[];try{list=JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));}catch(e){}
@@ -127,7 +147,14 @@ function applyProposal(id){
    if(!hit)throw new Error('提案已不在清單');
    var body={message:'apply proposal '+id,content:btoa(unescape(encodeURIComponent(JSON.stringify(list))))};if(PH_SHA)body.sha=PH_SHA;
    return fetch(GH_API_P,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)});});
- }).then(function(r){if(!r||!r.ok)throw new Error('提案狀態寫入失敗');say('✅ 已套用並上線：'+(p.title||id));loadQ();})
+ }).then(function(r){
+  if(!r||!r.ok)throw new Error('提案狀態寫入失敗');
+  var cid='s-'+p.place+'#'+(window._lastIdx!=null?window._lastIdx:0);
+  if(p.lat!=null){
+   return _geoPut(cid,p.lat,p.lng,p.geo_src||'proposal').then(function(ok){say(ok?('✅ 已套用並上線（含座標）：'+(p.title||id)):('✅ 已套用並上線：'+(p.title||id)+'（座標寫入失敗，排程板會再自動查）'));loadQ();});
+  }
+  say('✅ 已套用並上線：'+(p.title||id)+'（無座標，排程板會自動查）');loadQ();
+ })
  .catch(function(e){say('套用失敗：'+(e&&e.message?e.message:e)+'（仍保留待套用）');});}
 function approveApply(id){say('通過並套用…');applyProposal(id);}
 /* ==== APPLY HELPERS (end) ==== */
