@@ -131,7 +131,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p11</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p12</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -192,7 +192,8 @@ function blankDay(){var o={slots:{},legs:{},mealMin:null};SLOTS.forEach(function
 function blankPlan(){var p={roster:[],items:{},deadline:DEADLINE,finalized:false,created:new Date().toISOString()};DAYS.forEach(function(d){p.items[d.k]=blankDay();});return p;}
 function ensure(){if(!PLAN)PLAN=blankPlan();
  DAYS.forEach(function(d){if(!PLAN.items[d.k])PLAN.items[d.k]=blankDay();var it=PLAN.items[d.k];
-  SLOTS.forEach(function(s){if(!it.slots[s[0]])it.slots[s[0]]=[];});if(!it.legs)it.legs={};if(it.mealMin==null)it.mealMin=d.plan?60:0;});
+  SLOTS.forEach(function(s){if(!it.slots[s[0]])it.slots[s[0]]=[];});if(!it.legs)it.legs={};if(it.mealMin==null)it.mealMin=d.plan?60:0;
+  Object.keys(it.legs).forEach(function(k){var L=it.legs[k];if(L&&L.prop){L.mode=L.prop;delete L.prop;delete L.by;delete L.endorse;delete L.hold;}});});
  if(!PLAN.roster)PLAN.roster=[];if(!PLAN.deadline)PLAN.deadline=DEADLINE;
  if(me()&&PLAN.roster.indexOf(me())<0)PLAN.roster.push(me());}
 function d0(){return DAYS.filter(function(x){return x.k===curDay;})[0];}
@@ -214,12 +215,24 @@ function ghH(){return {'Accept':'application/vnd.github+json','Authorization':'B
 function loadPlan(){return fetch(API_P+'?t='+Date.now(),{headers:ghH(),cache:'no-store'})
  .then(function(r){if(r.status===404)return null;if(!r.ok)throw new Error('get '+r.status);return r.json();})
  .then(function(j){if(!j)return null;P_SHA=j.sha;try{return JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));}catch(e){return null;}});}
-function savePlan(){PLAN.updated=new Date().toISOString();
- var body={message:'plan '+new Date().toISOString(),content:btoa(unescape(encodeURIComponent(JSON.stringify(PLAN))))};
- if(P_SHA)body.sha=P_SHA;
- return fetch(API_P,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)})
- .then(function(r){if(r.status===409||r.status===422)throw new Error('conflict');if(!r.ok)throw new Error('put '+r.status);return r.json();})
- .then(function(j){P_SHA=j.content.sha;return true;});}
+var SAVE_Q=Promise.resolve();
+function savePlan(){
+ PLAN.updated=new Date().toISOString();
+ var content=btoa(unescape(encodeURIComponent(JSON.stringify(PLAN))));
+ var msg='plan '+new Date().toISOString();
+ function put(sha){var b={message:msg,content:content};if(sha)b.sha=sha;
+  return fetch(API_P,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(b)});}
+ function getSha(){return fetch(API_P+'?t='+Date.now(),{headers:ghH(),cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(j){return j?j.sha:null;});}
+ function attempt(sha,k){
+  return put(sha).then(function(r){
+   if(r.status===409||r.status===422){if(k<=0)throw new Error('conflict（請重試）');return getSha().then(function(s){return attempt(s,k-1);});}
+   if(!r.ok)throw new Error('put '+r.status);
+   return r.json().then(function(j){if(j&&j.content&&j.content.sha)P_SHA=j.content.sha;return true;});
+  });
+ }
+ SAVE_Q=SAVE_Q.then(function(){return attempt(P_SHA,2);},function(){return attempt(P_SHA,2);});
+ return SAVE_Q;
+}
 function saveQuiet(){savePlan().catch(function(e){toast('同步失敗：'+(e.message||e));});}
 function reload(){toast('重新載入…');boot();}
 
@@ -304,7 +317,7 @@ function computeAll(){
   if(pc&&samePort(seq[0],d))leg(d.k+':in',pm.in||'taxi',[pc.lat,pc.lng],coordOf(seq[0]));
   else cache.legs[d.k+':in']={min:null,km:null,src:'跨港',mode:'taxi',wait:null,ride:null,cross:true};
   for(var i=0;i<seq.length-1;i++){
-   var L=it.legs[i]||{};var mode=L.prop||L.mode||'taxi';
+   var mode=(it.legs[i]||{}).mode||'taxi';
    if(!samePort(seq[i],d)||!samePort(seq[i+1],d)){cache.legs[d.k+':'+i]={min:null,km:null,src:'跨港',mode:mode,wait:null,ride:null,cross:true};continue;}
    leg(d.k+':'+i,mode,coordOf(seq[i]),coordOf(seq[i+1]));
   }
@@ -334,7 +347,6 @@ function pendingList(){var out=[];roster();
  DAYS.forEach(function(d){
   if(!d.plan)return;var it=PLAN.items[d.k];
   SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){if(needs(o)>0)out.push(d.t+'・'+o.t+'（缺'+needs(o)+'）');});});
-  Object.keys(it.legs||{}).forEach(function(i){var L=it.legs[i];if(L&&L.prop&&needs(L)>0)out.push(d.t+'・交通段'+(+i+1)+'（缺'+needs(L)+'）');});
  });
  return out;}
 function nextStep(){
@@ -342,8 +354,7 @@ function nextStep(){
  if(Date.now()>planDeadline())return '⏰ 已過截止（唯讀）';
  var any=false,p=0;
  DAYS.forEach(function(d){if(!d.plan)return;var it=PLAN.items[d.k];
-  SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){any=true;if(needs(o)>0)p++;});});
-  Object.keys(it.legs||{}).forEach(function(i){var L=it.legs[i];if(L&&L.prop){any=true;if(needs(L)>0)p++;}});});
+  SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){any=true;if(needs(o)>0)p++;});});});
  if(!any)return '① 先按右上「＋ 加入項目」';
  if(p)return '② 還有 '+p+' 項待附議';
  return '③ 都可以了，按「定案」';
@@ -352,8 +363,7 @@ function renderStatus(){
  var el=document.getElementById('status');var dl=planDeadline();var left=Math.ceil((dl-Date.now())/86400000);
  var ag=0,tot=0;
  DAYS.forEach(function(d){if(!d.plan)return;var it=PLAN.items[d.k];
-  SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){tot++;if(agreed(o))ag++;});});
-  Object.keys(it.legs||{}).forEach(function(i){var L=it.legs[i];if(L&&L.prop){tot++;if(agreed(L))ag++;}});});
+  SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){tot++;if(agreed(o))ag++;});});});
  var s='<span>⏳ 截止 <b>'+DEADLINE.slice(5,10)+'</b>'+(left>0?'（剩 '+left+' 天）':'（已截止）')+'</span>';
  s+='<span>附議 <b>'+ag+'/'+tot+'</b></span><span>成員 <b>'+roster().length+'</b></span>';
  if(PLAN.finalized)s+='<span class="warn">✅ 已定案</span>';
@@ -410,17 +420,10 @@ function renderBoard(){
   if(open){
    out+=portLegRow('in','港口（'+(pc?pc.n:d.port)+'） → '+esc(seq[0].t.slice(0,14)),cache.legs[curDay+':in'],pm.in||'taxi');
    for(var i=0;i<seq.length-1;i++){
-    var L=it.legs[i]||{};var C=cache.legs[curDay+':'+i]||{};var cur=L.prop||L.mode||'taxi';
+    var L=it.legs[i]||{};var C=cache.legs[curDay+':'+i]||{};var cur=L.mode||'taxi';
     out+='<div class="leg"><div style="font-weight:700">'+(i+1)+'. '+esc(seq[i].t.slice(0,14))+' → '+esc(seq[i+1].t.slice(0,14))+'</div><div class="row" style="margin-top:4px">';
     out+=['walk','taxi','bus','mono'].map(function(m){return '<button class="'+(cur===m?'on':'')+'" onclick="setLeg('+i+',\''+m+'\')">'+MODEN[m]+'</button>';}).join('');
     out+=legEst(C);
-    if(L.prop){
-     var lst=stanceOf(L);
-     out+='<span class="prop">（'+esc(L.by||'?')+' 提議・原 '+(MODEN[L.mode]||L.mode)+'・附議 '+((L.endorse||[]).length)+'/'+roster().length+((L.hold||[]).length?'・再考慮 '+(L.hold||[]).length:'')+'）</span>';
-     if(agreed(L))out+='<span class="tag-ok">✅ 已確認</span>';
-     out+='<button class="st'+(lst==='yes'?' on':'')+'" onclick="endorseLeg('+i+')">附議</button>';
-     out+='<button class="st no'+(lst==='no'?' on':'')+'" onclick="holdLeg('+i+')">再考慮</button>';
-    }else if(L.mode){out+='<span class="prop">AI/原定</span>';}
     out+='</div></div>';
    }
    out+=portLegRow('out',esc(seq[seq.length-1].t.slice(0,14))+' → 港口（'+(pc?pc.n:d.port)+'）',cache.legs[curDay+':out'],pm.out||'taxi');
@@ -471,12 +474,7 @@ function toggleAgree(slot,idx){if(guard())return;setStance(arr0(slot)[idx],'yes'
 function holdItem(slot,idx){if(guard())return;setStance(arr0(slot)[idx],'no');recompute();}
 function locate(slot,idx){if(guard())return;var o=arr0(slot)[idx];toast('查座標…');
  resolveGeo({t:o.t,place:o.place||null,id:o.id}).then(function(c){if(!c){toast('查不到座標（維持未知）');return;}o.lat=c[0];o.lng=c[1];recompute();});}
-function setLeg(i,mode){if(guard())return;var it=it0();var L=it.legs[i]||(it.legs[i]={});if(!L.mode)L.mode='taxi';
- if((L.prop||L.mode)===mode){delete L.prop;delete L.by;delete L.endorse;delete L.hold;L.mode=mode;}
-  else{L.prop=mode;L.by=me()||'?';L.endorse=[me()||'?'];delete L.hold;}
-  recompute();}
-function endorseLeg(i){if(guard())return;var L=it0().legs[i];if(!L||!L.prop){toast('這段沒有提議');return;}setStance(L,'yes');recompute();}
-function holdLeg(i){if(guard())return;var L=it0().legs[i];if(!L||!L.prop){toast('這段沒有提議');return;}setStance(L,'no');recompute();}
+function setLeg(i,mode){if(guard())return;var it=it0();var L=it.legs[i]||(it.legs[i]={});L.mode=mode;delete L.prop;delete L.by;delete L.endorse;delete L.hold;recompute();}
 function setPortMode(which,mode){if(guard())return;var it=it0();it.portMode=it.portMode||{in:'taxi',out:'taxi'};it.portMode[which]=mode;recompute();}
 function recompute(){saveQuiet();return computeAll().then(function(){renderBoard();});}
 
