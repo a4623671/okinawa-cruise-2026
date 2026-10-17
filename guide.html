@@ -7,8 +7,8 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;background:#f4f1ea;color:#2b2b2b;line-height:1.65}
-.topbar{background:#fff;border-bottom:1px solid #e3ddd0;padding:10px 14px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:10}
-.topbar .logo{font-weight:800;font-size:18px}.topbar .sp{flex:1}
+.topbar{background:#fff;border-bottom:1px solid #e3ddd0;padding:8px 10px;display:flex;align-items:center;gap:6px;position:sticky;top:0;z-index:10}
+.topbar .logo{font-weight:800;font-size:15px;white-space:nowrap}.topbar .sp{flex:1}
 .topbar .who{font-size:13px;color:#0e6e5a;font-weight:700}
 .topbar button{border:1px solid #d8d0bd;background:#fff;border-radius:50%;width:34px;height:34px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .hero{background:linear-gradient(135deg,#7a1f2b,#c25e3a);color:#fff;padding:18px 16px}
@@ -17,8 +17,8 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 #ovbar::-webkit-scrollbar{display:none}
 #ovbar button{flex:none;border:1px solid #d8d0bd;border-radius:20px;padding:6px 12px;font-size:14px;background:#fff;cursor:pointer;white-space:nowrap}
 #ovbar button.on{background:#10293f;color:#fff;border-color:#10293f;font-weight:700}
-#ovbar select{flex:1 1 0;min-width:0;border:1px solid #d8d0bd;border-radius:20px;padding:7px 8px;font-size:14px;background:#fff} #ovbar #ovtoggle{flex:0 0 auto;border:1px solid #b9a86a;border-radius:20px;background:#fffdf3;color:#7a5200;font-size:13px;font-weight:700;padding:7px 10px;cursor:pointer;white-space:nowrap}
-#ovbar #ovtoggle{margin-left:auto;border-color:#b9a86a;color:#7a5200}
+#ovbar select{flex:1 1 0;min-width:0;border:1px solid #d8d0bd;border-radius:20px;padding:7px 8px;font-size:14px;background:#fff}
+.topbar #ovtoggle{width:auto;height:34px;border:1px solid #b9a86a;border-radius:18px;background:#fffdf3;color:#7a5200;font-weight:800;padding:0 12px;font-size:13px}
 body.ov #ovbar{display:flex}
 body.ov .cats{display:none}
 body.ov .sect{display:none}
@@ -42,6 +42,8 @@ body.ov .card.ov.ovopen{display:block;cursor:default}
 body.ov .card.ov.ovopen .ovthumb{display:none}
 body.ov .card.ov.ovopen .ovorig{display:block}
 body.ov .card.ov.ovopen .ovbody{display:block}
+body.catmode .ovthumb,body.catmode .ovdet{display:none!important}
+body.catmode .card.ov .ovbody>h3{padding-right:0}
 .sectblock{position:relative}.secthead{background:#fff;color:#10293f;border:1px solid #dfd7c4;border-radius:12px;padding:8px 14px;margin:14px 0 8px;font-size:16px;font-weight:800;display:flex;align-items:center;gap:8px;cursor:pointer;min-height:46px}
 .secthead .arw{margin-left:auto;font-size:13px;font-weight:700;color:#7a5200;border:1px solid #d8c98f;border-radius:14px;padding:4px 12px;white-space:nowrap;background:#fffdf3}
 .cats{display:flex;flex-direction:column;gap:8px;padding:10px 12px;background:#fff;border-bottom:1px solid #e3ddd0;position:sticky;top:51px;z-index:9}
@@ -184,7 +186,7 @@ img.ph{cursor:zoom-in}
 <body>
 <div id="gate"><div class="box"><h2>💬 三港討論區</h2><p>先寫下你的名字再進入<br>投票會記名，每家店／景點每人限一票</p><input id="nameInput" maxlength="12" placeholder="例如：小明"><div id="knownNames"></div><button onclick="enter()">進入討論區</button></div></div>
 
-<div class="topbar"><div class="logo">💬 三港討論區</div><a href="index.html" style="font-size:13px;color:#10293f;text-decoration:none;font-weight:700">‹ 入口</a><a href="plan.html" style="font-size:13px;color:#10293f;text-decoration:none;font-weight:700">🗓 排程板</a><div class="sp"></div><span class="who" id="who"></span><button onclick="rename()" title="改名">✏️</button><button onclick="window.print()" title="列印">🖨</button></div>
+<div class="topbar"><div class="logo">💬 討論區</div><a href="index.html" style="font-size:13px;color:#10293f;text-decoration:none;font-weight:700;white-space:nowrap">‹ 入口</a><a href="plan.html" style="font-size:13px;color:#10293f;text-decoration:none;font-weight:700;white-space:nowrap">🗓 排程</a><div class="sp"></div><span class="who" id="who"></span><button id="ovtoggle" title="切換總覽／分類">分類</button><button onclick="rename()" title="改名">✏️</button><button onclick="window.print()" title="列印">🖨</button></div>
 <div class="hero"><h1>那霸／宮古島／石垣島・投票選最想去</h1><p>🔥=熱門程度・💚=推薦程度。圖片Wikimedia Commons（需連網）。價格時間為約略值，出發前複查。✅定番・⚠️可能變動</p></div>
 <div class="cats">
 <div class="catrow"><span class="catlabel">地點</span><button class="cat place on" onclick="swPlace('naha',this)">🌺 那霸</button>
@@ -196,7 +198,7 @@ img.ph{cursor:zoom-in}
 <button class="cat cat2" onclick="swCat('souv',this)">🎁 伴手禮</button>
 <button class="cat cat2" onclick="swCat('feat',this)">✨ 當地特色</button>
 </div>
-<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20261015-bg）</div>
+<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20261017-bh）</div>
 </div>
 <div class="wrap">
 
@@ -881,7 +883,7 @@ function titles(){var m={};PLACES.forEach(function(s){var cards=document.querySe
 function cardCat(sectId,idx){return (CARDMAP[sectId]||[])[idx]||'spot';}
 
 /* ===== 總覽模式（預設）：精簡列＋港別篩選，點列展開細節 ===== */
-var OVKEY='discuss_view_v1',ovPlace='all',ovCat='all';
+var OVKEY='discuss_view_v2',ovPlace='all',ovCat='all';
 function ovState(){return localStorage.getItem(OVKEY)||'ov';}
 function setOvState(s){try{localStorage.setItem(OVKEY,s);}catch(e){}applyOvMode();}
 function setOpen(c,on){c.classList.toggle('ovopen',on);var b=c.querySelector('.ovdet');if(!b)return;var ic=c.querySelector('.ovorig')||c.querySelector('.imgbox'),bd=c.querySelector('.ovbody');if(on&&ic){if(b.parentElement!==ic)ic.appendChild(b);}else if(bd){if(b.parentElement!==bd)bd.appendChild(b);}b.textContent=on?'收合 ▴':'詳細 ▾';}
@@ -922,7 +924,7 @@ function applyOvMode(){
   else{s.classList.toggle('ovshow',s.id===curP);}
  });
  document.querySelectorAll('.secthead').forEach(function(hd){hd.style.display=mode==='ov'?'flex':'none';hd.querySelector('.arw').textContent=document.getElementById(hd.getAttribute('data-s')).classList.contains('ovshow')?'收合 ▲':'展開 ▼';});
- var tb=document.getElementById('ovtoggle');if(tb)tb.textContent=mode==='ov'?'分類／伴手禮':'回總覽';var sp=document.getElementById('ovplace');if(sp)sp.value=ovPlace;var sc=document.getElementById('ovcat');if(sc)sc.value=ovCat;
+ var tb=document.getElementById('ovtoggle');if(tb)tb.textContent=mode==='ov'?'分類':'總覽';var sp=document.getElementById('ovplace');if(sp)sp.value=ovPlace;var sc=document.getElementById('ovcat');if(sc)sc.value=ovCat;
  var ob=document.getElementById('ovbar');if(ob)ob.style.display=mode==='ov'?'flex':'none'; setOvTop();
  if(mode==='ov')applyOvFilter();else applyFilter();
 }
@@ -945,7 +947,7 @@ function initOv(){
  var bar=document.createElement('div');bar.id='ovbar';
  var PL='<option value="all">全部港口</option><option value="s-naha">🌺 那霸</option><option value="s-miyako">🏝 宮古島</option><option value="s-ishigaki">🪨 石垣島</option>';
  var CT='<option value="all">全部分類</option><option value="food">🍜 餐廳</option><option value="spot">📷 景點</option><option value="shop">🛍 購物</option><option value="souv">🎁 伴手禮</option><option value="feat">✨ 當地特色</option>';
- bar.innerHTML='<select id="ovplace">'+PL+'</select><select id="ovcat">'+CT+'</select><button id="ovtoggle"></button>';
+ bar.innerHTML='<select id="ovplace">'+PL+'</select><select id="ovcat">'+CT+'</select>';
  var catsEl=document.querySelector('.cats');catsEl.parentNode.insertBefore(bar,catsEl);
  document.getElementById('ovplace').onchange=function(){ovPlace=this.value;applyOvMode();};
  document.getElementById('ovcat').onchange=function(){ovCat=this.value;applyOvMode();};
