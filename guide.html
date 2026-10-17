@@ -22,7 +22,8 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 body.ov #ovbar{display:flex}
 body.ov .cats{display:none}
 body.ov .sect{display:none}
-body.ov .sect.ovshow{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;align-items:start;margin-bottom:8px}
+body.ov .sect.ovshow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-items:start;margin-bottom:8px}
+@media(min-width:680px){body.ov .sect.ovshow{grid-template-columns:repeat(4,minmax(0,1fr))}}
 body.ov .card.ov{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;margin-bottom:8px;cursor:pointer}
 body.ov .card.ov .ovthumb{flex:0 0 62px;width:62px;height:62px;border-radius:8px;overflow:hidden;background:#f1f1f1}
 body.ov .card.ov .ovthumb img{width:100%;height:100%;object-fit:cover;display:block;margin:0;border-radius:0}
@@ -52,8 +53,15 @@ body.ov .secthead{display:none!important}
 body.ov .sect.ovshow>.note,body.ov .sect.ovshow>.rankcard{grid-column:1/-1}
 body.ov .sect.ovshow>h2.st{grid-column:1/-1;background:#efe7d6;border-radius:10px;padding:6px 12px;margin:6px 0 0}
 body.ov .card.ov{flex-direction:column;align-items:stretch;gap:6px}
-body.ov .card.ov .ovthumb{flex:none;width:100%;height:104px}
-body.ov .card.ov:not(.ovopen) .ovbody>h3{padding-right:0;font-size:13px}
+body.ov .card.ov .ovthumb{flex:none;width:100%;height:92px}
+body.ov .card.ov{padding:7px}
+body.ov .card.ov:not(.ovopen) .vote{gap:4px;flex-wrap:nowrap;overflow:hidden;margin-top:4px;padding-top:0;border-top:none}
+body.ov .card.ov:not(.ovopen) .vote button{padding:3px 8px;font-size:12px;border-radius:14px;line-height:1.3;white-space:nowrap}
+body.ov .card.ov:not(.ovopen) .vote .cnt{font-size:12px;font-weight:800;white-space:nowrap}
+body.ov .card.ov:not(.ovopen) .vote .vn{display:none}
+body.ov .card.ov:not(.ovopen) .ovbody>h3{padding-right:0;font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#onlyv{flex:none;border:1px solid #d8d0bd;border-radius:20px;padding:6px 10px;font-size:13px;background:#fff;cursor:pointer;white-space:nowrap}
+#onlyv.on{background:#7a1f2b;color:#fff;border-color:#7a1f2b;font-weight:700}
 body.ov .card.ov:not(.ovopen) .ovdet{display:none}
 body.ov .card.ov.ovopen{grid-column:1/-1}
 .sectblock{position:relative}.secthead{background:#fff;color:#10293f;border:1px solid #dfd7c4;border-radius:12px;padding:8px 14px;margin:14px 0 8px;font-size:16px;font-weight:800;display:flex;align-items:center;gap:8px;cursor:pointer;min-height:46px}
@@ -210,7 +218,7 @@ img.ph{cursor:zoom-in}
 <button class="cat cat2" onclick="swCat('souv',this)">🎁 伴手禮</button>
 <button class="cat cat2" onclick="swCat('feat',this)">✨ 當地特色</button>
 </div>
-<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20261017-bj）</div>
+<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20261017-bk）</div>
 </div>
 <div class="wrap">
 
@@ -938,6 +946,7 @@ function applyOvMode(){
  document.querySelectorAll('.secthead').forEach(function(hd){hd.style.display=mode==='ov'?'flex':'none';hd.querySelector('.arw').textContent=document.getElementById(hd.getAttribute('data-s')).classList.contains('ovshow')?'收合 ▲':'展開 ▼';});
  var tb=document.getElementById('ovtoggle');if(tb)tb.textContent=mode==='ov'?'分類':'總覽';
  var pr=document.getElementById('portrow');if(pr)pr.querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-p')===ovPlace);});
+ var ov=document.getElementById('onlyv');if(ov)ov.classList.toggle('on',onlyVoted);
  var ob=document.getElementById('ovbar');if(ob)ob.style.display=mode==='ov'?'flex':'none'; setOvTop();
  if(mode==='ov')applyOvFilter();else applyFilter();
 }
@@ -947,6 +956,13 @@ function applyOvFilter(){
   var h2s=document.querySelectorAll('#'+s[0]+' h2.st');h2s.forEach(function(h){var dc=h.getAttribute('data-c');h.style.display=(ovCat==='all'||!dc||dc===ovCat)?'':'none';});
   var rks=document.querySelectorAll('#'+s[0]+' .rankcard');rks.forEach(function(r){r.style.display=(ovCat==='souv')?'':'none';});
  });
+ if(onlyVoted){var v2=loadV();document.querySelectorAll('.sect .card').forEach(function(c){if(!c.classList.contains('ov')||c.classList.contains('retired'))return;if(((v2[cidOf(c)]||[]).length)===0)c.style.display='none';});}
+ document.querySelectorAll('.sect').forEach(function(sec){var cur=null,any=false;function flush(){if(cur)cur.style.display=any?'':'none';}
+  [].slice.call(sec.children).forEach(function(el){
+   if(el.tagName==='H2'&&el.classList.contains('st')){flush();cur=el.getAttribute('data-c')?el:null;any=false;}
+   else if(el.classList&&el.classList.contains('card')){if(el.style.display!=='none')any=true;}
+  });flush();});
+ ovSort();
  var anyVisible=0;document.querySelectorAll('.sect').forEach(function(s){var n=[].slice.call(s.querySelectorAll('.card')).filter(function(c){return c.style.display!=='none';}).length;var hd=document.querySelector('.secthead[data-s="'+s.id+'"]');if(hd)hd.style.display=(ovState()==='ov'&&(ovPlace==='all'||ovPlace===s.id))?'flex':'none';if(ovPlace==='all'||ovPlace===s.id)anyVisible+=n;});
  var em=document.getElementById('ovempty');if(!em){em=document.createElement('div');em.id='ovempty';em.className='card';em.textContent='此分類目前沒有項目';document.querySelector('.wrap').appendChild(em);}
  em.style.display=anyVisible?'none':'block';
@@ -958,7 +974,7 @@ window.addEventListener('scroll',function(){setOvTop();},{passive:true});
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){setOvTop();});
 function initOv(){
  var bar=document.createElement('div');bar.id='ovbar';
- bar.innerHTML='<div id="portrow"><button data-p="all">全部</button><button data-p="s-naha">🌺 那霸</button><button data-p="s-miyako">🏝 宮古島</button><button data-p="s-ishigaki">🪨 石垣島</button></div>';
+ bar.innerHTML='<div id="portrow"><button data-p="all">全部</button><button data-p="s-naha">🌺 那霸</button><button data-p="s-miyako">🏝 宮古島</button><button data-p="s-ishigaki">🪨 石垣島</button></div><button id="onlyv" class="on" onclick="toggleOnlyVoted()">🎯 只看有票</button>';
  var catsEl=document.querySelector('.cats');catsEl.parentNode.insertBefore(bar,catsEl);
  bar.querySelectorAll('#portrow button').forEach(function(b){b.onclick=function(){ovPlace=this.getAttribute('data-p');applyOvMode();};});
  document.getElementById('ovtoggle').onclick=function(){setOvState(ovState()==='ov'?'cat':'ov');};
@@ -1162,7 +1178,14 @@ function paintRanks(){PLACES.forEach(function(s){paintRank(s[0],'food');paintRan
 function refreshRanks(){var v=loadV(),n=me();document.querySelectorAll('tr.srow').forEach(function(r){var id=r.getAttribute('data-id'),arr=v[id]||[];var b=r.querySelector('.svote'),c=r.querySelector('.scnt2'),m=r.querySelector('.scmt');if(b){b.textContent='👍';b.classList.toggle('voted',arr.indexOf(n)>=0);}if(c)c.textContent=arr.length;if(m){var cc=(CMT[id]||[]).length;m.textContent='💬'+(cc?' '+cc:'');}var rk=r.closest('.rankcard');if(rk){var k=SOUV_SORT[rk.getAttribute('data-place')+rk.getAttribute('data-kind')]||'hot';var sc=r.querySelector('.sscore');if(sc){if(k==='vote')sc.textContent=arr.length+'票';}}});}
 function toggle(id){var n=me();if(!n){document.getElementById('gate').classList.remove('hide');return;}if(GH_BUSY)return;GH_BUSY=true;
 ghGet().then(function(remote){var arr=remote[id]||[];var want=arr.indexOf(n)<0;function attempt(t){if(want){if(arr.indexOf(n)<0)arr.push(n);}else{var ix=arr.indexOf(n);if(ix>=0)arr.splice(ix,1);}if(!arr.length)delete remote[id];else remote[id]=arr;return ghPut(remote,GH_SHA).catch(function(e){if(t<=0)throw e;return ghGet().then(function(r2){remote=r2;arr=remote[id]||[];return attempt(t-1);});});}return attempt(2);}).then(function(v){saveV(v);setMode('online');refreshVotes();GH_BUSY=false;}).catch(function(e){GH_BUSY=false;setMode('offline');try{localStorage.setItem(GH_DIRTY,'1');}catch(x){}var v=loadV();var arr=v[id]||[];var ix=arr.indexOf(n);if(ix>=0)arr.splice(ix,1);else arr.push(n);if(!arr.length)delete v[id];else v[id]=arr;saveV(v);refreshVotes();alert('連線失敗，已暫存本機，連網後自動上傳');});}
-function refreshVotes(){var v=loadV(),n=me(),t=titles();PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){var d=c.querySelector('.vote');if(!d)return;var id=s[0]+'#'+i,arr=v[id]||[],btn=d.querySelector('button'),cnt=d.querySelector('.cnt');btn.textContent=arr.indexOf(n)>=0?'✅ 已投':'👍 投票';btn.classList.toggle('voted',arr.indexOf(n)>=0);cnt.textContent=arr.length+'票'+(arr.length?'（'+arr.join('、')+'）':'');});});paintComments();refreshRanks();paintDonkiList();if(document.getElementById('stats').classList.contains('on'))renderStats();}
+function refreshVotes(){var v=loadV(),n=me();PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){var d=c.querySelector('.vote');if(!d)return;var id=s[0]+'#'+i,arr=v[id]||[],btn=d.querySelector('button'),cnt=d.querySelector('.cnt');btn.textContent=arr.indexOf(n)>=0?'✅ 已投':'👍 投票';btn.classList.toggle('voted',arr.indexOf(n)>=0);cnt.innerHTML=arr.length+'票'+(arr.length?'<span class="vn">（'+arr.map(function(x){return String(x).replace(/</g,'&lt;');}).join('、')+'）</span>':'');});});paintComments();refreshRanks();paintDonkiList();try{if(typeof ovState==='function'&&ovState()==='ov')applyOvFilter();}catch(e){}if(document.getElementById('stats').classList.contains('on'))renderStats();}
+var onlyVoted=true;
+function toggleOnlyVoted(){onlyVoted=!onlyVoted;var b=document.getElementById('onlyv');if(b)b.classList.toggle('on',onlyVoted);applyOvFilter();}
+function ovSort(){var v=loadV();document.querySelectorAll('.sect').forEach(function(sec){var g=0;[].slice.call(sec.children).forEach(function(el){
+ if(el.tagName==='H2'&&el.classList.contains('st')){g++;el.style.order=g*1000;}
+ else if(el.classList&&el.classList.contains('card')){var n=((v[cidOf(el)]||[]).length);if(n>999)n=999;el.style.order=g*1000+1+(999-n);}
+ else{el.style.order=g*1000;}
+});});}
 function swPlace(id,el){curP='s-'+id;document.querySelectorAll('.cat.place').forEach(c=>c.classList.remove('on'));el.classList.add('on');applyFilter();var w=document.querySelector('.wrap');if(w)window.scrollTo({top:0,behavior:'smooth'});}
 function swCat(c,el){curC=c;document.querySelectorAll('.cat.cat2').forEach(x=>x.classList.remove('on'));el.classList.add('on');applyFilter();}
 function applyFilter(){if(typeof ovState==="function"&&ovState()==="ov"){applyOvFilter();return;}PLACES.forEach(function(s){var show=s[0]===curP;document.getElementById(s[0]).classList.toggle('on',show);if(!show)return;var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(card,i){if(card.classList.contains('retired'))return;card.style.display=cardCat(s[0],i)===curC?'':'none';});var rks=document.querySelectorAll('#'+s[0]+' .rankcard');rks.forEach(function(r){r.style.display=(show&&curC==='souv')?'':'none';});var h2s=document.querySelectorAll('#'+s[0]+' h2.st');h2s.forEach(function(h){var dc=h.getAttribute('data-c');h.style.display=(!dc||dc===curC)?'':'none';});});diagFilter();}
