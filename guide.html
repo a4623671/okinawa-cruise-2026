@@ -29,15 +29,11 @@ body.ov .card.ov .ovthumb{flex:0 0 62px;width:62px;height:62px;border-radius:8px
 body.ov .card.ov .ovthumb img{width:100%;height:100%;object-fit:cover;display:block;margin:0;border-radius:0}
 body.ov .card.ov .ovbody{flex:1;min-width:0;position:relative} body.ov .card.ov:not(.ovopen) .ovbody>h3{padding-right:96px} .ovdet{position:absolute;border:none;color:#fff;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;z-index:7} body.ov .card.ov:not(.ovopen) .ovbody .ovdet{top:0;right:0;border-radius:16px;background:#10293f;padding:6px 14px} body.ov .card.ov.ovopen .ovorig .ovdet,body.ov .card.ov.ovopen .imgbox .ovdet{top:0;left:0;right:0;width:100%;border-radius:10px 10px 0 0;padding:7px 0;text-align:center;background:rgba(16,41,63,.92);letter-spacing:1px}
 body.ov .card.ov .ovbody>h3{font-size:15px;margin:0 0 2px;line-height:1.35}
-body.ov .card.ov:not(.ovopen) .ovbody .en,
-body.ov .card.ov:not(.ovopen) .ovbody .stars,
-body.ov .card.ov:not(.ovopen) .ovbody>p,
-body.ov .card.ov:not(.ovopen) .ovbody>a.map,
-body.ov .card.ov:not(.ovopen) .ovbody .credit,
-body.ov .card.ov:not(.ovopen) .ovbody .cmt,
-body.ov .card.ov:not(.ovopen) .ovbody .gal,
 body.ov .card.ov:not(.ovopen) .ovorig,
-body.ov .card.ov:not(.ovopen) .imgbox{display:none}
+body.ov .card.ov:not(.ovopen) .imgbox,
+body.ov .card.ov:not(.ovopen) .ovbody>*{display:none}
+body.ov .card.ov:not(.ovopen) .ovbody>h3{display:block}
+body.ov .card.ov:not(.ovopen) .ovbody>.vote{display:flex}
 body.ov .card.ov:not(.ovopen) .ovbody .vote{margin-top:4px;padding-top:0;border-top:none}
 body.ov .card.ov.ovopen{display:block;cursor:default}
 body.ov .card.ov.ovopen .ovthumb{display:none}
@@ -60,6 +56,8 @@ body.ov .card.ov:not(.ovopen) .vote button{padding:3px 8px;font-size:12px;border
 body.ov .card.ov:not(.ovopen) .vote .cnt{font-size:12px;font-weight:800;white-space:nowrap}
 body.ov .card.ov:not(.ovopen) .vote .vn{display:none}
 body.ov .card.ov:not(.ovopen) .ovbody>h3{padding-right:0;font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ovvbtn{border:1px solid #0e6e5a;background:#fff;color:#0e6e5a;border-radius:20px;padding:10px 18px;font-size:15px;font-weight:700;cursor:pointer;width:100%}
+.ovvbtn.voted{background:#0e6e5a;color:#fff}
 #onlyv{flex:none;border:1px solid #d8d0bd;border-radius:20px;padding:6px 10px;font-size:13px;background:#fff;cursor:pointer;white-space:nowrap}
 #onlyv.on{background:#7a1f2b;color:#fff;border-color:#7a1f2b;font-weight:700}
 body.ov .card.ov:not(.ovopen) .ovdet{display:none}
@@ -174,7 +172,7 @@ tr.sdet2 td{background:#faf7ef}
 #imodal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:48;display:none;align-items:flex-end;justify-content:center}
 #imodal.on{display:flex}
 #imodal .ipanel{background:#fff;border-radius:18px 18px 0 0;max-width:680px;width:100%;max-height:88vh;overflow-y:auto;padding:18px 16px;position:relative}
-#imodal .ix{position:absolute;top:10px;right:16px;font-size:24px;cursor:pointer;z-index:2}
+#imodal .ix{position:absolute;top:10px;right:16px;font-size:18px;cursor:pointer;z-index:3;background:#f0ece2;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:#4a5b6c}
 #imodal .igal{position:relative;overflow:hidden;border-radius:10px;margin:8px 0}
 #imodal .itrk{display:flex;transition:transform .3s}
 #imodal .itrk img{width:100%;flex:none;border-radius:10px}
@@ -218,7 +216,7 @@ img.ph{cursor:zoom-in}
 <button class="cat cat2" onclick="swCat('souv',this)">🎁 伴手禮</button>
 <button class="cat cat2" onclick="swCat('feat',this)">✨ 當地特色</button>
 </div>
-<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20261017-bk）</div>
+<div class="legend">看到想去的按 👍投票，可隨時收回。右下 📊統計 看各區前3名。🇹🇼為台灣人推薦指數（PTT／Dcard／部落客 consensus，×5最高）。票數自動同步到雲端，所有人看到同一份。右下 💬小幫手 可新增／建議刪除。（版本 20261017-bl）</div>
 </div>
 <div class="wrap">
 
@@ -920,7 +918,7 @@ function buildOverview(){
   var db=document.createElement('button');db.type='button';db.className='ovdet';db.textContent='詳細 ▾';
   db.onclick=function(e){e.stopPropagation();setOpen(c,!c.classList.contains('ovopen'));};
   bd.appendChild(db);
-  c.addEventListener('click',function(e){if(e.target.closest('a,button,input,select,textarea,.gal'))return;setOpen(c,!c.classList.contains('ovopen'));});
+  c.addEventListener('click',function(e){if(e.target.closest('a,button,input,select,textarea,.gal'))return;if(ovState()==='ov'){openOvDetail(cidOf(c));}else{setOpen(c,!c.classList.contains('ovopen'));}});
  });
  document.querySelectorAll('.sect').forEach(function(s){
   var block=s.parentElement.classList.contains('sectblock')?s.parentElement:null;
@@ -1181,6 +1179,32 @@ ghGet().then(function(remote){var arr=remote[id]||[];var want=arr.indexOf(n)<0;f
 function refreshVotes(){var v=loadV(),n=me();PLACES.forEach(function(s){var cards=document.querySelectorAll('#'+s[0]+' .card');cards.forEach(function(c,i){var d=c.querySelector('.vote');if(!d)return;var id=s[0]+'#'+i,arr=v[id]||[],btn=d.querySelector('button'),cnt=d.querySelector('.cnt');btn.textContent=arr.indexOf(n)>=0?'✅ 已投':'👍 投票';btn.classList.toggle('voted',arr.indexOf(n)>=0);cnt.innerHTML=arr.length+'票'+(arr.length?'<span class="vn">（'+arr.map(function(x){return String(x).replace(/</g,'&lt;');}).join('、')+'）</span>':'');});});paintComments();refreshRanks();paintDonkiList();try{if(typeof ovState==='function'&&ovState()==='ov')applyOvFilter();}catch(e){}if(document.getElementById('stats').classList.contains('on'))renderStats();}
 var onlyVoted=true;
 function toggleOnlyVoted(){onlyVoted=!onlyVoted;var b=document.getElementById('onlyv');if(b)b.classList.toggle('on',onlyVoted);applyOvFilter();}
+function escH(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function ovSyncVote(cid){var b=document.getElementById('ovvbtn');if(!b)return;var v=loadV()[cid]||[];var voted=v.indexOf(me())>=0;b.textContent=(voted?'✅ 已投':'👍 投票')+'（'+v.length+'票）';b.classList.toggle('voted',voted);}
+function ovVote(cid){toggle(cid);setTimeout(function(){ovSyncVote(cid);},400);}
+function openOvDetail(cid){var c=cardByCid(cid);if(!c)return;
+ var h=c.querySelector('h3');
+ var html='<h3 style="font-size:18px;padding-right:30px">'+escH(h?cleanT(h.textContent):cid)+'</h3>';
+ var en=c.querySelector('.en');if(en)html+='<div class="en">'+en.innerHTML+'</div>';
+ var imgs=[].slice.call(c.querySelectorAll('img.ph')).filter(function(im){return im.src&&im.src.indexOf('data:')!==0;});
+ if(imgs.length)html+='<div class="igal"><div class="itrk">'+imgs.map(function(im){return '<img src="'+im.src+'" alt="'+String(im.alt||'').replace(/"/g,'')+'">';}).join('')+'</div></div>';
+ var cr=c.querySelector('.credit');if(cr)html+='<div class="credit">'+cr.innerHTML+'</div>';
+ var st=c.querySelector('.stars');if(st)html+='<div class="stars">'+st.innerHTML+'</div>';
+ var body=c.querySelector('.ovbody')||c;
+ [].slice.call(body.children).forEach(function(el){
+  if(el.tagName==='H3'||el.tagName==='IMG'||el.tagName==='A')return;
+  if(el.classList.contains('vote')||el.classList.contains('cmt')||el.classList.contains('ovdet'))return;
+  if(el.classList.contains('en')||el.classList.contains('credit')||el.classList.contains('stars'))return;
+  html+=el.outerHTML;
+ });
+ var t=cleanT(h?h.textContent:''),mp=c.querySelector('a.map');
+ html+='<div style="margin:10px 0"><a class="map" href="'+(mp?mp.getAttribute('href'):('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(t)))+'" target="_blank">🗺 地圖</a> <a class="map" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(t)+'" target="_blank">💬 評論</a></div>';
+ html+='<div style="margin-top:12px"><button id="ovvbtn" class="ovvbtn" onclick="ovVote(\''+cid+'\')"></button></div>';
+ document.getElementById('iboby').innerHTML=html;
+ IIMGS=imgs.map(function(im){return {s:im.src,a:im.alt};});IIDX=0;updI();bindItrk();
+ ovSyncVote(cid);
+ document.getElementById('imodal').classList.add('on');
+}
 function ovSort(){var v=loadV();document.querySelectorAll('.sect').forEach(function(sec){var g=0;[].slice.call(sec.children).forEach(function(el){
  if(el.tagName==='H2'&&el.classList.contains('st')){g++;el.style.order=g*1000;}
  else if(el.classList&&el.classList.contains('card')){var n=((v[cidOf(el)]||[]).length);if(n>999)n=999;el.style.order=g*1000+1+(999-n);}
