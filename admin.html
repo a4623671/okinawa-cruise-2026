@@ -34,14 +34,14 @@ h1{font-size:20px;margin-bottom:2px}.sub{font-size:13px;color:#888;margin-bottom
 <div id="pwmsg" style="font-size:13px;color:#b3402a;min-height:20px;margin-top:6px"></div></div>
 <div id="app" style="display:none">
 <h1>🛡 提案審核</h1>
-<div class="sub">直接通過＝排程自動改網頁（免審）・需要審核＝先停車＋通知 <span id="cnt"></span></div>
+<div class="sub">直接通過＝立即套用並上線討論區・需要審核＝先停車＋通知 <span id="cnt"></span></div>
 <div class="card"><div class="m">自動通過模式：<b id="modeTxt">讀取中…</b></div><div class="m" style="font-size:12px">開＝小幫手確認後排程直接改網頁免審；關＝每筆都要在這裡按通過</div><div class="btns"><button class="go" id="modeBtn" onclick="flipMode()">切換</button></div></div>
 <div style="text-align:center;margin-bottom:10px"><button onclick="loadQ()" style="border:1px solid #d8d0bd;background:#fff;border-radius:20px;padding:6px 18px;font-size:14px;cursor:pointer">↻ 重新整理</button></div>
 <div id="msg"></div>
 <div class="card"><div class="t" style="font-size:14px">💬 小幫手使用狀況 <span id="useCnt" style="color:#999;font-weight:400"></span></div><div id="useStat" class="m">讀取中…</div><div id="useList"></div>
 <div class="m" style="font-size:12px;color:#999">只記部署後的對話（30天），跟投票一樣公開可見</div></div>
 <div id="list"></div>
-<div class="note">管理者專用・版本 20261015-ap</div>
+<div class="note">管理者專用・版本 20261017-aq</div>
 </div>
 <script>
 var _p1='Z2l0aHViX3BhdF8xMUFISU5ORVEwV1JKV05mNFNvWHZCXzNtTUJVTWRaa0hDQV',_p2='hNbHA3QUFublh0bmNhTDN3NXZYd0tGbXlsYnlacmdVV0dFUTNSVm5KaXVMS1VW';
@@ -67,9 +67,9 @@ return '<div class="card"><div class="t">'+esc(p.title)+' <span class="badge st-
 +'　圖片URL：<input id="img-'+p.id+'" value="'+esc(p.img||'')+'" placeholder="https://…" style="width:60%;font-size:13px;padding:4px;border:1px solid #d8d0bd;border-radius:6px">'+'<img id="prev-'+p.id+'" src="'+esc(p.img||'')+'" style="max-width:120px;border-radius:6px;margin-top:4px;display:'+(p.img?'block':'none')+'"><br><span id="hint-'+p.id+'" style="font-size:11px;color:#999"></span></div>'
 +'<div class="m">'+(PN[p.place]||p.place)+'・提案人 '+esc(p.by)+'・'+esc((p.ts||'').slice(0,10))+'</div>'
 +(p.intro?'<div class="m">介紹：'+esc(p.intro)+'</div>':'')+(p.items&&p.items.length?'<div class="m">品項：<br>'+p.items.map(function(it,i){return (i+1)+'. '+esc(it.title)+'：'+esc(it.intro);}).join('<br>')+'</div>':'')+(p.where?'<div class="m">哪買：'+esc(p.where)+'</div>':'')+(p.reason?'<div class="m"><b>刪除理由：'+esc(p.reason)+'</b></div>':'')
-+'<div class="btns"><button class="go" '+(dis?'disabled':'')+' onclick="decide(\''+p.id+'\',\'approved\')">✅ 直接通過</button>'
++'<div class="btns"><button class="go" '+(dis?'disabled':'')+' onclick="approveApply(\''+p.id+'\')">✅ 通過並套用</button>'
 +'<button class="hold" '+(dis?'disabled':'')+' onclick="decide(\''+p.id+'\',\'needs-review\')">⏸ 需要審核</button></div></div>';}).join('');}
-if(appr.length){box.innerHTML+='<div class="card"><div class="t" style="font-size:14px">✅ 已批准・待套用（'+appr.length+'）</div>'+appr.map(function(p){return '<div class="m" style="border-top:1px dashed #ddd;padding-top:6px"><b>'+esc(p.title)+'</b> <span class="badge st-approved">已批准</span> <span style="color:#999">'+esc(p.by)+'・'+esc((p.ts||'').slice(0,10))+'</span>'+(p.img?'<br><img src="'+esc(p.img)+'" style="max-width:140px;border-radius:6px;margin-top:4px">':'<br><span style="color:#b3402a">⚠️ 尚無圖片</span><img id="aprev-'+p.id+'" style="max-width:140px;border-radius:6px;margin-top:4px;display:none"> <button id="asave-'+p.id+'" class="mini" style="display:none" onclick="saveImg(\''+p.id+'\')">存圖片</button>')+'<br><button class="mini" onclick="copyApply(\''+p.id+'\')">複製套用資料</button></div>';}).join('')+'<div class="m" style="font-size:12px;color:#999">按「直接通過」只標記批准；實際寫進討論區由排程執行，完成後才會變「已套用」。</div></div>';}
+if(appr.length){box.innerHTML+='<div class="card"><div class="t" style="font-size:14px">✅ 已批准・待套用（'+appr.length+'）</div>'+appr.map(function(p){return '<div class="m" style="border-top:1px dashed #ddd;padding-top:6px"><b>'+esc(p.title)+'</b> <span class="badge st-approved">已批准</span> <span style="color:#999">'+esc(p.by)+'・'+esc((p.ts||'').slice(0,10))+'</span>'+(p.img?'<br><img src="'+esc(p.img)+'" style="max-width:140px;border-radius:6px;margin-top:4px">':'<br><span style="color:#b3402a">⚠️ 尚無圖片</span><img id="aprev-'+p.id+'" style="max-width:140px;border-radius:6px;margin-top:4px;display:none"> <button id="asave-'+p.id+'" class="mini" style="display:none" onclick="saveImg(\''+p.id+'\')">存圖片</button>')+'<br><button class="mini" onclick="applyProposal(\''+p.id+'\')">⚡ 立即套用</button></div>';}).join('')+'<div class="m" style="font-size:12px;color:#999">「立即套用」會自動把卡片寫進討論區並上線（無圖片則留白）。</div></div>';}
 if(done.length){box.innerHTML+='<div class="card"><div class="t" style="font-size:14px">已處理（'+done.length+'）</div>'+done.map(function(p){return '<div class="m">'+esc(p.title||((p.items||[{}])[0].title||''))+' <span class="badge st-done">'+(STN[p.status]||p.status)+'</span> <span style="color:#999">'+esc(p.by)+'・'+esc((p.ts||'').slice(0,10))+'</span></div>';}).join('')+'</div>';}
 open.concat(appr).forEach(function(p){if(p.img)return;var inp=document.getElementById('img-'+p.id);if(inp&&inp.value.trim())return;imgLookup(p).then(function(u){if(!u)return;window._imgSug=window._imgSug||{};window._imgSug[p.id]=u;if(inp){if(inp.value.trim())return;inp.value=u;var pv=document.getElementById('prev-'+p.id);if(pv){pv.src=u;pv.style.display='block';}var hh=document.getElementById('hint-'+p.id);if(hh)hh.textContent='🤖 自動建議（請確認是否正確）';return;}var av=document.getElementById('aprev-'+p.id),as=document.getElementById('asave-'+p.id);if(av){av.src=u;av.style.display='inline-block';}if(as)as.style.display='inline-block';});});say('');}
 var PLBL={naha:'沖縄',miyako:'宮古島',ishigaki:'石垣島'};
@@ -77,6 +77,60 @@ function _clean(s){return String(s||'').replace(/[✅⚠️🔥💚⭐]/g,'').re
 function _wsearch(q){var u='https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch='+encodeURIComponent(q+' filetype:bitmap')+'&gsrnamespace=6&gsrlimit=1&prop=imageinfo&iiprop=url&iiurlwidth=640';return fetch(u).then(function(r){return r.json();}).then(function(j){var pg=(j.query||{}).pages||{};for(var k in pg){var ii=(pg[k].imageinfo||[])[0];if(ii&&(ii.thumburl||ii.url))return String(ii.thumburl||ii.url).split('?')[0];}return null;}).catch(function(){return null;});}
 function imgLookup(p){var t=_clean(p&&p.title),w=_clean(p&&p.where),pl=PLBL[p&&p.place]||'';var qs=[t&&w?t+' '+w:'',t&&pl?t+' '+pl:'',t].filter(Boolean);var i=0;function step(){if(i>=qs.length)return Promise.resolve(null);var q=qs[i++];return _wsearch(q).then(function(u){return u||step();});}return step();}
 function copyApply(id){var p=(window._Q||[]).filter(function(x){return x.id===id;})[0];if(!p){say('找不到');return;}var ks=document.getElementById('kind-'+id),im=document.getElementById('img-'+id);if(ks)p.kind=ks.value;if(im&&im.value.trim())p.img=im.value.trim();navigator.clipboard.writeText(JSON.stringify(p)).then(function(){say('已複製，可貼給排程套用');}).catch(function(){say('複製失敗');});}
+/* ==== APPLY HELPERS (start) ==== */
+var DEP_API='https://api.github.com/repos/a4623671/okinawa-cruise-2026/contents/guide.html';
+var DEP_SHA=null;
+function _esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function _ymd(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function _card(title,intro,where,img,by){
+ var t=String(title||'').replace(/\s*[✅⚠️]\s*$/,'').trim();
+ var h='<div class="card"><h3>'+_esc(t)+' ✅</h3>';
+ if(img)h+='<div class="gal"><div class="trk"><img class="ph" loading="lazy" src="'+_esc(img)+'" onerror="imgRetry(this)" alt="'+_esc(t)+'"></div><button class="gl">‹</button><button class="gr">›</button><div class="gdot"></div></div><div class="credit">圖：Wikimedia Commons（提案人 '+_esc(by)+'，'+_ymd()+'）</div>';
+ h+='<p>介紹：'+_esc(intro||'')+'</p>';
+ if(where)h+='<p class="kv"><b>位置：</b>'+_esc(where)+'</p>';
+ h+='<a class="map" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(where||t)+'" target="_blank">🗺 地圖</a></div>';
+ return h;}
+function _insertGuide(g,port,cardsHtml,kindN){
+ var marks={'s-naha':'<!-- ================= MIYAKO','s-miyako':'<!-- ================= ISHIGAKI','s-ishigaki':'<div class="note">⚠️ 郵輪行程'};
+ var mk=marks[port];if(!mk)throw new Error('未知港口 '+port);
+ var mi=g.indexOf(mk);if(mi<0)throw new Error('找不到 guide.html 段落標記');
+ var close=g.lastIndexOf('</div>',mi);if(close<0)throw new Error('找不到段落結尾');
+ var has=g.indexOf('id="newprop-'+port+'"')>=0;
+ var block=(has?'':'\n<h2 class="st" id="newprop-'+port+'">✨ 家人新增提案</h2>')+'\n'+cardsHtml+'\n';
+ g=g.slice(0,close)+block+g.slice(close);
+ var re=new RegExp("('"+port+"':\\[[^\\]]*)");
+ if(!re.test(g))throw new Error('找不到 CARDMAP '+port);
+ g=g.replace(re,function(m,grp){return grp+','+kindN.map(function(k){return "'"+k+"'";}).join(',');});
+ return g;}
+function applyProposal(id){
+ var p=(window._Q||[]).filter(function(x){return x.id===id;})[0];if(!p){say('找不到提案');return;}
+ if(p.kind==='del'){say('刪除類提案需人工處理');return;}
+ var ks=document.getElementById('kind-'+id),im=document.getElementById('img-'+id);
+ if(ks)p.kind=ks.value;if(im&&im.value.trim())p.img=im.value.trim();
+ say('準備套用…');
+ var pr=p.img?Promise.resolve(p.img):imgLookup(p).then(function(u){if(u)p.img=u;return u;});
+ pr.then(function(){
+  var kind=p.kind||'spot',intro=p.intro||'',where=p.where||'',by=p.by||'?',cards,kinds;
+  if(p.items&&p.items.length){cards=p.items.map(function(it,i){return _card(it.title,it.intro||intro,where,i===0?(p.img||''):'',by);}).join('\n');kinds=p.items.map(function(){return kind;});}
+  else{cards=_card(p.title,intro,where,p.img||'',by);kinds=[kind];}
+  say('寫入 guide.html…');
+  return fetch(DEP_API+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+   DEP_SHA=j.sha;var g;try{g=decodeURIComponent(escape(atob(j.content.replace(/\s/g,''))));}catch(e){throw new Error('guide 解碼失敗');}
+   g=_insertGuide(g,'s-'+p.place,cards,kinds);
+   var body={message:'apply proposal '+id+' ('+p.title+')',content:btoa(unescape(encodeURIComponent(g)))};if(DEP_SHA)body.sha=DEP_SHA;
+   return fetch(DEP_API,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)});
+  }).then(function(r){if(!r||!r.ok)throw new Error('guide 寫入失敗 '+((r&&r.status)||''));return true;});
+ }).then(function(){
+  say('更新提案狀態…');
+  return fetch(GH_API_P+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){PH_SHA=j.sha;var list=[];try{list=JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));}catch(e){}
+   var hit=false;list.forEach(function(x){if(x.id===id){x.status='applied';x.kind=p.kind;if(p.img)x.img=p.img;x.appliedAt=new Date().toISOString();hit=true;}});
+   if(!hit)throw new Error('提案已不在清單');
+   var body={message:'apply proposal '+id,content:btoa(unescape(encodeURIComponent(JSON.stringify(list))))};if(PH_SHA)body.sha=PH_SHA;
+   return fetch(GH_API_P,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)});});
+ }).then(function(r){if(!r||!r.ok)throw new Error('提案狀態寫入失敗');say('✅ 已套用並上線：'+(p.title||id));loadQ();})
+ .catch(function(e){say('套用失敗：'+(e&&e.message?e.message:e)+'（仍保留待套用）');});}
+function approveApply(id){say('通過並套用…');applyProposal(id);}
+/* ==== APPLY HELPERS (end) ==== */
 function saveImg(id){var u=(window._imgSug||{})[id];if(!u){say('沒有可存的圖片');return;}say('寫入圖片…');fetch(GH_API_P+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){PH_SHA=j.sha;var list=[];try{list=JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));}catch(e){}var hit=false;list.forEach(function(p){if(p.id===id){p.img=u;hit=true;}});if(!hit){say('找不到該提案');return null;}var body={message:'admin img '+id,content:btoa(unescape(encodeURIComponent(JSON.stringify(list))))};if(PH_SHA)body.sha=PH_SHA;return fetch(GH_API_P,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)});}).then(function(r){if(!r)return;if(!r.ok){say('寫入失敗（HTTP '+r.status+'）');return;}say('✅ 圖片已存入提案');loadQ();}).catch(function(e){say('寫入失敗：'+(e&&e.message?e.message:'網路錯誤'));});}
 function decide(id,st){say('寫入中…');fetch(GH_API_P+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){PH_SHA=j.sha;var list=[];try{list=JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));}catch(e){}var hit=false;list.forEach(function(p){if(p.id===id){p.status=st;var ks=document.getElementById('kind-'+id);if(ks)p.kind=ks.value;var im=document.getElementById('img-'+id);if(im&&im.value.trim())p.img=im.value.trim();hit=true;}});if(!hit){say('該提案已不在佇列');return null;}var body={message:'admin '+st+' '+id,content:btoa(unescape(encodeURIComponent(JSON.stringify(list))))};if(PH_SHA)body.sha=PH_SHA;
 return fetch(GH_API_P,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)});}).then(function(r){if(!r)return;if(r.status===409){say('有人同時修改，已重新載入，請再按一次');loadQ();return;}if(!r.ok){say('寫入失敗（HTTP '+r.status+'）；token 可能失效');return;}say(st==='approved'?'✅ 已批准（待套用）：'+((function(){var p=(window._Q||[]).filter(function(x){return x.id===id;})[0];return p?p.title:id;})()):'⏸ 已標記需要審核');loadQ();}).catch(function(e){say('寫入失敗：'+(e&&e.message?e.message:'網路錯誤'));});}
