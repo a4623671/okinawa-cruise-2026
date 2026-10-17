@@ -118,13 +118,15 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
 #mapov{position:fixed;inset:0;background:rgba(8,20,32,.45);z-index:70;display:none;align-items:center;justify-content:center;padding:6px}
 #mapov.on{display:flex}
 #mapcard{background:#fff;border-radius:16px;width:100%;max-width:760px;height:94vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.4)}
-#mapbar{display:flex;flex-wrap:wrap;align-items:center;gap:5px;padding:6px 8px;border-bottom:1px solid #dbe3ec;overflow:hidden;flex:none}
+#mapbar{display:flex;flex-wrap:wrap;align-items:center;gap:5px;padding:9px 12px;border-bottom:1px solid #dbe3ec;overflow:hidden;flex:none}
 #mapbar::-webkit-scrollbar{display:none}#mapdays::-webkit-scrollbar{display:none}
 #mapbar .day{border:1px solid #d8d0bd;border-radius:12px;padding:6px 4px;font-size:12.5px;background:#fff;cursor:pointer;white-space:nowrap;text-align:center;min-width:0;overflow:hidden;text-overflow:ellipsis}
 #mapdays{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;width:100%;flex:0 0 100%}
 #candBtn{white-space:nowrap;padding:4px 8px;font-size:12px;border-radius:12px}
 #mapbar .day.on{background:#10293f;color:#fff;border-color:#10293f;font-weight:700}
 #mapbar .t{font-weight:800;font-size:13px;white-space:nowrap;margin-right:2px}
+#mapbar .xbtn{width:30px;height:30px;font-size:15px;flex:none}
+#mapbar .mini{flex:none}
 #mapwrap{flex:1;min-height:220px}
 #mapfoot{flex:none;max-height:24vh;overflow:auto;padding:8px 12px;border-top:1px solid #dbe3ec;font-size:12px;background:#fff}
 #mapfoot a{display:inline-block;margin:2px 8px 2px 0;color:#10293f}
@@ -203,7 +205,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p31</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p32</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
