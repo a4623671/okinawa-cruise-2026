@@ -127,6 +127,10 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
 #mapfoot a{display:inline-block;margin:2px 8px 2px 0;color:#10293f}
 #mapfoot .warn{color:#b3402a;font-weight:700}
 #imenu{z-index:75}
+#subbar{display:none;gap:6px;align-items:center;padding:6px 8px;background:#f3ecfb;border-bottom:1px solid #e2d3f2;flex:none}
+#subbar.on{display:flex}
+#subbar button{border:1px solid #b9a86a;background:#fffdf3;color:#7a5200;border-radius:9px;padding:4px 8px;font-size:12px;font-weight:700;cursor:pointer;flex:none;white-space:nowrap}
+#subbar .st{font-size:12px;font-weight:800;color:#6b3fa0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
 #candbar{display:none;gap:6px;align-items:center;padding:6px 10px;border-bottom:1px solid #dbe3ec;background:#f7fafc;flex:none}
 #candbar.on{display:flex}
 #candbar select{flex:1;min-width:0;border:1px solid #d8d0bd;border-radius:10px;padding:6px;font-size:14px;background:#fff}
@@ -196,7 +200,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p26</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p27</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -215,10 +219,10 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
 <div id="mapov" onclick="if(event.target===this)closePlanMap()">
  <div id="mapcard">
   <div id="mapbar"><span class="t" title="行程地圖">🗺</span><span id="mapdays"></span><div class="sp" style="flex:1"></div><button class="mini" id="candBtn" onclick="toggleCand()">＋ 候選</button><button class="xbtn" onclick="closePlanMap()">✕</button></div>
+  <div id="subbar"></div>
   <div id="candbar"><select id="candKind"></select><button onclick="showCand()">顯示</button><button class="ghost" onclick="hideCand()">清除</button></div>
   <div id="mapwrap"></div>
   <div id="mappanel">
-   <div id="mapact"><button onclick="autoOrderMap()">🔀 最佳排序</button><button id="shipArr" onclick="mapSetShip('off')">🚢 下船</button><button id="shipBy" onclick="mapSetShip('board')">🚢 上船</button><span class="mlbl">全部交通</span><span id="modes"></span></div>
    <div id="maplist"></div>
   </div>
   <div id="mapfoot"></div>
@@ -845,7 +849,9 @@ function drawPlanMap(){
  document.getElementById('mapfoot').style.display=showAll?'block':'none';
  document.getElementById('candbar').classList.toggle('on',!showAll&&MCAND);
  document.getElementById('candBtn').style.display=showAll?'none':'inline-block';
- if(showAll){drawAllDays();return;}
+ if(showAll){MSUB=null;var _sb=document.getElementById('subbar');if(_sb)_sb.classList.remove('on');drawAllDays();return;}
+ if(MSUB){drawSubDay();return;}
+ var _sb2=document.getElementById('subbar');if(_sb2)_sb2.classList.remove('on');
  drawOneDay();
 }
 function drawAllDays(){
@@ -889,9 +895,6 @@ function drawOneDay(){
   if(p.x)MMARK[p.x.s+':'+p.x.i]=mk;
  });
  if(MCAND)candPins();
- document.getElementById('modes').innerHTML=modesHTML();
- var _sa=document.getElementById('shipArr');if(_sa)_sa.textContent='🚢 到港 '+(d0().arr||'--:--')+'｜下船 '+(dayOff(d0())||'--:--');
- var _sb=document.getElementById('shipBy');if(_sb)_sb.textContent='🚢 離港 '+(d0().dep||'--:--')+'｜上船 '+(dayBoard(d0())||'--:--');
  document.getElementById('maplist').innerHTML=mapPanelHTML(seq,pc,it);
  var b=pts.map(function(p){return [p.lat,p.lng];});
  if(b.length){try{PMAP.fitBounds(b,{padding:[40,40]});}catch(e){PMAP.setView(b[0],12);}}
@@ -899,7 +902,7 @@ function drawOneDay(){
 }
 function planPopup(x){
  return '<b>'+esc(x.o.t)+'</b><br>停留 '+fmtMin(x.o.min||0)+'<br>'+(votesOf(x.o.id).length?('票數 '+(votesOf(x.o.id).length+'')):'')+
-  '<div style="margin-top:8px"><button onclick="mapRemove(\''+x.s+'\','+x.i+')" style="border:none;background:#b3402a;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">✕ 移除</button></div>';
+  '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><button onclick="openSub(\''+x.s+'\','+x.i+')" style="border:none;background:#7a3fa0;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">🧭 周邊</button><button onclick="mapRemove(\''+x.s+'\','+x.i+')" style="border:none;background:#b3402a;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">✕ 移除</button></div>';
 }
 function mapRemove(slot,idx){if(guard())return;var a=arr0(slot);if(!a[idx])return;a.splice(idx,1);recompute().then(function(){drawPlanMap();});}
 function mapAdd(id){if(guard())return;addItem(id);MCANDL=MCANDL.filter(function(c){return c.id!==id;});setTimeout(function(){recompute().then(function(){drawPlanMap();});},350);}
@@ -908,6 +911,38 @@ function legRow(k,C){
  var mi=MODEN[mode]||mode;
  var txt=(C&&C.min!=null)?('約 '+fmtMin(C.min)+(C.km?'（'+C.km.toFixed(1)+'km）':'')):'時間未知';
  return '<div class="mapleg" onclick="mapCycle(\''+k+'\')"><span>'+mi+'</span> <span class="me">'+txt+'</span><span class="msw">點一下切換</span></div>';
+}
+function mapLegMenu(k){
+ if(guard())return;
+ var d=d0(),it=PLAN.items[curDay],pc=PORT[d.port];
+ var seq=[];SLOTS.forEach(function(sl){it.slots[sl[0]].forEach(function(o){seq.push(o);});});
+ var a=null,b=null;
+ if(k==='in'){a=pc?[pc.lat,pc.lng]:null;b=seq[0]?coordOf(seq[0]):null;}
+ else if(k==='out'){a=seq.length?coordOf(seq[seq.length-1]):null;b=pc?[pc.lat,pc.lng]:null;}
+ else{var i=+k;a=seq[i]?coordOf(seq[i]):null;b=seq[i+1]?coordOf(seq[i+1]):null;}
+ var cur=(k==='in'||k==='out')?((it.portMode||{})[k]||'mono'):((it.legs[k]||{}).mode||'mono');
+ document.getElementById('imenubody').innerHTML='<h2>選擇交通</h2><div class="menu"><button>計算中…</button></div>';
+ document.getElementById('imenu').classList.add('on');
+ var km=(a&&b)?hav(a,b):null;
+ Promise.all(['walk','taxi','bus','mono'].map(function(m){
+  if(!a||!b)return Promise.resolve({m:m,min:null});
+  if(m==='walk'||m==='taxi')return queryDrive(a,b).then(function(dr){var e=estMode(m,km,dr);return {m:m,min:e.min,km:e.km};}).catch(function(){return {m:m,min:null};});
+  var e=estMode(m,km,null);return Promise.resolve({m:m,min:e.min,km:e.km});
+ })).then(function(list){
+  var hh='<h2>選擇交通</h2><div class="menu">';
+  list.forEach(function(x){
+   hh+='<button'+(x.m===cur?' style="border-color:#10293f;background:#eef4f9;font-weight:800"':'')+' onclick="closeItemMenu();mapSetLeg(\''+k+'\',\''+x.m+'\')">'+MODEN[x.m]+'　'+(x.min!=null?('約 '+fmtMin(Math.round(x.min))):'時間未知')+(x.m===cur?'（目前）':'')+'</button>';
+  });
+  hh+='<button onclick="closeItemMenu()">取消</button></div>';
+  document.getElementById('imenubody').innerHTML=hh;
+ });
+}
+function mapSetLeg(k,m){
+ if(guard())return;
+ var it=it0();
+ if(k==='in'||k==='out'){var pm=it.portMode||{in:'mono',out:'mono'};pm[k]=m;it.portMode=pm;}
+ else{var L=it.legs[k]||(it.legs[k]={});L.mode=m;}
+ recompute().then(function(){drawPlanMap();});
 }
 function mapCycle(k){
  if(guard())return;
@@ -936,7 +971,7 @@ function mapPanelHTML(seq,pc,it){
  var by=dayBoard(d),byt=by?hm(by):null;
  var h='<div class="mtot">已排 <b>'+fmtMin(t.used)+'</b>／可用 <b>'+(t.cap!=null?fmtMin(t.cap):'—')+'</b>'+(t.cap!=null?('・餘 '+fmtMin(Math.max(0,t.cap-t.used))):'')+(t.over>0?(' <span style="color:#b3402a">超過 '+fmtMin(t.over)+'</span>'):'')+'</div>';
  h+='<div class="mstrip">';
- h+='<div class="mcard port"><div class="nm">🚢 下船</div><div class="sub">'+hm2s(tm)+'</div><div style="font-size:9.5px;color:#cfe0ee">到港 '+(d.arr||'--:--')+'</div></div>';
+ h+='<div class="mcard port" onclick="mapSetShip(\'off\')" title="點擊調整下船時間"><div class="nm">🚢 下船</div><div class="sub">'+hm2s(tm)+'</div><div style="font-size:9.5px;color:#cfe0ee">到港 '+(d.arr||'--:--')+'</div></div>';
  var key='in';
  seq.forEach(function(x,k){
   var C=cache.legs[curDay+':'+key];
@@ -950,6 +985,7 @@ function mapPanelHTML(seq,pc,it){
    +'<button onclick="event.stopPropagation();mapMove(\''+x.s+'\','+x.i+',-1)">◀</button>'
    +'<button onclick="event.stopPropagation();mapMove(\''+x.s+'\','+x.i+',1)">▶</button>'
    +'<button onclick="event.stopPropagation();mapSetMin(\''+x.s+'\','+x.i+')">⏱</button>'
+   +'<button onclick="event.stopPropagation();openSub(\''+x.s+'\','+x.i+')">🧭</button>'
    +'<button class="del" onclick="event.stopPropagation();mapRemove(\''+x.s+'\','+x.i+')">✕</button>'
    +'</div></div>';
   tm+=(+x.o.min||0);
@@ -958,14 +994,14 @@ function mapPanelHTML(seq,pc,it){
  var CO=cache.legs[curDay+':'+key];
  if(CO&&CO.min!=null)tm+=CO.min;
  h+=legChip(key,CO);
- h+='<div class="mcard port"><div class="nm">🚢 上船</div><div class="sub">'+(by||'--:--')+'</div><div style="font-size:9.5px;color:'+(byt!=null&&tm>byt?'#ffb4a8':'#cfe0ee')+'">預估 '+hm2s(tm)+'・離港 '+(d.dep||'--:--')+'</div></div>';
+ h+='<div class="mcard port" onclick="mapSetShip(\'board\')" title="點擊調整上船時間"><div class="nm">🚢 上船</div><div class="sub">'+(by||'--:--')+'</div><div style="font-size:9.5px;color:'+(byt!=null&&tm>byt?'#ffb4a8':'#cfe0ee')+'">預估 '+hm2s(tm)+'・離港 '+(d.dep||'--:--')+'</div></div>';
  h+='</div>';
  return h;
 }
 function legChip(k,C){
  var mode=(C&&C.mode)||'mono';var mi=MODEN[mode]||mode;
  var txt=(C&&C.min!=null)?fmtMin(C.min):'未知';
- return '<div class="mleg" onclick="mapCycle(\''+k+'\')"><div class="mi">'+mi+'</div><div class="mm">'+txt+'</div><div class="msw">切換</div></div>';
+ return '<div class="mleg" onclick="mapLegMenu(\''+k+'\')"><div class="mi">'+mi+'</div><div class="mm">'+txt+'</div><div class="msw">選擇</div></div>';
 }
 function mapSetMin(slot,idx){
  var o=arr0(slot)[idx];if(!o)return;
@@ -1078,6 +1114,139 @@ function candPopup(c){
  return '<b>'+esc(c.t)+'</b><br><span style="color:#6b7a89">'+(KINDN[c.kind]||'')+'・'+(vs.length?(vs.length+'票・'+esc(vs.join('、'))):'尚無投票')+'</span><br>'+esc(intro)+
   '<div style="margin-top:8px"><button onclick="mapAdd(\''+c.id+'\')" style="border:none;background:#0e6e5a;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">＋ 加入</button></div>';
 }
+/* ================= 週邊細部行程（巢狀） ================= */
+var MSUB=null;
+function subOf(o){if(!o.sub)o.sub=[];return o.sub;}
+function openSub(slot,idx){MSUB={slot:slot,idx:idx};drawPlanMap();}
+function closeSub(){MSUB=null;var sb=document.getElementById('subbar');if(sb)sb.classList.remove('on');drawPlanMap();}
+function subLeg(a,b,mode){
+ if(!a||!b)return Promise.resolve(null);
+ var km=hav(a,b);mode=mode||'mono';
+ if(mode==='walk'||mode==='taxi')return queryDrive(a,b).then(function(dr){var e=estMode(mode,km,dr);e.mode=mode;return e;}).catch(function(){return null;});
+ var e=estMode(mode,km,null);e.mode=mode;return Promise.resolve(e);
+}
+function subFocus(i){var p=arr0(MSUB.slot)[MSUB.idx];var s=(p.sub||[])[i];if(!s||s.lat==null)return;try{PMAP.setView([s.lat,s.lng],Math.max(PMAP.getZoom(),15),{animate:true});}catch(e){}}
+function subPopup(s,i){
+ return '<b>'+esc(s.t)+'</b><br>停留 '+fmtMin(s.min||0)+
+  '<div style="margin-top:8px"><button onclick="subRemove('+i+')" style="border:none;background:#b3402a;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">✕ 移除</button></div>';
+}
+function subRemove(i){var p=arr0(MSUB.slot)[MSUB.idx];if(!p||!p.sub)return;p.sub.splice(i,1);recomputeSub();}
+function subMove(i,d){var p=arr0(MSUB.slot)[MSUB.idx];var a=p.sub||[];var j=i+d;if(j<0||j>=a.length){toast(d<0?'已在最前':'已在最後');return;}var t=a[i];a[i]=a[j];a[j]=t;recomputeSub();}
+function subSetMin(i){
+ var p=arr0(MSUB.slot)[MSUB.idx],s=(p.sub||[])[i];if(!s)return;
+ var v=prompt('週邊停留幾分鐘？',s.min||30);if(v===null)return;
+ var n=parseInt(v,10);if(!(n>0)){toast('請輸入分鐘數');return;}
+ s.min=n;recomputeSub();
+}
+function recomputeSub(){recompute().then(function(){drawPlanMap();});}
+function drawSubDay(){
+ var p=arr0(MSUB.slot)[MSUB.idx];
+ if(!p){closeSub();return;}
+ var pc=coordOf(p);
+ var sb=document.getElementById('subbar');sb.classList.add('on');
+ sb.innerHTML='<button onclick="closeSub()">◀ 回主行程</button><span class="st">🧭 周邊：'+esc(p.t)+'</span><button onclick="addSub()">＋ 周邊</button>';
+ mapClear();
+ var subs=subOf(p),seq=[],miss=0;
+ if(pc)seq.push({c:pc,anchor:true});
+ subs.forEach(function(s,i){if(s.lat!=null)seq.push({c:[s.lat,s.lng],s:s,i:i});else miss++;});
+ var legs=[],chain=Promise.resolve();
+ for(var i=0;i<seq.length;i++){
+  (function(k){
+   var A=seq[k].c,B=seq[(k+1)%seq.length].c;
+   var mode=(p.subLegs&&p.subLegs[k]&&p.subLegs[k].mode)||'mono';
+   chain=chain.then(function(){return subLeg(A,B,mode).then(function(e){legs[k]=e;});});
+  })(i);
+ }
+ chain.then(function(){
+  var line=seq.map(function(x){return x.c;});
+  if(line.length>1)L.polyline(line.concat([line[0]]),{color:'#7a3fa0',weight:3,opacity:.8,dashArray:'6 5'}).addTo(PMAP);
+  var bounds=[];
+  seq.forEach(function(x,k){
+   var col=x.anchor?'#10293f':'#7a3fa0';
+   var mk=L.marker(x.c,{icon:L.divIcon({className:'',html:pinHTML(x.anchor?'★':(k+1),col,x.anchor?30:26),iconSize:[x.anchor?30:26,x.anchor?30:26]})})
+    .addTo(PMAP).bindPopup(x.anchor?('<b>主點 '+esc(p.t)+'</b>'):subPopup(x.s,x.i));
+   if(x.anchor)mk.bindTooltip('★ 主點',{permanent:true,direction:'top',offset:[0,-14],className:'porttip'});
+   else mk.bindTooltip((k+1)+'. '+String(x.s.t).slice(0,10),{permanent:true,direction:'right',offset:[10,0],className:'pintip'});
+   bounds.push(x.c);
+  });
+  if(bounds.length){try{PMAP.fitBounds(bounds,{padding:[40,40]});}catch(e){PMAP.setView(bounds[0],15);}}
+  var t=0,tot=0,strip='<div class="mstrip">';
+  strip+='<div class="mcard port"><div class="nm">★ 主點</div><div class="sub">'+esc(String(p.t).slice(0,10))+'</div><div style="font-size:9.5px;color:#cfe0ee">停留 '+fmtMin(p.min||0)+'</div></div>';
+  subs.forEach(function(s,i){
+   var C=legs[i];if(C&&C.min!=null){t+=C.min;tot+=C.min;}
+   strip+='<div class="mleg" onclick="subLegMenu('+i+')"><div class="mi">'+((MODEN[(C&&C.mode)||'mono'])||'')+'</div><div class="mm">'+(C&&C.min!=null?fmtMin(C.min):'未知')+'</div><div class="msw">選擇</div></div>';
+   strip+='<div class="mcard" onclick="subFocus('+i+')">'
+    +'<div class="nm">'+(i+2)+'. '+esc(s.t)+'</div>'
+    +'<div class="sub">'+(s.lat!=null?('+'+fmtMin(t)):'?')+'・停留 '+fmtMin(s.min||0)+'</div>'
+    +'<div class="act">'
+    +'<button onclick="event.stopPropagation();subMove('+i+',-1)">◀</button>'
+    +'<button onclick="event.stopPropagation();subMove('+i+',1)">▶</button>'
+    +'<button onclick="event.stopPropagation();subSetMin('+i+')">⏱</button>'
+    +'<button class="del" onclick="event.stopPropagation();subRemove('+i+')">✕</button>'
+    +'</div></div>';
+   t+=(+s.min||0);tot+=(+s.min||0);
+  });
+  var CL=legs[seq.length-1];
+  strip+='<div class="mleg" onclick="subLegMenu('+seq.length+')"><div class="mi">'+((MODEN[(CL&&CL.mode)||'mono'])||'')+'</div><div class="mm">'+(CL&&CL.min!=null?fmtMin(CL.min):'未知')+'</div><div class="msw">回主點</div></div>';
+  strip+='<div class="mcard port"><div class="nm">★ 回主點</div><div class="sub">'+fmtMin(t)+'</div></div>';
+  strip+='</div>';
+  var over=Math.max(0,tot-(+p.min||0));
+  var foot='<div class="mtot">週邊已排 <b>'+fmtMin(tot)+'</b>／主點停留 <b>'+fmtMin(p.min||0)+'</b>'+(over>0?' <span style="color:#b3402a">超過 '+fmtMin(over)+'</span>':'')+(miss?'　<span style="color:#b3541e">未定位 '+miss+' 項</span>':'')+'</div>';
+  document.getElementById('maplist').innerHTML=foot+strip;
+  setTimeout(function(){try{PMAP.invalidateSize();}catch(e){}},150);
+ });
+}
+function subLegMenu(k){
+ var p=arr0(MSUB.slot)[MSUB.idx];if(!p)return;
+ var seq=[];var pc=coordOf(p);if(pc)seq.push({c:pc});
+ (p.sub||[]).forEach(function(s){if(s.lat!=null)seq.push({c:[s.lat,s.lng]});});
+ var A=seq[k],B=seq[(k+1)%seq.length];if(!A||!B){toast('此段無法估算');return;}
+ var cur=(p.subLegs&&p.subLegs[k]&&p.subLegs[k].mode)||'mono';
+ document.getElementById('imenubody').innerHTML='<h2>選擇交通</h2><div class="menu"><button>計算中…</button></div>';
+ document.getElementById('imenu').classList.add('on');
+ var km=hav(A.c,B.c);
+ Promise.all(['walk','taxi','bus','mono'].map(function(m){
+  if(m==='walk'||m==='taxi')return queryDrive(A.c,B.c).then(function(dr){var e=estMode(m,km,dr);return {m:m,min:e.min};}).catch(function(){return {m:m,min:null};});
+  var e=estMode(m,km,null);return {m:m,min:e.min};
+ })).then(function(list){
+  var hh='<h2>選擇交通</h2><div class="menu">';
+  list.forEach(function(x){hh+='<button'+(x.m===cur?' style="border-color:#10293f;background:#eef4f9;font-weight:800"':'')+' onclick="closeItemMenu();setSubLeg('+k+',\''+x.m+'\')">'+MODEN[x.m]+'　'+(x.min!=null?'約 '+fmtMin(Math.round(x.min)):'未知')+(x.m===cur?'（目前）':'')+'</button>';});
+  hh+='<button onclick="closeItemMenu()">取消</button></div>';
+  document.getElementById('imenubody').innerHTML=hh;
+ });
+}
+function setSubLeg(k,m){var p=arr0(MSUB.slot)[MSUB.idx];if(!p)return;p.subLegs=p.subLegs||{};p.subLegs[k]={mode:m};recomputeSub();}
+function addSub(){
+ var p=arr0(MSUB.slot)[MSUB.idx];if(!p)return;
+ var pc=coordOf(p),near=[];
+ if(pc){CATALOG.forEach(function(c){var g=geo[c.id];if(!g||g.lat==null)return;var dkm=hav(pc,[g.lat,g.lng]);if(dkm<=1.5)near.push({c:c,g:g,d:dkm});});}
+ near.sort(function(a,b){return a.d-b.d;});
+ var h='<h2>＋ 加入週邊</h2><div class="menu">';
+ if(near.length){h+='<div style="font-size:12px;color:#6b7a89;margin:2px 0 6px">主點周邊 1.5km 內的候選</div>';near.slice(0,8).forEach(function(x){h+='<button onclick="closeItemMenu();subAddAt(\''+x.c.id+'\')">'+esc(x.c.t)+'　<span style="color:#95a3b2">'+x.d.toFixed(1)+'km</span></button>';});}
+ else h+='<div style="font-size:12px;color:#6b7a89;margin:2px 0 6px">附近沒有已定位的候選</div>';
+ h+='<button onclick="closeItemMenu();subAddManual()">✏️ 手動新增（輸入名稱）</button><button onclick="closeItemMenu()">取消</button></div>';
+ document.getElementById('imenubody').innerHTML=h;
+ document.getElementById('imenu').classList.add('on');
+}
+function subAddAt(cid){
+ var c=null;CATALOG.forEach(function(x){if(x.id===cid)c=x;});if(!c)return;
+ var g=geo[cid];if(!g||g.lat==null){toast('此候選沒有座標');return;}
+ var p=arr0(MSUB.slot)[MSUB.idx];
+ subOf(p).push({t:String(c.t).replace(/✅/g,'').trim(),min:c.kind==='food'?60:30,lat:g.lat,lng:g.lng,kind:c.kind,id:cid});
+ recomputeSub();
+}
+function subAddManual(){
+ var p=arr0(MSUB.slot)[MSUB.idx];if(!p)return;
+ var name=prompt('週邊名稱（例如：商店街、公園）','');if(!name)return;
+ var mins=prompt('停留幾分鐘？','30');var m=parseInt(mins,10);if(!(m>0))m=30;
+ toast('查座標…');
+ resolveGeo({t:name,place:dayPlace(),id:'sub-'+Date.now()}).then(function(c){
+  if(!c){toast('查不到座標');return;}
+  subOf(p).push({t:name,min:m,lat:c[0],lng:c[1],kind:'spot'});
+  recomputeSub();
+ });
+}
+
 </script>
 </body>
 </html>
