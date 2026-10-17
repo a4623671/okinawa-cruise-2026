@@ -193,7 +193,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p21</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p22</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -215,7 +215,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="candbar"><select id="candKind"></select><button onclick="showCand()">顯示</button><button class="ghost" onclick="hideCand()">清除</button></div>
   <div id="mapwrap"></div>
   <div id="mappanel">
-   <div id="mapact"><button onclick="autoOrderMap()">🔀 最佳排序</button><span class="mlbl">全部交通</span><span id="modes"></span></div>
+   <div id="mapact"><button onclick="autoOrderMap()">🔀 最佳排序</button><button id="shipArr" onclick="mapSetShip('arr')">🚢 下船</button><button id="shipBy" onclick="mapSetShip('by')">🚢 上船</button><span class="mlbl">全部交通</span><span id="modes"></span></div>
    <div id="maplist"></div>
   </div>
   <div id="mapfoot"></div>
@@ -272,6 +272,8 @@ function ensure(){if(!PLAN)PLAN=blankPlan();
  if(!PLAN.roster)PLAN.roster=[];if(!PLAN.deadline)PLAN.deadline=DEADLINE;
  if(me()&&PLAN.roster.indexOf(me())<0)PLAN.roster.push(me());}
 function d0(){return DAYS.filter(function(x){return x.k===curDay;})[0];}
+function dayArr(d){var it=d&&PLAN&&PLAN.items[d.k];return (it&&it.arr)||(d&&d.arr);}
+function dayBy(d){var it=d&&PLAN&&PLAN.items[d.k];return (it&&it.by)||(d&&d.by);}
 function it0(){return PLAN.items[curDay];}
 function roster(){return (PLAN&&PLAN.roster)||[];}
 function planDeadline(){return Date.parse((PLAN&&PLAN.deadline)||DEADLINE);}
@@ -475,7 +477,8 @@ function computeAll(){
 }
 function finish(d,used,miss){
  var cap=null,raw=null,meal=+(PLAN.items[d.k]&&PLAN.items[d.k].mealMin)||0;
- if(d.arr&&d.by){var a=hm(d.arr),b=hm(d.by);if(a!=null&&b!=null){raw=b-a;cap=raw-meal;}}
+ var _a=dayArr(d),_b=dayBy(d);
+ if(_a&&_b){var a=hm(_a),b=hm(_b);if(a!=null&&b!=null){raw=b-a;cap=raw-meal;}}
  cache.totals[d.k]={used:used,cap:cap,raw:raw,meal:meal,miss:miss,over:cap!=null?Math.max(0,used-cap):0};}
 
 /* ================= 繪製 ================= */
@@ -518,8 +521,8 @@ function renderBoard(){
  var ts='';
  if(d.plan&&t.cap!=null)ts='<div class="timesum">可用 <b>'+fmtMin(t.cap)+'</b>・已排 <b>'+fmtMin(t.used)+'</b>・餘 <b>'+fmtMin(Math.max(0,t.cap-t.used))+'</b>'+(t.miss?'・含未知段':'')+'</div>';
  document.getElementById('dayinfo').innerHTML='<b>'+esc(d.t)+'</b>'
-  +(d.arr?('・到港 '+d.arr):'')
-  +(d.by?('・回船 '+d.by+' 前'):'')
+  +(dayArr(d)?('・下船 '+dayArr(d)):'')
+  +(dayBy(d)?('・上船 '+dayBy(d)+' 前'):'')
   +(d.plan?('・用餐 −'+fmtMin(meal0)+' <button class="ghost" style="padding:1px 7px;font-size:11px" onclick="setMeal()">改</button>'):'')
   +ts;
  if(!d.plan){document.getElementById('warn').innerHTML='';document.getElementById('board').innerHTML='<div class="slot">此日無岸上規劃（登船／返抵）。</div>';renderStatus();return;}
@@ -719,7 +722,7 @@ function addItem(id){
 function dayPlan(d){
  var out={rows:[],end:null,over:0,miss:false};
  if(!d.plan)return out;
- var it=PLAN.items[d.k];var t=hm(d.arr);if(t==null)t=8*60;
+ var it=PLAN.items[d.k];var t=hm(dayArr(d));if(t==null)t=8*60;
  var seq=[];SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){seq.push(o);});});
  var pc=PORT[d.port];
  if(seq.length){var LI=cache.legs[d.k+':in'];
@@ -736,19 +739,19 @@ function dayPlan(d){
   if(LO&&LO.min!=null){out.rows.push({t:hm2s(t),n:'回港口（'+(pc?pc.n:d.port)+'）',min:LO.min,kind:'leg'});t+=LO.min;}else out.miss=true;}
  out.end=t;
  var meal=(+PLAN.items[d.k].mealMin)||0;if(meal)t+=meal;
- if(d.by){var by=hm(d.by);if(by!=null){out.over=Math.max(0,t-by);
+ if(dayBy(d)){var by=hm(dayBy(d));if(by!=null){out.over=Math.max(0,t-by);
   if(meal&&out.rows.length)out.rows.push({t:'用餐',n:'用餐（扣抵）',min:meal,kind:'meal'});
-  out.rows.push({t:hm2s(by),n:'回船（'+d.by+'）',min:0,kind:'ret'});}}
+  out.rows.push({t:hm2s(by),n:'上船（'+dayBy(d)+'）',min:0,kind:'ret'});}}
  return out;}
 function openSheet(){
  if(!PLAN){toast('尚未載入');return;}
  var h='<h2>🧾 旅遊規劃單</h2><div style="font-size:12px;color:#6b7a89;margin-bottom:8px">'
   +(PLAN.finalized?'✅ 已定案':'⚠️ 草稿（尚未定案，未全體附議）')+'・時間為估算，出發前複查</div>';
  DAYS.forEach(function(d){
-  if(!d.plan){h+='<div style="margin:8px 0"><b>'+esc(d.t)+'</b>：'+(d.arr?'到港 '+d.arr:'')+(d.dep?'・離港 '+d.dep:'')+'</div>';return;}
+  if(!d.plan){h+='<div style="margin:8px 0"><b>'+esc(d.t)+'</b>：'+(dayArr(d)?'下船 '+dayArr(d):'')+(d.dep?'・離港 '+d.dep:'')+'</div>';return;}
   var p=dayPlan(d);
   h+='<div style="margin:10px 0;border:1px solid #dbe3ec;border-radius:10px;padding:8px 10px"><b>'+esc(d.t)+'</b>'
-   +'<span style="font-size:12px;color:#6b7a89">　到港 '+d.arr+'・回船 '+d.by+' 前</span>'
+   +'<span style="font-size:12px;color:#6b7a89">　下船 '+dayArr(d)+'・上船 '+dayBy(d)+' 前</span>'
    +(p.over>0?'<div style="color:#c0392b;font-weight:800;font-size:13px">⛔ 超出回船時間 '+fmtMin(p.over)+'</div>':'')
    +(p.miss?'<div style="color:#b3541e;font-size:12px">※ 含未定位項目，部分交通時間未知</div>':'')
    +'<table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:6px">'
@@ -879,6 +882,8 @@ function drawOneDay(){
  });
  if(MCAND)candPins();
  document.getElementById('modes').innerHTML=modesHTML();
+ var _sa=document.getElementById('shipArr');if(_sa)_sa.textContent='🚢 下船 '+(dayArr(d0())||'--:--');
+ var _sb=document.getElementById('shipBy');if(_sb)_sb.textContent='🚢 上船 '+(dayBy(d0())||'--:--');
  document.getElementById('maplist').innerHTML=mapPanelHTML(seq,pc,it);
  var b=pts.map(function(p){return [p.lat,p.lng];});
  if(b.length){try{PMAP.fitBounds(b,{padding:[40,40]});}catch(e){PMAP.setView(b[0],12);}}
@@ -919,25 +924,33 @@ function setAllMode(m){
  recompute().then(function(){drawPlanMap();});
 }
 function mapPanelHTML(seq,pc,it){
- var t=cache.totals[curDay]||{};
+ var d=d0(),t=cache.totals[curDay]||{},tm=hm(dayArr(d));if(tm==null)tm=8*60;
+ var by=dayBy(d),byt=by?hm(by):null;
  var h='<div class="mtot">已排 <b>'+fmtMin(t.used)+'</b>／可用 <b>'+(t.cap!=null?fmtMin(t.cap):'—')+'</b>'+(t.cap!=null?('・餘 '+fmtMin(Math.max(0,t.cap-t.used))):'')+(t.over>0?(' <span style="color:#b3402a">超過 '+fmtMin(t.over)+'</span>'):'')+'</div>';
  h+='<div class="mstrip">';
- h+='<div class="mcard port"><div class="nm">🚢 港口</div><div class="sub">'+esc(pc?pc.n:d0().port)+'</div></div>';
- h+=legChip('in',cache.legs[curDay+':in']);
+ h+='<div class="mcard port"><div class="nm">🚢 下船</div><div class="sub">'+hm2s(tm)+'</div></div>';
+ var key='in';
  seq.forEach(function(x,k){
+  var C=cache.legs[curDay+':'+key];
+  if(C&&C.min!=null)tm+=C.min;
+  h+=legChip(key,C);
+  var late=(byt!=null&&(tm+(+x.o.min||0))>byt);
   h+='<div class="mcard" onclick="mapFocus(\''+x.s+'\','+x.i+')">'
    +'<div class="nm">'+(k+2)+'. '+esc(x.o.t)+'</div>'
-   +'<div class="sub">停留 '+fmtMin(x.o.min||0)+'</div>'
+   +'<div class="sub"'+ (late?' style="color:#b3402a"':'') +'>'+hm2s(tm)+'・停留 '+fmtMin(x.o.min||0)+'</div>'
    +'<div class="act">'
    +'<button onclick="event.stopPropagation();mapMove(\''+x.s+'\','+x.i+',-1)">◀</button>'
    +'<button onclick="event.stopPropagation();mapMove(\''+x.s+'\','+x.i+',1)">▶</button>'
    +'<button onclick="event.stopPropagation();mapSetMin(\''+x.s+'\','+x.i+')">⏱</button>'
    +'<button class="del" onclick="event.stopPropagation();mapRemove(\''+x.s+'\','+x.i+')">✕</button>'
    +'</div></div>';
-  var key=(k<seq.length-1)?String(k):'out';
-  h+=legChip(key,cache.legs[curDay+':'+key]);
+  tm+=(+x.o.min||0);
+  key=(k<seq.length-1)?String(k):'out';
  });
- h+='<div class="mcard port"><div class="nm">🚢 回港口</div><div class="sub">'+esc(pc?pc.n:d0().port)+'</div></div>';
+ var CO=cache.legs[curDay+':'+key];
+ if(CO&&CO.min!=null)tm+=CO.min;
+ h+=legChip(key,CO);
+ h+='<div class="mcard port"><div class="nm">🚢 上船</div><div class="sub">'+(by||'--:--')+'</div><div style="font-size:10px;color:'+(byt!=null&&tm>byt?'#ffb4a8':'#cfe0ee')+'">預估 '+hm2s(tm)+'</div></div>';
  h+='</div>';
  return h;
 }
@@ -961,6 +974,18 @@ function mapMinCustom(slot,idx){
  var v=prompt('停留幾分鐘？',o.min||60);if(v===null)return;
  var n=parseInt(v,10);if(!(n>0)){toast('請輸入分鐘數');return;}
  o.min=n;recompute().then(function(){drawPlanMap();});
+}
+function mapSetShip(which){
+ if(guard())return;
+ var d=d0(),it=PLAN.items[curDay];
+ var cur=which==='arr'?(dayArr(d)||''):(dayBy(d)||'');
+ var v=prompt((which==='arr'?'下船時間':'上船時間')+'（HH:MM）',cur);
+ if(v===null)return;
+ var m=String(v).trim().match(/^(\d{1,2})[:：.](\d{1,2})$/);
+ if(!m){toast('請輸入 HH:MM，例如 08:00');return;}
+ var hh=+m[1],mm=+m[2];if(hh>23||mm>59){toast('時間不正確');return;}
+ it[which]=String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0');
+ recompute().then(function(){drawPlanMap();});
 }
 function mapFocus(slot,idx){
  var m=MMARK[slot+':'+idx];if(!m)return;
