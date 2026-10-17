@@ -115,10 +115,10 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
 #mapov{position:fixed;inset:0;background:rgba(8,20,32,.45);z-index:70;display:none;align-items:center;justify-content:center;padding:6px}
 #mapov.on{display:flex}
 #mapcard{background:#fff;border-radius:16px;width:100%;max-width:760px;height:94vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.4)}
-#mapbar{display:flex;flex-wrap:nowrap;align-items:center;gap:5px;padding:6px 8px;border-bottom:1px solid #dbe3ec;overflow:hidden;flex:none}
+#mapbar{display:flex;flex-wrap:wrap;align-items:center;gap:5px;padding:6px 8px;border-bottom:1px solid #dbe3ec;overflow:hidden;flex:none}
 #mapbar::-webkit-scrollbar{display:none}#mapdays::-webkit-scrollbar{display:none}
-#mapbar .day{flex:none;border:1px solid #d8d0bd;border-radius:12px;padding:4px 8px;font-size:12px;background:#fff;cursor:pointer;white-space:nowrap}
-#mapdays{display:flex;flex:1;min-width:0;flex-wrap:nowrap;gap:5px;overflow-x:auto;scrollbar-width:none}
+#mapbar .day{border:1px solid #d8d0bd;border-radius:12px;padding:6px 4px;font-size:12.5px;background:#fff;cursor:pointer;white-space:nowrap;text-align:center;min-width:0;overflow:hidden;text-overflow:ellipsis}
+#mapdays{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;width:100%;flex:0 0 100%}
 #candBtn{white-space:nowrap;padding:4px 8px;font-size:12px;border-radius:12px}
 #mapbar .day.on{background:#10293f;color:#fff;border-color:#10293f;font-weight:700}
 #mapbar .t{font-weight:800;font-size:13px;white-space:nowrap;margin-right:2px}
@@ -200,7 +200,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p27</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p29</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -218,7 +218,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
 <button id="mapfab" onclick="openPlanMap()" title="行程地圖">🗺</button>
 <div id="mapov" onclick="if(event.target===this)closePlanMap()">
  <div id="mapcard">
-  <div id="mapbar"><span class="t" title="行程地圖">🗺</span><span id="mapdays"></span><div class="sp" style="flex:1"></div><button class="mini" id="candBtn" onclick="toggleCand()">＋ 候選</button><button class="xbtn" onclick="closePlanMap()">✕</button></div>
+  <div id="mapbar"><span class="t" title="行程地圖">🗺</span><span style="flex:1"></span><button class="mini" id="candBtn" onclick="toggleCand()">＋ 候選</button><button class="xbtn" onclick="closePlanMap()">✕</button><span id="mapdays"></span></div>
   <div id="subbar"></div>
   <div id="candbar"><select id="candKind"></select><button onclick="showCand()">顯示</button><button class="ghost" onclick="hideCand()">清除</button></div>
   <div id="mapwrap"></div>
