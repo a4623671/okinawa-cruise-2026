@@ -200,7 +200,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p29</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p30</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -1127,7 +1127,7 @@ function subLeg(a,b,mode){
 }
 function subFocus(i){var p=arr0(MSUB.slot)[MSUB.idx];var s=(p.sub||[])[i];if(!s||s.lat==null)return;try{PMAP.setView([s.lat,s.lng],Math.max(PMAP.getZoom(),15),{animate:true});}catch(e){}}
 function subPopup(s,i){
- return '<b>'+esc(s.t)+'</b><br>停留 '+fmtMin(s.min||0)+
+ return '<b>'+(s.note?'📝 ':'')+esc(s.t)+'</b><br>'+(s.note?'（註解）':'停留 '+fmtMin(s.min||0))+
   '<div style="margin-top:8px"><button onclick="subRemove('+i+')" style="border:none;background:#b3402a;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">✕ 移除</button></div>';
 }
 function subRemove(i){var p=arr0(MSUB.slot)[MSUB.idx];if(!p||!p.sub)return;p.sub.splice(i,1);recomputeSub();}
@@ -1162,11 +1162,11 @@ function drawSubDay(){
   if(line.length>1)L.polyline(line.concat([line[0]]),{color:'#7a3fa0',weight:3,opacity:.8,dashArray:'6 5'}).addTo(PMAP);
   var bounds=[];
   seq.forEach(function(x,k){
-   var col=x.anchor?'#10293f':'#7a3fa0';
-   var mk=L.marker(x.c,{icon:L.divIcon({className:'',html:pinHTML(x.anchor?'★':(k+1),col,x.anchor?30:26),iconSize:[x.anchor?30:26,x.anchor?30:26]})})
+   var col=x.anchor?'#10293f':((x.s&&x.s.note)?'#b3541e':'#7a3fa0');
+   var mk=L.marker(x.c,{icon:L.divIcon({className:'',html:pinHTML(x.anchor?'★':((x.s&&x.s.note)?'📝':(k+1)),col,x.anchor?30:26),iconSize:[x.anchor?30:26,x.anchor?30:26]})})
     .addTo(PMAP).bindPopup(x.anchor?('<b>主點 '+esc(p.t)+'</b>'):subPopup(x.s,x.i));
    if(x.anchor)mk.bindTooltip('★ 主點',{permanent:true,direction:'top',offset:[0,-14],className:'porttip'});
-   else mk.bindTooltip((k+1)+'. '+String(x.s.t).slice(0,10),{permanent:true,direction:'right',offset:[10,0],className:'pintip'});
+   else mk.bindTooltip(((x.s&&x.s.note)?'📝 ':(k+1)+'. ')+String(x.s.t).slice(0,12),{permanent:true,direction:'right',offset:[10,0],className:'pintip'});
    bounds.push(x.c);
   });
   if(bounds.length){try{PMAP.fitBounds(bounds,{padding:[40,40]});}catch(e){PMAP.setView(bounds[0],15);}}
@@ -1176,15 +1176,15 @@ function drawSubDay(){
    var C=legs[i];if(C&&C.min!=null){t+=C.min;tot+=C.min;}
    strip+='<div class="mleg" onclick="subLegMenu('+i+')"><div class="mi">'+((MODEN[(C&&C.mode)||'mono'])||'')+'</div><div class="mm">'+(C&&C.min!=null?fmtMin(C.min):'未知')+'</div><div class="msw">選擇</div></div>';
    strip+='<div class="mcard" onclick="subFocus('+i+')">'
-    +'<div class="nm">'+(i+2)+'. '+esc(s.t)+'</div>'
-    +'<div class="sub">'+(s.lat!=null?('+'+fmtMin(t)):'?')+'・停留 '+fmtMin(s.min||0)+'</div>'
+    +'<div class="nm">'+(s.note?'📝 ':(i+2)+'. ')+esc(s.t)+'</div>'
+    +'<div class="sub">'+(s.note?'註解':((s.lat!=null?('+'+fmtMin(t)):'?')+'・停留 '+fmtMin(s.min||0)))+'</div>'
     +'<div class="act">'
     +'<button onclick="event.stopPropagation();subMove('+i+',-1)">◀</button>'
     +'<button onclick="event.stopPropagation();subMove('+i+',1)">▶</button>'
     +'<button onclick="event.stopPropagation();subSetMin('+i+')">⏱</button>'
     +'<button class="del" onclick="event.stopPropagation();subRemove('+i+')">✕</button>'
     +'</div></div>';
-   t+=(+s.min||0);tot+=(+s.min||0);
+   if(!s.note){t+=(+s.min||0);tot+=(+s.min||0);}
   });
   var CL=legs[seq.length-1];
   strip+='<div class="mleg" onclick="subLegMenu('+seq.length+')"><div class="mi">'+((MODEN[(CL&&CL.mode)||'mono'])||'')+'</div><div class="mm">'+(CL&&CL.min!=null?fmtMin(CL.min):'未知')+'</div><div class="msw">回主點</div></div>';
@@ -1224,7 +1224,7 @@ function addSub(){
  var h='<h2>＋ 加入週邊</h2><div class="menu">';
  if(near.length){h+='<div style="font-size:12px;color:#6b7a89;margin:2px 0 6px">主點周邊 1.5km 內的候選</div>';near.slice(0,8).forEach(function(x){h+='<button onclick="closeItemMenu();subAddAt(\''+x.c.id+'\')">'+esc(x.c.t)+'　<span style="color:#95a3b2">'+x.d.toFixed(1)+'km</span></button>';});}
  else h+='<div style="font-size:12px;color:#6b7a89;margin:2px 0 6px">附近沒有已定位的候選</div>';
- h+='<button onclick="closeItemMenu();subAddManual()">✏️ 手動新增（輸入名稱）</button><button onclick="closeItemMenu()">取消</button></div>';
+ h+='<button onclick="closeItemMenu();subAddManual()">✏️ 手動新增（輸入名稱，會查座標）</button><button onclick="closeItemMenu();subAddNote()">📝 加註解（純文字，用主點位置打點）</button><button onclick="closeItemMenu()">取消</button></div>';
  document.getElementById('imenubody').innerHTML=h;
  document.getElementById('imenu').classList.add('on');
 }
@@ -1233,6 +1233,14 @@ function subAddAt(cid){
  var g=geo[cid];if(!g||g.lat==null){toast('此候選沒有座標');return;}
  var p=arr0(MSUB.slot)[MSUB.idx];
  subOf(p).push({t:String(c.t).replace(/✅/g,'').trim(),min:c.kind==='food'?60:30,lat:g.lat,lng:g.lng,kind:c.kind,id:cid});
+ recomputeSub();
+}
+function subAddNote(){
+ var p=arr0(MSUB.slot)[MSUB.idx];if(!p)return;
+ var txt=prompt('註解內容（例如：這裡買藥妝、集合點、拍照）','');if(!txt)return;
+ var pc=coordOf(p);
+ if(!pc){toast('主點沒有座標，無法打點');return;}
+ subOf(p).push({t:String(txt),min:0,lat:pc[0],lng:pc[1],kind:'note',note:true});
  recomputeSub();
 }
 function subAddManual(){
