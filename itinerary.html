@@ -327,10 +327,17 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 <div class="cfg"><h3>🛡 管理者</h3>
 <p class="rule">待審清單在首頁「提案審核」決定（直接通過／需要審核），確認後由排程器套用＋push。每日 08:00 自動產出投票加權排程 digest。</p></div>
 </div>
-<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20261002-wx6・有問題請截圖此行</div>
+<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20261017-it1（新增「📋 依排程板產生行程」）・有問題請截圖此行</div>
 <div class="summary"><div class="grow" id="sumtxt">已選 0 項・合計 0 分</div><button id="btnCopy" onclick="copyPlan()">複製初稿</button><button id="btnPrint" onclick="showSheet()">檢視</button></div>
-<div class="fab"><button id="fabNow" title="目前行程" onclick="locateNow()">📍</button><button id="fabWx" title="港口天氣" onclick="scrollWx()">🌤</button><button id="fabMap" title="港口地圖導航" onclick="openPortMap()">🗺</button></div>
+<div class="fab"><button id="fabNow" title="目前行程" onclick="locateNow()">📍</button><button id="fabAuto" title="依排程板產生行程" onclick="openAuto()">📋</button><button id="fabWx" title="港口天氣" onclick="scrollWx()">🌤</button><button id="fabMap" title="港口地圖導航" onclick="openPortMap()">🗺</button></div>
 <div class="mov" id="mov"><div class="movcard"><div class="movhead"><span id="movTitle">港口地圖</span><button onclick="closePortMap()">✕ 關閉</button></div><div id="movMap"></div><div class="movfoot" id="movFoot"></div></div></div>
+<div class="mov" id="auto"><div class="movcard">
+  <div class="movhead"><span id="autoTitle">📋 依排程板產生行程</span><button onclick="closeAuto()">✕ 關閉</button></div>
+  <div id="autoDays" style="display:flex;gap:6px;padding:8px 10px;overflow-x:auto;border-bottom:1px solid #eee;flex:none;background:#fff"></div>
+  <div id="autoLine" style="overflow:auto;max-height:38%;padding:8px 12px;font-size:14px;border-bottom:1px solid #eee;flex:none"></div>
+  <div id="autoMap" style="flex:1;min-height:200px"></div>
+  <div class="movfoot" id="autoFoot"></div>
+</div></div>
 <div id="nowtoast"></div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -403,6 +410,109 @@ function lmDrive(a,b){var u='https://router.project-osrm.org/route/v1/driving/'+
 function lmSet(key,mode){var mem=lmLoad();mem[key]=mode;lmSave(mem);var box=document.querySelector('.legsw[data-leg="'+key+'"]');if(!box)return;var leg=box._leg;var A=[leg[1],leg[2]],B=[leg[4],leg[5]];box.querySelector('.leginfo').textContent='計算中…';if(mode==='taxi'){lmDrive(A,B).then(function(r){lmPaint(key,box,r?{min:r.dur,km:r.km,src:'OSRM實測'}:lmEst(mode,_hav(A,B)),mode);});}else if(mode==='walk'){lmDrive(A,B).then(function(r){if(r)lmPaint(key,box,{min:r.km/4.5*60,km:r.km,src:'OSRM距離＋步速'},mode);else lmPaint(key,box,lmEst(mode,_hav(A,B)),mode);});}else{var r=lmEst(mode,_hav(A,B));lmPaint(key,box,r,mode);}}
 function lmInit(){var mem=lmLoad();Object.keys(LEGSMODE).forEach(function(pid){var el=document.getElementById(pid);if(!el)return;var trans=el.querySelectorAll('.stop.trans');(LEGSMODE[pid]||[]).forEach(function(leg,i){var st=trans[i];if(!st)return;var key=pid+'-'+i;var mode=mem[key]||leg[6];var sw=document.createElement('div');sw.className='legsw';sw.setAttribute('data-leg',key);sw._leg=leg;LMODES.forEach(function(m){var b=document.createElement('button');b.textContent=m[1];b.setAttribute('data-m',m[0]);b.onclick=(function(k,md){return function(){lmSet(k,md);};})(key,m[0]);sw.appendChild(b);});st.appendChild(sw);var info=document.createElement('div');info.className='leginfo';info.textContent='計算中…';sw.appendChild(info);var box=sw;var A=[leg[1],leg[2]],B=[leg[4],leg[5]];if(mode==='taxi'){lmDrive(A,B).then(function(r){lmPaint(key,box,r?{min:r.dur,km:r.km,src:'OSRM實測'}:lmEst(mode,_hav(A,B)),mode);});}else if(mode==='walk'){lmDrive(A,B).then(function(r){if(r)lmPaint(key,box,{min:r.km/4.5*60,km:r.km,src:'OSRM距離＋步速'},mode);else lmPaint(key,box,lmEst(mode,_hav(A,B)),mode);});}else{lmPaint(key,box,lmEst(mode,_hav(A,B)),mode);}});});}
 lmInit();
+</script>
+<script>
+/* ===== 依排程板（plan.json）自動產生行程：時間軸＋地圖＋導航 ===== */
+var A_DAYS=[{k:'2026-12-16',t:'12/16',port:'基隆',arr:null,by:null,plan:false},
+ {k:'2026-12-17',t:'12/17',port:'宮古島',arr:'08:00',by:'17:00',plan:true},
+ {k:'2026-12-18',t:'12/18',port:'那霸',arr:'07:00',by:'18:00',plan:true},
+ {k:'2026-12-19',t:'12/19',port:'石垣島',arr:'09:00',by:'18:00',plan:true},
+ {k:'2026-12-20',t:'12/20',port:'基隆',arr:null,by:null,plan:false}];
+var A_PORT={'那霸':{n:'那霸郵輪碼頭',lat:26.22557,lng:127.67464},'宮古島':{n:'平良港郵輪碼頭',lat:24.81409,lng:125.28174},'石垣島':{n:'石垣港新港郵輪碼頭',lat:24.32717,lng:124.14158}};
+var A_MODE={walk:'🚶 走路',taxi:'🚕 計程車',bus:'🚌 公車',mono:'🚝 單軌'};
+var A_SLOTS=['morning','afternoon','evening'];
+var A_PLAN=null,A_GEO={},A_MAP=null,A_CUR='2026-12-17',A_DR={},A_BUSY=false;
+function aesc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+function ahav(a,b){var R=6371,dLa=(b[0]-a[0])*Math.PI/180,dLn=(b[1]-a[1])*Math.PI/180;var s=Math.sin(dLa/2)*Math.sin(dLa/2)+Math.cos(a[0]*Math.PI/180)*Math.cos(b[0]*Math.PI/180)*Math.sin(dLn/2)*Math.sin(dLn/2);return 2*R*Math.asin(Math.sqrt(s));}
+function acoord(o){if(o.lat!=null&&o.lng!=null)return [o.lat,o.lng];var g=A_GEO[o.id];return (g&&g.lat!=null)?[g.lat,g.lng]:null;}
+function aMin(hm){if(!hm)return null;var p=String(hm).split(':');return (+p[0])*60+(+p[1]);}
+function aHm2(t){var h=Math.floor(t/60)%24,m=Math.round(t%60);return (h<10?'0':'')+h+':'+(m<10?'0':'')+m;}
+function aDrive(a,b){var k=a[0].toFixed(4)+','+a[1].toFixed(4)+'>'+b[0].toFixed(4)+','+b[1].toFixed(4);if(A_DR[k])return Promise.resolve(A_DR[k]);
+ return fetch('https://router.project-osrm.org/route/v1/driving/'+a[1]+','+a[0]+';'+b[1]+','+b[0]+'?overview=false').then(function(r){return r.json();}).then(function(j){if(j&&j.routes&&j.routes[0]){A_DR[k]={min:j.routes[0].duration/60,km:j.routes[0].distance/1000};return A_DR[k];}return null;}).catch(function(){return null;});}
+function aEst(mode,km,dr){
+ if(mode==='walk')return {min:Math.round((dr?dr.km*1000/75:km*1350/75)),km:dr?dr.km:km*1.35};
+ if(mode==='taxi')return {min:Math.round(2+(dr?dr.min:km*1.3/28*60)),km:dr?dr.km:km*1.3};
+ if(mode==='bus')return {min:Math.round(6+km*1.4/16*60),km:km*1.4};
+ return {min:Math.round(5+km*1.25/28*60),km:km*1.25};}
+function aLeg(ca,cb,mode){
+ if(!ca||!cb)return Promise.resolve(null);
+ var km=ahav(ca,cb);mode=mode||'taxi';
+ if(mode==='taxi'||mode==='walk')return aDrive(ca,cb).then(function(dr){var e=aEst(mode,km,dr);e.mode=mode;return e;});
+ var e=aEst(mode,km,null);e.mode=mode;return Promise.resolve(e);}
+function openAuto(){document.getElementById('auto').classList.add('open');
+ if(A_PLAN){aRender();return;}
+ Promise.all([
+  fetch('https://raw.githubusercontent.com/a4623671/cruise-votes/main/plan.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
+  fetch('https://raw.githubusercontent.com/a4623671/cruise-votes/main/geo.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+ ]).then(function(re){A_PLAN=re[0];A_GEO=re[1]||{};
+  if(!A_PLAN){document.getElementById('autoLine').innerHTML='<div style="color:#b3402a">讀不到排程板資料（需連網）</div>';return;}
+  var first=A_DAYS.filter(function(d){return d.plan&&((A_PLAN.items[d.k]||{}).slots||{})&&(A_PLAN.items[d.k].slots.morning||[]).concat(A_PLAN.items[d.k].slots.afternoon||[]).concat(A_PLAN.items[d.k].slots.evening||[]).length;})[0];
+  if(first)A_CUR=first.k;
+  aRender();});}
+function closeAuto(){document.getElementById('auto').classList.remove('open');}
+function aPick(k){A_CUR=k;aRender();}
+function aRender(){
+ if(A_BUSY)return;A_BUSY=true;
+ var d=A_DAYS.filter(function(x){return x.k===A_CUR;})[0];
+ document.getElementById('autoDays').innerHTML=A_DAYS.map(function(x){
+  return '<button class="day'+(x.k===A_CUR?' on':'')+'" onclick="aPick(\''+x.k+'\')">'+x.t+' '+aesc(x.port)+'</button>';}).join('');
+ var it=(A_PLAN.items||{})[A_CUR]||{},line=document.getElementById('autoLine');
+ var seq=[];A_SLOTS.forEach(function(s){((it.slots||{})[s]||[]).forEach(function(o){seq.push(o);});});
+ if(!d.plan||!seq.length){
+  line.innerHTML='<div style="color:#888">此日沒有排程項目（或為登船／返抵日）</div>';
+  document.getElementById('autoFoot').innerHTML='<a href="plan.html">到排程板安排</a>';
+  A_BUSY=false;aMap([],[]);return;
+ }
+ var pc=A_PORT[d.port];
+ var items=seq.map(function(o){return {o:o,c:acoord(o)};});
+ var legs=[],chain=Promise.resolve(),prev=pc?[pc.lat,pc.lng]:null;
+ items.forEach(function(x,i){
+  chain=chain.then(function(){return aLeg(prev,x.c,(it.portMode||{}).in||'taxi').then(function(e){legs[i]=e;prev=x.c;});});
+ });
+ chain=chain.then(function(){
+  var last=items[items.length-1].c;
+  if(pc&&last)return aLeg(last,[pc.lat,pc.lng],(it.portMode||{}).out||'taxi').then(function(e){legs[items.length]=e;});
+ }).then(function(){aPaint(d,it,items,legs);A_BUSY=false;});
+}
+function aPaint(d,it,items,legs){
+ var pc=A_PORT[d.port],t=aMin(d.arr)||(8*60),h='',pts=[],miss=0,total=0;
+ if(pc&&items[0]&&items[0].c){
+  var e0=legs[0];if(e0){h+='<div style="color:#5b6b7c;font-size:13px">'+aHm2(t)+' 從港口出發（'+(A_MODE[e0.mode]||'')+'約'+fmt(Math.round(e0.min))+'）</div>';t+=e0.min;total+=e0.min;}
+  pts.push([pc.n,pc.lat,pc.lng,'#10293f']);
+ }
+ items.forEach(function(x,i){
+  h+='<div style="display:flex;gap:8px;align-items:baseline;margin:6px 0"><b style="white-space:nowrap">'+aHm2(t)+'</b><span style="flex:1">'+aesc(x.o.t.replace(/✅/g,'').trim())+'</span><span style="color:#b3541e;font-size:13px;white-space:nowrap">停留 '+fmt(+x.o.min||0)+'</span></div>';
+  t+=(+x.o.min||0);
+  if(i<items.length-1&&legs[i+1]){var e=legs[i+1];h+='<div style="color:#5b6b7c;font-size:13px;padding-left:44px">↳ '+(A_MODE[e.mode]||'')+'約'+fmt(Math.round(e.min))+'（'+e.km.toFixed(1)+'km）</div>';t+=e.min;total+=e.min;}
+  if(x.c)pts.push([x.o.t.replace(/✅/g,'').trim(),x.c[0],x.c[1],'#1e7a34']);else miss++;
+ });
+ var lastE=legs[items.length];
+ if(pc&&lastE){h+='<div style="color:#5b6b7c;font-size:13px;padding-left:44px">↳ 回港口（'+(A_MODE[lastE.mode]||'')+'約'+fmt(Math.round(lastE.min))+'）</div>';t+=lastE.min;total+=lastE.min;}
+ else if(pc&&items[items.length-1].c){h+='<div style="color:#b3402a;font-size:13px;padding-left:44px">↳ 回港口：無法估算</div>';}
+ h+='<div style="margin-top:6px;font-size:13px;color:#5b6b7c">預估結束 '+aHm2(t)+(d.by?('・需在 '+d.by+' 前返船'):'')+'</div>';
+ document.getElementById('autoLine').innerHTML=h;
+ var foot='<div><b>共 '+items.length+' 項</b>・交通約 '+fmt(Math.round(total))+'・回船 '+aHm2(t)+'</div>';
+ if(miss)foot+='<div style="color:#b3402a;font-weight:700">⚠️ 有 '+miss+' 項未定位（在排程板用 ⋯ → 📍 可補）</div>';
+ foot+='<div style="margin-top:4px">'+pts.map(function(p,i){return '<a target="_blank" href="'+gLink(p[0])+'">'+(i+1)+'. '+aesc(p[0].slice(0,14))+'</a>';}).join('')+'</div>';
+ document.getElementById('autoFoot').innerHTML=foot;
+ aMap(pts,legs);
+}
+function aMap(pts,legs){
+ if(!window.L){document.getElementById('autoMap').innerHTML='<div style="padding:12px;color:#b3402a">地圖元件載入失敗（需連網）</div>';return;}
+ if(!A_MAP){A_MAP=L.map('autoMap');L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(A_MAP);}
+ A_MAP.eachLayer(function(l){if(l instanceof L.Marker||l instanceof L.Polyline)A_MAP.removeLayer(l);});
+ if(!pts.length){setTimeout(function(){try{A_MAP.invalidateSize();}catch(e){}},200);return;}
+ var line=pts.map(function(p){return [p[1],p[2]];});
+ if(line.length>1){line.push(line[0]);L.polyline(line,{color:'#1b6f9e',weight:3,opacity:.75,dashArray:'6 6'}).addTo(A_MAP);}
+ var b=[];
+ pts.forEach(function(p,i){
+  L.marker([p[1],p[2]],{icon:L.divIcon({className:'',html:'<div style="background:'+p[3]+';color:#fff;min-width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35)">'+(i+1)+'</div>',iconSize:[28,28]})})
+   .addTo(A_MAP).bindPopup('<b>'+(i+1)+'. '+aesc(p[0])+'</b><br><a target="_blank" href="'+gLink(p[0])+'">Google 導航</a>');
+  b.push([p[1],p[2]]);
+ });
+ try{A_MAP.fitBounds(b,{padding:[40,40]});}catch(e){A_MAP.setView(b[0],12);}
+ setTimeout(function(){try{A_MAP.invalidateSize();}catch(e){}},250);
+}
 </script>
 </body>
 </html>
