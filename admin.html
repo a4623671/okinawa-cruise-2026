@@ -41,7 +41,7 @@ h1{font-size:20px;margin-bottom:2px}.sub{font-size:13px;color:#888;margin-bottom
 <div class="card"><div class="t" style="font-size:14px">💬 小幫手使用狀況 <span id="useCnt" style="color:#999;font-weight:400"></span></div><div id="useStat" class="m">讀取中…</div><div id="useList"></div>
 <div class="m" style="font-size:12px;color:#999">只記部署後的對話（30天），跟投票一樣公開可見</div></div>
 <div id="list"></div>
-<div class="note">管理者專用・版本 20261017-ar</div>
+<div class="note">管理者專用・版本 20261017-as</div>
 </div>
 <script>
 var _p1='Z2l0aHViX3BhdF8xMUFISU5ORVEwV1JKV05mNFNvWHZCXzNtTUJVTWRaa0hDQV',_p2='hNbHA3QUFublh0bmNhTDN3NXZYd0tGbXlsYnlacmdVV0dFUTNSVm5KaXVMS1VW';
@@ -125,6 +125,10 @@ function applyProposal(id){
  if(p.kind==='del'){say('刪除類提案需人工處理');return;}
  var ks=document.getElementById('kind-'+id),im=document.getElementById('img-'+id);
  if(ks)p.kind=ks.value;if(im&&im.value.trim())p.img=im.value.trim();
+ var KM={food:'food',spot:'spot',shop:'shop',souv:'souv',feat:'feat',conv:'conv',del:'del'};
+ var KC={'餐廳':'food','美食':'food','餐':'food','景點':'spot','景':'spot','購物':'shop','購':'shop','伴手禮':'souv','禮':'souv','特色':'feat','當地特色':'feat','超商':'conv','刪除':'del'};
+ if(!KM[p.kind])p.kind=KC[p.kind]||p.kind;
+ var pm=String(p.place||'').match(/naha|miyako|ishigaki/i);if(pm)p.place=pm[0].toLowerCase();
  say('準備套用…');
  var pr=p.img?Promise.resolve(p.img):imgLookup(p).then(function(u){if(u)p.img=u;return u;});
  pr.then(function(){
