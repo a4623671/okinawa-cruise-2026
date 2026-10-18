@@ -134,7 +134,10 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .movcard{position:absolute;left:8px;right:8px;top:5%;bottom:5%;max-width:640px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
 .movhead{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#10293f;color:#fff;font-weight:800}
 .movhead button{margin-left:auto;border:none;border-radius:16px;padding:6px 14px;cursor:pointer}
-#movMap{flex:1;min-height:280px}
+#movMap{width:100%;height:100%}
+.mapbox{position:relative;flex:1;min-height:280px}
+.mapfabs{position:absolute;right:10px;bottom:12px;z-index:1100;display:flex;flex-direction:column;gap:8px}
+.mapfabs button{width:46px;height:46px;border-radius:50%;border:1px solid #d8e0ea;background:#fff;font-size:20px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;padding:0}
 .movfoot{padding:10px 14px;font-size:13px;border-top:1px solid #eee;max-height:42%;overflow:auto}
 .movfoot a{display:inline-block;margin:3px 6px 3px 0;background:#eef4ff;border:1px solid #9db8e8;color:#2b4d8f;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;text-decoration:none}
 .giftsheet{padding:12px 14px;overflow:auto;flex:1}
@@ -174,6 +177,7 @@ body.dark .mbtn.on small{color:#062033}
 body.dark .legdesc{color:#9fc3ff}
 body.dark .smbtn{background:#16212c;border-color:#2c3a49;color:#9fc3ff}
 body.dark .smbtn.on{background:#0ea5e9;border-color:#0ea5e9;color:#062033}
+body.dark .mapfabs button{background:#1b2733;border-color:#2c3a49;color:#dbe4ec}
 body.dark .pinbtn{background:#16212c;border-color:#2c3a49;color:#dbe4ec}
 body.dark .stoptime{color:#ff9d5c}
 body.dark .tl{border-color:#8a5a00}
@@ -232,7 +236,9 @@ body.dark .sfoot{background:#16212c;color:#9fb0c0}
 <div class="mov" id="mapov">
 <div class="movcard">
 <div class="movhead"><span id="mapTitle">🗺 地圖</span><button onclick="closeMap()">✕ 關閉</button></div>
-<div id="movMap"></div>
+<div class="mapbox"><div id="movMap"></div>
+<div class="mapfabs"><button id="mfabMe" title="我的位置" onclick="locateMe()">📍</button><button id="mfabNow" title="定位行程（現在／下一站）" onclick="focusNowOnMap()">⏱</button></div>
+</div>
 <div class="movfoot" id="mapfoot"></div>
 </div>
 </div>
@@ -318,7 +324,7 @@ var GH_REPO='https://api.github.com/repos/a4623671/cruise-votes/contents/plan.js
 var RAW='https://raw.githubusercontent.com/a4623671/cruise-votes/main/';
 var _p1='Z2l0aHViX3BhdF8xMUFISU5ORVEwV1JKV05mNFNvWHZCXzNtTUJVTWRaa0hDQV',_p2='hNbHA3QUFublh0bmNhTDN3NXZYd0tGbXlsYnlacmdVV0dFUTNSVm5KaXVMS1VW';
 var GH_TOKEN=atob(_p1+_p2);
-var VER='20261018-f7（定稿：交通方式選擇（存回排程板）＋地圖定位與現在/下一站＋週邊摺疊與細部地圖＋卡片全附圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
+var VER='20261018-f8（定稿：地圖右下定位鈕（含方向箭頭）＋定位行程鈕＋交通方式選擇＋週邊摺疊與細部地圖＋卡片全附圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
 var FS=['1','1.12','1.25'];
 
 /* ================= 狀態 ================= */
@@ -803,14 +809,15 @@ function gotoMe(){
  var r=findNow();var txt='📍 我的位置';
  if(r&&!r.toast){
   var t=(TIMES[DAYS[r.di].k]||[])[r.i];var c=t?coordOf(t.o):null;
-  if(c){var km=hav([ME[0],ME[1]],c);txt+='：距「'+String(t.o.t).replace(/✅/g,'').trim()+'」約 '+km.toFixed(1)+' km（步行約 '+Math.round(km*1.35/4.5*60)+' 分）';}
+  if(c){var km=hav([ME[0],ME[1]],c);var b=brgOf([ME[0],ME[1]],c);
+   txt+='：距「'+String(t.o.t).replace(/✅/g,'').trim()+'」約 '+km.toFixed(1)+' km（步行約 '+Math.round(km*1.35/4.5*60)+' 分）・方位 '+dirName(b)+'（'+Math.round(b)+'°）';}
  }
  el.textContent=txt;el.style.display='block';
  if(MAPOPEN){if(MAPMODE)drawSubMap();else drawDayMap();}
 }
 
 /* ================= 地圖 ================= */
-var MAP=null,MAPOPEN=false,LYR=null;
+var MAP=null,MAPOPEN=false,LYR=null,MKREF={};
 function openMap(){
  MAPMODE=null;
  document.getElementById('mapov').classList.add('open');MAPOPEN=true;
@@ -823,14 +830,35 @@ function openMap(){
  },60);
 }
 function closeMap(){document.getElementById('mapov').classList.remove('open');MAPOPEN=false;}
-function addMe(g){
+function brgOf(a,b){var f1=a[0]*Math.PI/180,f2=b[0]*Math.PI/180,dl=(b[1]-a[1])*Math.PI/180;var y=Math.sin(dl)*Math.cos(f2);var x=Math.cos(f1)*Math.sin(f2)-Math.sin(f1)*Math.cos(f2)*Math.cos(dl);return (Math.atan2(y,x)*180/Math.PI+360)%360;}
+function dirName(d){var n=['北','北北東','東北','東北東','東','東南東','東南','南南東','南','南南西','西南','西南西','西','西北西','西北','北北西'];return n[Math.round(d/22.5)%16];}
+function addMe(g,target){
  if(!ME)return;
  if(ME[2])L.circle([ME[0],ME[1]],{radius:Math.min(ME[2],300),color:'#1d4ed8',weight:1,opacity:.35,fillColor:'#3b82f6',fillOpacity:.15}).addTo(g);
+ if(target){
+  L.polyline([[ME[0],ME[1]],target],{color:'#2563eb',weight:2,opacity:.7,dashArray:'4 6'}).addTo(g);
+  var b=brgOf([ME[0],ME[1]],target);
+  L.marker([ME[0],ME[1]],{icon:L.divIcon({className:'',html:'<div style="width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:16px solid #2563eb;transform:rotate('+b.toFixed(0)+'deg);filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))"></div>',iconSize:[16,16],iconAnchor:[8,8]}),interactive:false}).addTo(g);
+ }
  L.circleMarker([ME[0],ME[1]],{radius:8,color:'#fff',weight:3,fillColor:'#2563eb',fillOpacity:1}).addTo(g).bindPopup('📍 我的位置（藍點）');
+}
+function focusNowOnMap(){
+ var r=findNow();
+ if(!r||r.toast){toast((r&&r.toast)||'找不到行程');return;}
+ if(DAYS[r.di].k!==curDay)switchDay(r.di);
+ NOWR=r;paintNow();drawDayMap();
+ var t=(TIMES[DAYS[r.di].k]||[])[r.i];var c=t?coordOf(t.o):null;
+ if(c&&MAP){
+  try{MAP.setView(c,Math.max(MAP.getZoom(),15),{animate:true});}catch(e){}
+  var mk=MKREF[t.k];if(mk)setTimeout(function(){try{mk.openPopup();}catch(e){}},400);
+ }
+ toast((r.kind==='cur'?'📍 目前：':'⏳ 下一站：')+String(t.o.t).replace(/✅/g,'').trim());
 }
 function drawDayMap(){
  if(!MAP)return;
  MAPMODE=null;
+ MKREF={};
+ document.getElementById('mfabNow').style.display='flex';
  if(LYR){LYR.clearLayers();}
  LYR=L.layerGroup().addTo(MAP);
  var di=DAYS.findIndex(function(d){return d.k===curDay;});var d=DAYS[di];
@@ -855,9 +883,15 @@ function drawDayMap(){
    var mk=L.marker(c,{icon:L.divIcon({className:'',html:iconHTML,iconSize:[isNow?34:28,isNow?34:28]})})
     .addTo(LYR).bindPopup('<b>'+esc(x.o.t)+'</b>'+(isNow?('<br><b style="color:#e05307">'+nowLbl+'</b>'):'')+'<br>停留 '+fmtMin(x.o.min||0)+(coordOf(x.o)?'<br><a target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+c[0]+','+c[1]+'&travelmode=walking">📍 導航</a>':'')+((x.o.sub&&x.o.sub.length)?('<br><button onclick="openSubMap('+di+','+k+')" style="margin-top:6px;border:none;background:#7a3fa0;color:#fff;border-radius:10px;padding:5px 10px;font-weight:700">🧭 週邊地圖</button>'):''));
    if(isNow)mk.bindTooltip(nowLbl,{permanent:true,direction:'top',offset:[0,-20]});
+   MKREF[k]=mk;
   });
   if(pts.length>1){var line=pts.slice();if(pc)line.push([pc.lat,pc.lng]);L.polyline(line,{color:'#e05307',weight:4,opacity:.85,dashArray:'8 6'}).addTo(LYR);}
-  if(ME){addMe(LYR);bounds.push([ME[0],ME[1]]);}
+  if(ME){
+   var tg=null;
+   if(nr&&!nr.toast&&DAYS[nr.di].k===d.k){var tt2=(TIMES[d.k]||[])[nr.i];if(tt2)tg=coordOf(tt2.o);}
+   if(!tg){seq.some(function(x){if(x.o.skip)return false;var c0=coordOf(x.o);if(c0){tg=c0;return true;}return false;});}
+   addMe(LYR,tg);bounds.push([ME[0],ME[1]]);
+  }
   if(bounds.length){try{MAP.fitBounds(bounds,{padding:[36,36]});}catch(e){MAP.setView(bounds[0],12);}}
   var foot='';
   seq.forEach(function(x,k){
@@ -865,7 +899,7 @@ function drawDayMap(){
    var sfx=(k===nowK)?('<b style="color:#e05307">（'+(nowLbl.indexOf('現在')>=0?'現在':'下一站')+'）</b>'):'';
    foot+='<a target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+c[0]+','+c[1]+'&travelmode=walking">📍 '+esc(String(x.o.t).replace(/✅/g,'').trim().slice(0,14))+'</a>'+sfx;
   });
-  document.getElementById('mapfoot').innerHTML=(ME?'<div style="margin-bottom:4px">📍 藍點＝我的位置'+(nowK>=0?('・'+nowLbl+'＝目前行程'):'')+'</div>':'<div style="margin-bottom:4px"><button onclick="locateMe()" style="border:none;background:#1d4ed8;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700;cursor:pointer">📍 顯示我的位置（開啟定位）</button></div>')+foot;
+  document.getElementById('mapfoot').innerHTML='<div style="margin-bottom:4px">'+(ME?('📍 藍點＝我的位置・箭頭＝方向'+(nowK>=0?('・'+nowLbl+'＝目前行程'):'')):'📍 右下按鈕可開啟定位・⏱ 定位目前行程')+'</div>'+foot;
 }
 function pin(txt,bg,size){return '<div style="background:'+bg+';color:#fff;min-width:'+size+'px;height:'+size+'px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:'+(size>=30?15:12)+'px;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35)">'+txt+'</div>';}
 
@@ -951,6 +985,7 @@ function openSubMap(di,k){
 }
 function drawSubMap(){
  if(!MAP||!MAPMODE)return;
+ document.getElementById('mfabNow').style.display='none';
  if(LYR)LYR.clearLayers();
  LYR=L.layerGroup().addTo(MAP);
  var d=DAYS[MAPMODE.di],seq=flatOf(d),p=seq[MAPMODE.k]&&seq[MAPMODE.k].o;
@@ -966,7 +1001,7 @@ function drawSubMap(){
   bounds.push(x.c);
  });
  if(pc)bounds.push(pc);
- if(ME){addMe(LYR);bounds.push([ME[0],ME[1]]);}
+ if(ME){addMe(LYR,loc.length?loc[0].c:pc);bounds.push([ME[0],ME[1]]);}
  if(bounds.length){try{MAP.fitBounds(bounds,{padding:[36,36]});}catch(e){MAP.setView(bounds[0],15);}}
  computeSubLegs(p).then(function(legs){
   var tot=subTotals(p,legs).tot;var over=Math.max(0,tot-(+p.min||0));
