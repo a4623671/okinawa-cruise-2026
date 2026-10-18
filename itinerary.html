@@ -140,6 +140,10 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .mapfabs button{width:46px;height:46px;border-radius:50%;border:1px solid #d8e0ea;background:#fff;font-size:20px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;padding:0}
 .movfoot{padding:10px 14px;font-size:13px;border-top:1px solid #eee;max-height:42%;overflow:auto}
 .movfoot a{display:inline-block;margin:3px 6px 3px 0;background:#eef4ff;border:1px solid #9db8e8;color:#2b4d8f;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;text-decoration:none}
+.movfoot .fmapbtn{display:inline-block;margin:3px 6px 3px 0;background:#eef4ff;border:1px solid #9db8e8;color:#2b4d8f;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer}
+.movfoot .fmapbtn.on{background:#10293f;color:#fff;border-color:#10293f}
+.lg{margin-right:9px;white-space:nowrap}
+.lgline{display:inline-block;width:22px;vertical-align:middle;margin-right:3px}
 .giftsheet{padding:12px 14px;overflow:auto;flex:1}
 .giftsheet h3{font-size:15px;margin:10px 0 4px}
 .giftsheet li{margin:3px 0 3px 18px;font-size:13.5px}
@@ -324,7 +328,7 @@ var GH_REPO='https://api.github.com/repos/a4623671/cruise-votes/contents/plan.js
 var RAW='https://raw.githubusercontent.com/a4623671/cruise-votes/main/';
 var _p1='Z2l0aHViX3BhdF8xMUFISU5ORVEwV1JKV05mNFNvWHZCXzNtTUJVTWRaa0hDQV',_p2='hNbHA3QUFublh0bmNhTDN3NXZYd0tGbXlsYnlacmdVV0dFUTNSVm5KaXVMS1VW';
 var GH_TOKEN=atob(_p1+_p2);
-var VER='20261018-f8（定稿：地圖右下定位鈕（含方向箭頭）＋定位行程鈕＋交通方式選擇＋週邊摺疊與細部地圖＋卡片全附圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
+var VER='20261018-f10（定稿：地圖每段真實路徑（步行/計程車/公車/單軌樣式＋圖例）＋多時段天氣（含去年逐時）＋卡片雙圖＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
 var FS=['1','1.12','1.25'];
 
 /* ================= 狀態 ================= */
@@ -370,13 +374,13 @@ function parseCatalog(html){
   parts.forEach(function(p,idx){
    var tm=p.match(/<h3>([\s\S]*?)<\/h3>/);if(!tm)return;
    var clean=function(s){return String(s||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();};
-   var im=p.match(/<img[^>]+src="([^"]+)"/);
+   var imgs=[],rx=/<img[^>]+src="([^"]+)"/g,x;while((x=rx.exec(p)))imgs.push(x[1]);
    var en=p.match(/<div class="en">([\s\S]*?)<\/div>/);
    var desc=[],rp=/<p(?:\s+class="kv")?>([\s\S]*?)<\/p>/g,d;
    while((d=rp.exec(p)))desc.push(clean(d[1]));
    var shop=p.match(/<div class="shop">([\s\S]*?)<\/div>/);if(shop)desc.push(clean(shop[1]));
    out.push({id:sid+'#'+idx,t:clean(tm[1]),kind:(CARDMAP[sid]||[])[idx]||'',place:sid.replace('s-',''),
-    img:im?im[1]:'',en:en?clean(en[1]):'',desc:desc.filter(function(z){return z;})});
+    img:imgs[0]||'',imgs:imgs,en:en?clean(en[1]):'',desc:desc.filter(function(z){return z;})});
   });
  });
  return out;}
@@ -410,9 +414,13 @@ function estMode(mode,km,drive){
 var DRIVE={};
 function queryDrive(a,b){var key=a[0].toFixed(4)+','+a[1].toFixed(4)+'>'+b[0].toFixed(4)+','+b[1].toFixed(4);
  if(DRIVE[key])return Promise.resolve(DRIVE[key]);
- var u='https://router.project-osrm.org/route/v1/driving/'+a[1]+','+a[0]+';'+b[1]+','+b[0]+'?overview=false';
+ var u='https://router.project-osrm.org/route/v1/driving/'+a[1]+','+a[0]+';'+b[1]+','+b[0]+'?overview=full&geometries=geojson';
  return fetch(u).then(function(r){return r.json();}).then(function(j){
-  if(j&&j.routes&&j.routes[0]){DRIVE[key]={min:j.routes[0].duration/60,km:j.routes[0].distance/1000};return DRIVE[key];}
+  if(j&&j.routes&&j.routes[0]){
+   var g=(j.routes[0].geometry&&j.routes[0].geometry.coordinates)||[];
+   var coords=g.map(function(c){return [c[1],c[0]];});
+   DRIVE[key]={min:j.routes[0].duration/60,km:j.routes[0].distance/1000,coords:coords};
+   return DRIVE[key];}
   return null;}).catch(function(){return null;});}
 function computeAll(){
  cache.legs={};cache.totals={};var jobs=[];
@@ -420,9 +428,12 @@ function computeAll(){
   if(!ca||!cb){cache.legs[k]={min:null,km:null,src:'無座標',mode:mode};return;}
   var km=hav(ca,cb);
   var modes={walk:estMode('walk',km,null),taxi:estMode('taxi',km,null),bus:estMode('bus',km,null),mono:estMode('mono',km,null)};
-  if(mode==='taxi'||mode==='walk'){
-   jobs.push(queryDrive(ca,cb).then(function(dr){var e=estMode(mode,km,dr);e.mode=mode;if(dr){modes.walk=estMode('walk',km,dr);modes.taxi=estMode('taxi',km,dr);}e.modes=modes;cache.legs[k]=e;}));
-  }else{var e=estMode(mode,km,null);e.mode=mode;e.modes=modes;cache.legs[k]=e;}
+  jobs.push(queryDrive(ca,cb).then(function(dr){
+   if(dr){modes.walk=estMode('walk',km,dr);modes.taxi=estMode('taxi',km,dr);}
+   var e=estMode(mode,km,(mode==='walk'||mode==='taxi')?dr:null);e.mode=mode;e.modes=modes;
+   if(dr&&dr.coords)e.coords=dr.coords;
+   cache.legs[k]=e;
+  }));
  }
  DAYS.forEach(function(d){
   if(!d.plan)return;
@@ -483,7 +494,7 @@ function wxLoad(){
     });
   }else{
    j=fetch(base,{cache:'no-store'}).then(function(r){return r.json();}).then(function(cur){
-    return fetch('https://archive-api.open-meteo.com/v1/archive?latitude='+c.la+'&longitude='+c.ln+'&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_sum,wind_speed_10m_max,wind_gusts_10m_max&timezone='+c.tz+'&windspeed_unit=kn&start_date=2025-12-16&end_date=2025-12-20',{cache:'no-store'})
+    return fetch('https://archive-api.open-meteo.com/v1/archive?latitude='+c.la+'&longitude='+c.ln+'&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_sum,wind_speed_10m_max,wind_gusts_10m_max&hourly=temperature_2m,weather_code,precipitation&timezone='+c.tz+'&windspeed_unit=kn&start_date=2025-12-16&end_date=2025-12-20',{cache:'no-store'})
      .then(function(r){return r.json();}).then(function(h){if(cur&&!cur.error)cur._hist=h;return cur;});
    });
   }
@@ -561,19 +572,24 @@ function wxPaint(){
  });
 }
 function wxStrip(port,dayK,di){
- if(WXMODE!=='fc')return '';
- var w=WXC[port];if(!w||!w.j||!w.j.hourly)return '';
- var hrs=[6,9,12,15,18,21],h='';
+ var w=WXC[port];if(!w)return '';
+ var src=null,dateK=dayK,useMM=false;
+ if(WXMODE==='fc'&&w.j&&w.j.hourly){src=w.j.hourly;}
+ else if(w.hist&&w.hist.hourly){src=w.hist.hourly;dateK='2025-'+dayK.slice(5);useMM=true;}
+ if(!src)return '';
+ var hrs=[0,3,6,9,12,15,18],h='';
  var nowH=null;var todayK=new Date().toISOString().slice(0,10);
- if(todayK===dayK)nowH=new Date().getHours();
+ if(WXMODE==='fc'&&todayK===dayK)nowH=new Date().getHours();
  hrs.forEach(function(hh){
-  var key=dayK+'T'+String(hh).padStart(2,'0')+':00';
-  var idx=(w.j.hourly.time||[]).indexOf(key);if(idx<0)return;
-  var ic=wxIcon(w.j.hourly.weather_code?w.j.hourly.weather_code[idx]:0);
-  var tp=Math.round(w.j.hourly.temperature_2m[idx]);
-  var pp=w.j.hourly.precipitation_probability?(w.j.hourly.precipitation_probability[idx]):null;
+  var key=dateK+'T'+String(hh).padStart(2,'0')+':00';
+  var idx=(src.time||[]).indexOf(key);if(idx<0)return;
+  var ic=wxIcon(src.weather_code?src.weather_code[idx]:0);
+  var tp=Math.round(src.temperature_2m[idx]);
+  var ppTxt='';
+  if(useMM){var mm=src.precipitation?(src.precipitation[idx]):null;if(mm!=null&&mm>0)ppTxt=mm.toFixed(1)+'mm';}
+  else{var pp=src.precipitation_probability?(src.precipitation_probability[idx]):null;if(pp!=null)ppTxt=pp+'%';}
   var cls='wxh'+(nowH!=null&&hh<nowH?' past':'');
-  h+='<div class="'+cls+'"><small>'+hh+'時</small><i>'+ic[0]+'</i><b>'+tp+'°</b>'+(pp!=null?('<small>'+pp+'%</small>'):'')+'</div>';
+  h+='<div class="'+cls+'"><small>'+hh+'時</small><i>'+ic[0]+'</i><b>'+tp+'°</b>'+(ppTxt?('<small>'+ppTxt+'</small>'):'')+'</div>';
  });
  return h?('<div class="wxstrip">'+h+'</div>'):'';
 }
@@ -686,7 +702,12 @@ function dayHTML(d,di){
   if(c)acts+='<a href="https://www.google.com/maps/dir/?api=1&destination='+c[0]+','+c[1]+'&travelmode=walking" target="_blank" rel="noopener">📍 導航</a>';
   acts+='<button onclick="switchDay('+di+');openMap()">🗺 地圖</button>';
   var mc=matchCard(x.o);
-  var imsrc=x.o.img||(mc&&mc.img)||'';
+  var pics=[];
+  function addPic(u){if(u&&pics.indexOf(u)<0&&pics.length<3)pics.push(u);}
+  if(mc&&mc.imgs&&mc.imgs.length)mc.imgs.forEach(addPic);
+  else if(mc&&mc.img)addPic(mc.img);
+  if(x.o.imgs&&x.o.imgs.length)x.o.imgs.forEach(addPic);
+  else if(x.o.img)addPic(x.o.img);
   var hasSub=!!(x.o.sub&&x.o.sub.length);
   h+='<div class="stop'+(x.o.skip?' skip':'')+'" id="stop-'+di+'-'+k+'"'+(hasSub?(' onclick="cardTap(event,'+di+','+k+')"'):'')+'>'
    +(isAct?('<div class="stopnum">'+n+'</div>'):'<div class="stopnum skipnum">⏭</div>')
@@ -694,7 +715,7 @@ function dayHTML(d,di){
    +'<div class="stoptime">'+(isAct?(hm2s(s)+'–'+hm2s(e)):'已跳過・不列入時間')+'</div>'
    +'<h3>'+(isAct?(n+'. '):'')+esc(nm)+'</h3>'
    +'<div class="sub">'+(kind?(esc(KINDN[kind]||kind)+(x.o.place?('・'+esc(x.o.place)):'')+' '):'')+tags+'</div>'
-   +(imsrc?('<img class="ph" loading="lazy" src="'+esc(imsrc)+'" onerror="this.style.display=\'none\'">'+(x.o.imgc?('<div class="credit">'+esc(x.o.imgc)+'</div>'):'')):'')
+   +(pics.length?(pics.map(function(u){return '<img class="ph" loading="lazy" src="'+esc(u)+'" onerror="this.style.display=\'none\'">';}).join('')+(x.o.imgc?('<div class="credit">'+esc(x.o.imgc)+'</div>'):'')):'')
    +kvHTML(x.o,mc,late)
    +(hasSub?('<div class="subhint">🧭 週邊細部行程 '+x.o.sub.length+' 項・點卡片展開<span class="chev">▾</span></div><div class="subbody" id="sub-'+di+'-'+k+'"></div>'):'')
    +'<div class="acts">'+acts+'</div>'
@@ -817,7 +838,7 @@ function gotoMe(){
 }
 
 /* ================= 地圖 ================= */
-var MAP=null,MAPOPEN=false,LYR=null,MKREF={};
+var MAP=null,MAPOPEN=false,LYR=null,MKREF={},MSREF={};
 function openMap(){
  MAPMODE=null;
  document.getElementById('mapov').classList.add('open');MAPOPEN=true;
@@ -841,6 +862,16 @@ function addMe(g,target){
   L.marker([ME[0],ME[1]],{icon:L.divIcon({className:'',html:'<div style="width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:16px solid #2563eb;transform:rotate('+b.toFixed(0)+'deg);filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))"></div>',iconSize:[16,16],iconAnchor:[8,8]}),interactive:false}).addTo(g);
  }
  L.circleMarker([ME[0],ME[1]],{radius:8,color:'#fff',weight:3,fillColor:'#2563eb',fillOpacity:1}).addTo(g).bindPopup('📍 我的位置（藍點）');
+}
+function mapFocusPin(k){
+ var mk=MKREF[k];if(!mk||!MAP)return;
+ try{MAP.setView(mk.getLatLng(),Math.max(MAP.getZoom(),16),{animate:false});}catch(e){}
+ setTimeout(function(){try{mk.openPopup();}catch(e){}},300);
+}
+function mapFocusSub(kk){
+ var mk=MSREF[kk];if(!mk||!MAP)return;
+ try{MAP.setView(mk.getLatLng(),Math.max(MAP.getZoom(),17),{animate:false});}catch(e){}
+ setTimeout(function(){try{mk.openPopup();}catch(e){}},300);
 }
 function focusNowOnMap(){
  var r=findNow();
@@ -885,7 +916,15 @@ function drawDayMap(){
    if(isNow)mk.bindTooltip(nowLbl,{permanent:true,direction:'top',offset:[0,-20]});
    MKREF[k]=mk;
   });
-  if(pts.length>1){var line=pts.slice();if(pc)line.push([pc.lat,pc.lng]);L.polyline(line,{color:'#e05307',weight:4,opacity:.85,dashArray:'8 6'}).addTo(LYR);}
+  var lkey='in';
+  seq.forEach(function(x,k){
+   if(x.o.skip)return;
+   var LC=cache.legs[d.k+':'+lkey];
+   if(LC&&LC.coords&&LC.coords.length>1)L.polyline(LC.coords,legStyle(LC.mode)).addTo(LYR);
+   lkey=String(k);
+  });
+  var LCO=cache.legs[d.k+':out'];
+  if(LCO&&LCO.coords&&LCO.coords.length>1)L.polyline(LCO.coords,legStyle(LCO.mode)).addTo(LYR);
   if(ME){
    var tg=null;
    if(nr&&!nr.toast&&DAYS[nr.di].k===d.k){var tt2=(TIMES[d.k]||[])[nr.i];if(tt2)tg=coordOf(tt2.o);}
@@ -897,9 +936,9 @@ function drawDayMap(){
   seq.forEach(function(x,k){
    var c=coordOf(x.o);if(!c||x.o.skip)return;
    var sfx=(k===nowK)?('<b style="color:#e05307">（'+(nowLbl.indexOf('現在')>=0?'現在':'下一站')+'）</b>'):'';
-   foot+='<a target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+c[0]+','+c[1]+'&travelmode=walking">📍 '+esc(String(x.o.t).replace(/✅/g,'').trim().slice(0,14))+'</a>'+sfx;
+   foot+='<button class="fmapbtn'+(k===nowK?' on':'')+'" onclick="mapFocusPin('+k+')">📍 '+esc(String(x.o.t).replace(/✅/g,'').trim().slice(0,14))+'</button>'+sfx;
   });
-  document.getElementById('mapfoot').innerHTML='<div style="margin-bottom:4px">'+(ME?('📍 藍點＝我的位置・箭頭＝方向'+(nowK>=0?('・'+nowLbl+'＝目前行程'):'')):'📍 右下按鈕可開啟定位・⏱ 定位目前行程')+'</div>'+foot;
+  document.getElementById('mapfoot').innerHTML=legendHTML()+'<div style="margin-bottom:4px">'+(ME?('📍 藍點＝我的位置・箭頭＝方向'+(nowK>=0?('・'+nowLbl+'＝目前行程'):'')):'📍 右下按鈕可開啟定位・⏱ 定位目前行程')+'・點站名＝在地圖上看</div>'+foot;
 }
 function pin(txt,bg,size){return '<div style="background:'+bg+';color:#fff;min-width:'+size+'px;height:'+size+'px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:'+(size>=30?15:12)+'px;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35)">'+txt+'</div>';}
 
@@ -911,11 +950,23 @@ function subLeg(A,B,mode){
  var km=hav(A,B);
  return queryDrive(A,B).then(function(dr){
   var modes={walk:estMode('walk',km,dr),taxi:estMode('taxi',km,dr),bus:estMode('bus',km,null),mono:estMode('mono',km,null)};
-  var e=estMode(mode,km,(mode==='walk'||mode==='taxi')?dr:null);e.mode=mode;e.modes=modes;return e;
+  var e=estMode(mode,km,(mode==='walk'||mode==='taxi')?dr:null);e.mode=mode;e.modes=modes;
+  if(dr&&dr.coords)e.coords=dr.coords;
+  return e;
  }).catch(function(){
   var modes={walk:estMode('walk',km,null),taxi:estMode('taxi',km,null),bus:estMode('bus',km,null),mono:estMode('mono',km,null)};
   var e=estMode(mode,km,null);e.mode=mode;e.modes=modes;return e;
  });
+}
+var LEGST={walk:{color:'#2e7d32',weight:4,dashArray:'10 8'},taxi:{color:'#555555',weight:4},bus:{color:'#1e5bb8',weight:4},mono:{color:'#7a3fa0',weight:4,dashArray:'12 8'}};
+function legStyle(m){var s=LEGST[m]||LEGST.mono;return {color:s.color,weight:s.weight,opacity:.85,dashArray:s.dashArray};}
+function legendHTML(){
+ return '<div style="margin-bottom:4px;font-size:11.5px;color:#33415c">'
+  +'<span class="lg"><span class="lgline" style="border-top:4px dashed #2e7d32"></span>步行</span>'
+  +'<span class="lg"><span class="lgline" style="border-top:4px solid #555555"></span>計程車</span>'
+  +'<span class="lg"><span class="lgline" style="border-top:4px solid #1e5bb8"></span>公車</span>'
+  +'<span class="lg"><span class="lgline" style="border-top:4px dashed #7a3fa0"></span>單軌</span>'
+  +'・回到行程點交通卡可切換即時更新</div>';
 }
 function computeSubLegs(p){
  if(SUBCACHE[p.id])return Promise.resolve(SUBCACHE[p.id]);
@@ -986,6 +1037,7 @@ function openSubMap(di,k){
 function drawSubMap(){
  if(!MAP||!MAPMODE)return;
  document.getElementById('mfabNow').style.display='none';
+ MSREF={};
  if(LYR)LYR.clearLayers();
  LYR=L.layerGroup().addTo(MAP);
  var d=DAYS[MAPMODE.di],seq=flatOf(d),p=seq[MAPMODE.k]&&seq[MAPMODE.k].o;
@@ -994,20 +1046,23 @@ function drawSubMap(){
  var pc=coordOf(p);
  if(pc){L.marker(pc,{icon:L.divIcon({className:'',html:'<div style="background:#94a3b8;color:#fff;min-width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;border:2px solid #fff;opacity:.9">★</div>',iconSize:[26,26]})}).addTo(LYR).bindTooltip('★ 主點（參考・不列入路線）',{permanent:true,direction:'top',offset:[0,-14]});}
  var loc=subLoc(p),bounds=[];
- if(loc.length>1)L.polyline(loc.map(function(x){return x.c;}),{color:'#7a3fa0',weight:3,opacity:.85,dashArray:'6 5'}).addTo(LYR);
  loc.forEach(function(x,kk){
-  L.marker(x.c,{icon:L.divIcon({className:'',html:pin((x.s.note?'📝':(kk+1)),(x.s.note?'#b3541e':'#7a3fa0'),26),iconSize:[26,26]})})
+  var mk=L.marker(x.c,{icon:L.divIcon({className:'',html:pin((x.s.note?'📝':(kk+1)),(x.s.note?'#b3541e':'#7a3fa0'),26),iconSize:[26,26]})})
    .addTo(LYR).bindPopup('<b>'+esc(x.s.t)+'</b><br>'+(x.s.note?'（註解）':('停留 '+fmtMin(x.s.min||0)))+'<br><a target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+x.c[0]+','+x.c[1]+'&travelmode=walking">📍 導航</a>');
+  MSREF[kk]=mk;
   bounds.push(x.c);
  });
  if(pc)bounds.push(pc);
  if(ME){addMe(LYR,loc.length?loc[0].c:pc);bounds.push([ME[0],ME[1]]);}
  if(bounds.length){try{MAP.fitBounds(bounds,{padding:[36,36]});}catch(e){MAP.setView(bounds[0],15);}}
  computeSubLegs(p).then(function(legs){
+  var loc2=subLoc(p);
+  for(var q=0;q<loc2.length-1;q++){var LC=legs[loc2[q+1].i];if(LC&&LC.coords&&LC.coords.length>1)L.polyline(LC.coords,legStyle(LC.mode)).addTo(LYR);}
   var tot=subTotals(p,legs).tot;var over=Math.max(0,tot-(+p.min||0));
   var foot='<div style="margin-bottom:4px">週邊已排 <b>'+fmtMin(tot)+'</b>／主點停留 <b>'+fmtMin(p.min||0)+'</b>'+(over>0?('・<span style="color:#b3402a">超過 '+fmtMin(over)+'</span>'):'')+'・路線：週邊之間（不含主點往返）</div>';
-  foot+=loc.filter(function(x){return !x.s.note;}).map(function(x){
-   return '<a target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+x.c[0]+','+x.c[1]+'&travelmode=walking">📍 '+esc(String(x.s.t).slice(0,14))+'</a>';
+  foot+=loc.map(function(x,kk){
+   if(x.s.note)return '';
+   return '<button class="fmapbtn" onclick="mapFocusSub('+kk+')">📍 '+esc(String(x.s.t).slice(0,14))+'</button>';
   }).join('');
   document.getElementById('mapfoot').innerHTML=foot;
  });
