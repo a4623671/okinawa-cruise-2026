@@ -328,7 +328,7 @@ var GH_REPO='https://api.github.com/repos/a4623671/cruise-votes/contents/plan.js
 var RAW='https://raw.githubusercontent.com/a4623671/cruise-votes/main/';
 var _p1='Z2l0aHViX3BhdF8xMUFISU5ORVEwV1JKV05mNFNvWHZCXzNtTUJVTWRaa0hDQV',_p2='hNbHA3QUFublh0bmNhTDN3NXZYd0tGbXlsYnlacmdVV0dFUTNSVm5KaXVMS1VW';
 var GH_TOKEN=atob(_p1+_p2);
-var VER='20261018-f10（定稿：地圖每段真實路徑（步行/計程車/公車/單軌樣式＋圖例）＋多時段天氣（含去年逐時）＋卡片雙圖＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
+var VER='20261018-f11（定稿：餐廳推薦菜色＋卡片右上氣溫（含去年逐時）＋修正情報配對＋地圖真實路徑＋多時段天氣＋卡片雙圖＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
 var FS=['1','1.12','1.25'];
 
 /* ================= 狀態 ================= */
@@ -560,15 +560,18 @@ function wxPaint(){
   el.innerHTML='<div>'+line+' <small>'+esc(sub)+'</small></div>'+extra+risk+wxStrip(d.port,d.k,di);
  });
  document.querySelectorAll('.wxchip').forEach(function(el){
-  if(WXMODE!=='fc'){el.style.display='none';return;}
   var di=+el.getAttribute('data-di'),k=+el.getAttribute('data-k'),d=DAYS[di];
   var t=(TIMES[d.k]||[])[k];if(!t||t.skip||t.s==null){el.style.display='none';return;}
   var hh=String(Math.floor(t.s/60)).padStart(2,'0');
-  var w=WXC[d.port];if(!w||!w.j||!w.j.hourly)return;
-  var idx=(w.j.hourly.time||[]).indexOf(d.k+'T'+hh+':00');if(idx<0){el.style.display='none';return;}
-  var ic=wxIcon(w.j.hourly.weather_code?w.j.hourly.weather_code[idx]:0);
-  el.textContent=ic[0]+Math.round(w.j.hourly.temperature_2m[idx])+'°';
-  el.title=hh+':00 '+ic[1];
+  var w=WXC[d.port];if(!w)return;
+  var src=null,dateK=d.k,lbl='';
+  if(WXMODE==='fc'&&w.j&&w.j.hourly){src=w.j.hourly;}
+  else if(w.hist&&w.hist.hourly){src=w.hist.hourly;dateK='2025-'+d.k.slice(5);lbl='（去年同日）';}
+  if(!src){el.style.display='none';return;}
+  var idx=(src.time||[]).indexOf(dateK+'T'+hh+':00');if(idx<0){el.style.display='none';return;}
+  var ic=wxIcon(src.weather_code?src.weather_code[idx]:0);
+  el.textContent=ic[0]+Math.round(src.temperature_2m[idx])+'°';
+  el.title=hh+':00 '+ic[1]+lbl;
  });
 }
 function wxStrip(port,dayK,di){
@@ -617,7 +620,9 @@ function kvHTML(o,mc,late){
  var rows=[];
  rows.push(['⏱ 停留時間',fmtMin(o.min||0)]);
  if(o.kind)rows.push(['🎯 類型',esc(KINDN[o.kind]||o.kind)]);
- if(mc&&mc.desc&&mc.desc.length)rows.push(['📖 情報',mc.desc.slice(0,3).map(esc).join('<br>')]);
+ if(o.dishes&&o.dishes.length)rows.push(['🍴 推薦菜色',o.dishes.map(esc).join('<br>')]);
+ var descs=o.desc?[o.desc]:((mc&&mc.desc&&mc.desc.length)?mc.desc.slice(0,3):[]);
+ if(descs.length)rows.push(['📖 情報',descs.map(esc).join('<br>')]);
  if(late)rows.push(['⚠️ 提醒','<span style="color:#b3402a;font-weight:700">超過回船時間，請縮短停留或跳過</span>']);
  return '<div class="kvcard">'+rows.map(function(r){return '<div class="kv"><span class="k">'+r[0]+'</span><span class="v">'+r[1]+'</span></div>';}).join('')+'</div>';
 }
@@ -628,7 +633,7 @@ function matchCard(o){
  var rx=/[（(]([^）)]+)[）)]/g,m;
  while((m=rx.exec(String(o.t)))){var n=normT(m[1]);if(n&&ns.indexOf(n)<0)ns.push(n);}
  if(!ns.length)return null;
- var exact=null,cont=null,clen=1e9;
+ var exact=null,cont=null,clen=0;
  CATALOG.forEach(function(c){
   if(o.place&&c.place!==o.place)return;
   var n=normT(c.t);if(!n)return;
@@ -638,7 +643,7 @@ function matchCard(o){
    else if(n.indexOf(needle)>=0||needle.indexOf(n)>=0)hit=Math.max(hit,1);
   });
   if(hit===2){if(!exact)exact=c;}
-  else if(hit===1){if(n.length<clen){cont=c;clen=n.length;}}
+  else if(hit===1){if(n.length>clen){cont=c;clen=n.length;}}
  });
  return exact||cont;
 }
