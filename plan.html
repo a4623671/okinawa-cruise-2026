@@ -205,7 +205,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261018-p34</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261018-p35</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -745,25 +745,28 @@ function addItem(id){
 
 /* ================= P4 規劃單 ================= */
 function dayPlan(d){
- var out={rows:[],end:null,over:0,miss:false};
+ var out={rows:[],end:null,over:0,miss:false,skipped:0};
  if(!d.plan)return out;
  var it=PLAN.items[d.k];var t=hm(dayOff(d));if(t==null)t=8*60;
  var seq=[];SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){seq.push(o);});});
  var pc=PORT[d.port];
- if(seq.length){var LI=cache.legs[d.k+':in'];
-  if(LI&&LI.min!=null){out.rows.push({t:hm2s(t),n:'從港口出發（'+(pc?pc.n:d.port)+'）',min:LI.min,kind:'leg'});t+=LI.min;}else out.miss=true;}
- for(var i=0;i<seq.length;i++){
+ var act=[];seq.forEach(function(o,i){if(!o.skip)act.push(i);else out.skipped++;});
+ if(!act.length)return out;
+ var LI=cache.legs[d.k+':in'];
+ if(LI&&LI.min!=null){out.rows.push({t:hm2s(t),n:'從港口出發（'+(pc?pc.n:d.port)+'）',min:LI.min,kind:'leg'});t+=LI.min;}else out.miss=true;
+ act.forEach(function(i,k){
   out.rows.push({t:hm2s(t),n:seq[i].t,min:(+seq[i].min||0),kind:'item'});
   t+=(+seq[i].min||0);
-  if(i<seq.length-1){
+  if(k<act.length-1){
    var L=cache.legs[d.k+':'+i];
-   if(!L||L.min==null){out.miss=true;continue;}
-   out.rows.push({t:hm2s(t),n:(MODEN[L.mode]||L.mode)+(L.wait?('（等'+Math.round(L.wait)+'＋搭'+Math.round(L.ride)+'）'):''),min:L.min,kind:'leg'});t+=L.min;}
- }
- if(seq.length){var LO=cache.legs[d.k+':out'];
-  if(LO&&LO.min!=null){out.rows.push({t:hm2s(t),n:'回港口（'+(pc?pc.n:d.port)+'）',min:LO.min,kind:'leg'});t+=LO.min;}else out.miss=true;}
+   if(!L||L.min==null){out.miss=true;}
+   else{out.rows.push({t:hm2s(t),n:(MODEN[L.mode]||L.mode)+(L.wait?('（等'+Math.round(L.wait)+'＋搭'+Math.round(L.ride)+'）'):''),min:L.min,kind:'leg'});t+=L.min;}
+  }
+ });
+ var LO=cache.legs[d.k+':out'];
+ if(LO&&LO.min!=null){out.rows.push({t:hm2s(t),n:'回港口（'+(pc?pc.n:d.port)+'）',min:LO.min,kind:'leg'});t+=LO.min;}else out.miss=true;
  out.end=t;
- var meal=(+PLAN.items[d.k].mealMin)||0;if(meal)t+=meal;
+ var meal=(+it.mealMin)||0;if(meal)t+=meal;
  if(dayBoard(d)){var by=hm(dayBoard(d));if(by!=null){out.over=Math.max(0,t-by);
   if(meal&&out.rows.length)out.rows.push({t:'用餐',n:'用餐（扣抵）',min:meal,kind:'meal'});
   out.rows.push({t:hm2s(by),n:'上船（'+dayBoard(d)+'）',min:0,kind:'ret'});}}
@@ -778,6 +781,7 @@ function openSheet(){
   h+='<div style="margin:10px 0;border:1px solid #dbe3ec;border-radius:10px;padding:8px 10px"><b>'+esc(d.t)+'</b>'
    +'<span style="font-size:12px;color:#6b7a89">　到港 '+d.arr+'・離港 '+d.dep+'・下船 '+dayOff(d)+'・上船 '+dayBoard(d)+' 前</span>'
    +(p.over>0?'<div style="color:#c0392b;font-weight:800;font-size:13px">⛔ 超出回船時間 '+fmtMin(p.over)+'</div>':'')
+   +(p.skipped?('<div style="color:#5b6b7c;font-size:12px">⏭ 已跳過 '+p.skipped+' 項（不列入路線與時間）</div>'):'')
    +(p.miss?'<div style="color:#b3541e;font-size:12px">※ 含未定位項目，部分交通時間未知</div>':'')
    +'<table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:6px">'
    +p.rows.map(function(r){

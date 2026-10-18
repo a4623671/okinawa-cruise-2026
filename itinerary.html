@@ -82,7 +82,7 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .picwrap{margin:8px 0 0}
 .pics{display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;border-radius:10px}
 .pics::-webkit-scrollbar{display:none}
-.pics img{flex:0 0 88%;height:175px;object-fit:cover;border-radius:10px;scroll-snap-align:center}
+.pics img{flex:0 0 100%;height:175px;object-fit:cover;border-radius:10px;scroll-snap-align:center}
 .pdots{display:flex;justify-content:center;gap:5px;margin:5px 0 0}
 .pdots span{width:7px;height:7px;border-radius:50%;background:#cfd8e3}
 .pdots span.on{background:#10293f}
@@ -342,7 +342,7 @@ var GH_REPO='https://api.github.com/repos/a4623671/cruise-votes/contents/plan.js
 var RAW='https://raw.githubusercontent.com/a4623671/cruise-votes/main/';
 var _p1='Z2l0aHViX3BhdF8xMUFISU5ORVEwV1JKV05mNFNvWHZCXzNtTUJVTWRaa0hDQV',_p2='hNbHA3QUFublh0bmNhTDN3NXZYd0tGbXlsYnlacmdVV0dFUTNSVm5KaXVMS1VW';
 var GH_TOKEN=atob(_p1+_p2);
-var VER='20261018-f12（定稿：卡片圖片輪播（可滑＋圓點）＋重複圖重抓＋餐廳推薦菜色＋右上氣溫＋地圖真實路徑＋多時段天氣＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
+var VER='20261018-f13（定稿：卡片圖片輪播＝一張一張滿版（不露邊）＋重複圖重抓＋餐廳推薦菜色＋右上氣溫＋地圖真實路徑＋多時段天氣＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
 var FS=['1','1.12','1.25'];
 
 /* ================= 狀態 ================= */
@@ -689,8 +689,8 @@ function picsHTML(pics,imgc){
 }
 function picScroll(el){
  var dots=el.parentNode.querySelector('.pdots');if(!dots)return;
- var w=el.scrollWidth/el.children.length;
- var i=Math.min(dots.children.length-1,Math.round(el.scrollLeft/w));
+ var i=0,best=1e9;
+ [].slice.call(el.children).forEach(function(c,j){var d=Math.abs(c.offsetLeft-el.scrollLeft);if(d<best){best=d;i=j;}});
  [].slice.call(dots.children).forEach(function(d,j){d.classList.toggle('on',j===i);});
 }
 function dayHTML(d,di){
