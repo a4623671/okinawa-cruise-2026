@@ -205,7 +205,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261018-p39</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261018-p40</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -770,21 +770,25 @@ function dayPlan(d){
  if(!act.length)return out;
  var LI=cache.legs[d.k+':in'];
  if(LI&&LI.min!=null){out.rows.push({t:hm2s(t),n:'從港口出發（'+(pc?pc.n:d.port)+'）',min:LI.min,kind:'leg'});t+=LI.min;}else out.miss=true;
- var lastReal=null;
+ var lastReal=null;var pendGaps=[];
  act.forEach(function(i){
   var o=seq[i];
+  if(o.gap&&o.after){pendGaps.push({o:o,i:i});return;}
   if(o.gap){out.rows.push({t:hm2s(t),n:o.t,min:(+o.min||0),kind:'gap'});t+=(+o.min||0);return;}
   if(lastReal!=null){
    var L=cache.legs[d.k+':'+lastReal];
    if(!L||L.min==null){out.miss=true;}
    else{out.rows.push({t:hm2s(t),n:(MODEN[L.mode]||L.mode)+(L.wait?('（等'+Math.round(L.wait)+'＋搭'+Math.round(L.ride)+'）'):''),min:L.min,kind:'leg'});t+=L.min;}
   }
+  pendGaps.forEach(function(g){out.rows.push({t:hm2s(t),n:g.o.t+'（交通後）',min:(+g.o.min||0),kind:'gap'});t+=(+g.o.min||0);});
+  pendGaps=[];
   var nb=hm(o.from||o.notBefore);
   if(nb!=null&&t<nb){out.rows.push({t:hm2s(t),n:'⏳ 等待（'+(o.from||o.notBefore)+' 起）',min:nb-t,kind:'wait'});t=nb;}
   out.rows.push({t:hm2s(t),n:o.t,min:(+o.min||0),kind:'item'});
   t+=(+o.min||0);
   lastReal=i;
  });
+ pendGaps.forEach(function(g){out.rows.push({t:hm2s(t),n:g.o.t+'（交通後）',min:(+g.o.min||0),kind:'gap'});t+=(+g.o.min||0);});
  var LO=cache.legs[d.k+':out'];
  if(LO&&LO.min!=null){out.rows.push({t:hm2s(t),n:'回港口（'+(pc?pc.n:d.port)+'）',min:LO.min,kind:'leg'});t+=LO.min;}else out.miss=true;
  out.end=t;
@@ -951,6 +955,13 @@ function planPopup(x){
   '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><button onclick="openSub(\''+x.s+'\','+x.i+')" style="border:none;background:#7a3fa0;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">🧭 周邊</button><button onclick="setWindow(\''+x.s+'\','+x.i+')" style="border:none;background:#5b6b7c;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">🕙 設定時段</button><button onclick="addGapAfter(\''+x.s+'\','+x.i+')" style="border:none;background:#5b6b7c;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">⏳ 加入空檔</button><button onclick="mapRemove(\''+x.s+'\','+x.i+')" style="border:none;background:#b3402a;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">✕ 移除</button></div>';
 }
 function mapRemove(slot,idx){if(guard())return;var a=arr0(slot);if(!a[idx])return;a.splice(idx,1);recompute().then(function(){drawPlanMap();});}
+function toggleGapPos(slot,idx){
+ if(guard())return;
+ var o=arr0(slot)[idx];if(!o||!o.gap)return;
+ if(o.after)delete o.after;else o.after=true;
+ recompute().then(function(){drawPlanMap();});
+ toast(o.after?'空檔改為「交通後」（抵達後等待）':'空檔改為「交通前」（出發前等待）');
+}
 function clearWindow(slot,idx){
  var o=arr0(slot)[idx];if(!o)return;
  delete o.from;delete o.to;delete o.notBefore;
@@ -1068,13 +1079,28 @@ function mapPanelHTML(seq,pc,it){
  var h='<div class="mtot">已排 <b>'+fmtMin(t.used)+'</b>／可用 <b>'+(t.cap!=null?fmtMin(t.cap):'—')+'</b>'+(t.cap!=null?('・餘 '+fmtMin(Math.max(0,t.cap-t.used))):'')+(t.over>0?(' <span style="color:#b3402a">超過 '+fmtMin(t.over)+'</span>'):'')+'</div>';
  h+='<div class="mstrip">';
  h+='<div class="mcard port" onclick="mapSetShip(\'off\')" title="點擊調整下船時間"><div class="nm">🚢 下船</div><div class="sub">'+hm2s(tm)+'</div><div style="font-size:9.5px;color:#cfe0ee">到港 '+(d.arr||'--:--')+'</div></div>';
-  var key='in';
+  var key='in';var pendGaps=[];
+  function gapCard(x,k,tmv){
+   return '<div class="mcard" onclick="mapFocus(\''+x.s+'\','+x.i+')">'
+    +'<div class="nm">'+(k+2)+'. '+esc(x.o.t)+'</div>'
+    +'<div class="sub">'+hm2s(tmv)+'・空檔 '+fmtMin(x.o.min||0)+(x.o.after?'・交通後':'・交通前')+'</div>'
+    +'<div class="act">'
+    +'<button onclick="event.stopPropagation();mapMove(\''+x.s+'\','+x.i+',-1)">◀</button>'
+    +'<button onclick="event.stopPropagation();mapMove(\''+x.s+'\','+x.i+',1)">▶</button>'
+    +'<button onclick="event.stopPropagation();mapSetMin(\''+x.s+'\','+x.i+')">⏱</button>'
+    +'<button onclick="event.stopPropagation();toggleGapPos(\''+x.s+'\','+x.i+')" title="切換交通前／後">⇄</button>'
+    +'<button class="del" onclick="event.stopPropagation();mapRemove(\''+x.s+'\','+x.i+')">✕</button>'
+    +'</div></div>';
+  }
   seq.forEach(function(x,k){
    var isAct=!x.o.skip;
    var isGap=!!x.o.gap;
+   if(isGap&&isAct&&x.o.after){pendGaps.push({x:x,k:k});return;}
    if(isAct&&!isGap){
     var C=cache.legs[curDay+':'+key];
     if(C&&C.min!=null){tm+=C.min;h+=legChip(key,C);}
+    pendGaps.forEach(function(g){h+=gapCard(g.x,g.k,tm);tm+=(+g.x.o.min||0);});
+    pendGaps=[];
     var nb=hm(x.o.from||x.o.notBefore);
     if(nb!=null&&tm<nb){
      h+='<div class="mcard" style="width:106px" onclick="event.stopPropagation();setWindow(\''+x.s+'\','+x.i+')" title="點卡片調整時段">'
@@ -1087,6 +1113,7 @@ function mapPanelHTML(seq,pc,it){
      tm=nb;
     }
    }
+   if(isGap&&isAct){h+=gapCard(x,k,tm);tm+=(+x.o.min||0);return;}
    var late=(isAct&&!isGap&&byt!=null&&(tm+(+x.o.min||0))>byt);
    var subTxt=isGap?(hm2s(tm)+'・空檔 '+fmtMin(x.o.min||0)):(isAct?((x.o.to&&(tm+(+x.o.min||0))>hm(x.o.to))?('⚠️ '+hm2s(tm)+'–'+hm2s(tm+(+x.o.min||0))+'・超過 '+x.o.to):(hm2s(tm)+'–'+hm2s(tm+(+x.o.min||0))+'・停留 '+fmtMin(x.o.min||0))):'⏭ 已跳過・不列入時間');
    h+='<div class="mcard'+(isAct?'':' skip')+'" onclick="mapFocus(\''+x.s+'\','+x.i+')">'
@@ -1102,6 +1129,7 @@ function mapPanelHTML(seq,pc,it){
     +'</div></div>';
    if(isAct){tm+=(+x.o.min||0);if(!isGap)key=String(k);}
   });
+  pendGaps.forEach(function(g){h+=gapCard(g.x,g.k,tm);tm+=(+g.x.o.min||0);});
  var CO=cache.legs[curDay+':out'];
  if(CO&&CO.min!=null)tm+=CO.min;
  h+=legChip('out',CO);
