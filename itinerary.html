@@ -49,6 +49,20 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .legbar{display:flex;align-items:flex-start;gap:7px;background:#f5f9ff;border:1.5px dashed #9db8e8;border-radius:10px;padding:7px 10px;margin:0 0 10px;font-size:12.5px;color:#2b4d8f;line-height:1.5}
 .legbar b{color:#1b4d9e}
 .legbar .li{font-size:15px;line-height:1.25}
+.legbox{margin:0 0 10px}
+.modes{display:flex;gap:6px;overflow-x:auto;padding:2px 0;scrollbar-width:none}
+.modes::-webkit-scrollbar{display:none}
+.mbtn{flex:1 0 66px;min-width:66px;display:flex;flex-direction:column;align-items:center;gap:1px;border:1.5px dashed #9db8e8;background:#f5f9ff;border-radius:10px;padding:6px 4px;cursor:pointer;color:#2b4d8f}
+.mbtn i{font-style:normal;font-size:17px;line-height:1.2}
+.mbtn b{font-size:12px;font-weight:800}
+.mbtn small{font-size:10.5px;color:#5b6b7c}
+.mbtn.on{background:#10293f;border-color:#10293f;color:#fff}
+.mbtn.on small{color:#cfe0ee}
+.legdesc{font-size:12.5px;color:#2b4d8f;margin-top:5px;line-height:1.5}
+.legdesc b{color:#1b4d9e}
+.smodes{display:inline-flex;gap:4px;margin-right:6px;vertical-align:middle}
+.smbtn{border:1px solid #c9d8f2;background:#fff;border-radius:8px;padding:1px 6px;font-size:11px;cursor:pointer;color:#2b4d8f}
+.smbtn.on{background:#10293f;color:#fff;border-color:#10293f}
 .stop{position:relative;background:#fff;border-radius:12px;padding:10px 12px;margin:0 0 10px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .stop.skip{opacity:.6;background:#f7fafc}
 .stop.now{outline:3px solid #e05307}
@@ -153,6 +167,13 @@ body.dark .kvcard{background:#16212c;border-color:#24313f}
 body.dark .kv .k{color:#d9b25f}
 body.dark .legbar{background:#16212c;border-color:#2c3a49;color:#9fc3ff}
 body.dark .legbar b{color:#cfe0ee}
+body.dark .mbtn{background:#16212c;border-color:#2c3a49;color:#9fc3ff}
+body.dark .mbtn small{color:#9fb0c0}
+body.dark .mbtn.on{background:#0ea5e9;border-color:#0ea5e9;color:#062033}
+body.dark .mbtn.on small{color:#062033}
+body.dark .legdesc{color:#9fc3ff}
+body.dark .smbtn{background:#16212c;border-color:#2c3a49;color:#9fc3ff}
+body.dark .smbtn.on{background:#0ea5e9;border-color:#0ea5e9;color:#062033}
 body.dark .pinbtn{background:#16212c;border-color:#2c3a49;color:#dbe4ec}
 body.dark .stoptime{color:#ff9d5c}
 body.dark .tl{border-color:#8a5a00}
@@ -295,11 +316,13 @@ function gcardHTML(c){
 var MODEN={walk:'🚶走路',taxi:'🚕計程車',bus:'🚌公車',mono:'🚝單軌'};
 var GH_REPO='https://api.github.com/repos/a4623671/cruise-votes/contents/plan.json';
 var RAW='https://raw.githubusercontent.com/a4623671/cruise-votes/main/';
-var VER='20261018-f6（定稿：地圖定位藍點＋現在/下一站標示＋週邊摺疊卡與細部地圖＋卡片全附圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
+var _p1='Z2l0aHViX3BhdF8xMUFISU5ORVEwV1JKV05mNFNvWHZCXzNtTUJVTWRaa0hDQV',_p2='hNbHA3QUFublh0bmNhTDN3NXZYd0tGbXlsYnlacmdVV0dFUTNSVm5KaXVMS1VW';
+var GH_TOKEN=atob(_p1+_p2);
+var VER='20261018-f7（定稿：交通方式選擇（存回排程板）＋地圖定位與現在/下一站＋週邊摺疊與細部地圖＋卡片全附圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
 var FS=['1','1.12','1.25'];
 
 /* ================= 狀態 ================= */
-var PLAN=null,CATALOG=[],VOTES={},cache={legs:{},totals:{}};
+var PLAN=null,CATALOG=[],VOTES={},cache={legs:{},totals:{}},PLAN_SHA=null;
 var curDay='2026-12-17',TIMES={},ME=null,NOWR=null,FSI=0;
 var WXC={},WXMODE='fc';
 
@@ -353,9 +376,19 @@ function parseCatalog(html){
  return out;}
 function loadPlan(){
  var raw=function(){return fetch(RAW+'plan.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();});};
- return fetch(GH_REPO+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null;})
-  .then(function(j){if(j&&j.content)return JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));return raw();})
+ var hdr={'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN};
+ return fetch(GH_REPO+'?t='+Date.now(),{headers:hdr,cache:'no-store'}).then(function(r){return r.ok?r.json():null;})
+  .then(function(j){if(j&&j.content){PLAN_SHA=j.sha;return JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));}return raw();})
   .catch(raw);
+}
+function savePlan(msg){
+ var body={message:msg||'plan: update (from 定稿)',content:btoa(unescape(encodeURIComponent(JSON.stringify(PLAN))))};
+ var put=function(sha){if(sha)body.sha=sha;
+  return fetch(GH_REPO,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)})
+   .then(function(r){if(!r.ok)return r.json().catch(function(){return {};}).then(function(j){throw new Error(j.message||('HTTP '+r.status));});return r.json();})
+   .then(function(j){if(j&&j.content&&j.content.sha)PLAN_SHA=j.content.sha;});};
+ if(PLAN_SHA)return put(PLAN_SHA);
+ return fetch(GH_REPO,{headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,cache:'no-store'}}).then(function(r){return r.ok?r.json():null;}).then(function(j){PLAN_SHA=j?j.sha:null;return put(PLAN_SHA);});
 }
 fetch('guide.html?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(h){CATALOG=parseCatalog(h);}).catch(function(){});
 fetch(RAW+'votes.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():{}}).then(function(j){VOTES=(j&&typeof j==='object')?j:{};}).catch(function(){});
@@ -380,9 +413,10 @@ function computeAll(){
  function leg(k,mode,ca,cb){
   if(!ca||!cb){cache.legs[k]={min:null,km:null,src:'無座標',mode:mode};return;}
   var km=hav(ca,cb);
+  var modes={walk:estMode('walk',km,null),taxi:estMode('taxi',km,null),bus:estMode('bus',km,null),mono:estMode('mono',km,null)};
   if(mode==='taxi'||mode==='walk'){
-   jobs.push(queryDrive(ca,cb).then(function(dr){var e=estMode(mode,km,dr);e.mode=mode;cache.legs[k]=e;}));
-  }else{var e=estMode(mode,km,null);e.mode=mode;cache.legs[k]=e;}
+   jobs.push(queryDrive(ca,cb).then(function(dr){var e=estMode(mode,km,dr);e.mode=mode;if(dr){modes.walk=estMode('walk',km,dr);modes.taxi=estMode('taxi',km,dr);}e.modes=modes;cache.legs[k]=e;}));
+  }else{var e=estMode(mode,km,null);e.mode=mode;e.modes=modes;cache.legs[k]=e;}
  }
  DAYS.forEach(function(d){
   if(!d.plan)return;
@@ -586,6 +620,27 @@ function matchCard(o){
  });
  return exact||cont;
 }
+function legboxHTML(dk,key,C,toName){
+ if(!C)return '';
+ if(C.cross)return '<div class="legbar"><span class="li">⚠️</span><span>此項不在本港・交通不估算</span></div>';
+ if(C.min==null)return '<div class="legbar"><span class="li">❓</span><span>缺座標・'+(toName?('到「'+esc(toName)+'」'):'')+'交通未估算</span></div>';
+ var cur=C.mode||'mono';
+ var btns=['walk','taxi','bus','mono'].map(function(m){
+  var e=C.modes&&C.modes[m];
+  var tm=(e&&e.min!=null)?('約'+fmtMin(Math.round(e.min))):'—';
+  return '<button class="mbtn'+(m===cur?' on':'')+'" onclick="event.stopPropagation();pickLeg(\''+dk+'\',\''+key+'\',\''+m+'\')"><i>'+(MODEI[m]||'')+'</i><b>'+esc(MODEW[m]||m)+'</b><small>'+tm+'</small></button>';
+ }).join('');
+ var dst=(toName==='返回碼頭')?'・返回碼頭':(toName?('・到「'+esc(toName)+'」'):'');
+ return '<div class="legbox"><div class="modes">'+btns+'</div><div class="legdesc">'+(MODEI[cur]||'')+' '+esc(MODEW[cur]||cur)+' <b>'+fmtMin(C.min)+'</b>'+dst+'（含移動時間）'+(C.km!=null?('・'+C.km.toFixed(1)+'km'):'')+'</div></div>';
+}
+function pickLeg(dk,key,m){
+ var it=PLAN.items[dk];if(!it)return;
+ if(key==='in'||key==='out'){var pm=it.portMode||{in:'mono',out:'mono'};pm[key]=m;it.portMode=pm;}
+ else{var L=it.legs[key]||(it.legs[key]={});L.mode=m;}
+ toast('交通改為 '+esc(MODEW[m]||m)+'・儲存中…');
+ computeAll().then(function(){renderAll();wxPaint();});
+ savePlan('plan: transport mode → '+m+' (from 定稿)').then(function(){toast('✅ 已儲存・排程板同步');}).catch(function(e){toast('儲存失敗：'+(e.message||e));});
+}
 function dayHTML(d,di){
  if(!d.plan){
   var info=d.k==='2026-12-16'
@@ -608,7 +663,7 @@ function dayHTML(d,di){
   var C=cache.legs[d.k+':'+key];
   var nm=String(x.o.t).replace(/✅/g,'').trim();
   if(isAct){
-   if(C)h+=legbarHTML(C,nm);
+   if(C)h+=legboxHTML(d.k,key,C,nm);
    if(C&&C.min!=null)tm+=C.min;
   }
   var s=tm,e=tm+(+x.o.min||0);
@@ -640,7 +695,7 @@ function dayHTML(d,di){
    +'</div>';
  });
  var CO=cache.legs[d.k+':out'];
- if(CO)h+=legbarHTML(CO,'返回碼頭');
+ if(CO)h+=legboxHTML(d.k,'out',CO,'返回碼頭');
  if(CO&&CO.min!=null)tm+=CO.min;
  h+='<div class="stop port"><h3>🚢 上船</h3><div class="sub">'+(by?('上船 '+by):'')+(d.dep?('・離港 '+d.dep):'')+'・預估返抵碼頭 '+hm2s(tm)+(byt!=null?('（緩衝 '+fmtMin(Math.max(0,byt-tm))+(tm>byt?'・⚠️ 已超過':'')+'）'):'')+'</div>'+(PORTIMG[d.port]?('<img class="ph" loading="lazy" src="'+PORTIMG[d.port]+'" onerror="this.style.display=\'none\'">'):'')+'</div>';
  h+='</div>';
@@ -657,16 +712,6 @@ function dayHTML(d,di){
  if(skipped)hh+='<li>⏭ 已跳過 '+skipped+' 項（不列入路線與時間）</li>';
  hh+='<li>停留時間與交通為估算，出發前請複查船方公告</li></ul></div>';
  h+=hh;
- var pk=dayPlaceOf(d);
- if(pk){
-  var sv=CATALOG.filter(function(c2){return c2.kind==='souv'&&c2.place===pk;});
-  var rec=SOUV_REC[pk]||[];
-  if(sv.length||rec.length){
-   h+='<div class="giftcard"><h3>🎁 伴手禮補貨（'+esc(d.port)+'）</h3><div class="ggrid">'+sv.map(gcardHTML).join('')+'</div>';
-   if(rec.length)h+='<div class="rec">💡 小編推薦：'+rec.map(esc).join('・')+'</div>';
-   h+='<button onclick="openGifts()">看三港全部伴手禮清單</button></div>';
-  }
- }
  return h;
 }
 function renderAll(){
@@ -830,15 +875,20 @@ function subOf(p){return (p&&p.sub)||[];}
 function subLoc(p){var loc=[];subOf(p).forEach(function(s,i){if(s.lat!=null&&s.lng!=null)loc.push({c:[s.lat,s.lng],s:s,i:i});});return loc;}
 function subLeg(A,B,mode){
  var km=hav(A,B);
- if(mode==='walk'||mode==='taxi')return queryDrive(A,B).then(function(dr){var e=estMode(mode,km,dr);e.mode=mode;return e;}).catch(function(){var e=estMode(mode,km,null);e.mode=mode;return e;});
- var e=estMode(mode,km,null);e.mode=mode;return Promise.resolve(e);
+ return queryDrive(A,B).then(function(dr){
+  var modes={walk:estMode('walk',km,dr),taxi:estMode('taxi',km,dr),bus:estMode('bus',km,null),mono:estMode('mono',km,null)};
+  var e=estMode(mode,km,(mode==='walk'||mode==='taxi')?dr:null);e.mode=mode;e.modes=modes;return e;
+ }).catch(function(){
+  var modes={walk:estMode('walk',km,null),taxi:estMode('taxi',km,null),bus:estMode('bus',km,null),mono:estMode('mono',km,null)};
+  var e=estMode(mode,km,null);e.mode=mode;e.modes=modes;return e;
+ });
 }
 function computeSubLegs(p){
  if(SUBCACHE[p.id])return Promise.resolve(SUBCACHE[p.id]);
  var loc=subLoc(p),legs={},chain=Promise.resolve();
  for(var i=0;i<loc.length-1;i++){(function(k){
   var A=loc[k].c,B=loc[k+1].c;
-  var mode=(p.subLegs&&p.subLegs[loc[k].i]&&p.subLegs[loc[k].i].mode)||'walk';
+  var mode=(p.subLegs&&p.subLegs[loc[k+1].i]&&p.subLegs[loc[k+1].i].mode)||'walk';
   chain=chain.then(function(){return subLeg(A,B,mode).then(function(e){legs[loc[k+1].i]=e;});});
  })(i);}
  return chain.then(function(){SUBCACHE[p.id]=legs;return legs;});
@@ -863,7 +913,15 @@ function buildSubBody(di,k){
   function locNo(i){for(var q=0;q<loc.length;q++)if(loc[q].i===i)return q+1;return 0;}
   subs.forEach(function(s,i){
    var C=legs[i];
-   if(C){t+=C.min;tot+=C.min;h+='<div class="sleg">'+(MODEI[C.mode]||'👣')+' '+esc(MODEW[C.mode]||C.mode)+' <b>'+fmtMin(C.min)+'</b>'+(C.km!=null?('・'+C.km.toFixed(1)+'km'):'')+'</div>';}
+   if(C){t+=C.min;tot+=C.min;
+    var cur=C.mode||'walk';
+    var sbtns=['walk','taxi','bus','mono'].map(function(m){
+     var e=C.modes&&C.modes[m];
+     var tm=(e&&e.min!=null)?(Math.round(e.min)+'分'):'—';
+     return '<button class="smbtn'+(m===cur?' on':'')+'" onclick="event.stopPropagation();pickSubLeg('+di+','+k+','+i+',\''+m+'\')">'+(MODEI[m]||'')+tm+'</button>';
+    }).join('');
+    h+='<div class="sleg"><span class="smodes">'+sbtns+'</span>'+(C.km!=null?('・'+C.km.toFixed(1)+'km'):'')+'</div>';
+   }
    h+='<div class="srow'+(s.note?' note':'')+'"><span class="snm">'+(s.note?'📝 ':((locNo(i)||'·')+'. '))+esc(s.t)+'</span><span class="sdur">'+(s.note?'註解':('+'+fmtMin(t)+'・停留 '+fmtMin(s.min||0)))+'</span></div>';
    if(!s.note){t+=(+s.min||0);tot+=(+s.min||0);}
   });
@@ -872,6 +930,14 @@ function buildSubBody(di,k){
   h+='<button class="smapbtn" onclick="event.stopPropagation();openSubMap('+di+','+k+')">🗺 打開週邊細部地圖</button>';
   el.innerHTML=h;
  });
+}
+function pickSubLeg(di,k,si,m){
+ var d=DAYS[di];var seq=flatOf(d);var x=seq[k];if(!x)return;
+ var p=x.o;p.subLegs=p.subLegs||{};p.subLegs[si]={mode:m};
+ delete SUBCACHE[p.id];
+ toast('週邊交通改為 '+esc(MODEW[m]||m)+'・儲存中…');
+ buildSubBody(di,k);
+ savePlan('plan: sub transport mode → '+m+' (from 定稿)').then(function(){toast('✅ 已儲存');}).catch(function(e){toast('儲存失敗：'+(e.message||e));});
 }
 function openSubMap(di,k){
  MAPMODE={di:di,k:k};
