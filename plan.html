@@ -205,7 +205,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261018-p37</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261018-p38</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -488,13 +488,24 @@ function computeAll(){
  return Promise.all(jobs).then(function(){
   DAYS.forEach(function(d){
    if(!d.plan)return;
-   var it=PLAN.items[d.k];var used=0,miss=false;
+   var it=PLAN.items[d.k];var used=0,miss=false,wait=0,lastReal=null;
    var seq=[];SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){seq.push(o);});});
-   var act2=[];seq.forEach(function(o,i){if(!o.skip)act2.push(i);else return;used+=(+o.min||0);});
-   var la2=act2.filter(function(i){return !seq[i].gap;});
-   var keys=[];
-   if(la2.length){keys.push(d.k+':in');for(var j=0;j<la2.length-1;j++)keys.push(d.k+':'+la2[j]);keys.push(d.k+':out');}
-   keys.forEach(function(k){var L=cache.legs[k];if(!L){miss=true;return;}if(L.min==null){miss=true;}else used+=L.min;});
+   var act2=[];seq.forEach(function(o,i){if(!o.skip)act2.push(i);});
+   var tm2=hm(dayOff(d));if(tm2==null)tm2=8*60;
+   var LI2=cache.legs[d.k+':in'];
+   if(!LI2||LI2.min==null)miss=true;else tm2+=LI2.min;
+   act2.forEach(function(i){
+    var o=seq[i];
+    if(o.gap){used+=(+o.min||0);tm2+=(+o.min||0);return;}
+    if(lastReal!=null){var L=cache.legs[d.k+':'+lastReal];if(!L||L.min==null)miss=true;else tm2+=L.min;}
+    var nb=hm(o.from||o.notBefore);
+    if(nb!=null&&tm2<nb){wait+=nb-tm2;tm2=nb;}
+    used+=(+o.min||0);tm2+=(+o.min||0);
+    lastReal=i;
+   });
+   var LO2=cache.legs[d.k+':out'];
+   if(!LO2||LO2.min==null)miss=true;else tm2+=LO2.min;
+   used+=wait;
    finish(d,used,miss);
   });
  });
@@ -620,6 +631,7 @@ function openItemMenu(slot,idx){
  h+='<div class="moverow"><span>移到：</span>'+others.map(function(x){return '<button onclick="closeItemMenu();moveToSlot(\''+slot+'\','+idx+',\''+x[0]+'\')">'+x[1]+'</button>';}).join('')+'</div>';
  h+='<button onclick="closeItemMenu();setMin(\''+slot+'\','+idx+')">⏱ 停留時間（目前 '+fmtMin(o.min||60)+'）</button>';
  if(!o.gap)h+='<button onclick="closeItemMenu();addGapAfter(\''+slot+'\','+idx+')">⏳ 在此後加入空檔（30分）</button>';
+ if(!o.gap)h+='<button onclick="closeItemMenu();setWindow(\''+slot+'\','+idx+')">🕙 設定時段（幾點到幾點）'+((o.from||o.notBefore)?('：'+(o.from||o.notBefore)+(o.to?('-'+o.to):'')):'')+'</button>';
  if(o.lat==null&&!o.gap)h+='<button onclick="closeItemMenu();locate(\''+slot+'\','+idx+')">📍 查座標</button>';
  h+='<button onclick="closeItemMenu();toggleSkip(\''+slot+'\','+idx+')">'+(o.skip?'↩︎ 取消跳過':'⏭ 跳過此項')+'</button>';
  h+='<button class="danger" onclick="closeItemMenu();rmItem(\''+slot+'\','+idx+')">🗑 移除此項</button>';
@@ -767,6 +779,8 @@ function dayPlan(d){
    if(!L||L.min==null){out.miss=true;}
    else{out.rows.push({t:hm2s(t),n:(MODEN[L.mode]||L.mode)+(L.wait?('（等'+Math.round(L.wait)+'＋搭'+Math.round(L.ride)+'）'):''),min:L.min,kind:'leg'});t+=L.min;}
   }
+  var nb=hm(o.from||o.notBefore);
+  if(nb!=null&&t<nb){out.rows.push({t:hm2s(t),n:'⏳ 等待（'+(o.from||o.notBefore)+' 起）',min:nb-t,kind:'wait'});t=nb;}
   out.rows.push({t:hm2s(t),n:o.t,min:(+o.min||0),kind:'item'});
   t+=(+o.min||0);
   lastReal=i;
@@ -796,6 +810,7 @@ function openSheet(){
      return '<tr><td style="width:64px;color:#5b6b7c">'+r.t+'</td><td>'+esc(r.n)
       +(r.kind==='item'?'　<span style="color:#95a3b2">停留 '+fmtMin(r.min)+'</span>':'')
       +(r.kind==='gap'?'　<span style="color:#7a3fa0">空檔 '+fmtMin(r.min)+'</span>':'')
+      +(r.kind==='wait'?'　<span style="color:#7a3fa0">等待 '+fmtMin(r.min)+'</span>':'')
       +(r.kind==='leg'?'　<span style="color:#95a3b2">'+fmtMin(r.min)+'</span>':'')+(r.kind==='meal'?'　<span style="color:#95a3b2">'+fmtMin(r.min)+'</span>':'')+'</td></tr>';}).join('')
    +'</table></div>';
  });
@@ -933,9 +948,37 @@ function drawOneDay(){
 }
 function planPopup(x){
  return '<b>'+esc(x.o.t)+'</b><br>停留 '+fmtMin(x.o.min||0)+'<br>'+(votesOf(x.o.id).length?('票數 '+(votesOf(x.o.id).length+'')):'')+
-  '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><button onclick="openSub(\''+x.s+'\','+x.i+')" style="border:none;background:#7a3fa0;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">🧭 周邊</button><button onclick="addGapAfter(\''+x.s+'\','+x.i+')" style="border:none;background:#5b6b7c;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">⏳ 加入空檔</button><button onclick="mapRemove(\''+x.s+'\','+x.i+')" style="border:none;background:#b3402a;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">✕ 移除</button></div>';
+  '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><button onclick="openSub(\''+x.s+'\','+x.i+')" style="border:none;background:#7a3fa0;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">🧭 周邊</button><button onclick="setWindow(\''+x.s+'\','+x.i+')" style="border:none;background:#5b6b7c;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">🕙 設定時段</button><button onclick="addGapAfter(\''+x.s+'\','+x.i+')" style="border:none;background:#5b6b7c;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">⏳ 加入空檔</button><button onclick="mapRemove(\''+x.s+'\','+x.i+')" style="border:none;background:#b3402a;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">✕ 移除</button></div>';
 }
 function mapRemove(slot,idx){if(guard())return;var a=arr0(slot);if(!a[idx])return;a.splice(idx,1);recompute().then(function(){drawPlanMap();});}
+function setWindow(slot,idx){
+ var o=arr0(slot)[idx];if(!o)return;
+ var cur=((o.from||o.notBefore||'')+(o.to?('-'+o.to):''));
+ var v=prompt('設定時段（幾點到幾點）\n例如 10:00-12:00\n只填 10:00＝最早開始；留空＝取消',cur);
+ if(v===null)return;
+ v=String(v).trim().replace(/[～~－—–]/g,'-').replace(/：/g,':');
+ if(!v){delete o.from;delete o.to;delete o.notBefore;recompute().then(function(){drawPlanMap();});toast('已取消時段');return;}
+ var m=v.match(/^(\d{1,2}:\d{2})(?:\s*-\s*(\d{1,2}:\d{2}))?$/);
+ if(!m){toast('格式請用 HH:MM 或 HH:MM-HH:MM');return;}
+ var a=hm(m[1]),b=m[2]?hm(m[2]):null;
+ if(a==null||(b!=null&&b<=a)){toast('時間不正確（結束需晚於開始）');return;}
+ o.from=hm2s(a);delete o.notBefore;
+ if(b!=null){o.to=hm2s(b);o.min=b-a;}
+ else delete o.to;
+ recompute().then(function(){drawPlanMap();});
+ toast('已設定 '+o.from+(o.to?('–'+o.to+'（停留 '+fmtMin(o.min)+'）'):'（最早開始）'));
+}
+function setNotBefore(slot,idx){
+ var o=arr0(slot)[idx];if(!o)return;
+ var v=prompt('最早開始時間（例如開門 10:00）\n留空＝取消',o.from||o.notBefore||'');
+ if(v===null)return;
+ v=String(v).trim();
+ if(!v){delete o.notBefore;delete o.from;recompute().then(function(){drawPlanMap();});toast('已取消最早時間');return;}
+ var m=hm(v);if(m==null){toast('格式請用 HH:MM，例如 10:00');return;}
+ o.from=hm2s(m);delete o.notBefore;
+ recompute().then(function(){drawPlanMap();});
+ toast('已設定最早 '+o.from+'（時間到之前會自動插入等待）');
+}
 function addGap(){
  if(guard())return;
  var it=it0();
@@ -1023,9 +1066,14 @@ function mapPanelHTML(seq,pc,it){
   seq.forEach(function(x,k){
    var isAct=!x.o.skip;
    var isGap=!!x.o.gap;
-   if(isAct&&!isGap){var C=cache.legs[curDay+':'+key];if(C&&C.min!=null)tm+=C.min;h+=legChip(key,C);}
+   if(isAct&&!isGap){
+    var C=cache.legs[curDay+':'+key];
+    if(C&&C.min!=null){tm+=C.min;h+=legChip(key,C);}
+    var nb=hm(x.o.from||x.o.notBefore);
+    if(nb!=null&&tm<nb){h+='<div class="mleg" style="min-width:58px"><div class="mi">⏳</div><div class="mm">等'+fmtMin(nb-tm)+'</div><div class="msw">最早'+hm2s(nb)+'</div></div>';tm=nb;}
+   }
    var late=(isAct&&!isGap&&byt!=null&&(tm+(+x.o.min||0))>byt);
-   var subTxt=isGap?(hm2s(tm)+'・空檔 '+fmtMin(x.o.min||0)):(isAct?(hm2s(tm)+'・停留 '+fmtMin(x.o.min||0)):'⏭ 已跳過・不列入時間');
+   var subTxt=isGap?(hm2s(tm)+'・空檔 '+fmtMin(x.o.min||0)):(isAct?((x.o.to&&(tm+(+x.o.min||0))>hm(x.o.to))?('⚠️ '+hm2s(tm)+'–'+hm2s(tm+(+x.o.min||0))+'・超過 '+x.o.to):(hm2s(tm)+'–'+hm2s(tm+(+x.o.min||0))+'・停留 '+fmtMin(x.o.min||0))):'⏭ 已跳過・不列入時間');
    h+='<div class="mcard'+(isAct?'':' skip')+'" onclick="mapFocus(\''+x.s+'\','+x.i+')">'
     +'<div class="nm">'+(k+2)+'. '+esc(x.o.t)+'</div>'
     +'<div class="sub"'+ (late?' style="color:#b3402a"':'') +'>'+subTxt+'</div>'

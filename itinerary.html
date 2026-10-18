@@ -346,7 +346,7 @@ var GH_REPO='https://api.github.com/repos/a4623671/cruise-votes/contents/plan.js
 var RAW='https://raw.githubusercontent.com/a4623671/cruise-votes/main/';
 var _p1='Z2l0aHViX3BhdF8xMUFISU5ORVEwV1JKV05mNFNvWHZCXzNtTUJVTWRaa0hDQV',_p2='hNbHA3QUFublh0bmNhTDN3NXZYd0tGbXlsYnlacmdVV0dFUTNSVm5KaXVMS1VW';
 var GH_TOKEN=atob(_p1+_p2);
-var VER='20261018-f14（定稿：空檔（自由時間）支援＋卡片圖片輪播滿版＋重複圖重抓＋餐廳推薦菜色＋右上氣溫＋地圖真實路徑＋多時段天氣＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
+var VER='20261018-f16（定稿：時段設定（幾點到幾點）＋開門自動等待＋空檔＋卡片圖片輪播滿版＋餐廳推薦菜色＋右上氣溫＋地圖真實路徑＋多時段天氣＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
 var FS=['1','1.12','1.25'];
 
 /* ================= 狀態 ================= */
@@ -479,13 +479,24 @@ function computeAll(){
  return Promise.all(jobs).then(function(){
   DAYS.forEach(function(d){
    if(!d.plan)return;
-   var it=PLAN.items[d.k];var used=0,miss=false;
+   var it=PLAN.items[d.k];var used=0,miss=false,wait=0,lastReal=null;
    var seq=flatOf(d);
-   var act2=[];seq.forEach(function(x,i){if(!x.o.skip)act2.push(i);else return;used+=(+x.o.min||0);});
-   var la2=act2.filter(function(i){return !seq[i].o.gap;});
-   var keys=[];
-   if(la2.length){keys.push(d.k+':in');for(var j=0;j<la2.length-1;j++)keys.push(d.k+':'+la2[j]);keys.push(d.k+':out');}
-   keys.forEach(function(k){var L=cache.legs[k];if(!L){miss=true;return;}if(L.min==null){if(!L.cross)miss=true;}else used+=L.min;});
+   var act2=[];seq.forEach(function(x,i){if(!x.o.skip)act2.push(i);});
+   var tm2=hm(dayOff(d));if(tm2==null)tm2=8*60;
+   var LI2=cache.legs[d.k+':in'];
+   if(!LI2||LI2.min==null){if(!(LI2&&LI2.cross))miss=true;}else tm2+=LI2.min;
+   act2.forEach(function(i){
+    var o=seq[i].o;
+    if(o.gap){used+=(+o.min||0);tm2+=(+o.min||0);return;}
+    if(lastReal!=null){var L=cache.legs[d.k+':'+lastReal];if(!L||L.min==null){if(!(L&&L.cross))miss=true;}else tm2+=L.min;}
+    var nb=hm(o.from||o.notBefore);
+    if(nb!=null&&tm2<nb){wait+=nb-tm2;tm2=nb;}
+    used+=(+o.min||0);tm2+=(+o.min||0);
+    lastReal=i;
+   });
+   var LO2=cache.legs[d.k+':out'];
+   if(!LO2||LO2.min==null){if(!(LO2&&LO2.cross))miss=true;}else tm2+=LO2.min;
+   used+=wait;
    var cap=null;var _a=dayOff(d),_b=dayBoard(d);
    if(_a&&_b){var a=hm(_a),b=hm(_b);if(a!=null&&b!=null)cap=Math.max(0,b-a-((+it.mealMin)||0));}
    cache.totals[d.k]={used:used,cap:cap,over:cap!=null?Math.max(0,used-cap):0,miss:miss};
@@ -640,6 +651,7 @@ function legbarHTML(C,toName){
 function kvHTML(o,mc,late){
  var rows=[];
  rows.push(['⏱ 停留時間',fmtMin(o.min||0)]);
+ if(o.from)rows.push(['🕙 預定時段',esc(o.from+(o.to?('–'+o.to):'')+' 起')]);
  if(o.kind)rows.push(['🎯 類型',esc(KINDN[o.kind]||o.kind)]);
  if(o.dishes&&o.dishes.length)rows.push(['🍴 推薦菜色',o.dishes.map(esc).join('<br>')]);
  var descs=o.desc?[o.desc]:((mc&&mc.desc&&mc.desc.length)?mc.desc.slice(0,3):[]);
@@ -732,6 +744,8 @@ function dayHTML(d,di){
   if(isAct){
    if(C)h+=legboxHTML(d.k,key,C,nm);
    if(C&&C.min!=null)tm+=C.min;
+   var nb=hm(x.o.from||x.o.notBefore);
+   if(nb!=null&&tm<nb){h+='<div class="gapbar">⏳ 等待開門 '+fmtMin(nb-tm)+'<span class="gapt">→ '+hm2s(nb)+'</span></div>';tm=nb;}
   }
   var s=tm,e=tm+(+x.o.min||0);
   if(isAct){list.push({k:k,o:x.o,s:s,e:e});tm=e;key=String(k);n++;}
