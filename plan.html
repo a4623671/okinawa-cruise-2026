@@ -198,6 +198,9 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <span class="who" id="who"></span>
   <button id="addBtn" onclick="openPool()">＋ 加入項目</button>
   <button onclick="openSheet()">🧾 規劃單</button>
+  <button onclick="undoStep()">↩︎ 上一步</button>
+  <button onclick="saveSnapshot()">💾 存檔</button>
+  <button onclick="restoreSnapshot()">📥 還原</button>
 </div>
 <div class="status" id="status"><span>載入中…</span></div>
 <div class="days" id="days"></div>
@@ -205,7 +208,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261018-p40</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261018-p41</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -663,7 +666,46 @@ function locate(slot,idx){if(guard())return;var o=arr0(slot)[idx];toast('查座�
  });}
 function setLeg(i,mode){if(guard())return;var it=it0();var L=it.legs[i]||(it.legs[i]={});L.mode=mode;delete L.prop;delete L.by;delete L.endorse;delete L.hold;recompute();}
 function setPortMode(which,mode){if(guard())return;var it=it0();it.portMode=it.portMode||{in:'mono',out:'mono'};it.portMode[which]=mode;recompute();}
-function recompute(){saveQuiet();return computeAll().then(function(){renderBoard();});}
+var undoStack=[],lastSnap=null;
+function recompute(){
+ try{
+  var cur=JSON.stringify(PLAN);
+  if(lastSnap==null)lastSnap=cur;
+  else if(cur!==lastSnap){undoStack.push(lastSnap);if(undoStack.length>30)undoStack.shift();lastSnap=cur;}
+ }catch(e){}
+ saveQuiet();return computeAll().then(function(){renderBoard();});}
+function undoStep(){
+ if(!undoStack.length){toast('沒有可回上一步的動作');return;}
+ if(guard())return;
+ PLAN=JSON.parse(undoStack.pop());
+ ensure(PLAN);lastSnap=JSON.stringify(PLAN);
+ recompute().then(function(){drawPlanMap();renderDays();});
+ toast('↩︎ 已回上一步（還可回 '+undoStack.length+' 步）');
+}
+function saveSnapshot(){
+ if(!PLAN){toast('尚未載入');return;}
+ var url=REPO+'history/plan-latest.json';
+ var body={message:'plan snapshot '+new Date().toISOString(),content:btoa(unescape(encodeURIComponent(JSON.stringify(PLAN))))};
+ var put=function(sha){if(sha)body.sha=sha;return fetch(url,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)});};
+ fetch(url,{headers:ghH(),cache:'no-store'}).then(function(r){return r.ok?r.json():null;})
+  .then(function(j){return put(j?j.sha:null);})
+  .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);toast('💾 已存檔（可隨時按「📥 還原」回復）');})
+  .catch(function(e){toast('存檔失敗：'+(e.message||e));});
+}
+function restoreSnapshot(){
+ if(!PLAN){toast('尚未載入');return;}
+ if(guard())return;
+ fetch(REPO+'history/plan-latest.json',{headers:ghH(),cache:'no-store'}).then(function(r){return r.ok?r.json():null;})
+  .then(function(j){
+   if(!j||!j.content){toast('還沒有存檔（先按「💾 存檔」）');return;}
+   var snap=JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,'')))));
+   if(!confirm('還原到上次存檔？（目前內容會被覆蓋，可用「↩︎ 上一步」再回復）'))return;
+   undoStack.push(JSON.stringify(PLAN));if(undoStack.length>30)undoStack.shift();
+   PLAN=snap;ensure(PLAN);lastSnap=null;
+   recompute().then(function(){drawPlanMap();renderDays();});
+   toast('📥 已還原存檔');
+  }).catch(function(e){toast('還原失敗：'+(e.message||e));});
+}
 
 /* ================= 候選池 UI ================= */
 var PLACEN={naha:'🌺那霸',miyako:'🏝宮古島',ishigaki:'🪨石垣島'};
@@ -850,7 +892,7 @@ function finalizePlan(){
 /* ================= 啟動 ================= */
 function boot(){
  document.getElementById('who').textContent=me()?('👤 '+me()):'';
- loadPlan().then(function(p){PLAN=p;ensure();var n=me();if(n&&PLAN.roster.indexOf(n)>=0&&!PLAN._rs){PLAN._rs=1;saveQuiet();}
+ loadPlan().then(function(p){PLAN=p;ensure();var n=me();if(n&&PLAN.roster.indexOf(n)>=0&&!PLAN._rs){PLAN._rs=1;saveQuiet();}lastSnap=JSON.stringify(PLAN);
   DAYS.forEach(function(d){if(!d.plan)return;PLAN.items[d.k]&&SLOTS.forEach(function(s){(PLAN.items[d.k].slots[s[0]]||[]).forEach(function(o){if(o.lat==null&&geo[o.id]&&geo[o.id].lat!=null){o.lat=geo[o.id].lat;o.lng=geo[o.id].lng;}});});});
   return computeAll();})
  .then(function(){renderDays();renderBoard();autoLocate();})
