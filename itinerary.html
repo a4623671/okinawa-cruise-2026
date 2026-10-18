@@ -79,6 +79,13 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .kv .v{flex:1;min-width:0;overflow-wrap:break-word}
 .ph{width:100%;border-radius:10px;margin:8px 0 2px;display:block}
 .credit{font-size:11px;color:#98a4b3;margin:2px 0 0}
+.picwrap{margin:8px 0 0}
+.pics{display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;border-radius:10px}
+.pics::-webkit-scrollbar{display:none}
+.pics img{flex:0 0 88%;height:175px;object-fit:cover;border-radius:10px;scroll-snap-align:center}
+.pdots{display:flex;justify-content:center;gap:5px;margin:5px 0 0}
+.pdots span{width:7px;height:7px;border-radius:50%;background:#cfd8e3}
+.pdots span.on{background:#10293f}
 .subhint{display:flex;align-items:center;gap:6px;margin-top:8px;background:#f3ecfb;border:1px solid #d5c2ee;color:#6b3fa0;border-radius:10px;padding:7px 10px;font-size:13px;font-weight:800;cursor:pointer}
 .subhint .chev{margin-left:auto;transition:transform .2s;font-size:14px}
 .stop.subopen .subhint .chev{transform:rotate(180deg)}
@@ -182,6 +189,8 @@ body.dark .legdesc{color:#9fc3ff}
 body.dark .smbtn{background:#16212c;border-color:#2c3a49;color:#9fc3ff}
 body.dark .smbtn.on{background:#0ea5e9;border-color:#0ea5e9;color:#062033}
 body.dark .mapfabs button{background:#1b2733;border-color:#2c3a49;color:#dbe4ec}
+body.dark .pdots span{background:#2c3a49}
+body.dark .pdots span.on{background:#9fc3ff}
 body.dark .pinbtn{background:#16212c;border-color:#2c3a49;color:#dbe4ec}
 body.dark .stoptime{color:#ff9d5c}
 body.dark .tl{border-color:#8a5a00}
@@ -300,6 +309,11 @@ var PORTIMG={
  '那霸':'https://commons.wikimedia.org/wiki/Special:FilePath/Naha%20Port%20terminal%20Okinawa%20JAPAN.jpg?width=960',
  '石垣島':'https://commons.wikimedia.org/wiki/Special:FilePath/Port%20of%20Ishigaki%202.jpg?width=960'
 };
+var PORTIMG2={
+ '宮古島':'https://commons.wikimedia.org/wiki/Special:FilePath/202408%20%E4%B8%8A%E5%8D%88%E6%99%82%E5%88%BB%E7%9A%84%E5%AE%AE%E5%8F%A4%E5%B3%B6%E5%B9%B3%E8%89%AF%E6%B8%AF%20(75mm%E7%84%A6%E8%B7%9D).jpg?width=960',
+ '那霸':'https://commons.wikimedia.org/wiki/Special:FilePath/Naha%20Port%20from%20Pacific%20Hotel%20Okinawa.jpg?width=960',
+ '石垣島':'https://commons.wikimedia.org/wiki/Special:FilePath/Port%20of%20Ishigaki%206.jpg?width=960'
+};
 var SOUVCAT={
  '🍬 食品甜點':['御菓子御殿 紅芋塔','ちんすこう（金楚糕）','黑糖かりんとう','宮古黑糖','マンゴー加工品','シークヮーサー加工品','ジーマーミ豆腐の素'],
  '🧂 調味・鹽':['雪塩（宮古島の雪塩）','石垣島ラー油（辺銀食堂）','ピパーツ（島胡椒）'],
@@ -328,7 +342,7 @@ var GH_REPO='https://api.github.com/repos/a4623671/cruise-votes/contents/plan.js
 var RAW='https://raw.githubusercontent.com/a4623671/cruise-votes/main/';
 var _p1='Z2l0aHViX3BhdF8xMUFISU5ORVEwV1JKV05mNFNvWHZCXzNtTUJVTWRaa0hDQV',_p2='hNbHA3QUFublh0bmNhTDN3NXZYd0tGbXlsYnlacmdVV0dFUTNSVm5KaXVMS1VW';
 var GH_TOKEN=atob(_p1+_p2);
-var VER='20261018-f11（定稿：餐廳推薦菜色＋卡片右上氣溫（含去年逐時）＋修正情報配對＋地圖真實路徑＋多時段天氣＋卡片雙圖＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
+var VER='20261018-f12（定稿：卡片圖片輪播（可滑＋圓點）＋重複圖重抓＋餐廳推薦菜色＋右上氣溫＋地圖真實路徑＋多時段天氣＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
 var FS=['1','1.12','1.25'];
 
 /* ================= 狀態 ================= */
@@ -668,6 +682,17 @@ function pickLeg(dk,key,m){
  computeAll().then(function(){renderAll();wxPaint();});
  savePlan('plan: transport mode → '+m+' (from 定稿)').then(function(){toast('✅ 已儲存・排程板同步');}).catch(function(e){toast('儲存失敗：'+(e.message||e));});
 }
+function picsHTML(pics,imgc){
+ var inner=pics.map(function(u){return '<img loading="lazy" src="'+esc(u)+'" onerror="this.style.display=\'none\'">';}).join('');
+ var dots=pics.length>1?('<div class="pdots">'+pics.map(function(u,i){return '<span'+(i===0?' class="on"':'')+'></span>';}).join('')+'</div>'):'';
+ return '<div class="picwrap"><div class="pics" onscroll="picScroll(this)">'+inner+'</div>'+dots+(imgc?('<div class="credit">'+esc(imgc)+'</div>'):'')+'</div>';
+}
+function picScroll(el){
+ var dots=el.parentNode.querySelector('.pdots');if(!dots)return;
+ var w=el.scrollWidth/el.children.length;
+ var i=Math.min(dots.children.length-1,Math.round(el.scrollLeft/w));
+ [].slice.call(dots.children).forEach(function(d,j){d.classList.toggle('on',j===i);});
+}
 function dayHTML(d,di){
  if(!d.plan){
   var info=d.k==='2026-12-16'
@@ -709,10 +734,12 @@ function dayHTML(d,di){
   var mc=matchCard(x.o);
   var pics=[];
   function addPic(u){if(u&&pics.indexOf(u)<0&&pics.length<3)pics.push(u);}
-  if(mc&&mc.imgs&&mc.imgs.length)mc.imgs.forEach(addPic);
-  else if(mc&&mc.img)addPic(mc.img);
-  if(x.o.imgs&&x.o.imgs.length)x.o.imgs.forEach(addPic);
-  else if(x.o.img)addPic(x.o.img);
+  if(x.o.imgs&&x.o.imgs.length){x.o.imgs.forEach(addPic);}
+  else{
+   if(mc&&mc.imgs&&mc.imgs.length)mc.imgs.forEach(addPic);
+   else if(mc&&mc.img)addPic(mc.img);
+   if(x.o.img)addPic(x.o.img);
+  }
   var hasSub=!!(x.o.sub&&x.o.sub.length);
   h+='<div class="stop'+(x.o.skip?' skip':'')+'" id="stop-'+di+'-'+k+'"'+(hasSub?(' onclick="cardTap(event,'+di+','+k+')"'):'')+'>'
    +(isAct?('<div class="stopnum">'+n+'</div>'):'<div class="stopnum skipnum">⏭</div>')
@@ -720,7 +747,7 @@ function dayHTML(d,di){
    +'<div class="stoptime">'+(isAct?(hm2s(s)+'–'+hm2s(e)):'已跳過・不列入時間')+'</div>'
    +'<h3>'+(isAct?(n+'. '):'')+esc(nm)+'</h3>'
    +'<div class="sub">'+(kind?(esc(KINDN[kind]||kind)+(x.o.place?('・'+esc(x.o.place)):'')+' '):'')+tags+'</div>'
-   +(pics.length?(pics.map(function(u){return '<img class="ph" loading="lazy" src="'+esc(u)+'" onerror="this.style.display=\'none\'">';}).join('')+(x.o.imgc?('<div class="credit">'+esc(x.o.imgc)+'</div>'):'')):'')
+   +(pics.length?picsHTML(pics,x.o.imgc):'')
    +kvHTML(x.o,mc,late)
    +(hasSub?('<div class="subhint">🧭 週邊細部行程 '+x.o.sub.length+' 項・點卡片展開<span class="chev">▾</span></div><div class="subbody" id="sub-'+di+'-'+k+'"></div>'):'')
    +'<div class="acts">'+acts+'</div>'
@@ -729,7 +756,7 @@ function dayHTML(d,di){
  var CO=cache.legs[d.k+':out'];
  if(CO)h+=legboxHTML(d.k,'out',CO,'返回碼頭');
  if(CO&&CO.min!=null)tm+=CO.min;
- h+='<div class="stop port"><h3>🚢 上船</h3><div class="sub">'+(by?('上船 '+by):'')+(d.dep?('・離港 '+d.dep):'')+'・預估返抵碼頭 '+hm2s(tm)+(byt!=null?('（緩衝 '+fmtMin(Math.max(0,byt-tm))+(tm>byt?'・⚠️ 已超過':'')+'）'):'')+'</div>'+(PORTIMG[d.port]?('<img class="ph" loading="lazy" src="'+PORTIMG[d.port]+'" onerror="this.style.display=\'none\'">'):'')+'</div>';
+ h+='<div class="stop port"><h3>🚢 上船</h3><div class="sub">'+(by?('上船 '+by):'')+(d.dep?('・離港 '+d.dep):'')+'・預估返抵碼頭 '+hm2s(tm)+(byt!=null?('（緩衝 '+fmtMin(Math.max(0,byt-tm))+(tm>byt?'・⚠️ 已超過':'')+'）'):'')+'</div>'+((PORTIMG2[d.port]||PORTIMG[d.port])?('<img class="ph" loading="lazy" src="'+(PORTIMG2[d.port]||PORTIMG[d.port])+'" onerror="this.style.display=\'none\'">'):'')+'</div>';
  h+='</div>';
  TIMES[d.k]=list;
  var t=cache.totals[d.k]||{used:0,cap:null,over:0,miss:false};
