@@ -63,6 +63,8 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .smodes{display:inline-flex;gap:4px;margin-right:6px;vertical-align:middle}
 .smbtn{border:1px solid #c9d8f2;background:#fff;border-radius:8px;padding:1px 6px;font-size:11px;cursor:pointer;color:#2b4d8f}
 .smbtn.on{background:#10293f;color:#fff;border-color:#10293f}
+.gapbar{background:#f3ecfb;border:1.5px dashed #b9a3dd;color:#6b3fa0;border-radius:10px;padding:8px 12px;margin:0 0 10px;font-size:13px;font-weight:800;display:flex;align-items:center;gap:8px}
+.gapbar .gapt{margin-left:auto;font-weight:700;font-size:12px;color:#8a6ac0}
 .stop{position:relative;background:#fff;border-radius:12px;padding:10px 12px;margin:0 0 10px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .stop.skip{opacity:.6;background:#f7fafc}
 .stop.now{outline:3px solid #e05307}
@@ -188,6 +190,8 @@ body.dark .mbtn.on small{color:#062033}
 body.dark .legdesc{color:#9fc3ff}
 body.dark .smbtn{background:#16212c;border-color:#2c3a49;color:#9fc3ff}
 body.dark .smbtn.on{background:#0ea5e9;border-color:#0ea5e9;color:#062033}
+body.dark .gapbar{background:#241a33;border-color:#4a3a66;color:#c9a8f0}
+body.dark .gapbar .gapt{color:#a58ad0}
 body.dark .mapfabs button{background:#1b2733;border-color:#2c3a49;color:#dbe4ec}
 body.dark .pdots span{background:#2c3a49}
 body.dark .pdots span.on{background:#9fc3ff}
@@ -342,7 +346,7 @@ var GH_REPO='https://api.github.com/repos/a4623671/cruise-votes/contents/plan.js
 var RAW='https://raw.githubusercontent.com/a4623671/cruise-votes/main/';
 var _p1='Z2l0aHViX3BhdF8xMUFISU5ORVEwV1JKV05mNFNvWHZCXzNtTUJVTWRaa0hDQV',_p2='hNbHA3QUFublh0bmNhTDN3NXZYd0tGbXlsYnlacmdVV0dFUTNSVm5KaXVMS1VW';
 var GH_TOKEN=atob(_p1+_p2);
-var VER='20261018-f13（定稿：卡片圖片輪播＝一張一張滿版（不露邊）＋重複圖重抓＋餐廳推薦菜色＋右上氣溫＋地圖真實路徑＋多時段天氣＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
+var VER='20261018-f14（定稿：空檔（自由時間）支援＋卡片圖片輪播滿版＋重複圖重抓＋餐廳推薦菜色＋右上氣溫＋地圖真實路徑＋多時段天氣＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
 var FS=['1','1.12','1.25'];
 
 /* ================= 狀態 ================= */
@@ -457,16 +461,18 @@ function computeAll(){
   var pm=it.portMode||(it.portMode={in:'mono',out:'mono'});
   var act=[];seq.forEach(function(x,i){if(!x.o.skip)act.push(i);});
   if(!act.length)return;
-  var f=act[0];
+  var legAct=act.filter(function(i){return !seq[i].o.gap;});
+  if(!legAct.length)return;
+  var f=legAct[0];
   if(pc&&samePort(seq[f].o,d))leg(d.k+':in',pm.in||'mono',[pc.lat,pc.lng],coordOf(seq[f].o));
   else cache.legs[d.k+':in']={min:null,km:null,src:'跨港',mode:'mono',cross:true};
-  for(var k2=0;k2<act.length-1;k2++){
-   var i=act[k2],j=act[k2+1];
+  for(var k2=0;k2<legAct.length-1;k2++){
+   var i=legAct[k2],j=legAct[k2+1];
    var mode=(it.legs[i]||{}).mode||'mono';
    if(!samePort(seq[i].o,d)||!samePort(seq[j].o,d)){cache.legs[d.k+':'+i]={min:null,km:null,src:'跨港',mode:mode,cross:true};continue;}
    leg(d.k+':'+i,mode,coordOf(seq[i].o),coordOf(seq[j].o));
   }
-  var lastI=act[act.length-1];
+  var lastI=legAct[legAct.length-1];
   if(pc&&samePort(seq[lastI].o,d))leg(d.k+':out',pm.out||'mono',coordOf(seq[lastI].o),[pc.lat,pc.lng]);
   else cache.legs[d.k+':out']={min:null,km:null,src:'跨港',mode:'mono',cross:true};
  });
@@ -476,8 +482,9 @@ function computeAll(){
    var it=PLAN.items[d.k];var used=0,miss=false;
    var seq=flatOf(d);
    var act2=[];seq.forEach(function(x,i){if(!x.o.skip)act2.push(i);else return;used+=(+x.o.min||0);});
+   var la2=act2.filter(function(i){return !seq[i].o.gap;});
    var keys=[];
-   if(act2.length){keys.push(d.k+':in');for(var j=0;j<act2.length-1;j++)keys.push(d.k+':'+act2[j]);keys.push(d.k+':out');}
+   if(la2.length){keys.push(d.k+':in');for(var j=0;j<la2.length-1;j++)keys.push(d.k+':'+la2[j]);keys.push(d.k+':out');}
    keys.forEach(function(k){var L=cache.legs[k];if(!L){miss=true;return;}if(L.min==null){if(!L.cross)miss=true;}else used+=L.min;});
    var cap=null;var _a=dayOff(d),_b=dayBoard(d);
    if(_a&&_b){var a=hm(_a),b=hm(_b);if(a!=null&&b!=null)cap=Math.max(0,b-a-((+it.mealMin)||0));}
@@ -712,8 +719,16 @@ function dayHTML(d,di){
  var list=[],key='in',n=0;
  seq.forEach(function(x,k){
   var isAct=!x.o.skip;
-  var C=cache.legs[d.k+':'+key];
+  var isGap=!!x.o.gap;
   var nm=String(x.o.t).replace(/✅/g,'').trim();
+  if(isGap){
+   if(x.o.skip){list.push({k:k,o:x.o,s:null,e:null,skip:true});h+='<div class="gapbar" style="opacity:.55">⏳ '+esc(nm.replace(/^⏳\s*/,''))+'（已跳過）</div>';return;}
+   var gs=tm,ge=tm+(+x.o.min||0);tm=ge;
+   list.push({k:k,o:x.o,s:gs,e:ge});
+   h+='<div class="gapbar">⏳ '+esc(nm.replace(/^⏳\s*/,''))+'・'+fmtMin(x.o.min||0)+'<span class="gapt">'+hm2s(gs)+'–'+hm2s(ge)+'</span></div>';
+   return;
+  }
+  var C=cache.legs[d.k+':'+key];
   if(isAct){
    if(C)h+=legboxHTML(d.k,key,C,nm);
    if(C&&C.min!=null)tm+=C.min;

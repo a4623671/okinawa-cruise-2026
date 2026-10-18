@@ -205,7 +205,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261018-p36</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261018-p37</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -223,7 +223,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
 <button id="mapfab" onclick="openPlanMap()" title="行程地圖">🗺</button>
 <div id="mapov" onclick="if(event.target===this)closePlanMap()">
  <div id="mapcard">
-  <div id="mapbar"><span class="t" title="行程地圖">🗺</span><span style="flex:1"></span><button class="mini" id="candBtn" onclick="toggleCand()">＋ 候選</button><button class="xbtn" onclick="closePlanMap()">✕</button><span id="mapdays"></span></div>
+  <div id="mapbar"><span class="t" title="行程地圖">🗺</span><span style="flex:1"></span><button class="mini" id="candBtn" onclick="toggleCand()">＋ 候選</button><button class="mini" onclick="addGap()">＋ 空檔</button><button class="xbtn" onclick="closePlanMap()">✕</button><span id="mapdays"></span></div>
   <div id="subbar"></div>
   <div id="candbar"><select id="candKind"></select><button onclick="showCand()">顯示</button><button class="ghost" onclick="hideCand()">清除</button></div>
   <div id="mapwrap"></div>
@@ -470,16 +470,18 @@ function computeAll(){
   var pm=it.portMode||(it.portMode={in:'mono',out:'mono'});
   var act=[];seq.forEach(function(o,i){if(!o.skip)act.push(i);});
   if(!act.length)return;
-  var f=act[0];
+  var legAct=act.filter(function(i){return !seq[i].gap;});
+  if(!legAct.length)return;
+  var f=legAct[0];
   if(pc&&samePort(seq[f],d))leg(d.k+':in',pm.in||'mono',[pc.lat,pc.lng],coordOf(seq[f]));
   else cache.legs[d.k+':in']={min:null,km:null,src:'跨港',mode:'mono',wait:null,ride:null,cross:true};
-  for(var k2=0;k2<act.length-1;k2++){
-   var i=act[k2],j=act[k2+1];
+  for(var k2=0;k2<legAct.length-1;k2++){
+   var i=legAct[k2],j=legAct[k2+1];
    var mode=(it.legs[i]||{}).mode||'mono';
    if(!samePort(seq[i],d)||!samePort(seq[j],d)){cache.legs[d.k+':'+i]={min:null,km:null,src:'跨港',mode:mode,wait:null,ride:null,cross:true};continue;}
    leg(d.k+':'+i,mode,coordOf(seq[i]),coordOf(seq[j]));
   }
-  var lastI=act[act.length-1];
+  var lastI=legAct[legAct.length-1];
   if(pc&&samePort(seq[lastI],d))leg(d.k+':out',pm.out||'mono',coordOf(seq[lastI]),[pc.lat,pc.lng]);
   else cache.legs[d.k+':out']={min:null,km:null,src:'跨港',mode:'mono',wait:null,ride:null,cross:true};
  });
@@ -489,8 +491,9 @@ function computeAll(){
    var it=PLAN.items[d.k];var used=0,miss=false;
    var seq=[];SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o){seq.push(o);});});
    var act2=[];seq.forEach(function(o,i){if(!o.skip)act2.push(i);else return;used+=(+o.min||0);});
+   var la2=act2.filter(function(i){return !seq[i].gap;});
    var keys=[];
-   if(act2.length){keys.push(d.k+':in');for(var j=0;j<act2.length-1;j++)keys.push(d.k+':'+act2[j]);keys.push(d.k+':out');}
+   if(la2.length){keys.push(d.k+':in');for(var j=0;j<la2.length-1;j++)keys.push(d.k+':'+la2[j]);keys.push(d.k+':out');}
    keys.forEach(function(k){var L=cache.legs[k];if(!L){miss=true;return;}if(L.min==null){miss=true;}else used+=L.min;});
    finish(d,used,miss);
   });
@@ -616,7 +619,8 @@ function openItemMenu(slot,idx){
  var others=SLOTS.filter(function(x){return x[0]!==slot;});
  h+='<div class="moverow"><span>移到：</span>'+others.map(function(x){return '<button onclick="closeItemMenu();moveToSlot(\''+slot+'\','+idx+',\''+x[0]+'\')">'+x[1]+'</button>';}).join('')+'</div>';
  h+='<button onclick="closeItemMenu();setMin(\''+slot+'\','+idx+')">⏱ 停留時間（目前 '+fmtMin(o.min||60)+'）</button>';
- if(o.lat==null)h+='<button onclick="closeItemMenu();locate(\''+slot+'\','+idx+')">📍 查座標</button>';
+ if(!o.gap)h+='<button onclick="closeItemMenu();addGapAfter(\''+slot+'\','+idx+')">⏳ 在此後加入空檔（30分）</button>';
+ if(o.lat==null&&!o.gap)h+='<button onclick="closeItemMenu();locate(\''+slot+'\','+idx+')">📍 查座標</button>';
  h+='<button onclick="closeItemMenu();toggleSkip(\''+slot+'\','+idx+')">'+(o.skip?'↩︎ 取消跳過':'⏭ 跳過此項')+'</button>';
  h+='<button class="danger" onclick="closeItemMenu();rmItem(\''+slot+'\','+idx+')">🗑 移除此項</button>';
  h+='<button onclick="closeItemMenu()">取消</button></div>';
@@ -754,14 +758,18 @@ function dayPlan(d){
  if(!act.length)return out;
  var LI=cache.legs[d.k+':in'];
  if(LI&&LI.min!=null){out.rows.push({t:hm2s(t),n:'從港口出發（'+(pc?pc.n:d.port)+'）',min:LI.min,kind:'leg'});t+=LI.min;}else out.miss=true;
- act.forEach(function(i,k){
-  out.rows.push({t:hm2s(t),n:seq[i].t,min:(+seq[i].min||0),kind:'item'});
-  t+=(+seq[i].min||0);
-  if(k<act.length-1){
-   var L=cache.legs[d.k+':'+i];
+ var lastReal=null;
+ act.forEach(function(i){
+  var o=seq[i];
+  if(o.gap){out.rows.push({t:hm2s(t),n:o.t,min:(+o.min||0),kind:'gap'});t+=(+o.min||0);return;}
+  if(lastReal!=null){
+   var L=cache.legs[d.k+':'+lastReal];
    if(!L||L.min==null){out.miss=true;}
    else{out.rows.push({t:hm2s(t),n:(MODEN[L.mode]||L.mode)+(L.wait?('（等'+Math.round(L.wait)+'＋搭'+Math.round(L.ride)+'）'):''),min:L.min,kind:'leg'});t+=L.min;}
   }
+  out.rows.push({t:hm2s(t),n:o.t,min:(+o.min||0),kind:'item'});
+  t+=(+o.min||0);
+  lastReal=i;
  });
  var LO=cache.legs[d.k+':out'];
  if(LO&&LO.min!=null){out.rows.push({t:hm2s(t),n:'回港口（'+(pc?pc.n:d.port)+'）',min:LO.min,kind:'leg'});t+=LO.min;}else out.miss=true;
@@ -787,6 +795,7 @@ function openSheet(){
    +p.rows.map(function(r){
      return '<tr><td style="width:64px;color:#5b6b7c">'+r.t+'</td><td>'+esc(r.n)
       +(r.kind==='item'?'　<span style="color:#95a3b2">停留 '+fmtMin(r.min)+'</span>':'')
+      +(r.kind==='gap'?'　<span style="color:#7a3fa0">空檔 '+fmtMin(r.min)+'</span>':'')
       +(r.kind==='leg'?'　<span style="color:#95a3b2">'+fmtMin(r.min)+'</span>':'')+(r.kind==='meal'?'　<span style="color:#95a3b2">'+fmtMin(r.min)+'</span>':'')+'</td></tr>';}).join('')
    +'</table></div>';
  });
@@ -880,7 +889,7 @@ function drawAllDays(){
   if(!seq.length)return;
   var pts=[];
   if(pc)pts.push({lat:pc.lat,lng:pc.lng,n:'港口 '+pc.n});
-  seq.forEach(function(o){var c=coordOf(o);if(!c){missing++;return;}pts.push({lat:c[0],lng:c[1],n:o.t});});
+  seq.forEach(function(o){if(o.gap)return;var c=coordOf(o);if(!c){missing++;return;}pts.push({lat:c[0],lng:c[1],n:o.t});});
   if(!pts.length)return;any=true;
   var line=pts.map(function(p){return [p.lat,p.lng];});if(pc&&line.length>1)line.push([pc.lat,pc.lng]);
   L.polyline(line,{color:col,weight:wk?4:3,opacity:wk?.85:.55,dashArray:'7 6'}).addTo(PMAP);
@@ -902,7 +911,7 @@ function drawOneDay(){
  var seq=[];SLOTS.forEach(function(s){it.slots[s[0]].forEach(function(o,i){seq.push({o:o,s:s[0],i:i});});});
  var pts=[],ptsSkip=[],missing=0;
  if(pc&&seq.length)pts.push({lat:pc.lat,lng:pc.lng,port:true});
- seq.forEach(function(x){var c=coordOf(x.o);if(!c){missing++;return;}if(!x.o.skip)pts.push({lat:c[0],lng:c[1],x:x});else ptsSkip.push({lat:c[0],lng:c[1],x:x});});
+ seq.forEach(function(x){if(x.o.gap)return;var c=coordOf(x.o);if(!c){missing++;return;}if(!x.o.skip)pts.push({lat:c[0],lng:c[1],x:x});else ptsSkip.push({lat:c[0],lng:c[1],x:x});});
  if(pts.length>1){var line=pts.map(function(p){return [p.lat,p.lng];});if(pc)line.push([pc.lat,pc.lng]);L.polyline(line,{color:col,weight:4,opacity:.85,dashArray:'8 6'}).addTo(PMAP);}
  ptsSkip.forEach(function(p){
   L.marker([p.lat,p.lng],{icon:L.divIcon({className:'',html:'<div style="background:#b8c4d0;color:#fff;min-width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;border:2px solid #fff;opacity:.75">⏭</div>',iconSize:[24,24]})})
@@ -924,9 +933,24 @@ function drawOneDay(){
 }
 function planPopup(x){
  return '<b>'+esc(x.o.t)+'</b><br>停留 '+fmtMin(x.o.min||0)+'<br>'+(votesOf(x.o.id).length?('票數 '+(votesOf(x.o.id).length+'')):'')+
-  '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><button onclick="openSub(\''+x.s+'\','+x.i+')" style="border:none;background:#7a3fa0;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">🧭 周邊</button><button onclick="mapRemove(\''+x.s+'\','+x.i+')" style="border:none;background:#b3402a;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">✕ 移除</button></div>';
+  '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><button onclick="openSub(\''+x.s+'\','+x.i+')" style="border:none;background:#7a3fa0;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">🧭 周邊</button><button onclick="addGapAfter(\''+x.s+'\','+x.i+')" style="border:none;background:#5b6b7c;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">⏳ 加入空檔</button><button onclick="mapRemove(\''+x.s+'\','+x.i+')" style="border:none;background:#b3402a;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">✕ 移除</button></div>';
 }
 function mapRemove(slot,idx){if(guard())return;var a=arr0(slot);if(!a[idx])return;a.splice(idx,1);recompute().then(function(){drawPlanMap();});}
+function addGap(){
+ if(guard())return;
+ var it=it0();
+ var last=SLOTS[SLOTS.length-1][0];
+ it.slots[last].push({id:'gap-'+Date.now(),t:'⏳ 空檔（自由時間）',kind:'gap',gap:true,min:30,src:'user',by:(me()||''),endorse:roster().slice()});
+ recompute().then(function(){drawPlanMap();});
+ toast('已加入空檔 30 分（◀▶ 移到要的位置、⏱ 調時間）');
+}
+function addGapAfter(slot,idx){
+ if(guard())return;
+ var a=arr0(slot);if(!a[idx])return;
+ a.splice(idx+1,0,{id:'gap-'+Date.now(),t:'⏳ 空檔（自由時間）',kind:'gap',gap:true,min:30,src:'user',by:(me()||''),endorse:roster().slice()});
+ recompute().then(function(){drawPlanMap();});
+ toast('已在此後加入空檔 30 分（⏱ 可調時間）');
+}
 function mapAdd(id){if(guard())return;addItem(id);MCANDL=MCANDL.filter(function(c){return c.id!==id;});setTimeout(function(){recompute().then(function(){drawPlanMap();});},350);}
 function legRow(k,C){
  var mode=(C&&C.mode)||'mono';
@@ -995,24 +1019,26 @@ function mapPanelHTML(seq,pc,it){
  var h='<div class="mtot">已排 <b>'+fmtMin(t.used)+'</b>／可用 <b>'+(t.cap!=null?fmtMin(t.cap):'—')+'</b>'+(t.cap!=null?('・餘 '+fmtMin(Math.max(0,t.cap-t.used))):'')+(t.over>0?(' <span style="color:#b3402a">超過 '+fmtMin(t.over)+'</span>'):'')+'</div>';
  h+='<div class="mstrip">';
  h+='<div class="mcard port" onclick="mapSetShip(\'off\')" title="點擊調整下船時間"><div class="nm">🚢 下船</div><div class="sub">'+hm2s(tm)+'</div><div style="font-size:9.5px;color:#cfe0ee">到港 '+(d.arr||'--:--')+'</div></div>';
- var key='in';
- seq.forEach(function(x,k){
-  var isAct=!x.o.skip;
-  if(isAct){var C=cache.legs[curDay+':'+key];if(C&&C.min!=null)tm+=C.min;h+=legChip(key,C);}
-  var late=(isAct&&byt!=null&&(tm+(+x.o.min||0))>byt);
-  h+='<div class="mcard'+(isAct?'':' skip')+'" onclick="mapFocus(\''+x.s+'\','+x.i+')">'
-   +'<div class="nm">'+(k+2)+'. '+esc(x.o.t)+'</div>'
-    +'<div class="sub"'+ (late?' style="color:#b3402a"':'') +'>'+(isAct?(hm2s(tm)+'・停留 '+fmtMin(x.o.min||0)):'⏭ 已跳過・不列入時間')+'</div>'
-   +'<div class="act">'
-   +'<button onclick="event.stopPropagation();mapMove(\''+x.s+'\','+x.i+',-1)">◀</button>'
-   +'<button onclick="event.stopPropagation();mapMove(\''+x.s+'\','+x.i+',1)">▶</button>'
-   +'<button onclick="event.stopPropagation();mapSetMin(\''+x.s+'\','+x.i+')">⏱</button>'
-   +'<button onclick="event.stopPropagation();toggleSkip(\''+x.s+'\','+x.i+')">'+(isAct?'⏭':'↩︎')+'</button>'
-   +'<button onclick="event.stopPropagation();openSub(\''+x.s+'\','+x.i+')">🧭</button>'
-   +'<button class="del" onclick="event.stopPropagation();mapRemove(\''+x.s+'\','+x.i+')">✕</button>'
-   +'</div></div>';
-  if(isAct){tm+=(+x.o.min||0);key=(k<seq.length-1)?String(k):'out';}
- });
+  var key='in';
+  seq.forEach(function(x,k){
+   var isAct=!x.o.skip;
+   var isGap=!!x.o.gap;
+   if(isAct&&!isGap){var C=cache.legs[curDay+':'+key];if(C&&C.min!=null)tm+=C.min;h+=legChip(key,C);}
+   var late=(isAct&&!isGap&&byt!=null&&(tm+(+x.o.min||0))>byt);
+   var subTxt=isGap?(hm2s(tm)+'・空檔 '+fmtMin(x.o.min||0)):(isAct?(hm2s(tm)+'・停留 '+fmtMin(x.o.min||0)):'⏭ 已跳過・不列入時間');
+   h+='<div class="mcard'+(isAct?'':' skip')+'" onclick="mapFocus(\''+x.s+'\','+x.i+')">'
+    +'<div class="nm">'+(k+2)+'. '+esc(x.o.t)+'</div>'
+    +'<div class="sub"'+ (late?' style="color:#b3402a"':'') +'>'+subTxt+'</div>'
+    +'<div class="act">'
+    +'<button onclick="event.stopPropagation();mapMove(\''+x.s+'\','+x.i+',-1)">◀</button>'
+    +'<button onclick="event.stopPropagation();mapMove(\''+x.s+'\','+x.i+',1)">▶</button>'
+    +'<button onclick="event.stopPropagation();mapSetMin(\''+x.s+'\','+x.i+')">⏱</button>'
+    +'<button onclick="event.stopPropagation();toggleSkip(\''+x.s+'\','+x.i+')">'+(isAct?'⏭':'↩︎')+'</button>'
+    +(isGap?'':'<button onclick="event.stopPropagation();openSub(\''+x.s+'\','+x.i+')">🧭</button>')
+    +'<button class="del" onclick="event.stopPropagation();mapRemove(\''+x.s+'\','+x.i+')">✕</button>'
+    +'</div></div>';
+   if(isAct){tm+=(+x.o.min||0);if(!isGap)key=String(k);}
+  });
  var CO=cache.legs[curDay+':out'];
  if(CO&&CO.min!=null)tm+=CO.min;
  h+=legChip('out',CO);
