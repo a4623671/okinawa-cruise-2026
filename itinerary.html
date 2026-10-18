@@ -64,6 +64,7 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .kv .k{flex:0 0 86px;color:#8a5a00;font-weight:800}
 .kv .v{flex:1;min-width:0;overflow-wrap:break-word}
 .ph{width:100%;border-radius:10px;margin:8px 0 2px;display:block}
+.credit{font-size:11px;color:#98a4b3;margin:2px 0 0}
 .badge{font-size:11.5px;border-radius:6px;padding:1px 8px;white-space:nowrap}
 .b-spot{background:#e3f2e4;color:#1e7a34}.b-food{background:#fdf0d5;color:#9a6200}
 .b-shop{background:#e8e4f8;color:#5b4a9e}.b-souv{background:#fff6e0;color:#8a5a00}
@@ -85,10 +86,18 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .health .bad{color:#b3402a;font-weight:700}
 .giftcard{background:#fffaf0;border:1px solid #f0dfa8;border-radius:12px;padding:10px 14px;margin:0 0 8px;font-size:13px}
 .giftcard h3{font-size:14.5px;margin-bottom:4px}
-.giftcard li{margin:3px 0 3px 18px}
-.giftcard .votes{color:#0b6e5f;font-size:11.5px;font-weight:700}
 .giftcard .rec{margin-top:6px;font-size:12.5px;color:#7a5200}
 .giftcard button{margin-top:8px;border:none;background:#10293f;color:#fff;border-radius:10px;padding:6px 12px;font-size:12.5px;font-weight:700;cursor:pointer}
+.gchips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.gchip{border:1px solid #e3d9b8;background:#fff;border-radius:16px;padding:4px 12px;font-size:12.5px;cursor:pointer;font-weight:700;color:#7a5200}
+.gchip.on{background:#10293f;color:#fff;border-color:#10293f}
+.ggrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0}
+.gcard{background:#fff;border:1px solid #f0e6cc;border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.gcard img{width:100%;height:96px;object-fit:cover;display:block}
+.gnoimg{height:96px;display:flex;align-items:center;justify-content:center;font-size:30px;background:#f7f2e2}
+.gt{font-weight:800;font-size:12.5px;padding:6px 8px 0;line-height:1.35}
+.gd{font-size:11px;color:#667;padding:2px 8px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.gv{font-size:11px;color:#0b6e5f;font-weight:700;padding:4px 8px 7px;margin-top:auto}
 .info{background:#fff;border-radius:12px;padding:12px 14px;font-size:13.5px;color:#445;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .fab{position:fixed;right:12px;bottom:16px;z-index:30;display:flex;flex-direction:column;gap:8px}
 .fab button{width:48px;height:48px;border-radius:50%;border:1px solid #d8e0ea;background:#fff;font-size:21px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.25)}
@@ -112,6 +121,11 @@ body.dark .day.on{background:#0ea5e9;border-color:#0ea5e9;color:#062033}
 body.dark .day.on small{color:#062033}
 body.dark .stop,body.dark .health,body.dark .info,body.dark .movcard{background:#1b2733;color:#dbe4ec}
 body.dark .giftcard{background:#2a2416;border-color:#4a3f1e;color:#e8dcc0}
+body.dark .gcard{background:#1b2733;border-color:#2c3a49}
+body.dark .gd{color:#9fb0c0}
+body.dark .gnoimg{background:#16212c}
+body.dark .gchip{background:#1b2733;color:#d9b25f;border-color:#4a3f1e}
+body.dark .gchip.on{background:#0ea5e9;color:#062033;border-color:#0ea5e9}
 body.dark .stop .sub{color:#9fb0c0}
 body.dark .tl{border-color:#2c3a49}
 body.dark .legrow .chip{background:#16212c;border-color:#2c3a49;color:#9fb0c0}
@@ -220,10 +234,50 @@ var SOUV_REC={
  naha:['首里城御城印・御守','Blue Seal 周邊（常溫）','迷你三線模型','海鹽ちんすこう'],
  ishigaki:['石垣の塩','黒真珠アクセサリー','八重山民謡 CD（やいま村）']
 };
+var SOUVTR={
+ 'ちんすこう（金楚糕）':'金楚糕（ちんすこう）',
+ 'シークヮーサー加工品':'香檬加工品（シークヮーサー）',
+ 'ジーマーミ豆腐の素':'花生豆腐製作包（ジーマーミ豆腐の素）',
+ 'マンゴー加工品':'芒果加工品（マンゴー）',
+ 'まもる君グッズ':'守護君周邊（まもる君グッズ）',
+ '島ぞうり（刻字夾腳拖）':'刻字島拖鞋（島ぞうり）',
+ '黑糖かりんとう':'黑糖花林糖（黑糖かりんとう）',
+ 'ピパーツ（島胡椒）':'島胡椒（ピパーツ）',
+ 'ミンサー織小物':'民紗織小物（ミンサー織）'
+};
+function trSouv(t){var s=String(t||'').replace(/✅/g,'').trim();return SOUVTR[s]||s;}
+var PORTIMG={
+ '宮古島':'https://commons.wikimedia.org/wiki/Special:FilePath/Miyako%20hirara%20port.jpg?width=960',
+ '那霸':'https://commons.wikimedia.org/wiki/Special:FilePath/Naha%20Port%20terminal%20Okinawa%20JAPAN.jpg?width=960',
+ '石垣島':'https://commons.wikimedia.org/wiki/Special:FilePath/Port%20of%20Ishigaki%202.jpg?width=960'
+};
+var SOUVCAT={
+ '🍬 食品甜點':['御菓子御殿 紅芋塔','ちんすこう（金楚糕）','黑糖かりんとう','宮古黑糖','マンゴー加工品','シークヮーサー加工品','ジーマーミ豆腐の素'],
+ '🧂 調味・鹽':['雪塩（宮古島の雪塩）','石垣島ラー油（辺銀食堂）','ピパーツ（島胡椒）'],
+ '🍶 酒類':['泡盛小瓶（久米仙・瑞泉）','菊之露泡盛','請福・白百合泡盛','Orion生啤＋周邊'],
+ '👘 工藝雜貨':['島ぞうり（刻字夾腳拖）','ミンサー織小物','まもる君グッズ']
+};
+var SOUV_IMG={'御菓子御殿 紅芋塔':'https://commons.wikimedia.org/wiki/Special:FilePath/JP%20%E6%97%A5%E6%9C%AC%20Japan%20%E6%B2%96%E7%B9%A9%20OKINAWA%20%E9%82%A3%E9%9C%B8%20Naha%20%E5%9C%8B%E9%9A%9B%E9%80%9A%20Kokusai-dori%20shop%20%E5%BE%A1%E8%8F%93%E5%AD%90%E5%BE%A1%E6%AE%BF%20%E3%81%8A%E3%81%8B%E3%81%97%E3%81%94%E3%81%A6%E3%82%93%20Okashigoten%20food%20January%202025%20R12S%2027.jpg?width=960'};
+function catOf(t){
+ var s=String(t||'').replace(/✅/g,'').trim();
+ for(var k in SOUVCAT){if(SOUVCAT[k].indexOf(s)>=0)return k;}
+ return '其他';
+}
+function gcardHTML(c){
+ var img=c.img||SOUV_IMG[String(c.t).replace(/✅/g,'').trim()]||'';
+ var desc=((c.desc&&c.desc[0])||'').replace(/^介紹：/,'');
+ var vt=votesOf(c.id);
+ return '<div class="gcard">'
+  +(img?('<img loading="lazy" src="'+esc(img)+'" onerror="this.style.display=\'none\'">'):'<div class="gnoimg">🎁</div>')
+  +'<div class="gt">'+esc(trSouv(c.t))+'</div>'
+  +(desc?('<div class="gd">'+esc(desc)+'</div>'):'')
+  +(vt.length?('<div class="gv">🗳 '+esc(vt.join('・'))+' 推</div>'):'<div class="gv"> </div>')
+  +'</div>';
+}
 var MODEN={walk:'🚶走路',taxi:'🚕計程車',bus:'🚌公車',mono:'🚝單軌'};
 var GH_REPO='https://api.github.com/repos/a4623671/cruise-votes/contents/plan.json';
 var RAW='https://raw.githubusercontent.com/a4623671/cruise-votes/main/';
-var VER='20261018-f3（定稿：上海式版面＋排程板自動生成＋天氣風浪靠港評估＋目前行程＋伴手禮）';
+var VER='20261018-f4（定稿：中文（日文）名稱＋卡片全附圖＋伴手禮圖文分類小卡＋天氣風浪靠港評估＋目前行程）';
 var FS=['1','1.12','1.25'];
 
 /* ================= 狀態 ================= */
@@ -491,23 +545,27 @@ function kvHTML(o,mc,late){
  if(o.kind)rows.push(['🎯 類型',esc(KINDN[o.kind]||o.kind)]);
  if(o.sub&&o.sub.length)rows.push(['🧭 週邊',o.sub.map(function(s2){return esc(s2.t)+(s2.min?('（'+fmtMin(s2.min)+'）'):'')+(s2.note?('・'+esc(s2.note)):'');}).join('<br>')]);
  if(mc&&mc.desc&&mc.desc.length)rows.push(['📖 情報',mc.desc.slice(0,3).map(esc).join('<br>')]);
- var who=[];
- if(o.by&&o.by!=='？'&&o.by!=='?')who.push('提議 '+esc(o.by));
- var en=o.endorse||[];if(en.length)who.push('附議 '+esc(en.join('・')));
- var vt=votesOf(o.id);if(vt.length)who.push('討論區票 '+esc(vt.join('・')));
- if(who.length)rows.push(['🗳 意見',who.join('・')]);
  if(late)rows.push(['⚠️ 提醒','<span style="color:#b3402a;font-weight:700">超過回船時間，請縮短停留或跳過</span>']);
  return '<div class="kvcard">'+rows.map(function(r){return '<div class="kv"><span class="k">'+r[0]+'</span><span class="v">'+r[1]+'</span></div>';}).join('')+'</div>';
 }
 function normT(s){return String(s||'').replace(/[✅⚠️🔥💚⭐]/g,'').replace(/[（(][^）)]*[）)]/g,'').replace(/\s+/g,'').replace(/(宮古島店|国際通り店|國際通店|牧志市場本店|空港店|本店|店)$/,'').trim();}
 function matchCard(o){
- var t=normT(o.t);if(!t)return null;
+ var ns=[],t=normT(o.t);
+ if(t)ns.push(t);
+ var rx=/[（(]([^）)]+)[）)]/g,m;
+ while((m=rx.exec(String(o.t)))){var n=normT(m[1]);if(n&&ns.indexOf(n)<0)ns.push(n);}
+ if(!ns.length)return null;
  var exact=null,cont=null,clen=1e9;
  CATALOG.forEach(function(c){
   if(o.place&&c.place!==o.place)return;
   var n=normT(c.t);if(!n)return;
-  if(n===t){if(!exact)exact=c;}
-  else if(n.indexOf(t)>=0||t.indexOf(n)>=0){if(n.length<clen){cont=c;clen=n.length;}}
+  var hit=0;
+  ns.forEach(function(needle){
+   if(n===needle)hit=Math.max(hit,2);
+   else if(n.indexOf(needle)>=0||needle.indexOf(n)>=0)hit=Math.max(hit,1);
+  });
+  if(hit===2){if(!exact)exact=c;}
+  else if(hit===1){if(n.length<clen){cont=c;clen=n.length;}}
  });
  return exact||cont;
 }
@@ -526,7 +584,7 @@ function dayHTML(d,di){
   +(by?('<span>上船 '+by+'</span>'):'')+(d.dep?('<span>離港 '+d.dep+'</span>'):'')+'</div></div>';
  h+='<div class="wxcard wxday" data-di="'+di+'">☁️ 天氣讀取中…</div>';
  h+='<div class="tl">';
- h+='<div class="stop port"><h3>🚢 下船</h3><div class="sub">'+esc(d.arr?('到港 '+d.arr):'')+'・碼頭：'+esc((PORT[d.port]||{}).n||d.port)+'</div></div>';
+ h+='<div class="stop port"><h3>🚢 下船</h3><div class="sub">'+esc(d.arr?('到港 '+d.arr):'')+'・碼頭：'+esc((PORT[d.port]||{}).n||d.port)+'</div>'+(PORTIMG[d.port]?('<img class="ph" loading="lazy" src="'+PORTIMG[d.port]+'" onerror="this.style.display=\'none\'">'):'')+'</div>';
  var list=[],key='in',n=0;
  seq.forEach(function(x,k){
   var isAct=!x.o.skip;
@@ -549,14 +607,15 @@ function dayHTML(d,di){
   var c=coordOf(x.o);
   if(c)acts+='<a href="https://www.google.com/maps/dir/?api=1&destination='+c[0]+','+c[1]+'&travelmode=walking" target="_blank" rel="noopener">📍 導航</a>';
   acts+='<button onclick="switchDay('+di+');openMap()">🗺 地圖</button>';
-  var mc=isAct?matchCard(x.o):null;
+  var mc=matchCard(x.o);
+  var imsrc=x.o.img||(mc&&mc.img)||'';
   h+='<div class="stop'+(x.o.skip?' skip':'')+'" id="stop-'+di+'-'+k+'">'
    +(isAct?('<div class="stopnum">'+n+'</div>'):'<div class="stopnum skipnum">⏭</div>')
    +'<div class="stopright">'+(c?('<button class="pinbtn" title="在地圖看" onclick="switchDay('+di+');openMap()">📌</button>'):'')+'<span class="wxchip" data-di="'+di+'" data-k="'+k+'"></span></div>'
    +'<div class="stoptime">'+(isAct?(hm2s(s)+'–'+hm2s(e)):'已跳過・不列入時間')+'</div>'
    +'<h3>'+(isAct?(n+'. '):'')+esc(nm)+'</h3>'
    +'<div class="sub">'+(kind?(esc(KINDN[kind]||kind)+(x.o.place?('・'+esc(x.o.place)):'')+' '):'')+tags+'</div>'
-   +(mc&&mc.img?('<img class="ph" loading="lazy" src="'+esc(mc.img)+'" onerror="this.style.display=\'none\'">'):'')
+   +(imsrc?('<img class="ph" loading="lazy" src="'+esc(imsrc)+'" onerror="this.style.display=\'none\'">'+(x.o.imgc?('<div class="credit">'+esc(x.o.imgc)+'</div>'):'')):'')
    +kvHTML(x.o,mc,late)
    +'<div class="acts">'+acts+'</div>'
    +'</div>';
@@ -564,7 +623,7 @@ function dayHTML(d,di){
  var CO=cache.legs[d.k+':out'];
  if(CO)h+=legbarHTML(CO,'返回碼頭');
  if(CO&&CO.min!=null)tm+=CO.min;
- h+='<div class="stop port"><h3>🚢 上船</h3><div class="sub">'+(by?('上船 '+by):'')+(d.dep?('・離港 '+d.dep):'')+'・預估返抵碼頭 '+hm2s(tm)+(byt!=null?('（緩衝 '+fmtMin(Math.max(0,byt-tm))+(tm>byt?'・⚠️ 已超過':'')+'）'):'')+'</div></div>';
+ h+='<div class="stop port"><h3>🚢 上船</h3><div class="sub">'+(by?('上船 '+by):'')+(d.dep?('・離港 '+d.dep):'')+'・預估返抵碼頭 '+hm2s(tm)+(byt!=null?('（緩衝 '+fmtMin(Math.max(0,byt-tm))+(tm>byt?'・⚠️ 已超過':'')+'）'):'')+'</div>'+(PORTIMG[d.port]?('<img class="ph" loading="lazy" src="'+PORTIMG[d.port]+'" onerror="this.style.display=\'none\'">'):'')+'</div>';
  h+='</div>';
  TIMES[d.k]=list;
  var t=cache.totals[d.k]||{used:0,cap:null,over:0,miss:false};
@@ -584,12 +643,7 @@ function dayHTML(d,di){
   var sv=CATALOG.filter(function(c2){return c2.kind==='souv'&&c2.place===pk;});
   var rec=SOUV_REC[pk]||[];
   if(sv.length||rec.length){
-   h+='<div class="giftcard"><h3>🎁 伴手禮補貨（'+esc(d.port)+'）</h3><ul>';
-   sv.forEach(function(c2){
-    var vt2=votesOf(c2.id);
-    h+='<li>'+esc(String(c2.t).replace(/✅/g,'').trim())+(vt2.length?('<span class="votes">（'+esc(vt2.join('・'))+' 推）</span>'):'')+'</li>';
-   });
-   h+='</ul>';
+   h+='<div class="giftcard"><h3>🎁 伴手禮補貨（'+esc(d.port)+'）</h3><div class="ggrid">'+sv.map(gcardHTML).join('')+'</div>';
    if(rec.length)h+='<div class="rec">💡 小編推薦：'+rec.map(esc).join('・')+'</div>';
    h+='<button onclick="openGifts()">看三港全部伴手禮清單</button></div>';
   }
@@ -729,22 +783,23 @@ function drawDayMap(){
 function pin(txt,bg,size){return '<div style="background:'+bg+';color:#fff;min-width:'+size+'px;height:'+size+'px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:'+(size>=30?15:12)+'px;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35)">'+txt+'</div>';}
 
 /* ================= 伴手禮清單 ================= */
-function openGifts(){
- var h='<div style="font-size:12.5px;color:#7a5200;background:#fff8e1;border:1px solid #f0dfa8;border-radius:10px;padding:8px 10px;margin-bottom:8px">🛂 提醒：肉類製品、生鮮蔬果不可帶回台灣；酒類免稅 1 公升。</div>';
+var GCAT='all';
+function openGifts(cat){
+ if(cat!=null)GCAT=cat;
+ var all=CATALOG.filter(function(c){return c.kind==='souv';});
+ var h='<div class="gchips"><button class="gchip'+(GCAT==='all'?' on':'')+'" onclick="openGifts(\'all\')">全部</button>';
+ Object.keys(SOUVCAT).forEach(function(k){h+='<button class="gchip'+(GCAT===k?' on':'')+'" onclick="openGifts(\''+k+'\')">'+k+'</button>';});
+ h+='</div>';
+ h+='<div style="font-size:12.5px;color:#7a5200;background:#fff8e1;border:1px solid #f0dfa8;border-radius:10px;padding:8px 10px;margin:0 0 8px">🛂 提醒：肉類製品、生鮮蔬果不可帶回台灣；酒類免稅 1 公升。</div>';
  ['miyako','naha','ishigaki'].forEach(function(pk){
   var nms={miyako:'宮古島',naha:'那霸',ishigaki:'石垣島'};
-  var sv=CATALOG.filter(function(c){return c.kind==='souv'&&c.place===pk;});
+  var sv=all.filter(function(c){return c.place===pk&&(GCAT==='all'||catOf(c.t)===GCAT);});
   if(!sv.length)return;
-  h+='<h3>🎁 '+nms[pk]+'</h3><ul>';
-  sv.forEach(function(c){
-   var vt=votesOf(c.id);
-   h+='<li>'+esc(String(c.t).replace(/✅/g,'').trim())+(vt.length?('<span class="votes">（'+esc(vt.join('・'))+' 推）</span>'):'')+'</li>';
-  });
-  h+='</ul>';
+  h+='<h3>🎁 '+nms[pk]+'</h3><div class="ggrid">'+sv.map(gcardHTML).join('')+'</div>';
   var rec=SOUV_REC[pk]||[];
-  if(rec.length)h+='<div style="font-size:12.5px;color:#7a5200;margin:2px 0 6px">💡 小編推薦：'+rec.map(esc).join('・')+'</div>';
+  if(rec.length&&GCAT==='all')h+='<div style="font-size:12.5px;color:#7a5200;margin:2px 0 6px">💡 小編推薦：'+rec.map(esc).join('・')+'</div>';
  });
- if(CATALOG.filter(function(c){return c.kind==='souv';}).length===0)h+='<div>討論區資料載入中…請稍後再開</div>';
+ if(!all.length)h+='<div>討論區資料載入中…請稍後再開</div>';
  document.getElementById('giftsheet').innerHTML=h;
  document.getElementById('giftov').classList.add('open');
 }
