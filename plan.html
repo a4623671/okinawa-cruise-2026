@@ -205,7 +205,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261018-p38</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261018-p39</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -951,6 +951,12 @@ function planPopup(x){
   '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><button onclick="openSub(\''+x.s+'\','+x.i+')" style="border:none;background:#7a3fa0;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">🧭 周邊</button><button onclick="setWindow(\''+x.s+'\','+x.i+')" style="border:none;background:#5b6b7c;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">🕙 設定時段</button><button onclick="addGapAfter(\''+x.s+'\','+x.i+')" style="border:none;background:#5b6b7c;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">⏳ 加入空檔</button><button onclick="mapRemove(\''+x.s+'\','+x.i+')" style="border:none;background:#b3402a;color:#fff;border-radius:10px;padding:6px 12px;font-weight:700">✕ 移除</button></div>';
 }
 function mapRemove(slot,idx){if(guard())return;var a=arr0(slot);if(!a[idx])return;a.splice(idx,1);recompute().then(function(){drawPlanMap();});}
+function clearWindow(slot,idx){
+ var o=arr0(slot)[idx];if(!o)return;
+ delete o.from;delete o.to;delete o.notBefore;
+ recompute().then(function(){drawPlanMap();});
+ toast('已刪除等待（改依到達時間開始；停留 '+fmtMin(o.min||0)+'）');
+}
 function setWindow(slot,idx){
  var o=arr0(slot)[idx];if(!o)return;
  var cur=((o.from||o.notBefore||'')+(o.to?('-'+o.to):''));
@@ -1070,7 +1076,16 @@ function mapPanelHTML(seq,pc,it){
     var C=cache.legs[curDay+':'+key];
     if(C&&C.min!=null){tm+=C.min;h+=legChip(key,C);}
     var nb=hm(x.o.from||x.o.notBefore);
-    if(nb!=null&&tm<nb){h+='<div class="mleg" style="min-width:58px"><div class="mi">⏳</div><div class="mm">等'+fmtMin(nb-tm)+'</div><div class="msw">最早'+hm2s(nb)+'</div></div>';tm=nb;}
+    if(nb!=null&&tm<nb){
+     h+='<div class="mcard" style="width:106px" onclick="event.stopPropagation();setWindow(\''+x.s+'\','+x.i+')" title="點卡片調整時段">'
+      +'<div class="nm">⏳ 等待 '+fmtMin(nb-tm)+'</div>'
+      +'<div class="sub">最早 '+hm2s(nb)+' 起</div>'
+      +'<div class="act">'
+      +'<button onclick="event.stopPropagation();setWindow(\''+x.s+'\','+x.i+')">🕙 改</button>'
+      +'<button class="del" onclick="event.stopPropagation();clearWindow(\''+x.s+'\','+x.i+')">✕ 刪</button>'
+      +'</div></div>';
+     tm=nb;
+    }
    }
    var late=(isAct&&!isGap&&byt!=null&&(tm+(+x.o.min||0))>byt);
    var subTxt=isGap?(hm2s(tm)+'・空檔 '+fmtMin(x.o.min||0)):(isAct?((x.o.to&&(tm+(+x.o.min||0))>hm(x.o.to))?('⚠️ '+hm2s(tm)+'–'+hm2s(tm+(+x.o.min||0))+'・超過 '+x.o.to):(hm2s(tm)+'–'+hm2s(tm+(+x.o.min||0))+'・停留 '+fmtMin(x.o.min||0))):'⏭ 已跳過・不列入時間');
