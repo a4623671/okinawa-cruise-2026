@@ -36,6 +36,11 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .dayhead .times span{background:rgba(255,255,255,.16);border-radius:8px;padding:2px 8px}
 .wxcard{background:linear-gradient(135deg,#0ea5e9,#1d4ed8);color:#fff;border-radius:12px;padding:10px 14px;margin-bottom:10px;font-size:13px;font-weight:700}
 .wxcard small{font-weight:400;opacity:.88}
+.risk{display:inline-block;border-radius:8px;padding:2px 10px;margin-top:5px;font-size:12.5px;font-weight:800}
+.risk-ok{background:rgba(255,255,255,.22);color:#fff}
+.risk-yellow{background:#f6d860;color:#5a4600}
+.risk-orange{background:#f0a04b;color:#5a3200}
+.risk-red{background:#e05307;color:#fff}
 .wxstrip{display:flex;gap:6px;overflow-x:auto;margin-top:8px;padding-bottom:2px}
 .wxh{flex:0 0 auto;min-width:46px;text-align:center;background:rgba(255,255,255,.14);border-radius:8px;padding:5px 4px;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:1px;color:#fff}
 .wxh i{font-style:normal;font-size:16px}
@@ -139,6 +144,16 @@ body.dark .giftsheet{background:#1b2733}
 <li>✅ 完全去殼鹹蛋可、無肉餡糕餅可；含肉鬆／蛋黃酥不可</li>
 </ul>
 </details>
+<details class="customs" style="background:#eef7ff;border-color:#cfe4f7;color:#0e3a5d">
+<summary>🌬 靠港風浪標準參考（為什麼會「跳港」）</summary>
+<ul>
+<li>一般港口：持續風 <b>34–38 節</b>（約 8 級風）為船長／港務局取消靠港的紅線；預報<b>陣風超過 40 節</b>常直接取消（例如突尼西亞拉古萊特港即以此判定）</li>
+<li>浪高：外海湧浪達 <b>4 公尺</b>＋陣風 45 節 → 船長啟動船內避難管制（關閉戶外甲板、泳池洩水、旅客留在船艙）</li>
+<li>船型差異：新世代巨輪（7 具側推）約 30 節仍可能靠泊；中型舊船在 25 節以上強側風就可能提早放棄</li>
+<li>12 月沖繩為<b>東北季風期</b>：宮古島・石垣島海岸空曠、風浪偏大，冬季郵輪延後或取消靠港時有所聞</li>
+<li>本頁風險等級僅為公開預報推估；<b>是否靠港一律由船長與當地港務局現場決定</b></li>
+</ul>
+</details>
 <div class="days" id="days"></div>
 <div id="content"></div>
 <div class="fab">
@@ -192,7 +207,7 @@ var SOUV_REC={
 var MODEN={walk:'🚶走路',taxi:'🚕計程車',bus:'🚌公車',mono:'🚝單軌'};
 var GH_REPO='https://api.github.com/repos/a4623671/cruise-votes/contents/plan.json';
 var RAW='https://raw.githubusercontent.com/a4623671/cruise-votes/main/';
-var VER='20261018-f1（定稿：排程板自動生成＋天氣＋目前行程＋伴手禮）';
+var VER='20261018-f2（定稿：排程板自動生成＋天氣風浪靠港評估＋目前行程＋伴手禮）';
 var FS=['1','1.12','1.25'];
 
 /* ================= 狀態 ================= */
@@ -322,19 +337,24 @@ function wxLoad(){
  var jobs=[];
  Object.keys(WXCITY).forEach(function(n){
   var c=WXCITY[n];
-  var base='https://api.open-meteo.com/v1/forecast?latitude='+c.la+'&longitude='+c.ln+'&current=temperature_2m,weather_code&timezone='+c.tz;
+  var base='https://api.open-meteo.com/v1/forecast?latitude='+c.la+'&longitude='+c.ln+'&current=temperature_2m,weather_code&timezone='+c.tz+'&windspeed_unit=kn';
   var j;
   if(WXMODE==='fc'){
-   j=fetch(base+'&hourly=temperature_2m,weather_code,precipitation_probability&daily=temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max&start_date='+DAYS[0].k+'&end_date='+DAYS[4].k,{cache:'no-store'})
-    .then(function(r){return r.json();});
+   j=fetch(base+'&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m,wind_gusts_10m&daily=temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max&start_date='+DAYS[0].k+'&end_date='+DAYS[4].k,{cache:'no-store'})
+    .then(function(r){return r.json();})
+    .then(function(fc){
+     return fetch('https://marine-api.open-meteo.com/v1/marine?latitude='+c.la+'&longitude='+c.ln+'&daily=wave_height_max,swell_wave_height_max&timezone='+c.tz+'&start_date='+DAYS[0].k+'&end_date='+DAYS[4].k,{cache:'no-store'})
+      .then(function(r){return r.json();}).catch(function(){return null;})
+      .then(function(mr){if(fc&&!fc.error&&mr&&!mr.error)fc._marine=mr;return fc;});
+    });
   }else{
    j=fetch(base,{cache:'no-store'}).then(function(r){return r.json();}).then(function(cur){
-    return fetch('https://archive-api.open-meteo.com/v1/archive?latitude='+c.la+'&longitude='+c.ln+'&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_sum&timezone='+c.tz+'&start_date=2025-12-16&end_date=2025-12-20',{cache:'no-store'})
+    return fetch('https://archive-api.open-meteo.com/v1/archive?latitude='+c.la+'&longitude='+c.ln+'&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_sum,wind_speed_10m_max,wind_gusts_10m_max&timezone='+c.tz+'&windspeed_unit=kn&start_date=2025-12-16&end_date=2025-12-20',{cache:'no-store'})
      .then(function(r){return r.json();}).then(function(h){if(cur&&!cur.error)cur._hist=h;return cur;});
    });
   }
-  jobs.push(j.then(function(j2){WXC[n]={j:(j2&&!j2.error)?j2:null,hist:j2&&j2._hist?j2._hist:null};})
-   .catch(function(){WXC[n]={j:null,hist:null};}));
+  jobs.push(j.then(function(j2){WXC[n]={j:(j2&&!j2.error)?j2:null,hist:j2&&j2._hist?j2._hist:null,marine:j2&&j2._marine?j2._marine:null};})
+   .catch(function(){WXC[n]={j:null,hist:null,marine:null};}));
  });
  return Promise.all(jobs);
 }
@@ -342,14 +362,33 @@ function wxDayInfo(port,dayK,di){
  var w=WXC[port];if(!w||!w.j)return null;
  if(WXMODE==='fc'&&w.j.daily){
   var idx=(w.j.daily.time||[]).indexOf(dayK);if(idx<0)return null;
-  return {max:w.j.daily.temperature_2m_max[idx],min:w.j.daily.temperature_2m_min[idx],code:w.j.daily.weathercode?w.j.daily.weathercode[idx]:0,p:w.j.daily.precipitation_probability_max?w.j.daily.precipitation_probability_max[idx]:null};
+  var o={max:w.j.daily.temperature_2m_max[idx],min:w.j.daily.temperature_2m_min[idx],code:(w.j.daily.weathercode||[])[idx]||0,
+   p:w.j.daily.precipitation_probability_max?w.j.daily.precipitation_probability_max[idx]:null,
+   wind:(w.j.daily.wind_speed_10m_max||[])[idx],gust:(w.j.daily.wind_gusts_10m_max||[])[idx]};
+  var mr=w.marine;
+  if(mr&&mr.daily){var mi=(mr.daily.time||[]).indexOf(dayK);
+   if(mi>=0){o.wave=(mr.daily.wave_height_max||[])[mi];o.swell=(mr.daily.swell_wave_height_max||[])[mi];}}
+  return o;
  }
  if(w.hist&&w.hist.daily){
   var idx2=(w.hist.daily.time||[]).indexOf('2025-'+dayK.slice(5));if(idx2<0)return null;
-  return {max:w.hist.daily.temperature_2m_max[idx2],min:w.hist.daily.temperature_2m_min[idx2],code:w.hist.daily.weather_code?w.hist.daily.weather_code[idx2]:0,mm:w.hist.daily.precipitation_sum?w.hist.daily.precipitation_sum[idx2]:null};
+  return {max:w.hist.daily.temperature_2m_max[idx2],min:w.hist.daily.temperature_2m_min[idx2],code:(w.hist.daily.weather_code||[])[idx2]||0,
+   mm:w.hist.daily.precipitation_sum?w.hist.daily.precipitation_sum[idx2]:null,
+   wind:(w.hist.daily.wind_speed_10m_max||[])[idx2],gust:(w.hist.daily.wind_gusts_10m_max||[])[idx2]};
  }
  return null;
 }
+function portRisk(w){
+ if(!w||w.wind==null)return null;
+ var wind=w.wind,gust=(w.gust!=null?w.gust:wind),wave=(w.wave!=null?w.wave:null);
+ var ord={ok:0,yellow:1,orange:2,red:3},lvl='ok';
+ function up(x){if(ord[x]>ord[lvl])lvl=x;}
+ if(wind>=35||gust>=40||(wave!=null&&wave>=4))up('red');
+ else if(wind>=30||gust>=35||(wave!=null&&wave>=2.5))up('orange');
+ else if(wind>=22||gust>=28||(wave!=null&&wave>=1.5))up('yellow');
+ return {lvl:lvl,wind:wind,gust:gust,wave:wave};
+}
+var RISKN={ok:'🟢 靠港條件良好',yellow:'🟡 風浪偏大・留意船方公告',orange:'🟠 靠港風險偏高・可能延後或改靠',red:'🔴 高風險・有取消靠港可能'};
 function wxPaint(){
  document.querySelectorAll('.wxday').forEach(function(el){
   var di=+el.getAttribute('data-di'),d=DAYS[di];
@@ -362,7 +401,18 @@ function wxPaint(){
   var sub='';
   if(WXMODE==='fc'){sub=cur!=null?('即時 '+cur+'°・逐時預報'):'逐時預報';}
   else{sub='去年同日（2025）'+(cur!=null?('・即時 '+cur+'°'):'')+'・出發前 16 天內自動切換預報';}
-  el.innerHTML='<div>'+line+' <small>'+esc(sub)+'</small></div>'+wxStrip(d.port,d.k,di);
+  var extra='';
+  if(w.wind!=null){
+   extra='<div style="margin-top:5px;font-size:12.5px">🌬 '+(WXMODE==='fc'?'風 ':'去年同日風 ')+Math.round(w.wind)+'–'+Math.round(w.gust!=null?w.gust:w.wind)+' 節'
+    +(w.wave!=null?('・🌊 浪高 '+w.wave.toFixed(1)+'m'+(w.swell!=null?('（湧浪 '+w.swell.toFixed(1)+'m）'):'')):((WXMODE==='fc')?'・🌊 浪高：出發前約 10 天內顯示':''))+'</div>';
+  }
+  var risk='';
+  var r=portRisk(w);
+  if(r){
+   risk='<div><span class="risk risk-'+r.lvl+'">'+(WXMODE==='fc'?'靠港評估：':'去年同日參考：')+RISKN[r.lvl]+(WXMODE==='fc'?'':'（僅參考）')+'</span></div>';
+   if(WXMODE==='fc')risk+='<div style="font-size:11px;opacity:.85;margin-top:3px">依公開預報推估（取消靠港紅線：持續風 34–38 節／陣風 40 節；湧浪 4m 啟動船內管制）・最終由船長與港務局決定</div>';
+  }
+  el.innerHTML='<div>'+line+' <small>'+esc(sub)+'</small></div>'+extra+risk+wxStrip(d.port,d.k,di);
  });
  document.querySelectorAll('.wxchip').forEach(function(el){
   if(WXMODE!=='fc'){el.style.display='none';return;}
