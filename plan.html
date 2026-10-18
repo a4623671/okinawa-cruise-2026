@@ -172,8 +172,8 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
 .mcard.port .sub{color:#cfe0ee}
 .mcard .nm{font-weight:800;font-size:11.5px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .mcard .sub{font-size:10.5px;color:#b3541e;font-weight:800}
-.mcard .act{display:flex;gap:3px;margin-top:auto}
-.mcard .act button{border:1px solid #dbe3ec;background:#fff;border-radius:6px;font-size:10px;padding:1px 4px;cursor:pointer;line-height:1.3}
+.mcard .act{display:flex;flex-wrap:wrap;gap:3px;margin-top:auto}
+.mcard .act button{flex:1 1 28%;min-width:0;border:1px solid #dbe3ec;background:#fff;border-radius:6px;font-size:10px;padding:2px 0;cursor:pointer;line-height:1.3;text-align:center}
 .mcard .act .del{border-color:#f2b8ae;color:#b3402a}
 .mleg{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:0 4px;font-size:10px;color:#5b6b7c;cursor:pointer;min-width:52px}
 .mleg .mi{font-size:10px;white-space:nowrap}
@@ -205,7 +205,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261018-p33</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261018-p34</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -533,7 +533,7 @@ function renderStatus(){
 }
 function renderDays(){document.getElementById('days').innerHTML=DAYS.map(function(d){
  return '<button class="day'+(d.k===curDay?' on':'')+'" onclick="pickDay(\''+d.k+'\')">'+d.t.slice(0,5)+'<small>'+esc(d.port)+'</small></button>';}).join('');}
-function pickDay(k){curDay=k;renderDays();renderBoard();if(document.getElementById('pool').classList.contains('on'))renderPool();}
+function pickDay(k){mapPick(k);if(document.getElementById('pool').classList.contains('on'))renderPool();}
 function renderBoard(){
  var d=d0(),it=it0();
  document.body.classList.toggle('locked',frozen());
@@ -1047,6 +1047,19 @@ function mapSetShip(which){
  if(!m){toast('請輸入 HH:MM，例如 08:00');return;}
  var hh=+m[1],mm=+m[2];if(hh>23||mm>59){toast('時間不正確');return;}
  it[which]=String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0');
+ recompute().then(function(){drawPlanMap();});
+}
+function mapMove(slot,idx,dir){
+ if(guard())return;
+ var flat=[];SLOTS.forEach(function(s){arr0(s[0]).forEach(function(o,i){flat.push({s:s[0],i:i,o:o});});});
+ var pos=-1;for(var j=0;j<flat.length;j++){if(flat[j].s===slot&&flat[j].i===idx){pos=j;break;}}
+ if(pos<0)return;
+ var j2=pos+dir;
+ if(j2<0||j2>=flat.length){toast(dir<0?'已在最前':'已在最後');return;}
+ var objs=flat.map(function(x){return x.o;});
+ var tmp=objs[pos];objs[pos]=objs[j2];objs[j2]=tmp;
+ var cur=0;
+ SLOTS.forEach(function(s){var a=arr0(s[0]);var len=a.length;for(var q=0;q<len;q++){a[q]=objs[cur++];}});
  recompute().then(function(){drawPlanMap();});
 }
 function mapFocus(slot,idx){
