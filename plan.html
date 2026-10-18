@@ -205,7 +205,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261018-p35</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261018-p36</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -1002,7 +1002,7 @@ function mapPanelHTML(seq,pc,it){
   var late=(isAct&&byt!=null&&(tm+(+x.o.min||0))>byt);
   h+='<div class="mcard'+(isAct?'':' skip')+'" onclick="mapFocus(\''+x.s+'\','+x.i+')">'
    +'<div class="nm">'+(k+2)+'. '+esc(x.o.t)+'</div>'
-   +'<div class="sub"'+ (late?' style="color:#b3402a"':'') +'>'+hm2s(tm)+'・停留 '+fmtMin(x.o.min||0)+'</div>'
+    +'<div class="sub"'+ (late?' style="color:#b3402a"':'') +'>'+(isAct?(hm2s(tm)+'・停留 '+fmtMin(x.o.min||0)):'⏭ 已跳過・不列入時間')+'</div>'
    +'<div class="act">'
    +'<button onclick="event.stopPropagation();mapMove(\''+x.s+'\','+x.i+',-1)">◀</button>'
    +'<button onclick="event.stopPropagation();mapMove(\''+x.s+'\','+x.i+',1)">▶</button>'
