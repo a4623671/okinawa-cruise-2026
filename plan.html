@@ -205,7 +205,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261017-p32</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261018-p33</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -1164,61 +1164,63 @@ function drawSubDay(){
  var sb=document.getElementById('subbar');sb.classList.add('on');
  sb.innerHTML='<button onclick="closeSub()">◀ 回主行程</button><span class="st">🧭 周邊：'+esc(p.t)+'</span><button onclick="addSub()">＋ 周邊</button>';
  mapClear();
- var subs=subOf(p),seq=[],miss=0;
- if(pc)seq.push({c:pc,anchor:true});
- subs.forEach(function(s,i){if(s.lat!=null)seq.push({c:[s.lat,s.lng],s:s,i:i});else miss++;});
- var legs=[],chain=Promise.resolve();
- for(var i=0;i<seq.length;i++){
+ var subs=subOf(p),loc=[],miss=0;
+ subs.forEach(function(s,i){if(s.lat!=null)loc.push({c:[s.lat,s.lng],s:s,i:i});else miss++;});
+ if(pc){var mk0=L.marker(pc,{icon:L.divIcon({className:'',html:'<div style="background:#94a3b8;color:#fff;min-width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;border:2px solid #fff;opacity:.9">★</div>',iconSize:[26,26]})});
+  mk0.addTo(PMAP).bindTooltip('★ 主點（參考・不列入路線）',{permanent:true,direction:'top',offset:[0,-14],className:'porttip'});}
+ var legs={},chain=Promise.resolve();
+ for(var i=0;i<loc.length-1;i++){
   (function(k){
-   var A=seq[k].c,B=seq[(k+1)%seq.length].c;
-   var mode=(p.subLegs&&p.subLegs[k]&&p.subLegs[k].mode)||'mono';
-   chain=chain.then(function(){return subLeg(A,B,mode).then(function(e){legs[k]=e;});});
+   var A=loc[k].c,B=loc[k+1].c;
+   var mode=(p.subLegs&&p.subLegs[loc[k].i]&&p.subLegs[loc[k].i].mode)||'mono';
+   chain=chain.then(function(){return subLeg(A,B,mode).then(function(e){legs[loc[k+1].i]=e;});});
   })(i);
  }
  chain.then(function(){
-  var line=seq.map(function(x){return x.c;});
-  if(line.length>1)L.polyline(line.concat([line[0]]),{color:'#7a3fa0',weight:3,opacity:.8,dashArray:'6 5'}).addTo(PMAP);
+  if(loc.length>1)L.polyline(loc.map(function(x){return x.c;}),{color:'#7a3fa0',weight:3,opacity:.85,dashArray:'6 5'}).addTo(PMAP);
   var bounds=[];
-  seq.forEach(function(x,k){
-   var col=x.anchor?'#10293f':((x.s&&x.s.note)?'#b3541e':'#7a3fa0');
-   var mk=L.marker(x.c,{icon:L.divIcon({className:'',html:pinHTML(x.anchor?'★':((x.s&&x.s.note)?'📝':(k+1)),col,x.anchor?30:26),iconSize:[x.anchor?30:26,x.anchor?30:26]})})
-    .addTo(PMAP).bindPopup(x.anchor?('<b>主點 '+esc(p.t)+'</b>'):subPopup(x.s,x.i));
-   if(x.anchor)mk.bindTooltip('★ 主點',{permanent:true,direction:'top',offset:[0,-14],className:'porttip'});
-   else mk.bindTooltip(((x.s&&x.s.note)?'📝 ':(k+1)+'. ')+String(x.s.t).slice(0,12),{permanent:true,direction:'right',offset:[10,0],className:'pintip'});
+  loc.forEach(function(x,k){
+   var mk=L.marker(x.c,{icon:L.divIcon({className:'',html:pinHTML((x.s.note?'📝':(k+1)),(x.s.note?'#b3541e':'#7a3fa0'),26),iconSize:[26,26]})})
+    .addTo(PMAP).bindPopup(subPopup(x.s,x.i));
+   mk.bindTooltip((x.s.note?'📝 ':(k+1)+'. ')+String(x.s.t).slice(0,12),{permanent:true,direction:'right',offset:[10,0],className:'pintip'});
    bounds.push(x.c);
   });
+  if(pc)bounds.push(pc);
   if(bounds.length){try{PMAP.fitBounds(bounds,{padding:[40,40]});}catch(e){PMAP.setView(bounds[0],15);}}
   var t=0,tot=0,strip='<div class="mstrip">';
-  strip+='<div class="mcard port"><div class="nm">★ 主點</div><div class="sub">'+esc(String(p.t).slice(0,10))+'</div><div style="font-size:9.5px;color:#cfe0ee">停留 '+fmtMin(p.min||0)+'</div></div>';
-  subs.forEach(function(s,i){
-   var C=legs[i];if(C&&C.min!=null){t+=C.min;tot+=C.min;}
-   strip+='<div class="mleg" onclick="subLegMenu('+i+')"><div class="mi">'+((MODEN[(C&&C.mode)||'mono'])||'')+'</div><div class="mm">'+(C&&C.min!=null?fmtMin(C.min):'未知')+'</div><div class="msw">選擇</div></div>';
-   strip+='<div class="mcard" onclick="subFocus('+i+')">'
-    +'<div class="nm">'+(s.note?'📝 ':(i+2)+'. ')+esc(s.t)+'</div>'
-    +'<div class="sub">'+(s.note?'註解':((s.lat!=null?('+'+fmtMin(t)):'?')+'・停留 '+fmtMin(s.min||0)))+'</div>'
-    +'<div class="act">'
-    +'<button onclick="event.stopPropagation();subMove('+i+',-1)">◀</button>'
-    +'<button onclick="event.stopPropagation();subMove('+i+',1)">▶</button>'
-    +'<button onclick="event.stopPropagation();subSetMin('+i+')">⏱</button>'
-    +'<button class="del" onclick="event.stopPropagation();subRemove('+i+')">✕</button>'
-    +'</div></div>';
-   if(!s.note){t+=(+s.min||0);tot+=(+s.min||0);}
-  });
-  var CL=legs[seq.length-1];
-  strip+='<div class="mleg" onclick="subLegMenu('+seq.length+')"><div class="mi">'+((MODEN[(CL&&CL.mode)||'mono'])||'')+'</div><div class="mm">'+(CL&&CL.min!=null?fmtMin(CL.min):'未知')+'</div><div class="msw">回主點</div></div>';
-  strip+='<div class="mcard port"><div class="nm">★ 回主點</div><div class="sub">'+fmtMin(t)+'</div></div>';
+  if(!subs.length){
+   strip+='<div class="mcard port"><div class="nm">★ 主點</div><div class="sub">'+esc(String(p.t).slice(0,10))+'</div><div style="font-size:9.5px;color:#cfe0ee">停留 '+fmtMin(p.min||0)+'</div></div>';
+   strip+='<div class="mcard" style="width:120px;align-items:center;justify-content:center" onclick="addSub()"><div class="nm">＋ 周邊</div><div class="sub" style="color:#6b7a89">加入附近或手動</div></div>';
+  }else{
+   subs.forEach(function(s,i){
+    var C=legs[i];
+    if(C){t+=C.min;tot+=C.min;strip+='<div class="mleg" onclick="subLegMenu('+i+')"><div class="mi">'+((MODEN[C.mode])||'')+'</div><div class="mm">'+(C.min!=null?fmtMin(C.min):'未知')+'</div><div class="msw">選擇</div></div>';}
+    strip+='<div class="mcard" onclick="subFocus('+i+')">'
+     +'<div class="nm">'+(s.note?'📝 ':(locIndex(loc,i)+1)+'. ')+esc(s.t)+'</div>'
+     +'<div class="sub">'+(s.note?'註解':('+'+fmtMin(t)+'・停留 '+fmtMin(s.min||0)))+'</div>'
+     +'<div class="act">'
+     +'<button onclick="event.stopPropagation();subMove('+i+',-1)">◀</button>'
+     +'<button onclick="event.stopPropagation();subMove('+i+',1)">▶</button>'
+     +'<button onclick="event.stopPropagation();subSetMin('+i+')">⏱</button>'
+     +'<button class="del" onclick="event.stopPropagation();subRemove('+i+')">✕</button>'
+     +'</div></div>';
+    if(!s.note){t+=(+s.min||0);tot+=(+s.min||0);}
+   });
+  }
   strip+='</div>';
   var over=Math.max(0,tot-(+p.min||0));
-  var foot='<div class="mtot">週邊已排 <b>'+fmtMin(tot)+'</b>／主點停留 <b>'+fmtMin(p.min||0)+'</b>'+(over>0?' <span style="color:#b3402a">超過 '+fmtMin(over)+'</span>':'')+(miss?'　<span style="color:#b3541e">未定位 '+miss+' 項</span>':'')+'</div>';
+  var foot='<div class="mtot">週邊已排 <b>'+fmtMin(tot)+'</b>／主點停留 <b>'+fmtMin(p.min||0)+'</b>'+(over>0?' <span style="color:#b3402a">超過 '+fmtMin(over)+'</span>':'')+(miss?'　<span style="color:#b3541e">未定位 '+miss+' 項</span>':'')+(loc.length>1?'　<span style="color:#6b7a89">路線：週邊之間（不含主點往返）</span>':'')+'</div>';
   document.getElementById('maplist').innerHTML=foot+strip;
   setTimeout(function(){try{PMAP.invalidateSize();}catch(e){}},150);
  });
 }
+function locIndex(loc,i){for(var k=0;k<loc.length;k++)if(loc[k].i===i)return k;return -1;}
 function subLegMenu(k){
  var p=arr0(MSUB.slot)[MSUB.idx];if(!p)return;
- var seq=[];var pc=coordOf(p);if(pc)seq.push({c:pc});
- (p.sub||[]).forEach(function(s){if(s.lat!=null)seq.push({c:[s.lat,s.lng]});});
- var A=seq[k],B=seq[(k+1)%seq.length];if(!A||!B){toast('此段無法估算');return;}
+ var subs=p.sub||[];
+ var loc=[];subs.forEach(function(s,i){if(s.lat!=null)loc.push({c:[s.lat,s.lng],i:i});});
+ var pos=locIndex(loc,k);if(pos<1){toast('這是第一站，沒有前一段');return;}
+ var A=loc[pos-1],B=loc[pos];
  var cur=(p.subLegs&&p.subLegs[k]&&p.subLegs[k].mode)||'mono';
  document.getElementById('imenubody').innerHTML='<h2>選擇交通</h2><div class="menu"><button>計算中…</button></div>';
  document.getElementById('imenu').classList.add('on');
