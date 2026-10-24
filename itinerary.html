@@ -202,6 +202,22 @@ body.dark .subhint{background:#241a33;border-color:#4a3a66;color:#c9a8f0}
 body.dark .stop.subopen .subhint{background:#2c2140}
 body.dark .subbody{border-color:#4a3a66}
 body.dark .sfoot{background:#16212c;color:#9fb0c0}
+.mined{border:none;background:#eef4ff;border-radius:8px;padding:1px 7px;font-size:12px;cursor:pointer;vertical-align:middle;line-height:1.7}
+.edsheet{padding:14px 16px 18px;overflow:auto}
+.edname{font-size:14px;font-weight:800;margin-bottom:12px;line-height:1.5}
+.edbig{display:flex;align-items:center;gap:10px;justify-content:center;margin:4px 0 12px}
+.edbig input{width:110px;font-size:26px;font-weight:800;text-align:center;padding:8px;border:1px solid #cbd5e1;border-radius:10px}
+.edbig .step{width:58px;height:46px;font-size:16px;border-radius:12px;border:1px solid #cbd5e1;background:#fff;cursor:pointer}
+.edchips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.edchips button{padding:7px 12px;border-radius:999px;border:1px solid #cbd5e1;background:#fff;font-size:13px;cursor:pointer}
+.edchips button.on{background:#0ea5e9;color:#062033;border-color:#0ea5e9;font-weight:800}
+.ednote{font-size:12px;color:#8a6a00;margin-top:12px;text-align:center;min-height:16px}
+.edrow{display:flex;gap:10px;margin-top:14px}
+.edrow button{flex:1;padding:12px;border-radius:12px;border:1px solid #cbd5e1;background:#fff;font-weight:800;cursor:pointer}
+.edrow .save{background:#0ea5e9;border-color:#0ea5e9;color:#062033}
+body.dark .edbig input,body.dark .edchips button,body.dark .edrow button{background:#1b2733;color:#dbe4ec;border-color:#2c3a49}
+body.dark .edrow .save{background:#0ea5e9;color:#062033}
+body.dark .mined{background:#16212c;color:#9fc3ff}
 #textview{max-width:880px;margin:14px auto;padding:0 12px}
 .txtbar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px}
 .txtbar button{padding:8px 14px;border-radius:10px;border:1px solid #cbd5e1;background:#fff;font-size:14px;cursor:pointer;color:#1f2937}
@@ -276,6 +292,15 @@ body.dark #txtpre{background:#1b2733;border-color:#2c3a49;color:#dbe4ec}
 <div class="giftsheet" id="giftsheet"></div>
 </div>
 </div>
+<div class="mov" id="edov"><div class="movcard" style="bottom:auto;max-height:72%">
+<div class="movhead"><span id="edtitle">調整停留時間</span><button onclick="closeMinEdit()">✕ 關閉</button></div>
+<div class="edsheet">
+ <div class="edname" id="edname"></div>
+ <div class="edbig"><button class="step" onclick="edStep(-15)">−15</button><input id="edmin" type="number" inputmode="numeric" min="0" max="600" step="5" oninput="syncChips()"><span style="font-weight:800">分</span><button class="step" onclick="edStep(15)">＋15</button></div>
+ <div class="edchips" id="edchips"></div>
+ <div class="ednote" id="ednote"></div>
+ <div class="edrow"><button onclick="closeMinEdit()">取消</button><button class="save" onclick="saveMinEdit()">儲存</button></div>
+</div></div></div>
 <div id="nowtoast"></div>
 <div class="ver" id="ver"></div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -360,7 +385,7 @@ var GH_REPO='https://api.github.com/repos/a4623671/cruise-votes/contents/plan.js
 var RAW='https://raw.githubusercontent.com/a4623671/cruise-votes/main/';
 var _p1='Z2l0aHViX3BhdF8xMUFISU5ORVEwV1JKV05mNFNvWHZCXzNtTUJVTWRaa0hDQV',_p2='hNbHA3QUFublh0bmNhTDN3NXZYd0tGbXlsYnlacmdVV0dFUTNSVm5KaXVMS1VW';
 var GH_TOKEN=atob(_p1+_p2);
-var VER='20261024-f20（PARCO CITY 時段顯示；原 f19：第1天登船流程：集合→報到→登船→自助餐→SPA；定稿＋文字版：一鍵複製／下載純文字行程；原 f17 功能：空檔可切交通前/後＋時段設定＋開門等待＋卡片圖片輪播滿版＋餐廳推薦菜色＋右上氣溫＋地圖真實路徑＋多時段天氣＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
+var VER='20261024-f21（卡片可調停留時間（含週邊細部）；原 f20：PARCO CITY 時段顯示；原 f19：第1天登船流程：集合→報到→登船→自助餐→SPA；定稿＋文字版：一鍵複製／下載純文字行程；原 f17 功能：空檔可切交通前/後＋時段設定＋開門等待＋卡片圖片輪播滿版＋餐廳推薦菜色＋右上氣溫＋地圖真實路徑＋多時段天氣＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
 var FS=['1','1.12','1.25'];
 
 /* ================= 狀態 ================= */
@@ -663,9 +688,9 @@ function legbarHTML(C,toName){
  var dst=(toName==='返回碼頭')?'・返回碼頭':(toName?('・到「'+esc(toName)+'」'):'');
  return '<div class="legbar"><span class="li">'+(MODEI[C.mode]||'🚝')+'</span><span>'+esc(MODEW[C.mode]||C.mode)+' <b>'+fmtMin(C.min)+'</b>'+dst+'（含移動時間）'+(C.km!=null?('・'+C.km.toFixed(1)+'km'):'')+'</span></div>';
 }
-function kvHTML(o,mc,late){
+function kvHTML(o,mc,late,di,k){
  var rows=[];
- rows.push(['⏱ 停留時間',fmtMin(o.min||0)]);
+ rows.push(['⏱ 停留時間','<span style="display:inline-flex;align-items:center;gap:6px">'+fmtMin(o.min||0)+'<button class="mined" onclick="event.stopPropagation();openMinEdit('+di+','+k+')">✏️ 調整</button></span>']);
  if(o.from)rows.push(['🕙 預定時段',esc(o.from+(o.to?('–'+o.to):' 起'))]);
  if(o.kind)rows.push(['🎯 類型',esc(KINDN[o.kind]||o.kind)]);
  if(o.dishes&&o.dishes.length)rows.push(['🍴 推薦菜色',o.dishes.map(esc).join('<br>')]);
@@ -800,7 +825,7 @@ function dayHTML(d,di){
    +'<h3>'+(isAct?(n+'. '):'')+esc(nm)+'</h3>'
    +'<div class="sub">'+(kind?(esc(KINDN[kind]||kind)+(x.o.place?('・'+esc(placeName(x.o.place))):'')+' '):'')+tags+'</div>'
    +(pics.length?picsHTML(pics,x.o.imgc):'')
-   +kvHTML(x.o,mc,late)
+   +kvHTML(x.o,mc,late,di,k)
    +(hasSub?('<div class="subhint">🧭 週邊細部行程 '+x.o.sub.length+' 項・點卡片展開<span class="chev">▾</span></div><div class="subbody" id="sub-'+di+'-'+k+'"></div>'):'')
    +'<div class="acts">'+acts+'</div>'
    +'</div>';
@@ -1098,7 +1123,7 @@ function buildSubBody(di,k){
     }).join('');
     h+='<div class="sleg"><span class="smodes">'+sbtns+'</span>'+(C.km!=null?('・'+C.km.toFixed(1)+'km'):'')+'</div>';
    }
-   h+='<div class="srow'+(s.note?' note':'')+'"><span class="snm">'+(s.note?'📝 ':((locNo(i)||'·')+'. '))+esc(s.t)+'</span><span class="sdur">'+(s.note?'註解':('+'+fmtMin(t)+'・停留 '+fmtMin(s.min||0)))+'</span></div>';
+   h+='<div class="srow'+(s.note?' note':'')+'"><span class="snm">'+(s.note?'📝 ':((locNo(i)||'·')+'. '))+esc(s.t)+'</span><span class="sdur">'+(s.note?'註解':('+'+fmtMin(t)+'・停留 '+fmtMin(s.min||0)+' <button class="mined" onclick="event.stopPropagation();openMinEdit('+di+','+k+','+i+')">✏️</button>'))+'</span></div>';
    if(!s.note){t+=(+s.min||0);tot+=(+s.min||0);}
   });
   var over=Math.max(0,tot-(+p.min||0));
@@ -1183,6 +1208,46 @@ function openGifts(cat){
 function closeGifts(){document.getElementById('giftov').classList.remove('open');}
 
 
+/* ================= 停留時間編輯 ================= */
+var EDIT=null;
+var ED_CHIPS=[10,15,20,30,45,60,90,120,150,180];
+function openMinEdit(di,k,si){
+ var seq=flatOf(DAYS[di]);var x=seq[k];if(!x)return;
+ var o=x.o,sub=(si!=null&&o.sub)?o.sub[si]:null;
+ EDIT={di:di,k:k,si:(si!=null?si:null)};
+ document.getElementById('edname').textContent=(sub?('🧭 '+sub.t):(String(o.t).replace(/✅/g,'').trim()));
+ document.getElementById('edtitle').textContent=(sub?'調整週邊停留時間':'調整停留時間');
+ document.getElementById('edmin').value=(sub?sub.min:o.min)||0;
+ var eb=document.getElementById('edchips');
+ eb.innerHTML=ED_CHIPS.map(function(m){return '<button onclick="edSet('+m+')" data-m="'+m+'">'+fmtMin(m)+'</button>';}).join('');
+ syncChips();
+ document.getElementById('ednote').textContent=(sub?'週邊已排時間會重算｜':(o.from?('最早 '+o.from+' 起｜'):''))+'儲存後自動重排後面行程';
+ document.getElementById('edov').classList.add('open');
+}
+function closeMinEdit(){var el=document.getElementById('edov');if(el)el.classList.remove('open');EDIT=null;}
+function edStep(d){var i=document.getElementById('edmin');i.value=Math.max(0,(parseInt(i.value,10)||0)+d);syncChips();}
+function edSet(m){document.getElementById('edmin').value=m;syncChips();}
+function syncChips(){
+ var v=parseInt(document.getElementById('edmin').value,10);
+ document.querySelectorAll('#edchips button').forEach(function(b){b.classList.toggle('on',(+b.getAttribute('data-m'))===v);});
+}
+function saveMinEdit(){
+ if(!EDIT)return;
+ var v=parseInt(document.getElementById('edmin').value,10);
+ if(isNaN(v)||v<0){toast('請輸入 0 以上的分鐘數');return;}
+ v=Math.min(600,v);
+ var di=EDIT.di,k=EDIT.k,si=EDIT.si;
+ var seq=flatOf(DAYS[di]);var x=seq[k];if(!x){closeMinEdit();return;}
+ if(si==null)x.o.min=v;else x.o.sub[si].min=v;
+ closeMinEdit();
+ toast('停留改為 '+fmtMin(v)+'・儲存中…');
+ computeAll().then(function(){renderAll();}).then(function(){
+  var el=document.getElementById('stop-'+di+'-'+k);
+  if(el){el.scrollIntoView({block:'center',behavior:'smooth'});}
+  if(si!=null&&el)setTimeout(function(){el.click();},250);
+ });
+ savePlan('plan: dwell '+(si!=null?'sub ':'')+v+'min (from 定稿)').then(function(){toast('✅ 已儲存 '+fmtMin(v));}).catch(function(e){toast('儲存失敗：'+(e.message||e));});
+}
 /* ================= 文字版 ================= */
 var TXT=false;
 function legLine(C){
