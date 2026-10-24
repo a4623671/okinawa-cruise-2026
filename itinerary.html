@@ -360,7 +360,7 @@ var GH_REPO='https://api.github.com/repos/a4623671/cruise-votes/contents/plan.js
 var RAW='https://raw.githubusercontent.com/a4623671/cruise-votes/main/';
 var _p1='Z2l0aHViX3BhdF8xMUFISU5ORVEwV1JKV05mNFNvWHZCXzNtTUJVTWRaa0hDQV',_p2='hNbHA3QUFublh0bmNhTDN3NXZYd0tGbXlsYnlacmdVV0dFUTNSVm5KaXVMS1VW';
 var GH_TOKEN=atob(_p1+_p2);
-var VER='20261024-f19（第1天登船流程：集合→報到→登船→自助餐→SPA；定稿＋文字版：一鍵複製／下載純文字行程；原 f17 功能：空檔可切交通前/後＋時段設定＋開門等待＋卡片圖片輪播滿版＋餐廳推薦菜色＋右上氣溫＋地圖真實路徑＋多時段天氣＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
+var VER='20261024-f20（PARCO CITY 時段顯示；原 f19：第1天登船流程：集合→報到→登船→自助餐→SPA；定稿＋文字版：一鍵複製／下載純文字行程；原 f17 功能：空檔可切交通前/後＋時段設定＋開門等待＋卡片圖片輪播滿版＋餐廳推薦菜色＋右上氣溫＋地圖真實路徑＋多時段天氣＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
 var FS=['1','1.12','1.25'];
 
 /* ================= 狀態 ================= */
@@ -666,7 +666,7 @@ function legbarHTML(C,toName){
 function kvHTML(o,mc,late){
  var rows=[];
  rows.push(['⏱ 停留時間',fmtMin(o.min||0)]);
- if(o.from)rows.push(['🕙 預定時段',esc(o.from+(o.to?('–'+o.to):'')+' 起')]);
+ if(o.from)rows.push(['🕙 預定時段',esc(o.from+(o.to?('–'+o.to):' 起'))]);
  if(o.kind)rows.push(['🎯 類型',esc(KINDN[o.kind]||o.kind)]);
  if(o.dishes&&o.dishes.length)rows.push(['🍴 推薦菜色',o.dishes.map(esc).join('<br>')]);
  var descs=o.desc?[o.desc]:((mc&&mc.desc&&mc.desc.length)?mc.desc.slice(0,3):[]);
@@ -1231,7 +1231,7 @@ function buildTripText(){
    L.push(hm2s(x.s)+'–'+hm2s(x.e)+'　'+n+'. '+nm);
    var meta=[];if(o.kind)meta.push(KINDN[o.kind]||o.kind);if(o.place)meta.push(placeName(o.place));
    var ml=meta.length?('　　'+meta.join('・')):'';
-   if(o.from)ml+=(ml?'｜':'　　')+'🕙 '+o.from+(o.to?('–'+o.to):'')+' 起';
+   if(o.from)ml+=(ml?'｜':'　　')+'🕙 '+o.from+(o.to?('–'+o.to):' 起');
    if(ml)L.push(ml);
    if(o.dishes&&o.dishes.length)L.push('　　🍴 '+o.dishes.map(esc).join('、'));
    if(o.sub&&o.sub.length)L.push('　　🧭 週邊：'+o.sub.map(function(s){return String(s.t).replace(/✅/g,'').trim()+(s.min?('（'+s.min+'分）'):'');}).join('、'));
