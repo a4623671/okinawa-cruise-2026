@@ -208,7 +208,7 @@ body.locked .ops,body.locked .mv,body.locked .leg .row button,body.locked #addBt
   <div id="dayinfo"></div>
   <div id="warn"></div>
   <div id="board"></div>
-  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261018-p41</div>
+  <div style="text-align:center;font-size:12px;color:#9fb0c0;padding:10px 0">版本 20261024-p42</div>
 </div>
 <div class="bar">
   <div class="grow" id="bartxt">—</div>
@@ -257,7 +257,7 @@ var P_SHA=null, GEO_SHA=null;
 
 /* ================= 行程骨架（郵輪硬限制） ================= */
 var DAYS=[
- {k:'2026-12-16',t:'12/16 基隆登船',port:'基隆',arr:null,dep:'18:00',by:null,plan:false},
+ {k:'2026-12-16',t:'12/16 基隆登船',port:'基隆',arr:null,dep:'18:00',by:null,plan:true},
  {k:'2026-12-17',t:'12/17 宮古島',port:'宮古島',arr:'08:00',dep:'18:00',by:'17:00',plan:true},
  {k:'2026-12-18',t:'12/18 那霸',port:'那霸',arr:'07:00',dep:'19:00',by:'18:00',plan:true},
  {k:'2026-12-19',t:'12/19 石垣島',port:'石垣島',arr:'09:00',dep:'19:00',by:'18:00',plan:true},
@@ -269,6 +269,7 @@ var MODEN={walk:'🚶走路',taxi:'🚕計程車',bus:'🚌公車',mono:'🚝單
 var DEADLINE='2026-12-02T22:00:00+08:00';
 /* 郵輪停靠碼頭座標（OSM 實查；非一般漁港/離島渡輪碼頭） */
 var PORT={
+ '基隆':{n:'基隆車站北側集合',lat:25.13285,lng:121.73940},
  '那霸':{n:'安謝新港（那覇港新港ふ頭）',lat:26.2364909,lng:127.6777349},
  '宮古島':{n:'平良港國際郵輪碼頭',lat:24.81409,lng:125.28174},
  '石垣島':{n:'石垣港新港國際旅客船碼頭',lat:24.3276299,lng:124.1415995}

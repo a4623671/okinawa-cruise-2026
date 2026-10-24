@@ -282,7 +282,7 @@ body.dark #txtpre{background:#1b2733;border-color:#2c3a49;color:#dbe4ec}
 <script>
 /* ================= 常數 ================= */
 var DAYS=[
- {k:'2026-12-16',t:'12/16',port:'基隆',arr:null,dep:'18:00',by:null,plan:false},
+ {k:'2026-12-16',t:'12/16',port:'基隆',arr:null,dep:'18:00',by:null,plan:true},
  {k:'2026-12-17',t:'12/17',port:'宮古島',arr:'08:00',dep:'18:00',by:'17:00',plan:true},
  {k:'2026-12-18',t:'12/18',port:'那霸',arr:'07:00',dep:'19:00',by:'18:00',plan:true},
  {k:'2026-12-19',t:'12/19',port:'石垣島',arr:'09:00',dep:'19:00',by:'18:00',plan:true},
@@ -292,6 +292,7 @@ var SLOTS=[['morning','🌅 上午'],['afternoon','☀️ 下午'],['evening','�
 var KINDN={spot:'景點',food:'餐飲',shop:'購物',souv:'伴手禮',feat:'特色'};
 var KINDC={spot:'b-spot',food:'b-food',shop:'b-shop',souv:'b-souv',feat:'b-feat'};
 var PORT={
+ '基隆':{n:'基隆車站北側集合',lat:25.13285,lng:121.73940},
  '那霸':{n:'安謝新港（那覇港新港ふ頭）',lat:26.2364909,lng:127.6777349},
  '宮古島':{n:'平良港國際郵輪碼頭',lat:24.81409,lng:125.28174},
  '石垣島':{n:'石垣港新港國際旅客船碼頭',lat:24.3276299,lng:124.1415995}
@@ -359,7 +360,7 @@ var GH_REPO='https://api.github.com/repos/a4623671/cruise-votes/contents/plan.js
 var RAW='https://raw.githubusercontent.com/a4623671/cruise-votes/main/';
 var _p1='Z2l0aHViX3BhdF8xMUFISU5ORVEwV1JKV05mNFNvWHZCXzNtTUJVTWRaa0hDQV',_p2='hNbHA3QUFublh0bmNhTDN3NXZYd0tGbXlsYnlacmdVV0dFUTNSVm5KaXVMS1VW';
 var GH_TOKEN=atob(_p1+_p2);
-var VER='20261020-f18（定稿＋文字版：一鍵複製／下載純文字行程；原 f17 功能：空檔可切交通前/後＋時段設定＋開門等待＋卡片圖片輪播滿版＋餐廳推薦菜色＋右上氣溫＋地圖真實路徑＋多時段天氣＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
+var VER='20261024-f19（第1天登船流程：集合→報到→登船→自助餐→SPA；定稿＋文字版：一鍵複製／下載純文字行程；原 f17 功能：空檔可切交通前/後＋時段設定＋開門等待＋卡片圖片輪播滿版＋餐廳推薦菜色＋右上氣溫＋地圖真實路徑＋多時段天氣＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
 var FS=['1','1.12','1.25'];
 
 /* ================= 狀態 ================= */
@@ -657,6 +658,7 @@ var MODEW={walk:'步行',taxi:'計程車',bus:'公車',mono:'單軌'};
 function legbarHTML(C,toName){
  if(!C)return '';
  if(C.cross)return '<div class="legbar"><span class="li">⚠️</span><span>此項不在本港・交通不估算</span></div>';
+ if(C.km!=null&&C.km<0.05)return '';
  if(C.min==null)return '<div class="legbar"><span class="li">❓</span><span>缺座標・'+(toName?('到「'+esc(toName)+'」'):'')+'交通未估算</span></div>';
  var dst=(toName==='返回碼頭')?'・返回碼頭':(toName?('・到「'+esc(toName)+'」'):'');
  return '<div class="legbar"><span class="li">'+(MODEI[C.mode]||'🚝')+'</span><span>'+esc(MODEW[C.mode]||C.mode)+' <b>'+fmtMin(C.min)+'</b>'+dst+'（含移動時間）'+(C.km!=null?('・'+C.km.toFixed(1)+'km'):'')+'</span></div>';
@@ -695,6 +697,7 @@ function matchCard(o){
 }
 function legboxHTML(dk,key,C,toName){
  if(!C)return '';
+ if(C.km!=null&&C.km<0.05)return '';
  if(C.cross)return '<div class="legbar"><span class="li">⚠️</span><span>此項不在本港・交通不估算</span></div>';
  if(C.min==null)return '<div class="legbar"><span class="li">❓</span><span>缺座標・'+(toName?('到「'+esc(toName)+'」'):'')+'交通未估算</span></div>';
  var cur=C.mode||'mono';
@@ -736,11 +739,11 @@ function dayHTML(d,di){
  var tm=hm(dayOff(d));if(tm==null)tm=8*60;
  var by=dayBoard(d),byt=by?hm(by):null;
  var h='<div class="dayhead"><h2>'+d.t+'・'+esc(d.port)+'</h2><div class="times">'
-  +(d.arr?('<span>到港 '+d.arr+'</span>'):'')+('<span>下船 '+hm2s(tm)+'</span>')
+  +(d.arr?('<span>到港 '+d.arr+'</span>'):'')+('<span>'+(d.arr?'下船 ':'集合 ')+hm2s(tm)+'</span>')
   +(by?('<span>上船 '+by+'</span>'):'')+(d.dep?('<span>離港 '+d.dep+'</span>'):'')+'</div></div>';
  h+='<div class="wxcard wxday" data-di="'+di+'">☁️ 天氣讀取中…</div>';
  h+='<div class="tl">';
- h+='<div class="stop port"><h3>🚢 下船</h3><div class="sub">'+esc(d.arr?('到港 '+d.arr):'')+'・碼頭：'+esc((PORT[d.port]||{}).n||d.port)+'</div>'+(PORTIMG[d.port]?('<img class="ph" loading="lazy" src="'+PORTIMG[d.port]+'" onerror="this.style.display=\'none\'">'):'')+'</div>';
+ h+='<div class="stop port"><h3>'+(d.arr?'🚢 下船':'⚓ 集合')+'</h3><div class="sub">'+(d.arr?esc('到港 '+d.arr)+'・碼頭：':(hm2s(tm)+'・集合點：'))+esc((PORT[d.port]||{}).n||d.port)+'</div>'+(PORTIMG[d.port]?('<img class="ph" loading="lazy" src="'+PORTIMG[d.port]+'" onerror="this.style.display=\'none\'">'):'')+'</div>';
  var list=[],key='in',n=0,pendGaps=[];
  seq.forEach(function(x,k){
   var isAct=!x.o.skip;
@@ -765,7 +768,7 @@ function dayHTML(d,di){
    });
    pendGaps=[];
    var nb=hm(x.o.from||x.o.notBefore);
-   if(nb!=null&&tm<nb){h+='<div class="gapbar">⏳ 等待開門 '+fmtMin(nb-tm)+'<span class="gapt">→ '+hm2s(nb)+'</span></div>';tm=nb;}
+   if(nb!=null&&tm<nb){h+='<div class="gapbar">⏳ 等待 '+fmtMin(nb-tm)+'<span class="gapt">至 '+hm2s(nb)+'</span></div>';tm=nb;}
   }
   var s=tm,e=tm+(+x.o.min||0);
   if(isAct){list.push({k:k,o:x.o,s:s,e:e});tm=e;key=String(k);n++;}
@@ -808,9 +811,11 @@ function dayHTML(d,di){
   h+='<div class="gapbar">⏳ '+esc(String(g.x.o.t).replace(/✅/g,'').replace(/^⏳\s*/,''))+'・'+fmtMin(g.x.o.min||0)+'（交通後）<span class="gapt">'+hm2s(gs2)+'–'+hm2s(ge2)+'</span></div>';
  });
  var CO=cache.legs[d.k+':out'];
- if(CO)h+=legboxHTML(d.k,'out',CO,'返回碼頭');
+ if(CO&&by)h+=legboxHTML(d.k,'out',CO,'返回碼頭');
  if(CO&&CO.min!=null)tm+=CO.min;
- h+='<div class="stop port"><h3>🚢 上船</h3><div class="sub">'+(by?('上船 '+by):'')+(d.dep?('・離港 '+d.dep):'')+'・預估返抵碼頭 '+hm2s(tm)+(byt!=null?('（緩衝 '+fmtMin(Math.max(0,byt-tm))+(tm>byt?'・⚠️ 已超過':'')+'）'):'')+'</div>'+((PORTIMG2[d.port]||PORTIMG[d.port])?('<img class="ph" loading="lazy" src="'+(PORTIMG2[d.port]||PORTIMG[d.port])+'" onerror="this.style.display=\'none\'">'):'')+'</div>';
+ var pimg=(PORTIMG2[d.port]||PORTIMG[d.port])?('<img class="ph" loading="lazy" src="'+(PORTIMG2[d.port]||PORTIMG[d.port])+'" onerror="this.style.display=\'none\'">'):'';
+ h+= by?('<div class="stop port"><h3>🚢 上船</h3><div class="sub">上船 '+by+(d.dep?('・離港 '+d.dep):'')+'・預估返抵碼頭 '+hm2s(tm)+'（緩衝 '+fmtMin(Math.max(0,byt-tm))+(tm>byt?'・⚠️ 已超過':'')+'）</div>'+pimg+'</div>')
+ :('<div class="stop port"><h3>🚢 啟航</h3><div class="sub">'+(d.dep?('離港 '+d.dep):'')+'・登船後自由活動</div>'+pimg+'</div>');
  h+='</div>';
  TIMES[d.k]=list.slice().sort(function(a,b){return ((a.s==null)?1e9:a.s)-((b.s==null)?1e9:b.s);});
  var t=cache.totals[d.k]||{used:0,cap:null,over:0,miss:false};
@@ -1182,6 +1187,7 @@ function closeGifts(){document.getElementById('giftov').classList.remove('open')
 var TXT=false;
 function legLine(C){
  if(!C)return '';
+ if(C.km!=null&&C.km<0.05)return '';
  if(C.cross)return '　　⚠️ 此項不在本港・交通不估算';
  if(C.min==null)return '　　❓ 缺座標・交通未估算';
  return '　　→ '+(MODEI[C.mode]||'🚝')+' '+(MODEW[C.mode]||C.mode)+' '+fmtMin(C.min)+(C.km!=null?('（'+C.km.toFixed(1)+'km）'):'');
@@ -1195,7 +1201,7 @@ function buildTripText(){
  DAYS.forEach(function(d,di){
   var wd=(function(){try{var p=d.k.split('-');return WK[new Date(Date.UTC(+p[0],+p[1]-1,+p[2])).getDay()];}catch(e){return '';}})();
   L.push('');L.push('━━━━━━━━━━━━━━━━━━━━');
-  L.push('■ '+d.t+'（'+wd+'）'+d.port+(d.plan?'':'・'+(d.k==='2026-12-16'?'登船日':'返程日')));
+  L.push('■ '+d.t+'（'+wd+'）'+d.port+(d.port==='基隆'?(d.arr?'・返程日':'・登船日'):''));
   L.push('━━━━━━━━━━━━━━━━━━━━');
   if(!d.plan){
    if(d.k==='2026-12-16'){L.push('18:00 啟航｜建議 14:00 前抵達基隆港務大樓報到（15:00 前完成手續）');L.push('上午可逛廟口／正濱彩色屋／基隆塔；行李先寄港務大樓或車站置物櫃');}
@@ -1203,8 +1209,9 @@ function buildTripText(){
    return;
   }
   var off=dayOff(d),by=dayBoard(d);
-  L.push('到港 '+(d.arr||'—')+'｜下船 '+off+(by?('｜上船 '+by):'')+(d.dep?('｜離港 '+d.dep):''));
-  var pn=(PORT[d.port]||{}).n;if(pn)L.push('碼頭：'+pn);
+  if(d.arr)L.push('到港 '+d.arr+'｜下船 '+off+(by?('｜上船 '+by):'')+(d.dep?('｜離港 '+d.dep):''));
+  else L.push('集合 '+off+(by?('｜登船 '+by):'')+(d.dep?('｜離港 '+d.dep):''));
+  var pn=(PORT[d.port]||{}).n;if(pn)L.push((d.arr?'碼頭：':'集合點：')+pn);
   var w=(function(){try{return wxDayInfo(d.port,d.k,di);}catch(e){return null;}})();
   if(w){var ic=wxIcon(w.code),rk=portRisk(w);
    var ln='天氣：'+ic[0]+' '+ic[1]+(w.max!=null?(' '+Math.round(w.min)+'–'+Math.round(w.max)+'°C'):'');
@@ -1219,7 +1226,7 @@ function buildTripText(){
    if(o.gap){L.push('');L.push(x.skip?('⏭ '+nm+'（已跳過，不列入時間）'):('⏳ '+nm.replace(/^⏳\s*/,'')+'　'+hm2s(x.s)+'–'+hm2s(x.e)));return;}
    if(x.skip||o.skip){L.push('');L.push('⏭ '+nm+'（已跳過，不列入路線）');return;}
    L.push('');
-   L.push(legLine(cache.legs[d.k+':'+(prev==null?'in':prev)]));
+   var LL=legLine(cache.legs[d.k+':'+(prev==null?'in':prev)]);if(LL)L.push(LL);
    n++;
    L.push(hm2s(x.s)+'–'+hm2s(x.e)+'　'+n+'. '+nm);
    var meta=[];if(o.kind)meta.push(KINDN[o.kind]||o.kind);if(o.place)meta.push(placeName(o.place));
@@ -1232,12 +1239,13 @@ function buildTripText(){
    prev=x.k;
   });
   var out=cache.legs[d.k+':out'];
-  if(n){L.push('');L.push(legLine(out));}
+  if(n&&by){L.push('');L.push(legLine(out));}
   var endT=null;
   if(n){endT=(mx||hm(off)||0)+(out&&out.min!=null?out.min:0);}
   else if(off!=null)endT=hm(off);
   var bt=by?hm(by):null;
   if(by)L.push('🚢 上船 '+by+(endT!=null?('｜預估返抵碼頭 '+hm2s(endT)+'（緩衝 '+fmtMin(Math.max(0,bt-endT))+(endT>bt?'・⚠️ 已超過':'')+'）'):''));
+  else if(d.dep){L.push('');L.push('🚢 啟航 '+d.dep+'・登船後自由活動');}
  });
  L.push('');L.push('※ 停留時間與交通為估算，出發前請複查船方公告；是否靠港由船長與港務局決定。');
  return L.filter(function(s){return s!==''||true;}).join('\n').replace(/\n{3,}/g,'\n\n').replace(/\n　　\n/g,'\n');
