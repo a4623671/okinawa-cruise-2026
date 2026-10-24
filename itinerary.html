@@ -202,6 +202,12 @@ body.dark .subhint{background:#241a33;border-color:#4a3a66;color:#c9a8f0}
 body.dark .stop.subopen .subhint{background:#2c2140}
 body.dark .subbody{border-color:#4a3a66}
 body.dark .sfoot{background:#16212c;color:#9fb0c0}
+#textview{max-width:880px;margin:14px auto;padding:0 12px}
+.txtbar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px}
+.txtbar button{padding:8px 14px;border-radius:10px;border:1px solid #cbd5e1;background:#fff;font-size:14px;cursor:pointer;color:#1f2937}
+#txtpre{background:#fff;border:1px solid #dbe4ec;border-radius:14px;padding:18px 20px;font:13.5px/1.85 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word;color:#1f2937;box-shadow:0 2px 10px rgba(15,23,42,.06);margin:0}
+body.dark .txtbar button{background:#1b2733;color:#dbe4ec;border-color:#2c3a49}
+body.dark #txtpre{background:#1b2733;border-color:#2c3a49;color:#dbe4ec}
 @media print{.topbar,.days,.fab,.customs,#nowtoast,.meline{display:none}.plan{display:block!important;padding:0}.stop{break-inside:avoid}}
 </style>
 </head>
@@ -212,6 +218,7 @@ body.dark .sfoot{background:#16212c;color:#9fb0c0}
 <a href="plan.html">排程板</a>
 <div class="sp"></div>
 <button onclick="openGifts()">🎁 伴手禮</button>
+<button onclick="toggleText()" id="btnTxt">📄 文字版</button>
 <button onclick="locateNow()">⏱ 目前行程</button>
 <button onclick="cycleFs()">A</button>
 <button onclick="toggleDark()">🌙</button>
@@ -246,6 +253,10 @@ body.dark .sfoot{background:#16212c;color:#9fb0c0}
 </details>
 <div class="days" id="days"></div>
 <div id="content"></div>
+<div id="textview" style="display:none">
+<div class="txtbar"><button onclick="copyText()">📋 複製全部</button><button onclick="downloadText()">⬇️ 下載 TXT</button><button onclick="toggleText(false)">🗂 回卡片版</button></div>
+<pre id="txtpre"></pre>
+</div>
 <div class="fab">
 <button id="fabMe" title="我的位置" onclick="locateMe()">📍</button>
 <button id="fabMap" title="當日地圖" onclick="openMap()">🗺</button>
@@ -296,6 +307,8 @@ var SOUV_REC={
  naha:['首里城御城印・御守','Blue Seal 周邊（常溫）','迷你三線模型','海鹽ちんすこう'],
  ishigaki:['石垣の塩','黒真珠アクセサリー','八重山民謡 CD（やいま村）']
 };
+var PLACEN={naha:'那霸',miyako:'宮古島',ishigaki:'石垣島',基隆:'基隆'};
+function placeName(p){return PLACEN[p]||p;}
 var SOUVTR={
  'ちんすこう（金楚糕）':'金楚糕（ちんすこう）',
  'シークヮーサー加工品':'香檬加工品（シークヮーサー）',
@@ -346,7 +359,7 @@ var GH_REPO='https://api.github.com/repos/a4623671/cruise-votes/contents/plan.js
 var RAW='https://raw.githubusercontent.com/a4623671/cruise-votes/main/';
 var _p1='Z2l0aHViX3BhdF8xMUFISU5ORVEwV1JKV05mNFNvWHZCXzNtTUJVTWRaa0hDQV',_p2='hNbHA3QUFublh0bmNhTDN3NXZYd0tGbXlsYnlacmdVV0dFUTNSVm5KaXVMS1VW';
 var GH_TOKEN=atob(_p1+_p2);
-var VER='20261018-f17（定稿：空檔可切交通前/後＋時段設定＋開門等待＋卡片圖片輪播滿版＋餐廳推薦菜色＋右上氣溫＋地圖真實路徑＋多時段天氣＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
+var VER='20261020-f18（定稿＋文字版：一鍵複製／下載純文字行程；原 f17 功能：空檔可切交通前/後＋時段設定＋開門等待＋卡片圖片輪播滿版＋餐廳推薦菜色＋右上氣溫＋地圖真實路徑＋多時段天氣＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
 var FS=['1','1.12','1.25'];
 
 /* ================= 狀態 ================= */
@@ -782,7 +795,7 @@ function dayHTML(d,di){
    +'<div class="stopright">'+(c?('<button class="pinbtn" title="在地圖看" onclick="event.stopPropagation();switchDay('+di+');openMap()">📌</button>'):'')+'<span class="wxchip" data-di="'+di+'" data-k="'+k+'"></span></div>'
    +'<div class="stoptime">'+(isAct?(hm2s(s)+'–'+hm2s(e)):'已跳過・不列入時間')+'</div>'
    +'<h3>'+(isAct?(n+'. '):'')+esc(nm)+'</h3>'
-   +'<div class="sub">'+(kind?(esc(KINDN[kind]||kind)+(x.o.place?('・'+esc(x.o.place)):'')+' '):'')+tags+'</div>'
+   +'<div class="sub">'+(kind?(esc(KINDN[kind]||kind)+(x.o.place?('・'+esc(placeName(x.o.place))):'')+' '):'')+tags+'</div>'
    +(pics.length?picsHTML(pics,x.o.imgc):'')
    +kvHTML(x.o,mc,late)
    +(hasSub?('<div class="subhint">🧭 週邊細部行程 '+x.o.sub.length+' 項・點卡片展開<span class="chev">▾</span></div><div class="subbody" id="sub-'+di+'-'+k+'"></div>'):'')
@@ -1164,6 +1177,95 @@ function openGifts(cat){
 }
 function closeGifts(){document.getElementById('giftov').classList.remove('open');}
 
+
+/* ================= 文字版 ================= */
+var TXT=false;
+function legLine(C){
+ if(!C)return '';
+ if(C.cross)return '　　⚠️ 此項不在本港・交通不估算';
+ if(C.min==null)return '　　❓ 缺座標・交通未估算';
+ return '　　→ '+(MODEI[C.mode]||'🚝')+' '+(MODEW[C.mode]||C.mode)+' '+fmtMin(C.min)+(C.km!=null?('（'+C.km.toFixed(1)+'km）'):'');
+}
+function buildTripText(){
+ var L=[];
+ L.push('MSC榮耀號・沖繩5日｜岸上觀光定稿（文字版）');
+ L.push('2026/12/16 基隆 → 宮古島 → 那霸 → 石垣島 → 12/20 基隆');
+ if(PLAN&&PLAN.updated){try{L.push('資料更新：'+new Date(PLAN.updated).toLocaleString('zh-TW',{timeZone:'Asia/Taipei',hour12:false}));}catch(e){}}
+ var WK='日一二三四五六';
+ DAYS.forEach(function(d,di){
+  var wd=(function(){try{var p=d.k.split('-');return WK[new Date(Date.UTC(+p[0],+p[1]-1,+p[2])).getDay()];}catch(e){return '';}})();
+  L.push('');L.push('━━━━━━━━━━━━━━━━━━━━');
+  L.push('■ '+d.t+'（'+wd+'）'+d.port+(d.plan?'':'・'+(d.k==='2026-12-16'?'登船日':'返程日')));
+  L.push('━━━━━━━━━━━━━━━━━━━━');
+  if(!d.plan){
+   if(d.k==='2026-12-16'){L.push('18:00 啟航｜建議 14:00 前抵達基隆港務大樓報到（15:00 前完成手續）');L.push('上午可逛廟口／正濱彩色屋／基隆塔；行李先寄港務大樓或車站置物櫃');}
+   else{L.push('07:00 返抵基隆｜入境通關後解散');L.push('※ 回台禁帶：肉類製品、生鮮蔬果、活體動植物（詳見網頁版「回台禁帶提醒」）');}
+   return;
+  }
+  var off=dayOff(d),by=dayBoard(d);
+  L.push('到港 '+(d.arr||'—')+'｜下船 '+off+(by?('｜上船 '+by):'')+(d.dep?('｜離港 '+d.dep):''));
+  var pn=(PORT[d.port]||{}).n;if(pn)L.push('碼頭：'+pn);
+  var w=(function(){try{return wxDayInfo(d.port,d.k,di);}catch(e){return null;}})();
+  if(w){var ic=wxIcon(w.code),rk=portRisk(w);
+   var ln='天氣：'+ic[0]+' '+ic[1]+(w.max!=null?(' '+Math.round(w.min)+'–'+Math.round(w.max)+'°C'):'');
+   if(w.wave!=null)ln+='｜浪高 '+(''+w.wave).replace(/^$/,'—')+'m';
+   if(rk)ln+='｜'+RISKN[rk.lvl];
+   L.push(ln);}
+  var t=cache.totals[d.k];
+  if(t&&t.cap!=null)L.push('⏱ 已排 '+fmtMin(t.used)+'／可用 '+fmtMin(t.cap)+'（餘 '+fmtMin(Math.max(0,t.cap-t.used))+'）');
+  var rows=TIMES[d.k]||[],n=0,prev=null,mx=null;
+  rows.forEach(function(x){
+   var o=x.o,nm=String(o.t).replace(/✅/g,'').trim();
+   if(o.gap){L.push('');L.push(x.skip?('⏭ '+nm+'（已跳過，不列入時間）'):('⏳ '+nm.replace(/^⏳\s*/,'')+'　'+hm2s(x.s)+'–'+hm2s(x.e)));return;}
+   if(x.skip||o.skip){L.push('');L.push('⏭ '+nm+'（已跳過，不列入路線）');return;}
+   L.push('');
+   L.push(legLine(cache.legs[d.k+':'+(prev==null?'in':prev)]));
+   n++;
+   L.push(hm2s(x.s)+'–'+hm2s(x.e)+'　'+n+'. '+nm);
+   var meta=[];if(o.kind)meta.push(KINDN[o.kind]||o.kind);if(o.place)meta.push(placeName(o.place));
+   var ml=meta.length?('　　'+meta.join('・')):'';
+   if(o.from)ml+=(ml?'｜':'　　')+'🕙 '+o.from+(o.to?('–'+o.to):'')+' 起';
+   if(ml)L.push(ml);
+   if(o.dishes&&o.dishes.length)L.push('　　🍴 '+o.dishes.map(esc).join('、'));
+   if(o.sub&&o.sub.length)L.push('　　🧭 週邊：'+o.sub.map(function(s){return String(s.t).replace(/✅/g,'').trim()+(s.min?('（'+s.min+'分）'):'');}).join('、'));
+   if(mx==null||x.e>mx)mx=x.e;
+   prev=x.k;
+  });
+  var out=cache.legs[d.k+':out'];
+  if(n){L.push('');L.push(legLine(out));}
+  var endT=null;
+  if(n){endT=(mx||hm(off)||0)+(out&&out.min!=null?out.min:0);}
+  else if(off!=null)endT=hm(off);
+  var bt=by?hm(by):null;
+  if(by)L.push('🚢 上船 '+by+(endT!=null?('｜預估返抵碼頭 '+hm2s(endT)+'（緩衝 '+fmtMin(Math.max(0,bt-endT))+(endT>bt?'・⚠️ 已超過':'')+'）'):''));
+ });
+ L.push('');L.push('※ 停留時間與交通為估算，出發前請複查船方公告；是否靠港由船長與港務局決定。');
+ return L.filter(function(s){return s!==''||true;}).join('\n').replace(/\n{3,}/g,'\n\n').replace(/\n　　\n/g,'\n');
+}
+function toggleText(force){
+ if(!PLAN){toast('排程資料載入中…請稍候再按');return;}
+ TXT=(force==null?!TXT:!!force);
+ document.getElementById('textview').style.display=TXT?'block':'none';
+ document.getElementById('content').style.display=TXT?'none':'';
+ document.getElementById('days').style.display=TXT?'none':'';
+ var b=document.getElementById('btnTxt');if(b)b.textContent=TXT?'🗂 卡片版':'📄 文字版';
+ if(TXT){document.getElementById('txtpre').textContent=buildTripText();try{document.getElementById('days').scrollTop=0;}catch(e){}
+  window.scrollTo({top:0,behavior:'smooth'});}
+}
+function copyText(){
+ var t=document.getElementById('txtpre').textContent;
+ function ok(){toast('已複製文字版（可貼到 LINE／記事本）');}
+ function fb(){var ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');ok();}catch(e){toast('複製失敗，請長按全選');}document.body.removeChild(ta);}
+ if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(ok,fb);}else fb();
+}
+function downloadText(){
+ var t=document.getElementById('txtpre').textContent;
+ var blob=new Blob(['\ufeff'+t],{type:'text/plain;charset=utf-8'});
+ var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='沖繩定稿_20261216.txt';
+ document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},800);
+ toast('已下載 TXT');
+}
 /* ================= 顯示設定 ================= */
 function cycleFs(){FSI=(FSI+1)%FS.length;document.body.style.zoom=FS[FSI];try{localStorage.setItem('ok_it_fs',FSI);}catch(e){}}
 function toggleDark(){document.body.classList.toggle('dark');try{localStorage.setItem('ok_it_dark',document.body.classList.contains('dark')?'1':'0');}catch(e){}}
