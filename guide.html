@@ -256,6 +256,10 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 .rkname{flex:1;min-width:0;font-size:13.5px;line-height:1.4;cursor:pointer}
 .rkvotes{font-size:11px;color:#7b8a99;margin-top:1px}
 .rkprice{font-size:12px;color:#b3402a;font-weight:900;white-space:nowrap}
+#rkDetail{position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:80;display:none;align-items:flex-end;justify-content:center}
+#rkDetail.on{display:flex}
+#rkDetail .ipanel{background:#fff;border-radius:18px 18px 0 0;max-width:720px;width:100%;max-height:90vh;overflow-y:auto;padding:18px 16px calc(24px + env(safe-area-inset-bottom));position:relative}
+#rkDetail .ix{position:absolute;top:10px;right:16px;font-size:18px;cursor:pointer;background:#f0ece2;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:#4a5b6c}
 </style>
 </head>
 <body class="lv">
@@ -273,7 +277,7 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 <button class="cat cat2" onclick="swCat('souv',this)">🎁 伴手禮</button>
 <button class="cat cat2" onclick="swCat('feat',this)">✨ 當地特色</button>
 </div>
-<div class="legend">每人可勾選多項，可隨時取消；勾選會即時同步給家人。價格與營業時間為約略值。（版本 20261027-bv）</div>
+<div class="legend">每人可勾選多項，可隨時取消；勾選會即時同步給家人。價格與營業時間為約略值。（版本 20261027-bw）</div>
 </div>
 
 <div id="lvui">
@@ -891,12 +895,6 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 <p class="kv"><b>價格：</b>約¥10,000–20,000｜<b>店家：</b>Bic Camera</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%95%E3%82%A3%E3%83%AA%E3%83%83%E3%83%97%E3%82%B9%20%E3%82%BD%E3%83%8B%E3%83%83%E3%82%B1%E3%82%A2%E3%83%BC" target="_blank">🗺 地圖</a></div>
 
-<div class="card" data-cat="電器" data-price="約¥3,000–20,000" data-store="Bic Camera"><h3>ソニー／Anker イヤホン</h3><div class="en">Earphones</div>
-<img class="ph" loading="lazy" src="images/goods/earphones.jpg" onerror="imgRetry(this)" alt="ソニー／Anker イヤホン">
-<p>介紹：降噪耳機，機上／船上好用。</p>
-<p class="kv"><b>價格：</b>約¥3,000–20,000｜<b>店家：</b>Bic Camera</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%82%BD%E3%83%8B%E3%83%BC%EF%BC%8FAnker%20%E3%82%A4%E3%83%A4%E3%83%9B%E3%83%B3" target="_blank">🗺 地圖</a></div>
-
 <div class="card" data-cat="電器" data-price="約¥10,000–20,000" data-store="Bic Camera"><h3>ReFa 美容ローラー</h3><div class="en">ReFa Roller</div>
 <img class="ph" loading="lazy" src="images/goods/refa.jpg" onerror="imgRetry(this)" alt="ReFa 美容ローラー">
 <p>介紹：美容滾輪，送禮人氣。</p>
@@ -1064,6 +1062,186 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 <p>介紹：消毒藥水，旅遊小外傷必備。</p>
 <p class="kv"><b>價格：</b>約¥600–900｜<b>店家：</b>藥妝店（松本清・大國藥妝・唐吉軻德）</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%9E%E3%82%AD%E3%83%AD%E3%83%B3%EF%BC%88%E6%B6%88%E6%AF%92%E6%B6%B2%EF%BC%89" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥39,000–45,000" data-store="Bic Camera" data-amzrank="0"><h3>AirPods Pro 3</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/airpods-pro3.jpg" onerror="imgRetry(this)" alt="AirPods Pro 3">
+<p>介紹：主動降噪、空間音訊，iPhone 用戶首選。</p>
+<p class="kv"><b>價格：</b>約¥39,000–45,000｜<b>參考：</b>未收錄榜單</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20AirPods%20Pro%203" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥40,000–48,000" data-store="Bic Camera" data-amzrank="47"><h3>SONY WF-1000XM6</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/wf1000xm6.jpg" onerror="imgRetry(this)" alt="SONY WF-1000XM6">
+<p>介紹：世界級降噪＋LDAC，旗艦真無線。</p>
+<p class="kv"><b>價格：</b>約¥40,000–48,000｜<b>參考：</b>Amazon 耳機暢銷 #47</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20SONY%20WF-1000XM6" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥39,000–45,000" data-store="Bic Camera" data-amzrank="46"><h3>Bose QuietComfort Ultra Earbuds 2</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/bose-qc-ultra.jpg" onerror="imgRetry(this)" alt="Bose QuietComfort Ultra Earbuds 2">
+<p>介紹：沉浸式音訊、頂級降噪。</p>
+<p class="kv"><b>價格：</b>約¥39,000–45,000｜<b>參考：</b>Amazon 耳機暢銷 #46</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20Bose%20QuietComfort%20Ultra%20Earbuds%202" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥12,000–15,000" data-store="Bic Camera" data-amzrank="4"><h3>Anker Soundcore Liberty 5</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/liberty5.jpg" onerror="imgRetry(this)" alt="Anker Soundcore Liberty 5">
+<p>介紹：超降噪 3.5、48 小時續航。</p>
+<p class="kv"><b>價格：</b>約¥12,000–15,000｜<b>參考：</b>Amazon 耳機暢銷 #4</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20Anker%20Soundcore%20Liberty%205" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥7,000–9,000" data-store="Bic Camera" data-amzrank="5"><h3>Anker Soundcore P42i</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/p42i.jpg" onerror="imgRetry(this)" alt="Anker Soundcore P42i">
+<p>介紹：40 小時、IP55 防塵水，入門熱銷。</p>
+<p class="kv"><b>價格：</b>約¥7,000–9,000｜<b>參考：</b>Amazon 耳機暢銷 #5</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20Anker%20Soundcore%20P42i" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥6,000–8,000" data-store="Bic Camera" data-amzrank="10"><h3>Anker Soundcore V20i</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/v20i.jpg" onerror="imgRetry(this)" alt="Anker Soundcore V20i">
+<p>介紹：開放式耳掛，36 小時續航。</p>
+<p class="kv"><b>價格：</b>約¥6,000–8,000｜<b>參考：</b>Amazon 耳機暢銷 #10</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20Anker%20Soundcore%20V20i" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥8,000–10,000" data-store="Bic Camera" data-amzrank="20"><h3>Anker Soundcore Q30i</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/q30i.jpg" onerror="imgRetry(this)" alt="Anker Soundcore Q30i">
+<p>介紹：耳罩式降噪，80 小時續航。</p>
+<p class="kv"><b>價格：</b>約¥8,000–10,000｜<b>參考：</b>Amazon 耳機暢銷 #20</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20Anker%20Soundcore%20Q30i" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥4,000–5,000" data-store="Bic Camera" data-amzrank="32"><h3>Anker Soundcore K20i</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/k20i.jpg" onerror="imgRetry(this)" alt="Anker Soundcore K20i">
+<p>介紹：入門真無線，36 小時續航。</p>
+<p class="kv"><b>價格：</b>約¥4,000–5,000｜<b>參考：</b>Amazon 耳機暢銷 #32</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20Anker%20Soundcore%20K20i" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥9,000–12,000" data-store="Bic Camera" data-amzrank="53"><h3>Anker Soundcore AeroClip</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/aeroclip.jpg" onerror="imgRetry(this)" alt="Anker Soundcore AeroClip">
+<p>介紹：耳夾開放式，運動配戴穩。</p>
+<p class="kv"><b>價格：</b>約¥9,000–12,000｜<b>參考：</b>Amazon 耳機暢銷 #53</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20Anker%20Soundcore%20AeroClip" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥10,000–12,000" data-store="Bic Camera" data-amzrank="22"><h3>SONY WF-C510</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/wfc510.jpg" onerror="imgRetry(this)" alt="SONY WF-C510">
+<p>介紹：輕量 4.6g，通話清晰。</p>
+<p class="kv"><b>價格：</b>約¥10,000–12,000｜<b>參考：</b>Amazon 耳機暢銷 #22</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20SONY%20WF-C510" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥2,000–3,000" data-store="Bic Camera" data-amzrank="11"><h3>SONY MDR-EX155</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/mdr-ex155.jpg" onerror="imgRetry(this)" alt="SONY MDR-EX155">
+<p>介紹：有線入耳，音質均衡。</p>
+<p class="kv"><b>價格：</b>約¥2,000–3,000｜<b>參考：</b>Amazon 耳機暢銷 #11</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20SONY%20MDR-EX155" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥3,500–5,000" data-store="Bic Camera" data-amzrank="6"><h3>Xiaomi Redmi Buds 8 Lite</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/buds8lite.jpg" onerror="imgRetry(this)" alt="Xiaomi Redmi Buds 8 Lite">
+<p>介紹：ANC 降噪，36 小時續航。</p>
+<p class="kv"><b>價格：</b>約¥3,500–5,000｜<b>參考：</b>Amazon 耳機暢銷 #6</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20Xiaomi%20Redmi%20Buds%208%20Lite" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥2,500–3,500" data-store="Bic Camera" data-amzrank="13"><h3>Xiaomi Redmi Buds 6 Play</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/buds6play.jpg" onerror="imgRetry(this)" alt="Xiaomi Redmi Buds 6 Play">
+<p>介紹：超輕入門款，36 小時。</p>
+<p class="kv"><b>價格：</b>約¥2,500–3,500｜<b>參考：</b>Amazon 耳機暢銷 #13</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20Xiaomi%20Redmi%20Buds%206%20Play" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥5,000–7,000" data-store="Bic Camera" data-amzrank="14"><h3>SOUNDPEATS C30</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/speats-c30.jpg" onerror="imgRetry(this)" alt="SOUNDPEATS C30">
+<p>介紹：-52dB 降噪、LDAC，VGP 金獎。</p>
+<p class="kv"><b>價格：</b>約¥5,000–7,000｜<b>參考：</b>Amazon 耳機暢銷 #14</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20SOUNDPEATS%20C30" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥6,000–8,000" data-store="Bic Camera" data-amzrank="51"><h3>SOUNDPEATS PearlClip Pro</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/pearlclip.jpg" onerror="imgRetry(this)" alt="SOUNDPEATS PearlClip Pro">
+<p>介紹：耳夾開放式，VGP 性價比大獎。</p>
+<p class="kv"><b>價格：</b>約¥6,000–8,000｜<b>參考：</b>Amazon 耳機暢銷 #51</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20SOUNDPEATS%20PearlClip%20Pro" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥7,000–9,000" data-store="Bic Camera" data-amzrank="27"><h3>EarFun Clip 2</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/earfun-clip2.jpg" onerror="imgRetry(this)" alt="EarFun Clip 2">
+<p>介紹：耳夾式 VGP 金獎，LDAC。</p>
+<p class="kv"><b>價格：</b>約¥7,000–9,000｜<b>參考：</b>Amazon 耳機暢銷 #27</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20EarFun%20Clip%202" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥6,000–8,000" data-store="Bic Camera" data-amzrank="52"><h3>EarFun Air Pro 4i</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/airpro4i.jpg" onerror="imgRetry(this)" alt="EarFun Air Pro 4i">
+<p>介紹：50dB 混合 ANC，高解析。</p>
+<p class="kv"><b>價格：</b>約¥6,000–8,000｜<b>參考：</b>Amazon 耳機暢銷 #52</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20EarFun%20Air%20Pro%204i" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥2,500–3,500" data-store="Bic Camera" data-amzrank="29"><h3>final E500</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/final-e500.jpg" onerror="imgRetry(this)" alt="final E500">
+<p>介紹：有線入耳，ASMR/VR 適用。</p>
+<p class="kv"><b>價格：</b>約¥2,500–3,500｜<b>參考：</b>Amazon 耳機暢銷 #29</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20final%20E500" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥4,000–6,000" data-store="Bic Camera" data-amzrank="31"><h3>Victor HA-A6T</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/jvc-a6t.jpg" onerror="imgRetry(this)" alt="Victor HA-A6T">
+<p>介紹：小巧真無線，23 小時續航。</p>
+<p class="kv"><b>價格：</b>約¥4,000–6,000｜<b>參考：</b>Amazon 耳機暢銷 #31</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20Victor%20HA-A6T" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥5,000–7,000" data-store="Bic Camera" data-amzrank="39"><h3>Panasonic RP-HZ47</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/panasonic-hz47.jpg" onerror="imgRetry(this)" alt="Panasonic RP-HZ47">
+<p>介紹：耳夾式，長時間配戴舒適。</p>
+<p class="kv"><b>價格：</b>約¥5,000–7,000｜<b>參考：</b>Amazon 耳機暢銷 #39</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20Panasonic%20RP-HZ47" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥18,000–22,000" data-store="Bic Camera" data-amzrank="37"><h3>Shokz OpenRun Pro 2</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/shokz-runpro2.jpg" onerror="imgRetry(this)" alt="Shokz OpenRun Pro 2">
+<p>介紹：骨傳導運動耳機，VGP 金獎。</p>
+<p class="kv"><b>價格：</b>約¥18,000–22,000｜<b>參考：</b>Amazon 耳機暢銷 #37</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20Shokz%20OpenRun%20Pro%202" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥12,000–15,000" data-store="Bic Camera" data-amzrank="38"><h3>Shokz OpenRun Air 2</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/shokz-air2.jpg" onerror="imgRetry(this)" alt="Shokz OpenRun Air 2">
+<p>介紹：輕量骨傳導，IP67。</p>
+<p class="kv"><b>價格：</b>約¥12,000–15,000｜<b>參考：</b>Amazon 耳機暢銷 #38</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20Shokz%20OpenRun%20Air%202" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥15,000–18,000" data-store="Bic Camera" data-amzrank="43"><h3>Shokz OpenComm2</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/shokz-comm2.jpg" onerror="imgRetry(this)" alt="Shokz OpenComm2">
+<p>介紹：商務通話骨傳導，16 小時。</p>
+<p class="kv"><b>價格：</b>約¥15,000–18,000｜<b>參考：</b>Amazon 耳機暢銷 #43</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20Shokz%20OpenComm2" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥15,000–18,000" data-store="Bic Camera" data-amzrank="49"><h3>Shokz OpenDots 2</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/shokz-dots2.jpg" onerror="imgRetry(this)" alt="Shokz OpenDots 2">
+<p>介紹：耳夾式 Dolby Audio，VGP 金獎。</p>
+<p class="kv"><b>價格：</b>約¥15,000–18,000｜<b>參考：</b>Amazon 耳機暢銷 #49</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20Shokz%20OpenDots%202" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥25,000–30,000" data-store="Bic Camera" data-amzrank="48"><h3>JBL TOUR PRO 3</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/jbl-tourpro3.jpg" onerror="imgRetry(this)" alt="JBL TOUR PRO 3">
+<p>介紹：觸控螢幕充電盒，混合降噪。</p>
+<p class="kv"><b>價格：</b>約¥25,000–30,000｜<b>參考：</b>Amazon 耳機暢銷 #48</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20JBL%20TOUR%20PRO%203" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥4,000–6,000" data-store="Bic Camera" data-amzrank="56"><h3>UGREEN ClipBuds</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/ugreen-clip.jpg" onerror="imgRetry(this)" alt="UGREEN ClipBuds">
+<p>介紹：耳夾開放式，30 小時續航。</p>
+<p class="kv"><b>價格：</b>約¥4,000–6,000｜<b>參考：</b>Amazon 耳機暢銷 #56</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20UGREEN%20ClipBuds" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥5,000–7,000" data-store="Bic Camera" data-amzrank="59"><h3>UGREEN HiTune Max5c</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/ugreen-max5c.jpg" onerror="imgRetry(this)" alt="UGREEN HiTune Max5c">
+<p>介紹：耳罩式 75 小時，LDAC。</p>
+<p class="kv"><b>價格：</b>約¥5,000–7,000｜<b>參考：</b>Amazon 耳機暢銷 #59</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20UGREEN%20HiTune%20Max5c" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥25,000–30,000" data-store="Bic Camera" data-amzrank="0"><h3>Beats Studio Pro</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/beats-studio-pro.jpg" onerror="imgRetry(this)" alt="Beats Studio Pro">
+<p>介紹：耳罩降噪，Apple/Android 雙相容。</p>
+<p class="kv"><b>價格：</b>約¥25,000–30,000｜<b>參考：</b>未收錄榜單</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20Beats%20Studio%20Pro" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥45,000–55,000" data-store="Bic Camera" data-amzrank="0"><h3>SONY WH-1000XM6</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/wh1000xm6.jpg" onerror="imgRetry(this)" alt="SONY WH-1000XM6">
+<p>介紹：旗艦耳罩降噪，LDAC。</p>
+<p class="kv"><b>價格：</b>約¥45,000–55,000｜<b>參考：</b>未收錄榜單</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20SONY%20WH-1000XM6" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="電器" data-price="約¥18,000–22,000" data-store="Bic Camera" data-amzrank="0"><h3>AirPods 4</h3><div class="en">Bic Camera</div>
+<img class="ph" loading="lazy" src="images/goods/airpods4.jpg" onerror="imgRetry(this)" alt="AirPods 4">
+<p>介紹：半入耳設計，空間音訊。</p>
+<p class="kv"><b>價格：</b>約¥18,000–22,000｜<b>參考：</b>未收錄榜單</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%83%83%E3%82%AF%E3%82%AB%E3%83%A1%E3%83%A9%20AirPods%204" target="_blank">🗺 地圖</a></div>
 </div>
 
 <!-- ================= MIYAKO ================= -->
@@ -1402,13 +1580,14 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 </div>
 
 <div id="imodal"><div class="ipanel"><span class="ix" onclick="closeItem()">✕</span><div id="iboby"></div></div></div>
+<div id="rkDetail"><div class="ipanel"><span class="ix" onclick="closeRankItem()">✕</span><div id="rkDetailBody"></div></div></div>
 <div id="rankOv"><div class="ipanel"><span class="ix" onclick="closeRankOv()">✕</span>
  <h3 style="font-size:18px;padding-right:30px">🏆 人氣 TOP 30</h3>
  <div class="rk-tabs"><button id="rkDonki" class="on" onclick="renderRankOv('唐吉軻德')">🛒 唐吉軻德</button><button id="rkBic" onclick="renderRankOv('Bic Camera')">🔌 Bic Camera</button><button id="rkDrug" onclick="renderRankOv('藥妝店')">💊 藥妝店</button></div>
  <div id="rkBody"></div>
- <div style="font-size:11.5px;color:#8a7a5c;margin-top:12px">人氣分＝外部榜單（おきなわ部・TRVLOGUE・JAF Mate 2025）＋家人勾選票數×10。藥妝類目前無公開銷售榜，先以家人票數統計；價格為約略值。</div>
+ <div style="font-size:11.5px;color:#8a7a5c;margin-top:12px">人氣分＝唐吉：三大榜單（おきなわ部・TRVLOGUE・JAF Mate 2025）；Bic：Amazon 耳機暢銷榜（2026-10）；藥妝：家人票數。全部再加家人勾選×10，點品項可看大圖與說明；價格為約略值。</div>
 </div></div>
-<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20261027-bv<span id="jsok"></span><span id="jsdiag"></span>・有問題請截圖此行</div>
+<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20261027-bw<span id="jsok"></span><span id="jsdiag"></span>・有問題請截圖此行</div>
 <button id="statsBtn" onclick="openStats()">📊</button>
 <button id="chatBtn" onclick="openChat()">💬</button>
 <div id="chatpanel"><div style="display:flex;align-items:center;padding:10px 14px 0"><b style="font-size:16px">💬 小幫手</b><button onclick="toggleThreads()" style="border:1px solid #d8d0bd;background:#fff;border-radius:16px;padding:4px 10px;font-size:13px;cursor:pointer;margin-left:8px">📜 對話</button><span style="flex:1"></span><button onclick="closeChat()" style="border:1px solid #d8d0bd;background:#fff;border-radius:16px;padding:4px 12px;font-size:13px;cursor:pointer">✕ 關閉</button></div><div id="chatthreads" style="display:none;max-height:150px;overflow-y:auto;margin:8px 14px 0;background:#fff;border-radius:10px;padding:6px"></div><div id="chatlog"></div><div id="chatbar"><input id="chatinput" maxlength="200" placeholder="小幫手即將開通…" disabled><button onclick="sendChat()">送出</button></div></div>
@@ -1421,7 +1600,7 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 var PLACES=[['s-naha','那霸'],['s-miyako','宮古島'],['s-ishigaki','石垣島']];
 var CATS=['food','spot','shop','souv','feat'];
 var CATN={food:'餐廳',spot:'景點',shop:'購物',souv:'伴手禮',feat:'當地特色'};
-var CARDMAP={'s-naha': ['food', 'food', 'food', 'food', 'food', 'food', 'food', 'food', 'food', 'food', 'food', 'spot', 'spot', 'spot', 'spot', 'spot', 'spot', 'spot', 'spot', 'spot', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'spot', 'spot', 'spot', 'spot', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'feat', 'spot', 'spot', 'spot', 'food', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'food', 'shop', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'shop', 'shop', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv'], 's-miyako': ['spot', 'spot', 'spot', 'spot', 'spot', 'food', 'food', 'shop', 'spot', 'spot', 'spot', 'spot', 'spot', 'shop', 'shop', 'souv', 'souv', 'souv', 'souv', 'souv', 'feat', 'spot', 'spot', 'shop', 'shop', 'shop'], 's-ishigaki': ['spot', 'spot', 'spot', 'spot', 'food', 'food', 'food', 'food', 'food', 'shop', 'spot', 'spot', 'spot', 'spot', 'shop', 'souv', 'souv', 'souv', 'souv', 'souv', 'feat', 'shop', 'shop', 'shop']};
+var CARDMAP={'s-naha': ['food', 'food', 'food', 'food', 'food', 'food', 'food', 'food', 'food', 'food', 'food', 'spot', 'spot', 'spot', 'spot', 'spot', 'spot', 'spot', 'spot', 'spot', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'spot', 'spot', 'spot', 'spot', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'feat', 'spot', 'spot', 'spot', 'food', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'food', 'shop', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'shop', 'shop', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv'], 's-miyako': ['spot', 'spot', 'spot', 'spot', 'spot', 'food', 'food', 'shop', 'spot', 'spot', 'spot', 'spot', 'spot', 'shop', 'shop', 'souv', 'souv', 'souv', 'souv', 'souv', 'feat', 'spot', 'spot', 'shop', 'shop', 'shop'], 's-ishigaki': ['spot', 'spot', 'spot', 'spot', 'food', 'food', 'food', 'food', 'food', 'shop', 'spot', 'spot', 'spot', 'spot', 'shop', 'souv', 'souv', 'souv', 'souv', 'souv', 'feat', 'shop', 'shop', 'shop']};
 var GROUPS=[];PLACES.forEach(function(s){CATS.forEach(function(c){GROUPS.push(s[1]+CATN[c]);});});
 var curP='s-naha',curC='food';
 var VKEY='discuss_votes_v1',NKEY='discuss_name_v1';
@@ -1732,7 +1911,7 @@ function lvData(){
    var t=el.querySelector('h3');if(!t)return;
    out.push({cid:sid+'#'+i,sid:sid,kind:cardCat(sid,i),
     name:t.textContent.replace(/✅/g,'').trim(),img:(el.querySelector('img.ph')||{}).getAttribute?el.querySelector('img.ph').getAttribute('src'):'',
-    cat:el.getAttribute('data-cat')||'',price:el.getAttribute('data-price')||'',
+    cat:el.getAttribute('data-cat')||'',price:el.getAttribute('data-price')||'',amzrank:+(el.getAttribute('data-amzrank')||0),
     store:el.getAttribute('data-store')||''});
   });
  });
@@ -1814,6 +1993,23 @@ function toggleLv(force){
 }
 
 
+
+function openRankItem(cid){
+ var p=cid.split('#'),cards=document.querySelectorAll('#'+p[0]+' .card'),c=cards[+p[1]];if(!c)return;
+ var h3=c.querySelector('h3'),en=c.querySelector('.en'),im=c.querySelector('img.ph');
+ var desc='';c.querySelectorAll('p').forEach(function(pp){desc+=pp.outerHTML;});
+ var map=c.querySelector('a.map');
+ document.getElementById('rkDetailBody').innerHTML=
+  '<h3 style="font-size:19px;padding-right:30px;line-height:1.4">'+(h3?escH(h3.textContent.replace(/✅/g,'').trim()):'')+'</h3>'
+  +(en?'<div style="color:#8a7a5c;font-size:13px;margin-top:2px">'+escH(en.textContent)+'</div>':'')
+  +(im?'<img src="'+escH(im.getAttribute('src'))+'" style="width:100%;max-height:50vh;object-fit:contain;background:#fff;border-radius:12px;margin:12px 0;border:1px solid #eee">':'')
+  +'<div style="font-size:14px;line-height:1.7">'+desc+'</div>'
+  +(map?'<div style="margin-top:12px"><a class="map" href="'+map.getAttribute('href')+'" target="_blank">🗺 地圖</a></div>':'');
+ document.getElementById('rkDetail').classList.add('on');
+}
+function closeRankItem(){document.getElementById('rkDetail').classList.remove('on');}
+document.getElementById('rkDetail').addEventListener('click',function(e){if(e.target===this)closeRankItem();});
+
 /* ===== 人氣排行（榜單分＋家人票） ===== */
 var POP_SRC=[
  ['おきなわ部',10,['島とうがらしマヨプレッツェル','今日のシーサーもよう','御菓子御殿 紅芋塔','雪塩ちんすこう','ぷっちょ','ハイチュウ','チョコミント黒糖']],
@@ -1831,8 +2027,12 @@ function popInfo(name){
  return {pts:pts,tags:tags};
 }
 function popScore(o,v){
- var inf=popInfo(o.name);
- return {score:inf.pts+(v.length*10),pts:inf.pts,votes:v.length,tags:inf.tags};
+ var inf=popInfo(o.name),pts=inf.pts,tags=inf.tags.slice();
+ if(o.store==='Bic Camera'){
+  if(o.amzrank){pts+=(61-o.amzrank)*3;tags.push('Amazon耳機#'+o.amzrank);}
+  else if(o.kind==='souv'){pts+=5;tags.push('榜單未收錄');}
+ }
+ return {score:pts+(v.length*10),pts:pts,votes:v.length,tags:tags};
 }
 
 /* ===== 伴手禮推薦排行 ===== */
@@ -1858,7 +2058,7 @@ function renderRankOv(store){
    var emo={'食品':'🍬','酒類':'🍶','用品':'🧴','電器':'🔌','紀念品':'🎐','伴手禮':'🎁'}[o.cat]||'🎁';
    h+='<div class="rkrow"><div class="rkno">'+(i+1)+'</div>'
     +(o.img?('<img class="rkthumb" loading="lazy" src="'+escH(o.img)+'" onerror="this.style.display=\'none\'">'):('<div class="rkthumb em">'+emo+'</div>'))
-    +'<div class="rkname" onclick="openOvDetail(\''+o.cid+'\')">'+escH(o.name)
+    +'<div class="rkname" onclick="openRankItem(\''+o.cid+'\')">'+escH(o.name)
     +'<div class="rkvotes">人氣 '+pi.score+(pi.tags.length?('｜'+pi.tags.join('・')):'')+(pi.votes?('・'+pi.votes+' 票'):'')+'</div></div>'
     +(o.price?('<div class="rkprice">'+escH(o.price)+'</div>'):'')
     +'<button class="lvchk'+(on?' on':'')+'" style="width:26px;height:26px;flex:none" onclick="lvToggle(\''+o.cid+'\');setTimeout(function(){renderRankOv()},800)">'+(on?'✓':'')+'</button>'
