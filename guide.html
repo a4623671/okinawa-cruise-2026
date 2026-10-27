@@ -247,8 +247,9 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 #rankOv.on{display:flex}
 #rankOv .ipanel{background:#fff;border-radius:18px 18px 0 0;max-width:720px;width:100%;max-height:88vh;overflow-y:auto;padding:18px 16px calc(20px + env(safe-area-inset-bottom));position:relative}
 #rankOv .ix{position:absolute;top:10px;right:16px;font-size:18px;cursor:pointer;background:#f0ece2;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:#4a5b6c}
-.rk-tabs{display:flex;gap:8px;margin:8px 0 12px}
-.rk-tabs button{flex:1;padding:10px 6px;border-radius:12px;border:1px solid #d8d0bd;background:#fff;font-weight:800;font-size:13.5px;color:#33415c;cursor:pointer}
+.rk-tabs{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px}
+.rk-tabs button{flex:1 1 40%;min-width:0;padding:10px 6px;border-radius:12px;border:1px solid #d8d0bd;background:#fff;font-weight:800;font-size:13px;color:#33415c;cursor:pointer;white-space:nowrap}
+@media(min-width:680px){.rk-tabs button{flex:1 1 0}}
 .rk-tabs button.on{background:#10293f;color:#fff;border-color:#10293f}
 .rksec{font-size:12.5px;font-weight:900;color:#8a7a5c;margin:14px 0 4px}
 .rkrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dotted #e6dfcd}
@@ -277,7 +278,7 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 <button class="cat cat2" onclick="swCat('souv',this)">🎁 伴手禮</button>
 <button class="cat cat2" onclick="swCat('feat',this)">✨ 當地特色</button>
 </div>
-<div class="legend">每人可勾選多項，可隨時取消；勾選會即時同步給家人。價格與營業時間為約略值。（版本 20261027-by）</div>
+<div class="legend">每人可勾選多項，可隨時取消；勾選會即時同步給家人。價格與營業時間為約略值。（版本 20261027-bz）</div>
 </div>
 
 <div id="lvui">
@@ -1686,152 +1687,152 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 
 <h2 class="st" data-c="souv">🛍 3COINS 必買 30（台灣旅客參考）</h2>
 <p class="note">排名參考日本 3COINS 官方暢銷榜與台灣旅客討論度整理，僅供採買參考、非官方名次。價格為日本官網稅込價，門市庫存與台灣售價依現場為準；沖繩門市：3COINS+plus 那霸 Main Place／PARCO CITY／永旺夢樂城沖繩來客夢。</p>
-<div class="card" data-cat="3COINS" data-price="¥1,100" data-store="3COINS"><h3>01. 3COINS 環保購物袋</h3><div class="en">3COINS Eco Bag</div>
+<div class="card" data-cat="3COINS" data-price="¥1,100" data-amzrank="1"data-store="3COINS"><h3>01. 3COINS 環保購物袋</h3><div class="en">3COINS Eco Bag</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-01.jpg" onerror="imgRetry(this)" alt="3COINS 環保購物袋">
 <p>介紹：大容量又輕，折起來只有手掌大，回程裝戰利品或超市採買都好用。</p>
 <p class="kv"><b>價格：</b>¥1,100（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2623-PSEB01-000/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥3,300" data-store="3COINS"><h3>02. 3COINS 摺疊旅行袋</h3><div class="en">Folding Carry Bag</div>
+<div class="card" data-cat="3COINS" data-price="¥3,300" data-amzrank="2"data-store="3COINS"><h3>02. 3COINS 摺疊旅行袋</h3><div class="en">Folding Carry Bag</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-02.jpg" onerror="imgRetry(this)" alt="3COINS 摺疊旅行袋">
 <p>介紹：可折成扁平收納，回程多買一箱也不怕；有滾輪與提把，尺寸依航空公司規定確認。</p>
 <p class="kv"><b>價格：</b>¥3,300（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2622-PSTKBAG-00/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥330" data-store="3COINS"><h3>03. 3COINS 自動壓縮袋 3 入</h3><div class="en">Auto Compression Bags</div>
+<div class="card" data-cat="3COINS" data-price="¥330" data-amzrank="3"data-store="3COINS"><h3>03. 3COINS 自動壓縮袋 3 入</h3><div class="en">Auto Compression Bags</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-03.jpg" onerror="imgRetry(this)" alt="3COINS 自動壓縮袋 3 入">
 <p>介紹：換季衣物、外套、棉被用手捲或吸塵器就能壓縮，行李瞬間多出空間。</p>
 <p class="kv"><b>價格：</b>¥330（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2524-3C7B177-00/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥1,100" data-store="3COINS"><h3>04. 3COINS 電動壓縮機</h3><div class="en">Electric Compression Pump</div>
+<div class="card" data-cat="3COINS" data-price="¥1,100" data-amzrank="4"data-store="3COINS"><h3>04. 3COINS 電動壓縮機</h3><div class="en">Electric Compression Pump</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-04.jpg" onerror="imgRetry(this)" alt="3COINS 電動壓縮機">
 <p>介紹：搭配壓縮袋使用的電動抽氣機，飯店整理行李比手捲快很多。</p>
 <p class="kv"><b>價格：</b>¥1,100（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2524-3C7B176-00/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥1,320" data-store="3COINS"><h3>05. 3COINS 旅行吊掛衣物收納</h3><div class="en">Travel Hanging Clothes Storage</div>
+<div class="card" data-cat="3COINS" data-price="¥1,320" data-amzrank="5"data-store="3COINS"><h3>05. 3COINS 旅行吊掛衣物收納</h3><div class="en">Travel Hanging Clothes Storage</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-05.jpg" onerror="imgRetry(this)" alt="3COINS 旅行吊掛衣物收納">
 <p>介紹：吊掛式衣物收納，飯店衣櫃直接掛，回程整袋提走不漏東漏西。</p>
 <p class="kv"><b>價格：</b>¥1,320（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2622-EC-M05-000/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥880" data-store="3COINS"><h3>06. 3COINS 有機棉迷你浴巾</h3><div class="en">Organic Cotton Mini Bath Towel</div>
+<div class="card" data-cat="3COINS" data-price="¥880" data-amzrank="6"data-store="3COINS"><h3>06. 3COINS 有機棉迷你浴巾</h3><div class="en">Organic Cotton Mini Bath Towel</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-06.jpg" onerror="imgRetry(this)" alt="3COINS 有機棉迷你浴巾">
 <p>介紹：有機棉迷你浴巾，吸水快乾、體積小，海邊或溫泉後很好用。</p>
 <p class="kv"><b>價格：</b>¥880（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2611-OCMINI01-0/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥550" data-store="3COINS"><h3>07. 3COINS 摺疊頸枕</h3><div class="en">Folding Neck Pillow</div>
+<div class="card" data-cat="3COINS" data-price="¥550" data-amzrank="7"data-store="3COINS"><h3>07. 3COINS 摺疊頸枕</h3><div class="en">Folding Neck Pillow</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-07.jpg" onerror="imgRetry(this)" alt="3COINS 摺疊頸枕">
 <p>介紹：飛機、巴士上補眠用，支撐頸部，摺疊後不占空間。</p>
 <p class="kv"><b>價格：</b>¥550（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2424-KTNP01-000/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥792" data-store="3COINS"><h3>08. 3COINS 防潑水迷你斜背包</h3><div class="en">Water Repellent Mini Shoulder Bag</div>
+<div class="card" data-cat="3COINS" data-price="¥792" data-amzrank="8"data-store="3COINS"><h3>08. 3COINS 防潑水迷你斜背包</h3><div class="en">Water Repellent Mini Shoulder Bag</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-08.jpg" onerror="imgRetry(this)" alt="3COINS 防潑水迷你斜背包">
 <p>介紹：防潑水材質，手機、護照、行動電源一包搞定，午後雷陣雨也不怕。</p>
 <p class="kv"><b>價格：</b>¥792（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2612-C3-0000000/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥550" data-store="3COINS"><h3>09. 3COINS 防潑水輕量摺疊包</h3><div class="en">Water Repellent Packable Bag</div>
+<div class="card" data-cat="3COINS" data-price="¥550" data-amzrank="9"data-store="3COINS"><h3>09. 3COINS 防潑水輕量摺疊包</h3><div class="en">Water Repellent Packable Bag</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-09.jpg" onerror="imgRetry(this)" alt="3COINS 防潑水輕量摺疊包">
 <p>介紹：輕量防潑水摺疊包，可塞進隨身包，臨時採買或海邊玩水都方便。</p>
 <p class="kv"><b>價格：</b>¥550（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2622-TR-ST-06-0/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥1,100" data-store="3COINS"><h3>10. 3COINS 多功能小物收納包</h3><div class="en">Multi Pouch</div>
+<div class="card" data-cat="3COINS" data-price="¥1,100" data-amzrank="10"data-store="3COINS"><h3>10. 3COINS 多功能小物收納包</h3><div class="en">Multi Pouch</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-10.jpg" onerror="imgRetry(this)" alt="3COINS 多功能小物收納包">
 <p>介紹：多隔層小物包，化妝品、充電線、藥品分類清楚，送禮也實用。</p>
 <p class="kv"><b>價格：</b>¥1,100（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2621-3C7B486-00/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥880" data-store="3COINS"><h3>11. 3COINS 多隔層 3C 收納包</h3><div class="en">Gadget Pouch</div>
+<div class="card" data-cat="3COINS" data-price="¥880" data-amzrank="11"data-store="3COINS"><h3>11. 3COINS 多隔層 3C 收納包</h3><div class="en">Gadget Pouch</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-11.jpg" onerror="imgRetry(this)" alt="3COINS 多隔層 3C 收納包">
 <p>介紹：專門收納充電器、線材、耳機與行動電源，出差旅行不再翻包。</p>
 <p class="kv"><b>價格：</b>¥880（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2622-3C7B546-00/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥330" data-store="3COINS"><h3>12. 3COINS 透明收納箱包 L</h3><div class="en">Clear Box Bag L</div>
+<div class="card" data-cat="3COINS" data-price="¥330" data-amzrank="12"data-store="3COINS"><h3>12. 3COINS 透明收納箱包 L</h3><div class="en">Clear Box Bag L</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-12.jpg" onerror="imgRetry(this)" alt="3COINS 透明收納箱包 L">
 <p>介紹：透明收納箱包 L，內容物一眼可見，裝衣服或戰利品都合適。</p>
 <p class="kv"><b>價格：</b>¥330（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2414-M02-000000/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥550" data-store="3COINS"><h3>13. 3COINS 透明收納箱包 LL</h3><div class="en">Clear Box Bag LL</div>
+<div class="card" data-cat="3COINS" data-price="¥550" data-amzrank="13"data-store="3COINS"><h3>13. 3COINS 透明收納箱包 LL</h3><div class="en">Clear Box Bag LL</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-13.jpg" onerror="imgRetry(this)" alt="3COINS 透明收納箱包 LL">
 <p>介紹：透明收納箱包 LL，大容量可放外套、毛巾，搬家與旅行兩用。</p>
 <p class="kv"><b>價格：</b>¥550（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2414-M01-000000/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥330" data-store="3COINS"><h3>14. 3COINS 附蓋透明收納盒</h3><div class="en">Clear Wide Box with Lid</div>
+<div class="card" data-cat="3COINS" data-price="¥330" data-amzrank="14"data-store="3COINS"><h3>14. 3COINS 附蓋透明收納盒</h3><div class="en">Clear Wide Box with Lid</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-14.jpg" onerror="imgRetry(this)" alt="3COINS 附蓋透明收納盒">
 <p>介紹：附蓋透明寬收納盒，堆疊不亂，化妝品與雜物分類。</p>
 <p class="kv"><b>價格：</b>¥330（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2414-M03-000000/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥770" data-store="3COINS"><h3>15. 3COINS 可拆隔板三層收納盒</h3><div class="en">3-Tier Storage Box</div>
+<div class="card" data-cat="3COINS" data-price="¥770" data-amzrank="15"data-store="3COINS"><h3>15. 3COINS 可拆隔板三層收納盒</h3><div class="en">3-Tier Storage Box</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-15.jpg" onerror="imgRetry(this)" alt="3COINS 可拆隔板三層收納盒">
 <p>介紹：三層收納盒，隔板可拆，藥品、文具、飾品都能分類。</p>
 <p class="kv"><b>價格：</b>¥770（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2622-SKRBOX-000/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥880" data-store="3COINS"><h3>16. 3COINS 壁掛式文件收納</h3><div class="en">Wall File</div>
+<div class="card" data-cat="3COINS" data-price="¥880" data-amzrank="16"data-store="3COINS"><h3>16. 3COINS 壁掛式文件收納</h3><div class="en">Wall File</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-16.jpg" onerror="imgRetry(this)" alt="3COINS 壁掛式文件收納">
 <p>介紹：壁掛式文件收納，護照、票券、行程表集中，出門不手忙腳亂。</p>
 <p class="kv"><b>價格：</b>¥880（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2611-PSKFILE-00/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥880" data-store="3COINS"><h3>17. 3COINS 壁掛式繪本收納</h3><div class="en">Wall Book Storage</div>
+<div class="card" data-cat="3COINS" data-price="¥880" data-amzrank="17"data-store="3COINS"><h3>17. 3COINS 壁掛式繪本收納</h3><div class="en">Wall Book Storage</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-17.jpg" onerror="imgRetry(this)" alt="3COINS 壁掛式繪本收納">
 <p>介紹：壁掛式繪本收納，小孩房或玄關收納童書，視覺整齊。</p>
 <p class="kv"><b>價格：</b>¥880（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2623-KRJD02-000/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥550" data-store="3COINS"><h3>18. 3COINS 有機棉洗臉毛巾</h3><div class="en">Organic Cotton Face Towel</div>
+<div class="card" data-cat="3COINS" data-price="¥550" data-amzrank="18"data-store="3COINS"><h3>18. 3COINS 有機棉洗臉毛巾</h3><div class="en">Organic Cotton Face Towel</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-18.jpg" onerror="imgRetry(this)" alt="3COINS 有機棉洗臉毛巾">
 <p>介紹：有機棉洗臉毛巾，親膚吸水，輕薄好帶，多色可選。</p>
 <p class="kv"><b>價格：</b>¥550（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2611-OCFACE01-0/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥330" data-store="3COINS"><h3>19. 3COINS 吸水乾髮帽</h3><div class="en">Hair Dry Cap</div>
+<div class="card" data-cat="3COINS" data-price="¥330" data-amzrank="19"data-store="3COINS"><h3>19. 3COINS 吸水乾髮帽</h3><div class="en">Hair Dry Cap</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-19.jpg" onerror="imgRetry(this)" alt="3COINS 吸水乾髮帽">
 <p>介紹：吸水乾髮帽，洗完頭包著就不滴水，海邊玩水後必備。</p>
 <p class="kv"><b>價格：</b>¥330（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2325-HDCAP-0000/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥660" data-store="3COINS"><h3>20. 3COINS 蠶絲眼罩</h3><div class="en">Silk Mask</div>
+<div class="card" data-cat="3COINS" data-price="¥660" data-amzrank="20"data-store="3COINS"><h3>20. 3COINS 蠶絲眼罩</h3><div class="en">Silk Mask</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-20.jpg" onerror="imgRetry(this)" alt="3COINS 蠶絲眼罩">
 <p>介紹：100% 蠶絲眼罩，透氣親膚，飛機與飯店睡眠好用。</p>
 <p class="kv"><b>價格：</b>¥660（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2622-PLSILK107-/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥330" data-store="3COINS"><h3>21. 3COINS 2D 立體口罩 30 枚</h3><div class="en">2D Fit Up Mask</div>
+<div class="card" data-cat="3COINS" data-price="¥330" data-amzrank="21"data-store="3COINS"><h3>21. 3COINS 2D 立體口罩 30 枚</h3><div class="en">2D Fit Up Mask</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-21.jpg" onerror="imgRetry(this)" alt="3COINS 2D 立體口罩 30 枚">
 <p>介紹：2D 立體口罩 30 枚入，透氣不悶，日常補貨型伴手禮。</p>
 <p class="kv"><b>價格：</b>¥330（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2511-SC01-00000/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥550" data-store="3COINS"><h3>22. 3COINS 藥品手冊收納包</h3><div class="en">Medicine Notebook Case</div>
+<div class="card" data-cat="3COINS" data-price="¥550" data-amzrank="22"data-store="3COINS"><h3>22. 3COINS 藥品手冊收納包</h3><div class="en">Medicine Notebook Case</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-22.jpg" onerror="imgRetry(this)" alt="3COINS 藥品手冊收納包">
 <p>介紹：藥品手冊收納包，放處方箋、藥品、健保卡，回診或旅行都方便。</p>
 <p class="kv"><b>價格：</b>¥550（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2611-KHT-12-000/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥330" data-store="3COINS"><h3>23. 3COINS 分裝小盒 4 入</h3><div class="en">Small Case 4-Piece Set</div>
+<div class="card" data-cat="3COINS" data-price="¥330" data-amzrank="23"data-store="3COINS"><h3>23. 3COINS 分裝小盒 4 入</h3><div class="en">Small Case 4-Piece Set</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-23.jpg" onerror="imgRetry(this)" alt="3COINS 分裝小盒 4 入">
 <p>介紹：4 個小分裝盒，藥品、飾品、糖果分類，輕巧不占空間。</p>
 <p class="kv"><b>價格：</b>¥330（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2622-KWKCASE-00/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥660" data-store="3COINS"><h3>24. 3COINS 鑰匙圈展示架</h3><div class="en">Keychain Stand</div>
+<div class="card" data-cat="3COINS" data-price="¥660" data-amzrank="24"data-store="3COINS"><h3>24. 3COINS 鑰匙圈展示架</h3><div class="en">Keychain Stand</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-24.jpg" onerror="imgRetry(this)" alt="3COINS 鑰匙圈展示架">
 <p>介紹：鑰匙圈展示架，扭蛋、吊飾、小物一次展示。</p>
 <p class="kv"><b>價格：</b>¥660（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2614-CHYD-00000/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥330" data-store="3COINS"><h3>25. 3COINS 圖案襪（混色）</h3><div class="en">Assorted Socks</div>
+<div class="card" data-cat="3COINS" data-price="¥330" data-amzrank="25"data-store="3COINS"><h3>25. 3COINS 圖案襪（混色）</h3><div class="en">Assorted Socks</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-25.jpg" onerror="imgRetry(this)" alt="3COINS 圖案襪（混色）">
 <p>介紹：混色圖案襪，材質柔軟、顏色可愛，適合送同事朋友。</p>
 <p class="kv"><b>價格：</b>¥330（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2623-KN1-KNIT-0/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥2,200" data-store="3COINS"><h3>26. 3COINS 微波調理器（6 合一）</h3><div class="en">Microwave Cooker KITINTO</div>
+<div class="card" data-cat="3COINS" data-price="¥2,200" data-amzrank="26"data-store="3COINS"><h3>26. 3COINS 微波調理器（6 合一）</h3><div class="en">Microwave Cooker KITINTO</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-26.jpg" onerror="imgRetry(this)" alt="3COINS 微波調理器（6 合一）">
 <p>介紹：6 合一微波調理器，煎、炒、煮、蒸、炊飯一鍋完成，免開火。</p>
 <p class="kv"><b>價格：</b>¥2,200（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2416-HCMWP01-00/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥550" data-store="3COINS"><h3>27. 3COINS 2WAY 油噴瓶</h3><div class="en">2WAY Oil Spray Bottle</div>
+<div class="card" data-cat="3COINS" data-price="¥550" data-amzrank="27"data-store="3COINS"><h3>27. 3COINS 2WAY 油噴瓶</h3><div class="en">2WAY Oil Spray Bottle</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-27.jpg" onerror="imgRetry(this)" alt="3COINS 2WAY 油噴瓶">
 <p>介紹：2WAY 油噴瓶，可倒可噴，控制用油量，露營與日常料理都好用。</p>
 <p class="kv"><b>價格：</b>¥550（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2417-EC-3C7U322/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥330" data-store="3COINS"><h3>28. 3COINS 2WAY 迷你噴瓶</h3><div class="en">2WAY Mini Spray Bottle</div>
+<div class="card" data-cat="3COINS" data-price="¥330" data-amzrank="28"data-store="3COINS"><h3>28. 3COINS 2WAY 迷你噴瓶</h3><div class="en">2WAY Mini Spray Bottle</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-28.jpg" onerror="imgRetry(this)" alt="3COINS 2WAY 迷你噴瓶">
 <p>介紹：2WAY 迷你噴瓶，分裝化妝水、酒精或醬油，旅行攜帶不漏。</p>
 <p class="kv"><b>價格：</b>¥330（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2522-3C7U007-00/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥1,980" data-store="3COINS"><h3>29. 3COINS 微波玻璃蒸籠鍋</h3><div class="en">Microwave Glass Steamer</div>
+<div class="card" data-cat="3COINS" data-price="¥1,980" data-amzrank="29"data-store="3COINS"><h3>29. 3COINS 微波玻璃蒸籠鍋</h3><div class="en">Microwave Glass Steamer</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-29.jpg" onerror="imgRetry(this)" alt="3COINS 微波玻璃蒸籠鍋">
 <p>介紹：微波玻璃蒸籠鍋，微波就能蒸蔬菜、包子，健康料理少油煙。</p>
 <p class="kv"><b>價格：</b>¥1,980（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
 <a class="map" href="https://www.palcloset.jp/display/item/2623-ROKT01-000/?b=3coins" target="_blank">🔗 官方商品頁</a></div>
-<div class="card" data-cat="3COINS" data-price="¥770" data-store="3COINS"><h3>30. 3COINS 衛生用品壓縮收納包 L</h3><div class="en">Sanitary Compression Pouch L</div>
+<div class="card" data-cat="3COINS" data-price="¥770" data-amzrank="30"data-store="3COINS"><h3>30. 3COINS 衛生用品壓縮收納包 L</h3><div class="en">Sanitary Compression Pouch L</div>
 <img class="ph" loading="lazy" src="images/goods/3coins-30.jpg" onerror="imgRetry(this)" alt="3COINS 衛生用品壓縮收納包 L">
 <p>介紹：衛生用品壓縮收納包 L，外出攜帶衛生棉或尿布，壓縮後不占空間。</p>
 <p class="kv"><b>價格：</b>¥770（稅込）｜<b>哪買：</b>3COINS+plus 那霸 Main Place／PARCO CITY／Rycom</p>
@@ -2177,13 +2178,13 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 <div id="imodal"><div class="ipanel"><span class="ix" onclick="closeItem()">✕</span><div id="iboby"></div></div></div>
 <div id="rkDetail"><div class="ipanel"><span class="ix" onclick="closeRankItem()">✕</span><div id="rkDetailBody"></div></div></div>
 <div id="rankOv"><div class="ipanel"><span class="ix" onclick="closeRankOv()">✕</span>
- <h3 style="font-size:18px;padding-right:30px">🏆 人氣 TOP 30</h3>
- <div class="rk-tabs"><button id="rkDonki" class="on" onclick="renderRankOv('唐吉軻德')">🛒 唐吉軻德</button><button id="rkDrug" onclick="renderRankOv('藥妝店')">💊 藥妝店</button></div>
+ <h3 style="font-size:18px;padding-right:30px">🏆 人氣／推薦排行</h3>
+ <div class="rk-tabs"><button id="rkDonki" class="on" onclick="renderRankOv('唐吉軻德')">🛒 唐吉軻德</button><button id="rkBic" onclick="renderRankOv('Bic Camera')">🔌 Bic Camera</button><button id="rkDrug" onclick="renderRankOv('藥妝店')">💊 藥妝店</button><button id="rkThree" onclick="renderRankOv('3COINS')">🛍 3COINS</button></div>
  <div class="rk-tabs" id="rkSub" style="display:none;gap:4px"><button data-c="藥品" class="on" onclick="rkSub('藥品')">藥品</button><button data-c="美妝" onclick="rkSub('美妝')">美妝</button><button data-c="貼布" onclick="rkSub('貼布')">貼布</button><button data-c="保健品" onclick="rkSub('保健品')">保健品</button></div>
  <div id="rkBody"></div>
- <div style="font-size:11.5px;color:#8a7a5c;margin-top:12px">人氣分＝唐吉：三大榜單；藥妝：Amazon 分類暢銷榜（醫藥品／美妝／貼布／保健品，各取前 20）。全部再加家人勾選×10；點品項可看大圖與說明。</div>
+ <div style="font-size:11.5px;color:#8a7a5c;margin-top:12px">人氣分＝唐吉：三大榜單；Bic：Amazon 耳機榜；藥妝：Amazon 分類暢銷榜（醫藥品／美妝／貼布／保健品，各取前 20）；3COINS：台灣旅客必買 30（非官方名次）。全部再加家人勾選×10；點品項可看大圖與說明。</div>
 </div></div>
-<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20261027-by<span id="jsok"></span><span id="jsdiag"></span>・有問題請截圖此行</div>
+<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20261027-bz<span id="jsok"></span><span id="jsdiag"></span>・有問題請截圖此行</div>
 <button id="statsBtn" onclick="openStats()">📊</button>
 <button id="chatBtn" onclick="openChat()">💬</button>
 <div id="chatpanel"><div style="display:flex;align-items:center;padding:10px 14px 0"><b style="font-size:16px">💬 小幫手</b><button onclick="toggleThreads()" style="border:1px solid #d8d0bd;background:#fff;border-radius:16px;padding:4px 10px;font-size:13px;cursor:pointer;margin-left:8px">📜 對話</button><span style="flex:1"></span><button onclick="closeChat()" style="border:1px solid #d8d0bd;background:#fff;border-radius:16px;padding:4px 12px;font-size:13px;cursor:pointer">✕ 關閉</button></div><div id="chatthreads" style="display:none;max-height:150px;overflow-y:auto;margin:8px 14px 0;background:#fff;border-radius:10px;padding:6px"></div><div id="chatlog"></div><div id="chatbar"><input id="chatinput" maxlength="200" placeholder="小幫手即將開通…" disabled><button onclick="sendChat()">送出</button></div></div>
@@ -2514,7 +2515,7 @@ function lvData(){
  return out;
 }
 function lvMatch(o){
- var isStore=(o.store==='唐吉軻德'||o.store==='Bic Camera'||o.store==='藥妝店');
+ var isStore=(o.store==='唐吉軻德'||o.store==='Bic Camera'||o.store==='藥妝店'||o.store==='3COINS');
  if(!isStore&&LVS.port!=='all'&&o.sid!==LVS.port)return false;
  if(LVS.kind!=='all'&&o.kind!==LVS.kind)return false;
  if(LVS.cat!=='all'&&o.cat!==LVS.cat)return false;
@@ -2632,6 +2633,10 @@ function popScore(o,v){
   if(o.amzrank){pts+=(21-o.amzrank)*5;tags.push((o.cat||'')+'#'+o.amzrank);}
   else if(o.kind==='souv'){pts+=3;tags.push('榜單未收錄');}
  }
+ if(o.store==='3COINS'){
+  if(o.amzrank){pts+=(31-o.amzrank)*3;tags.push('推薦#'+o.amzrank);}
+  else if(o.kind==='souv'){pts+=1;tags.push('必買清單');}
+ }
  return {score:pts+(v.length*10),pts:pts,votes:v.length,tags:tags};
 }
 
@@ -2642,16 +2647,16 @@ function openRankOv(store){RKS=store||RKS;document.getElementById('rankOv').clas
 function closeRankOv(){document.getElementById('rankOv').classList.remove('on');}
 function renderRankOv(store){
  if(store)RKS=store;
- document.getElementById('rkDonki').classList.toggle('on',RKS==='唐吉軻德');
- document.getElementById('rkDrug').classList.toggle('on',RKS==='藥妝店');document.getElementById('rkSub').style.display=(RKS==='藥妝店')?'flex':'none';document.querySelectorAll('#rkSub button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-c')===RKSUB);});
+ ['rkDonki:唐吉軻德','rkBic:Bic Camera','rkDrug:藥妝店','rkThree:3COINS'].forEach(function(x){var a=x.split(':'),el=document.getElementById(a[0]);if(el)el.classList.toggle('on',RKS===a[1]);});
+ document.getElementById('rkSub').style.display=(RKS==='藥妝店')?'flex':'none';document.querySelectorAll('#rkSub button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-c')===RKSUB);});
  var v=loadV(),mine=me();
  var items=lvData().filter(function(o){return o.store===RKS&&o.kind==='souv';});
  if(RKS==='藥妝店'){items=items.filter(function(o){return (o.cat||'')===RKSUB;});}
  var scored=items.map(function(o){return {o:o,pi:popScore(o,v[o.cid]||[])};});
  scored.sort(function(a,b){if(a.o.amzrank&&b.o.amzrank&&a.o.amzrank!==b.o.amzrank)return a.o.amzrank-b.o.amzrank;if(b.pi.score!==a.pi.score)return b.pi.score-a.pi.score;return a.o.name.localeCompare(b.o.name,'zh-Hant');});
- var lim=(RKS==='藥妝店'&&RKSUB==='美妝')?30:20;var top=scored.slice(0,lim);
+ var lim=(RKS==='3COINS')?30:((RKS==='藥妝店'&&RKSUB==='美妝')?30:20);var top=scored.slice(0,lim);
  var h='',checked=items.filter(function(o){return (v[o.cid]||[]).indexOf(mine)>=0;}).length;
- h+='<div style="font-size:12px;color:#6b7a89;margin-bottom:2px">🏆 '+(RKS==='藥妝店'?RKSUB+' TOP '+top.length:('人氣 TOP '+top.length))+'／共 '+items.length+' 項・你已勾 '+checked+' 項</div>';
+ h+='<div style="font-size:12px;color:#6b7a89;margin-bottom:2px">🏆 '+(RKS==='藥妝店'?RKSUB+' TOP '+top.length:((RKS==='3COINS'?'推薦 TOP ':'人氣 TOP ')+top.length))+'／共 '+items.length+' 項・你已勾 '+checked+' 項</div>';
  var lastCat='';
  top.forEach(function(row,i){
    var o=row.o,pi=row.pi,vv=v[o.cid]||[],on=vv.indexOf(mine)>=0;
