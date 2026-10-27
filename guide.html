@@ -215,14 +215,20 @@ body.lv #lvui{display:block}
 .lvsearch input{flex:1;border:1px solid #d8d0bd;border-radius:10px;padding:9px 11px;font-size:13px;background:#fff}
 .lvsearch button{border:1px solid #d8d0bd;border-radius:10px;padding:8px 12px;background:#fff;font-size:12.5px;color:#33415c;white-space:nowrap;flex:none}
 .lvsearch button.on{background:#0f7b4d;color:#fff;border-color:#0f7b4d;font-weight:700}
+.lvmore{display:none;padding-top:2px}
+.lvmore.open{display:block}
+#lvmoreBtn.on{background:#10293f;color:#fff;border-color:#10293f}
+.lvsearch input{min-width:0}
+.lvsel{border:1px solid #d8d0bd;border-radius:10px;padding:9px 8px;font-size:13px;background:#fff;color:#33415c;font-weight:700;flex:none;max-width:42vw}
+.lvhint{font-size:11px;color:#8a7a5c;align-self:center;white-space:nowrap}
 .lvsec{font-size:12.5px;color:#8a7a5c;font-weight:900;margin:14px 2px 6px;display:flex;justify-content:space-between;align-items:center}
 .lvrow{display:flex;align-items:center;gap:10px;background:#fff;border-radius:12px;padding:10px 12px;margin-bottom:6px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .lvrow.on{background:#f0f8f2;box-shadow:inset 0 0 0 2px #9fd3ac}
 .lvchk{flex:none;width:28px;height:28px;border-radius:9px;border:2px solid #b9c3cd;background:#fff;color:#fff;font-weight:900;font-size:16px;line-height:1;cursor:pointer;padding:0}
 .lvrow.on .lvchk,.lvchk.on{background:#18a058;border-color:#18a058}
 .lvname{flex:1;min-width:0;cursor:pointer}
-.lvthumb{width:44px;height:44px;border-radius:10px;object-fit:cover;flex:none;background:#eef1f4}
-.lvthumb.em{display:flex;align-items:center;justify-content:center;font-size:20px}
+.lvthumb{width:58px;height:58px;border-radius:12px;object-fit:cover;flex:none;background:#eef1f4;cursor:zoom-in}
+.lvthumb.em{display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer}
 .rkthumb{width:42px;height:42px;border-radius:9px;object-fit:cover;flex:none;background:#eef1f4}
 .rkthumb.em{display:flex;align-items:center;justify-content:center;font-size:19px}
 .lvname b{font-size:14px;display:block;line-height:1.45;color:#1f2d3d}
@@ -278,16 +284,30 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 <button class="cat cat2" onclick="swCat('souv',this)">🎁 伴手禮</button>
 <button class="cat cat2" onclick="swCat('feat',this)">✨ 當地特色</button>
 </div>
-<div class="legend">每人可勾選多項，可隨時取消；勾選會即時同步給家人。價格與營業時間為約略值。（版本 20261027-bz）</div>
+<div class="legend">每人可勾選多項，可隨時取消；點圖片可看大圖；勾選會即時同步給家人。價格與營業時間為約略值。（版本 20261027-ca）</div>
 </div>
 
 <div id="lvui">
  <div class="lvbar">
-  <div class="lvseg" data-k="port"><span class="lbl">日期</span><button data-v="all" class="on">全部</button><button data-v="s-miyako">12/17 🏝 宮古島</button><button data-v="s-naha">12/18 🌺 那霸</button><button data-v="s-ishigaki">12/19 🪨 石垣島</button></div>
-  <div class="lvseg" data-k="kind"><span class="lbl">類型</span><button data-v="all">全部</button><button data-v="souv" class="on">🎁 伴手禮</button><button data-v="food">🍜 餐廳</button><button data-v="spot">📷 景點</button><button data-v="shop">🛍 購物</button><button data-v="feat">✨ 特色</button></div>
-  <div class="lvseg" data-k="cat"><span class="lbl">細項</span><button data-v="all" class="on">全部</button><button data-v="食品">食品</button><button data-v="酒類">酒類</button><button data-v="美妝">💄 美妝</button><button data-v="電器">電器</button><button data-v="紀念品">紀念品</button></div>
-  <div class="lvseg" data-k="store"><span class="lbl">店家</span><button data-v="all" class="on">全部</button><button data-v="唐吉軻德">唐吉軻德</button><button data-v="Bic Camera">Bic Camera</button><button data-v="藥妝店">💊 藥妝店</button><button data-v="3COINS">🛍 3COINS</button></div>
-  <div class="lvsearch"><input id="lvq" placeholder="搜尋品項（例：ちんすこう、電器）"><button id="lvmine" onclick="toggleLvMine()">只看我勾</button><button onclick="openRankOv()" style="white-space:nowrap">🏆 排行</button></div>
+  <div class="lvsearch">
+   <select id="lvkind" class="lvsel" aria-label="類型">
+    <option value="all">全部類型</option>
+    <option value="souv" selected>🎁 伴手禮</option>
+    <option value="food">🍜 餐廳</option>
+    <option value="spot">📷 景點</option>
+    <option value="shop">🛍 購物</option>
+    <option value="feat">✨ 特色</option>
+   </select>
+   <input id="lvq" placeholder="搜尋品項">
+   <button id="lvmoreBtn" onclick="toggleLvMore()">⚙️ 篩選</button>
+   <button onclick="openRankOv()">🏆 排行</button>
+  </div>
+  <div id="lvmore" class="lvmore">
+   <div class="lvseg" data-k="port"><span class="lbl">日期</span><button data-v="all" class="on">全部</button><button data-v="s-miyako">12/17 🏝 宮古島</button><button data-v="s-naha">12/18 🌺 那霸</button><button data-v="s-ishigaki">12/19 🪨 石垣島</button></div>
+   <div class="lvseg" data-k="cat"><span class="lbl">細項</span><button data-v="all" class="on">全部</button><button data-v="食品">食品</button><button data-v="酒類">酒類</button><button data-v="美妝">💄 美妝</button><button data-v="電器">電器</button><button data-v="紀念品">紀念品</button></div>
+   <div class="lvseg" data-k="store"><span class="lbl">店家</span><button data-v="all" class="on">全部</button><button data-v="唐吉軻德">唐吉軻德</button><button data-v="Bic Camera">Bic Camera</button><button data-v="藥妝店">💊 藥妝店</button><button data-v="3COINS">🛍 3COINS</button></div>
+   <div class="lvsearch" style="margin-top:6px"><button id="lvmine" onclick="toggleLvMine()">☑️ 只看我勾</button><span class="lvhint">只顯示你已勾選的品項</span><button onclick="lvClearFilters()" style="margin-left:auto">✕ 清除</button></div>
+  </div>
  </div>
  <div id="lvlist"></div>
 </div>
@@ -2184,7 +2204,7 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
  <div id="rkBody"></div>
  <div style="font-size:11.5px;color:#8a7a5c;margin-top:12px">人氣分＝唐吉：三大榜單；Bic：Amazon 耳機榜；藥妝：Amazon 分類暢銷榜（醫藥品／美妝／貼布／保健品，各取前 20）；3COINS：台灣旅客必買 30（非官方名次）。全部再加家人勾選×10；點品項可看大圖與說明。</div>
 </div></div>
-<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20261027-bz<span id="jsok"></span><span id="jsdiag"></span>・有問題請截圖此行</div>
+<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20261027-ca<span id="jsok"></span><span id="jsdiag"></span>・有問題請截圖此行</div>
 <button id="statsBtn" onclick="openStats()">📊</button>
 <button id="chatBtn" onclick="openChat()">💬</button>
 <div id="chatpanel"><div style="display:flex;align-items:center;padding:10px 14px 0"><b style="font-size:16px">💬 小幫手</b><button onclick="toggleThreads()" style="border:1px solid #d8d0bd;background:#fff;border-radius:16px;padding:4px 10px;font-size:13px;cursor:pointer;margin-left:8px">📜 對話</button><span style="flex:1"></span><button onclick="closeChat()" style="border:1px solid #d8d0bd;background:#fff;border-radius:16px;padding:4px 12px;font-size:13px;cursor:pointer">✕ 關閉</button></div><div id="chatthreads" style="display:none;max-height:150px;overflow-y:auto;margin:8px 14px 0;background:#fff;border-radius:10px;padding:6px"></div><div id="chatlog"></div><div id="chatbar"><input id="chatinput" maxlength="200" placeholder="小幫手即將開通…" disabled><button onclick="sendChat()">送出</button></div></div>
@@ -2555,7 +2575,7 @@ function lvRender(){
    var emo={'食品':'🍬','酒類':'🍶','美妝':'💄','用品':'🧴','電器':'🔌','紀念品':'🎐','伴手禮':'🎁','3COINS':'🛍'}[o.cat]||'🎁';
    h+='<div class="lvrow'+(on?' on':'')+'" data-cid="'+o.cid+'">'
     +'<button class="lvchk" aria-label="勾選" onclick="event.stopPropagation();lvToggle(\''+o.cid+'\')">'+(on?'✓':'')+'</button>'
-    +(o.img?('<img class="lvthumb" loading="lazy" src="'+escH(o.img)+'" onerror="this.style.display=\'none\'">'):('<div class="lvthumb em">'+emo+'</div>'))
+    +(o.img?('<img class="lvthumb" loading="lazy" src="'+escH(o.img)+'" onerror="this.style.display=\'none\'" onclick="event.stopPropagation();openOvDetail(\''+o.cid+'\')" title="點圖看大圖">'):('<div class="lvthumb em" onclick="event.stopPropagation();openOvDetail(\''+o.cid+'\')" title="點圖看大圖">'+emo+'</div>'))
     +'<div class="lvname" onclick="openOvDetail(\''+o.cid+'\')"><b>'+escH(o.name)+'</b><span class="lvmeta">'+lvTags(o,vv.length)+'</span></div>'
     +'<div class="lvright">'+(o.price?('<div class="lvprice">'+escH(o.price)+'</div>'):'')+(vv.length?('<div class="lvvotes">'+vv.slice(0,3).map(escH).join('、')+(vv.length>3?'…':'')+'</div>'):'')+'</div>'
     +'</div>';
@@ -2563,6 +2583,8 @@ function lvRender(){
  });
  document.getElementById('lvlist').innerHTML=h||'<div style="padding:26px;text-align:center;color:#8a7a5c">沒有符合的項目</div>';
  document.getElementById('lvcount').textContent='已勾 '+totalChecked+' 項（伴手禮）';
+ var ksel=document.getElementById('lvkind');if(ksel)ksel.value=LVS.kind;
+ syncLvMore();
 }
 function lvToggle(cid){
  if(!me()){document.getElementById('gate').classList.remove('hide');return;}
@@ -2570,6 +2592,9 @@ function lvToggle(cid){
  setTimeout(lvRender,600);
 }
 function toggleLvMine(){LVS.mine=!LVS.mine;var b=document.getElementById('lvmine');if(b)b.classList.toggle('on',LVS.mine);lvRender();}
+function toggleLvMore(){var el=document.getElementById('lvmore');if(!el)return;el.classList.toggle('open');syncLvMore();}
+function lvClearFilters(){LVS.port='all';LVS.cat='all';LVS.store='all';LVS.mine=false;document.querySelectorAll('#lvmore .lvseg').forEach(function(seg){seg.querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-v')==='all');});});var m=document.getElementById('lvmine');if(m)m.classList.remove('on');lvRender();}
+function syncLvMore(){var el=document.getElementById('lvmore'),b=document.getElementById('lvmoreBtn');if(!b)return;var n=(LVS.port!=='all'?1:0)+(LVS.cat!=='all'?1:0)+(LVS.store!=='all'?1:0)+(LVS.mine?1:0);b.textContent=n?('⚙️ 篩選 ('+n+')'):'⚙️ 篩選';b.classList.toggle('on',n>0||(el&&el.classList.contains('open')));}
 function lvCopy(){
  var all=lvData(),v=loadV(),byStore={},lines=[];
  all.forEach(function(o){var vv=v[o.cid]||[];if(!vv.length||o.kind!=='souv')return;
@@ -2678,6 +2703,7 @@ document.getElementById('rankOv').addEventListener('click',function(e){if(e.targ
 function lvInit(){
  document.body.classList.add('lv');
  try{localStorage.setItem('discuss_lv','1');}catch(e){}
+ var ksel=document.getElementById('lvkind');if(ksel)ksel.onchange=function(){LVS.kind=this.value;lvRender();};
  document.querySelectorAll('#lvui .lvseg').forEach(function(seg){
   var k=seg.getAttribute('data-k');
   seg.querySelectorAll('button').forEach(function(btn){
