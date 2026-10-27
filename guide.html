@@ -273,7 +273,7 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 <button class="cat cat2" onclick="swCat('souv',this)">🎁 伴手禮</button>
 <button class="cat cat2" onclick="swCat('feat',this)">✨ 當地特色</button>
 </div>
-<div class="legend">每人可勾選多項，可隨時取消；勾選會即時同步給家人。價格與營業時間為約略值。（版本 20261027-bt）</div>
+<div class="legend">每人可勾選多項，可隨時取消；勾選會即時同步給家人。價格與營業時間為約略值。（版本 20261027-bu）</div>
 </div>
 
 <div id="lvui">
@@ -281,7 +281,7 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
   <div class="lvseg" data-k="port"><span class="lbl">日期</span><button data-v="all" class="on">全部</button><button data-v="s-miyako">12/17 🏝 宮古島</button><button data-v="s-naha">12/18 🌺 那霸</button><button data-v="s-ishigaki">12/19 🪨 石垣島</button></div>
   <div class="lvseg" data-k="kind"><span class="lbl">類型</span><button data-v="all">全部</button><button data-v="souv" class="on">🎁 伴手禮</button><button data-v="food">🍜 餐廳</button><button data-v="spot">📷 景點</button><button data-v="shop">🛍 購物</button><button data-v="feat">✨ 特色</button></div>
   <div class="lvseg" data-k="cat"><span class="lbl">細項</span><button data-v="all" class="on">全部</button><button data-v="食品">食品</button><button data-v="酒類">酒類</button><button data-v="用品">用品</button><button data-v="電器">電器</button><button data-v="紀念品">紀念品</button></div>
-  <div class="lvseg" data-k="store"><span class="lbl">店家</span><button data-v="all" class="on">全部</button><button data-v="唐吉軻德">唐吉軻德</button><button data-v="Bic Camera">Bic Camera</button></div>
+  <div class="lvseg" data-k="store"><span class="lbl">店家</span><button data-v="all" class="on">全部</button><button data-v="唐吉軻德">唐吉軻德</button><button data-v="Bic Camera">Bic Camera</button><button data-v="藥妝店">💊 藥妝店</button></div>
   <div class="lvsearch"><input id="lvq" placeholder="搜尋品項（例：ちんすこう、電器）"><button id="lvmine" onclick="toggleLvMine()">只看我勾</button><button onclick="openRankOv()" style="white-space:nowrap">🏆 排行</button></div>
  </div>
  <div id="lvlist"></div>
@@ -545,8 +545,10 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 
 <h2 class="st" data-c="souv">🎁 伴手禮（那霸必買清單）</h2>
 <div class="card" data-cat="食品" data-price="¥800（5入）" data-store="唐吉軻德"><h3>御菓子御殿 紅芋塔 ✅</h3><div class="en">Beniimo Tart (元祖)</div>
+<img class="ph" loading="lazy" src="images/goods/benitart.jpg" onerror="imgRetry(this)" alt="御菓子御殿 紅芋塔">
+<div class="credit">圖：御菓子御殿官方商品圖</div>
 <div class="stars"><b>🔥🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚💚</span></div>
-<p>介紹：沖繩伴手禮之王，紅芋蛋塔酥鬆香甜。國際通店款式最多，機場免稅也有（比價後下手）。恩納本店附設紅芋工廠見學，岸上時間不合可略過。暫無授權清晰實拍照，請點地圖看店面實景。</p>
+<p>介紹：沖繩伴手禮之王，紅芋蛋塔酥鬆香甜。國際通店款式最多，機場免稅也有（比價後下手）。恩納本店附設紅芋工廠見學，岸上時間不合可略過。</p>
 <p class="kv"><b>價格：</b>12入約¥1,200–1,500⚠️｜<b>哪買：</b>國際通店、平和通、唐吉訶德、機場</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=御菓子御殿+国際通り" target="_blank">🗺 地圖</a></div>
 
@@ -805,49 +807,49 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 <p class="kv"><b>價格：</b>¥338／個・5入 ¥1,766｜<b>店家：</b>其他</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%92%E3%83%A9%E3%83%9F%E3%83%BC%E3%83%AC%E3%83%A2%E3%83%B3%E3%82%B1%E3%83%BC%E3%82%AD" target="_blank">🗺 地圖</a></div>
 
-<div class="card" data-cat="用品" data-price="約¥1,000（14枚）" data-store="唐吉軻德"><h3>めぐりズム 蒸氣眼罩（花王）</h3><div class="en">Steam Eye Mask</div>
+<div class="card" data-cat="藥妝" data-price="約¥1,000（14枚）" data-store="藥妝店"><h3>めぐりズム 蒸氣眼罩（花王）</h3><div class="en">Steam Eye Mask</div>
 <img class="ph" loading="lazy" src="images/goods/eye-mask.jpg" onerror="imgRetry(this)" alt="めぐりズム 蒸氣眼罩（花王）">
 <p>介紹：睡前放鬆，機上／船上都好用。</p>
 <p class="kv"><b>價格：</b>約¥1,000（14枚）｜<b>店家：</b>唐吉軻德</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%82%81%E3%81%90%E3%82%8A%E3%82%BA%E3%83%A0%20%E8%92%B8%E6%B0%A3%E7%9C%BC%E7%BD%A9" target="_blank">🗺 地圖</a></div>
 
-<div class="card" data-cat="用品" data-price="約¥700" data-store="唐吉軻德"><h3>休足時間（LION）</h3><div class="en">Kyusoku Jikan</div>
+<div class="card" data-cat="藥妝" data-price="約¥700" data-store="藥妝店"><h3>休足時間（LION）</h3><div class="en">Kyusoku Jikan</div>
 <img class="ph" loading="lazy" src="images/goods/kyusoku.jpg" onerror="imgRetry(this)" alt="休足時間（LION）">
 <p>介紹：走一整天後貼小腿，隔天繼續走。</p>
 <p class="kv"><b>價格：</b>約¥700｜<b>店家：</b>唐吉軻德</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=%E4%BC%91%E8%B6%B3%E6%99%82%E9%96%93" target="_blank">🗺 地圖</a></div>
 
-<div class="card" data-cat="用品" data-price="約¥500–900" data-store="唐吉軻德"><h3>Vロート 眼藥水</h3><div class="en">Rohto V</div>
+<div class="card" data-cat="藥妝" data-price="約¥500–900" data-store="藥妝店"><h3>Vロート 眼藥水</h3><div class="en">Rohto V</div>
 <img class="ph" loading="lazy" src="images/goods/eyedrops.jpg" onerror="imgRetry(this)" alt="Vロート 眼藥水">
 <p>介紹：清涼感眼藥水，逛街必備。</p>
 <p class="kv"><b>價格：</b>約¥500–900｜<b>店家：</b>唐吉軻德</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=V%E3%83%AD%E3%83%BC%E3%83%88%20%E7%9C%BC%E8%97%A5%E6%B0%B4" target="_blank">🗺 地圖</a></div>
 
-<div class="card" data-cat="用品" data-price="約¥600" data-store="唐吉軻德"><h3>龍角散ダイレクト</h3><div class="en">Ryukakusan Direct</div>
+<div class="card" data-cat="藥妝" data-price="約¥600" data-store="藥妝店"><h3>龍角散ダイレクト</h3><div class="en">Ryukakusan Direct</div>
 <img class="ph" loading="lazy" src="images/goods/ryukakusan.jpg" onerror="imgRetry(this)" alt="龍角散ダイレクト">
 <p>介紹：喉嚨乾癢即食粉末，船艙空調必備。</p>
 <p class="kv"><b>價格：</b>約¥600｜<b>店家：</b>唐吉軻德</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=%E9%BE%8D%E8%A7%92%E6%95%A3%E3%83%80%E3%82%A4%E3%83%AC%E3%82%AF%E3%83%88" target="_blank">🗺 地圖</a></div>
 
-<div class="card" data-cat="用品" data-price="約¥700–1,000" data-store="唐吉軻德"><h3>EVE QUICK 止痛藥</h3><div class="en">EVE Quick</div>
+<div class="card" data-cat="藥妝" data-price="約¥700–1,000" data-store="藥妝店"><h3>EVE QUICK 止痛藥</h3><div class="en">EVE Quick</div>
 <img class="ph" loading="lazy" src="images/goods/eve.jpg" onerror="imgRetry(this)" alt="EVE QUICK 止痛藥">
 <p>介紹：頭痛、生理痛常備（依個人用藥習慣）。</p>
 <p class="kv"><b>價格：</b>約¥700–1,000｜<b>店家：</b>唐吉軻德</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=EVE%20QUICK%20%E6%AD%A2%E7%97%9B%E8%97%A5" target="_blank">🗺 地圖</a></div>
 
-<div class="card" data-cat="用品" data-price="約¥800" data-store="唐吉軻德"><h3>太田胃散</h3><div class="en">Ohta Isan</div>
+<div class="card" data-cat="藥妝" data-price="約¥800" data-store="藥妝店"><h3>太田胃散</h3><div class="en">Ohta Isan</div>
 <img class="ph" loading="lazy" src="images/goods/ohta.jpg" onerror="imgRetry(this)" alt="太田胃散">
 <p>介紹：吃太多脹氣時用。</p>
 <p class="kv"><b>價格：</b>約¥800｜<b>店家：</b>唐吉軻德</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=%E5%A4%AA%E7%94%B0%E8%83%83%E6%95%A3" target="_blank">🗺 地圖</a></div>
 
-<div class="card" data-cat="用品" data-price="約¥600" data-store="唐吉軻德"><h3>サロンパス 貼布</h3><div class="en">Salonpas</div>
+<div class="card" data-cat="藥妝" data-price="約¥600" data-store="藥妝店"><h3>サロンパス 貼布</h3><div class="en">Salonpas</div>
 <img class="ph" loading="lazy" src="images/goods/salonpas.jpg" onerror="imgRetry(this)" alt="サロンパス 貼布">
 <p>介紹：肩頸腰痠貼布。</p>
 <p class="kv"><b>價格：</b>約¥600｜<b>店家：</b>唐吉軻德</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%82%B5%E3%83%AD%E3%83%B3%E3%83%91%E3%82%B9%20%E8%B2%BC%E5%B8%83" target="_blank">🗺 地圖</a></div>
 
-<div class="card" data-cat="用品" data-price="約¥900" data-store="唐吉軻德"><h3>ビオレUV 防曬</h3><div class="en">Biore UV</div>
+<div class="card" data-cat="藥妝" data-price="約¥900" data-store="藥妝店"><h3>ビオレUV 防曬</h3><div class="en">Biore UV</div>
 <img class="ph" loading="lazy" src="images/goods/biore.jpg" onerror="imgRetry(this)" alt="ビオレUV 防曬">
 <p>介紹：海島紫外線強，記得補擦。</p>
 <p class="kv"><b>價格：</b>約¥900｜<b>店家：</b>唐吉軻德</p>
@@ -930,6 +932,66 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 <p>介紹：那覇機場 2F 出發大廳，營業到 20:30，最後補貨點。</p>
 <p class="kv"><b>營業：</b>09:00–20:30｜<b>店家：</b>Bic Camera</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=Air%20BicCamera%20%E9%82%A3%E8%A6%87%E7%A9%BA%E6%B8%AF%E5%BA%97" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="藥妝" data-price="約¥2,500–3,000" data-store="藥妝店"><h3>アリナミンEXプラス（武田）</h3><div class="en">Alinamin EX Plus</div>
+<img class="ph" loading="lazy" src="images/goods/alinamin.jpg" onerror="imgRetry(this)" alt="arinamin">
+<p>介紹：維他命 B 群老牌熱銷款，網紅常推的「合利他命」；60 錠盒裝。</p>
+<p class="kv"><b>價格：</b>約¥2,500–3,000｜<b>店家：</b>藥妝店（松本清・大國藥妝・唐吉軻德）</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%82%A2%E3%83%AA%E3%83%8A%E3%83%9F%E3%83%B3EX%E3%83%97%E3%83%A9%E3%82%B9%E6%AD%A6%E7%94%B0" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="藥妝" data-price="約¥700–900" data-store="藥妝店"><h3>サンテFXネオ（参天）</h3><div class="en">Sante FX Neo</div>
+<img class="ph" loading="lazy" src="images/goods/santefx.jpg" onerror="imgRetry(this)" alt="santefx">
+<p>介紹：清涼感眼藥水，藍色包裝人氣款，長時間逛街後用。</p>
+<p class="kv"><b>價格：</b>約¥700–900｜<b>店家：</b>藥妝店（松本清・大國藥妝・唐吉軻德）</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%82%B5%E3%83%B3%E3%83%86FX%E3%83%8D%E3%82%AA%E5%8F%82%E5%A4%A9" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="藥妝" data-price="約¥1,500–2,000" data-store="藥妝店"><h3>ヒアレインS（参天）</h3><div class="en">Hyalein S</div>
+<img class="ph" loading="lazy" src="images/goods/hyalein.jpg" onerror="imgRetry(this)" alt="hyalein">
+<p>介紹：角膜修復型眼藥水，乾眼、隱眼族常備。</p>
+<p class="kv"><b>價格：</b>約¥1,500–2,000｜<b>店家：</b>藥妝店（松本清・大國藥妝・唐吉軻德）</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%92%E3%82%A2%E3%83%AC%E3%82%A4%E3%83%B3S%E5%8F%82%E5%A4%A9" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="藥妝" data-price="約¥400–600" data-store="藥妝店"><h3>メンソレータム メルティクリームリップ</h3><div class="en">Melty Cream Lip</div>
+<img class="ph" loading="lazy" src="images/goods/melty.jpg" onerror="imgRetry(this)" alt="melty">
+<p>介紹：高保濕護唇膏，藥妝店長年熱賣。</p>
+<p class="kv"><b>價格：</b>約¥400–600｜<b>店家：</b>藥妝店（松本清・大國藥妝・唐吉軻德）</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%A1%E3%83%B3%E3%82%BD%E3%83%AC%E3%83%BC%E3%82%BF%E3%83%A0%20%E3%83%A1%E3%83%AB%E3%83%86%E3%82%A3%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%A0%E3%83%AA%E3%83%83%E3%83%97" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="藥妝" data-price="約¥500–700" data-store="藥妝店"><h3>ニベアクリーム（缶）</h3><div class="en">Nivea Cream</div>
+<img class="ph" loading="lazy" src="images/goods/nivea.jpg" onerror="imgRetry(this)" alt="nivea">
+<p>介紹：經典藍罐，臉身體都能用，送禮自用都划算。</p>
+<p class="kv"><b>價格：</b>約¥500–700｜<b>店家：</b>藥妝店（松本清・大國藥妝・唐吉軻德）</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%8B%E3%83%99%E3%82%A2%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%A0%E7%BC%B6" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="藥妝" data-price="約¥800–1,000" data-store="藥妝店"><h3>ムヒアルファEX</h3><div class="en">Muhi Alpha EX</div>
+<img class="ph" loading="lazy" src="images/goods/muhi.jpg" onerror="imgRetry(this)" alt="muhi">
+<p>介紹：蚊蟲止癢液，夏季/離島必備。</p>
+<p class="kv"><b>價格：</b>約¥800–1,000｜<b>店家：</b>藥妝店（松本清・大國藥妝・唐吉軻德）</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%A0%E3%83%92%E3%82%A2%E3%83%AB%E3%83%95%E3%82%A1EX" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="藥妝" data-price="約¥1,200–1,500" data-store="藥妝店"><h3>パブロンゴールドA</h3><div class="en">Pabron Gold A</div>
+<img class="ph" loading="lazy" src="images/goods/pabron.jpg" onerror="imgRetry(this)" alt="pabron">
+<p>介紹：感冒藥粉，家庭常備人氣款。</p>
+<p class="kv"><b>價格：</b>約¥1,200–1,500｜<b>店家：</b>藥妝店（松本清・大國藥妝・唐吉軻德）</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%91%E3%83%96%E3%83%AD%E3%83%B3%E3%82%B4%E3%83%BC%E3%83%AB%E3%83%89A" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="藥妝" data-price="約¥700–900" data-store="藥妝店"><h3>ロキソニンS</h3><div class="en">Loxonin S</div>
+<img class="ph" loading="lazy" src="images/goods/loxonin.jpg" onerror="imgRetry(this)" alt="loxonin">
+<p>介紹：止痛退燒藥，藥妝店限定販售。</p>
+<p class="kv"><b>價格：</b>約¥700–900｜<b>店家：</b>藥妝店（松本清・大國藥妝・唐吉軻德）</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%AD%E3%82%AD%E3%82%BD%E3%83%8B%E3%83%B3S" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="藥妝" data-price="約¥1,200–1,800" data-store="藥妝店"><h3>ハイチオールC</h3><div class="en">Hythiol C</div>
+<img class="ph" loading="lazy" src="images/goods/haithiol.jpg" onerror="imgRetry(this)" alt="haithiol">
+<p>介紹：美白錠人氣款，網紅常推。</p>
+<p class="kv"><b>價格：</b>約¥1,200–1,800｜<b>店家：</b>藥妝店（松本清・大國藥妝・唐吉軻德）</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%8F%E3%82%A4%E3%83%81%E3%82%AA%E3%83%BC%E3%83%ABC" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="藥妝" data-price="約¥500–700" data-store="藥妝店"><h3>熱さまシート（小林製薬）</h3><div class="en">Netsusama Sheet</div>
+<img class="ph" loading="lazy" src="images/goods/nessama.jpg" onerror="imgRetry(this)" alt="nessama">
+<p>介紹：退熱貼，小孩大人皆可用。</p>
+<p class="kv"><b>價格：</b>約¥500–700｜<b>店家：</b>藥妝店（松本清・大國藥妝・唐吉軻德）</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E7%86%B1%E3%81%95%E3%81%BE%E3%82%B7%E3%83%BC%E3%83%88%E5%B0%8F%E6%9E%97%E8%A3%BD%E8%96%AC" target="_blank">🗺 地圖</a></div>
 </div>
 
 <!-- ================= MIYAKO ================= -->
@@ -1270,11 +1332,11 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 <div id="imodal"><div class="ipanel"><span class="ix" onclick="closeItem()">✕</span><div id="iboby"></div></div></div>
 <div id="rankOv"><div class="ipanel"><span class="ix" onclick="closeRankOv()">✕</span>
  <h3 style="font-size:18px;padding-right:30px">🏆 伴手禮推薦排行</h3>
- <div class="rk-tabs"><button id="rkDonki" class="on" onclick="renderRankOv('唐吉軻德')">🛒 唐吉軻德</button><button id="rkBic" onclick="renderRankOv('Bic Camera')">🔌 Bic Camera</button></div>
+ <div class="rk-tabs"><button id="rkDonki" class="on" onclick="renderRankOv('唐吉軻德')">🛒 唐吉軻德</button><button id="rkBic" onclick="renderRankOv('Bic Camera')">🔌 Bic Camera</button><button id="rkDrug" onclick="renderRankOv('藥妝店')">💊 藥妝店</button></div>
  <div id="rkBody"></div>
  <div style="font-size:11.5px;color:#8a7a5c;margin-top:12px">排行整理自旅遊網站／部落客：おきなわ部（Donki 8選）、TRVLOGUE（Donki 7選）、JAF Mate Online（2025 沖繩伴手禮）。價格為約略值，以店內為準。</div>
 </div></div>
-<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20261027-bt<span id="jsok"></span><span id="jsdiag"></span>・有問題請截圖此行</div>
+<div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20261027-bu<span id="jsok"></span><span id="jsdiag"></span>・有問題請截圖此行</div>
 <button id="statsBtn" onclick="openStats()">📊</button>
 <button id="chatBtn" onclick="openChat()">💬</button>
 <div id="chatpanel"><div style="display:flex;align-items:center;padding:10px 14px 0"><b style="font-size:16px">💬 小幫手</b><button onclick="toggleThreads()" style="border:1px solid #d8d0bd;background:#fff;border-radius:16px;padding:4px 10px;font-size:13px;cursor:pointer;margin-left:8px">📜 對話</button><span style="flex:1"></span><button onclick="closeChat()" style="border:1px solid #d8d0bd;background:#fff;border-radius:16px;padding:4px 12px;font-size:13px;cursor:pointer">✕ 關閉</button></div><div id="chatthreads" style="display:none;max-height:150px;overflow-y:auto;margin:8px 14px 0;background:#fff;border-radius:10px;padding:6px"></div><div id="chatlog"></div><div id="chatbar"><input id="chatinput" maxlength="200" placeholder="小幫手即將開通…" disabled><button onclick="sendChat()">送出</button></div></div>
@@ -1287,7 +1349,7 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 var PLACES=[['s-naha','那霸'],['s-miyako','宮古島'],['s-ishigaki','石垣島']];
 var CATS=['food','spot','shop','souv','feat'];
 var CATN={food:'餐廳',spot:'景點',shop:'購物',souv:'伴手禮',feat:'當地特色'};
-var CARDMAP={'s-naha': ['food', 'food', 'food', 'food', 'food', 'food', 'food', 'food', 'food', 'food', 'food', 'spot', 'spot', 'spot', 'spot', 'spot', 'spot', 'spot', 'spot', 'spot', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'spot', 'spot', 'spot', 'spot', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'feat', 'spot', 'spot', 'spot', 'food', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'food', 'shop', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'shop', 'shop'], 's-miyako': ['spot', 'spot', 'spot', 'spot', 'spot', 'food', 'food', 'shop', 'spot', 'spot', 'spot', 'spot', 'spot', 'shop', 'shop', 'souv', 'souv', 'souv', 'souv', 'souv', 'feat', 'spot', 'spot', 'shop', 'shop', 'shop'], 's-ishigaki': ['spot', 'spot', 'spot', 'spot', 'food', 'food', 'food', 'food', 'food', 'shop', 'spot', 'spot', 'spot', 'spot', 'shop', 'souv', 'souv', 'souv', 'souv', 'souv', 'feat', 'shop', 'shop', 'shop']};
+var CARDMAP={'s-naha': ['food', 'food', 'food', 'food', 'food', 'food', 'food', 'food', 'food', 'food', 'food', 'spot', 'spot', 'spot', 'spot', 'spot', 'spot', 'spot', 'spot', 'spot', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'spot', 'spot', 'spot', 'spot', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'feat', 'spot', 'spot', 'spot', 'food', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'food', 'shop', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'shop', 'shop', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv'], 's-miyako': ['spot', 'spot', 'spot', 'spot', 'spot', 'food', 'food', 'shop', 'spot', 'spot', 'spot', 'spot', 'spot', 'shop', 'shop', 'souv', 'souv', 'souv', 'souv', 'souv', 'feat', 'spot', 'spot', 'shop', 'shop', 'shop'], 's-ishigaki': ['spot', 'spot', 'spot', 'spot', 'food', 'food', 'food', 'food', 'food', 'shop', 'spot', 'spot', 'spot', 'spot', 'shop', 'souv', 'souv', 'souv', 'souv', 'souv', 'feat', 'shop', 'shop', 'shop']};
 var GROUPS=[];PLACES.forEach(function(s){CATS.forEach(function(c){GROUPS.push(s[1]+CATN[c]);});});
 var curP='s-naha',curC='food';
 var VKEY='discuss_votes_v1',NKEY='discuss_name_v1';
@@ -1605,7 +1667,7 @@ function lvData(){
  return out;
 }
 function lvMatch(o){
- var isStore=(o.store==='唐吉軻德'||o.store==='Bic Camera');
+ var isStore=(o.store==='唐吉軻德'||o.store==='Bic Camera'||o.store==='藥妝店');
  if(!isStore&&LVS.port!=='all'&&o.sid!==LVS.port)return false;
  if(LVS.kind!=='all'&&o.kind!==LVS.kind)return false;
  if(LVS.cat!=='all'&&o.cat!==LVS.cat)return false;
@@ -1625,13 +1687,13 @@ function lvRender(){
  var all=lvData(),v=loadV(),mine=me();
  var rows=all.filter(lvMatch);
  rows.sort(function(a,b){var va=(v[a.cid]||[]).length,vb=(v[b.cid]||[]).length;if(vb!==va)return vb-va;return a.name.localeCompare(b.name,'zh-Hant');});
- var pn={DONKI:'🛒 唐吉軻德・全沖繩門市共通',BIC:'🔌 Bic Camera・那霸（國際通／機場）',miyako:'🏝 宮古島・12/17（四）',naha:'🌺 那霸・12/18（五）',ishigaki:'🪨 石垣島・12/19（六）'};
+ var pn={DONKI:'🛒 唐吉軻德・全沖繩門市共通',BIC:'🔌 Bic Camera・那霸（國際通／機場）',DRUG:'💊 藥妝店・松本清／大國藥妝／唐吉',miyako:'🏝 宮古島・12/17（四）',naha:'🌺 那霸・12/18（五）',ishigaki:'🪨 石垣島・12/19（六）'};
  var groups={};rows.forEach(function(o){
-  var gk=(o.store==='唐吉軻德')?'DONKI':((o.store==='Bic Camera')?'BIC':o.sid);
+  var gk=(o.store==='唐吉軻德')?'DONKI':((o.store==='Bic Camera')?'BIC':((o.store==='藥妝店')?'DRUG':o.sid));
   var g=gk+'|'+(o.cat||CATN[o.kind]||'其他');(groups[g]=groups[g]||[]).push(o);});
  var h='',cnt=0,totalChecked=0;
  all.forEach(function(o){if((v[o.cid]||[]).length&&(o.kind==='souv'))totalChecked++;});
- var pr={DONKI:1,BIC:2,miyako:3,naha:4,ishigaki:5},cr={'食品':1,'酒類':2,'用品':3,'電器':4,'紀念品':5,'伴手禮':6};
+ var pr={DONKI:1,BIC:2,DRUG:3,miyako:4,naha:5,ishigaki:6},cr={'食品':1,'酒類':2,'用品':3,'電器':4,'紀念品':5,'伴手禮':6};
  Object.keys(groups).sort(function(a,b){
   var aa=a.split('|'),bb=b.split('|');
   var pa=pr[aa[0].replace('s-','')]||9,pb=pr[bb[0].replace('s-','')]||9;
@@ -1686,7 +1748,7 @@ function closeRankOv(){document.getElementById('rankOv').classList.remove('on');
 function renderRankOv(store){
  if(store)RKS=store;
  document.getElementById('rkDonki').classList.toggle('on',RKS==='唐吉軻德');
- document.getElementById('rkBic').classList.toggle('on',RKS==='Bic Camera');
+ document.getElementById('rkBic').classList.toggle('on',RKS==='Bic Camera');document.getElementById('rkDrug').classList.toggle('on',RKS==='藥妝店');
  var v=loadV(),mine=me();
  var items=lvData().filter(function(o){return o.store===RKS&&o.kind==='souv';});
  var order=['食品','酒類','用品','電器','紀念品','伴手禮'];
