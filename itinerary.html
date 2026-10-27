@@ -385,7 +385,7 @@ var GH_REPO='https://api.github.com/repos/a4623671/cruise-votes/contents/plan.js
 var RAW='https://raw.githubusercontent.com/a4623671/cruise-votes/main/';
 var _p1='Z2l0aHViX3BhdF8xMUFISU5ORVEwV1JKV05mNFNvWHZCXzNtTUJVTWRaa0hDQV',_p2='hNbHA3QUFublh0bmNhTDN3NXZYd0tGbXlsYnlacmdVV0dFUTNSVm5KaXVMS1VW';
 var GH_TOKEN=atob(_p1+_p2);
-var VER='20261027-f23（步行距離上限修正；原 f22：效能：交通/天氣快取、編輯後保留天氣、停留=時段同步；原 f21：卡片可調停留時間（含週邊細部）；原 f20：PARCO CITY 時段顯示；原 f19：第1天登船流程：集合→報到→登船→自助餐→SPA；定稿＋文字版：一鍵複製／下載純文字行程；原 f17 功能：空檔可切交通前/後＋時段設定＋開門等待＋卡片圖片輪播滿版＋餐廳推薦菜色＋右上氣溫＋地圖真實路徑＋多時段天氣＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
+var VER='20261027-f24（港口卡加上下船時間；原 f23：步行距離上限修正；原 f22：效能：交通/天氣快取、編輯後保留天氣、停留=時段同步；原 f21：卡片可調停留時間（含週邊細部）；原 f20：PARCO CITY 時段顯示；原 f19：第1天登船流程：集合→報到→登船→自助餐→SPA；定稿＋文字版：一鍵複製／下載純文字行程；原 f17 功能：空檔可切交通前/後＋時段設定＋開門等待＋卡片圖片輪播滿版＋餐廳推薦菜色＋右上氣溫＋地圖真實路徑＋多時段天氣＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
 var FS=['1','1.12','1.25'];
 
 /* ================= 狀態 ================= */
@@ -787,7 +787,7 @@ function dayHTML(d,di){
   +(by?('<span>上船 '+by+'</span>'):'')+(d.dep?('<span>離港 '+d.dep+'</span>'):'')+'</div></div>';
  h+='<div class="wxcard wxday" data-di="'+di+'">☁️ 天氣讀取中…</div>';
  h+='<div class="tl">';
- h+='<div class="stop port"><h3>'+(d.arr?'🚢 下船':'⚓ 集合')+'</h3><div class="sub">'+(d.arr?esc('到港 '+d.arr)+'・碼頭：':(hm2s(tm)+'・集合點：'))+esc((PORT[d.port]||{}).n||d.port)+'</div>'+(PORTIMG[d.port]?('<img class="ph" loading="lazy" src="'+PORTIMG[d.port]+'" onerror="this.style.display=\'none\'">'):'')+'</div>';
+ h+='<div class="stop port"><h3>'+(d.arr?'🚢 下船':'⚓ 集合')+'</h3><div class="sub">'+(d.arr?esc('到港 '+d.arr+'・下船 '+hm2s(tm)+'・碼頭：'):(hm2s(tm)+'・集合點：'))+esc((PORT[d.port]||{}).n||d.port)+'</div>'+(PORTIMG[d.port]?('<img class="ph" loading="lazy" src="'+PORTIMG[d.port]+'" onerror="this.style.display=\'none\'">'):'')+'</div>';
  var list=[],key='in',n=0,pendGaps=[];
  seq.forEach(function(x,k){
   var isAct=!x.o.skip;
