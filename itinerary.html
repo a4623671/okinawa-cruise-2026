@@ -378,7 +378,7 @@ function gcardHTML(c){
   +'<div class="gt">'+esc(trSouv(c.t))+'</div>'
   +((c.price||c.store)?('<div class="gd" style="font-weight:800;color:#b3402a">'+esc((c.price||'')+(c.store?((c.price?'・':'')+c.store):''))+'</div>'):'')
   +(desc?('<div class="gd">'+esc(desc)+'</div>'):'')
-  +(vt.length?('<div class="gv">✅ '+esc(vt.join('・'))+'</div>'):'<div class="gv"> </div>')
+  +(vt.length?('<div class="gv">✅ 已勾：'+esc(vt.join('・'))+'</div>'):'<div class="gv"> </div>')
   +'</div>';
 }
 var MODEN={walk:'🚶走路',taxi:'🚕計程車',bus:'🚌公車',mono:'🚝單軌'};
@@ -386,7 +386,7 @@ var GH_REPO='https://api.github.com/repos/a4623671/cruise-votes/contents/plan.js
 var RAW='https://raw.githubusercontent.com/a4623671/cruise-votes/main/';
 var _p1='Z2l0aHViX3BhdF8xMUFISU5ORVEwV1JKV05mNFNvWHZCXzNtTUJVTWRaa0hDQV',_p2='hNbHA3QUFublh0bmNhTDN3NXZYd0tGbXlsYnlacmdVV0dFUTNSVm5KaXVMS1VW';
 var GH_TOKEN=atob(_p1+_p2);
-var VER='20261027-f25（伴手禮改為討論區勾選清單・60 項伴手禮/用品/電器；原 f24：港口卡加上下船時間；原 f23：步行距離上限修正；原 f22：效能：交通/天氣快取、編輯後保留天氣、停留=時段同步；原 f21：卡片可調停留時間（含週邊細部）；原 f20：PARCO CITY 時段顯示；原 f19：第1天登船流程：集合→報到→登船→自助餐→SPA；定稿＋文字版：一鍵複製／下載純文字行程；原 f17 功能：空檔可切交通前/後＋時段設定＋開門等待＋卡片圖片輪播滿版＋餐廳推薦菜色＋右上氣溫＋地圖真實路徑＋多時段天氣＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
+var VER='20261027-f27（新增 3COINS 必買 30；伴手禮視窗直接顯示全部、✅ 標記投票；原 f25：伴手禮改為討論區勾選清單・60 項伴手禮/用品/電器；原 f24：港口卡加上下船時間；原 f23：步行距離上限修正；原 f22：效能：交通/天氣快取、編輯後保留天氣、停留=時段同步；原 f21：卡片可調停留時間（含週邊細部）；原 f20：PARCO CITY 時段顯示；原 f19：第1天登船流程：集合→報到→登船→自助餐→SPA；定稿＋文字版：一鍵複製／下載純文字行程；原 f17 功能：空檔可切交通前/後＋時段設定＋開門等待＋卡片圖片輪播滿版＋餐廳推薦菜色＋右上氣溫＋地圖真實路徑＋多時段天氣＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
 var FS=['1','1.12','1.25'];
 
 /* ================= 狀態 ================= */
@@ -1209,29 +1209,22 @@ function drawSubMap(){
 }
 
 /* ================= 伴手禮清單 ================= */
-var GCAT='all',GMODE='mine';
-function giftCount(){return CATALOG.filter(function(c){return c.kind==='souv'&&votesOf(c.id).length>0;}).length;}
-function updateGiftBtn(){var b=document.getElementById('btnGift');if(!b)return;var n=giftCount();b.textContent='🎁 伴手禮'+(n?(' ('+n+')'):'');}
+var GCAT='all';
+function updateGiftBtn(){var b=document.getElementById('btnGift');if(b)b.textContent='🎁 伴手禮';}
 function openGifts(mode,cat){
- if(mode!=null)GMODE=mode;if(cat!=null)GCAT=cat;
+ if(cat!=null)GCAT=cat;
  var all=CATALOG.filter(function(c){return c.kind==='souv';});
- var checked=all.filter(function(c){return votesOf(c.id).length>0;});
- var list=(GMODE==='mine')?checked.slice():all.slice();
+ var voted=all.filter(function(c){return votesOf(c.id).length>0;});
+ var list=all.slice();
  var cats={};all.forEach(function(c){cats[c.cat||'伴手禮']=(cats[c.cat||'伴手禮']||0)+1;});
  if(GCAT!=='all')list=list.filter(function(c){return (c.cat||'伴手禮')===GCAT;});
  list.sort(function(a,b){var va=votesOf(a.id).length,vb=votesOf(b.id).length;if(vb!==va)return vb-va;return String(a.t).localeCompare(String(b.t),'zh-Hant');});
  var h='<div class="gchips">'
-  +'<button class="gchip'+(GMODE==='mine'?' on':'')+'" onclick="openGifts(\'mine\')">✅ 已勾選 ('+checked.length+')</button>'
-  +'<button class="gchip'+(GMODE==='all'?' on':'')+'" onclick="openGifts(\'all\')">📦 全部 ('+all.length+')</button>'
-  +'</div><div class="gchips">'
   +'<button class="gchip'+(GCAT==='all'?' on':'')+'" onclick="openGifts(null,\'all\')">全部類別</button>';
  Object.keys(cats).forEach(function(k){h+='<button class="gchip'+(GCAT===k?' on':'')+'" onclick="openGifts(null,\''+k+'\')">'+esc(k)+' ('+cats[k]+')</button>';});
  h+='</div>';
  h+='<div style="font-size:12.5px;color:#7a5200;background:#fff8e1;border:1px solid #f0dfa8;border-radius:10px;padding:8px 10px;margin:6px 0 8px">🛂 提醒：肉類製品、生鮮蔬果不可帶回台灣；酒類免稅 1 公升。電器為 100V，台灣 110V 多數可用但保固不跨海。</div>';
- if(GMODE==='mine'&&!checked.length){
-  h+='<div style="padding:20px;text-align:center;color:#6b7a89;font-size:13.5px">還沒有人勾選伴手禮。<br>到討論區勾選想買的品項，這裡就會自動顯示。</div>'
-   +'<div style="text-align:center;margin:6px 0 10px"><a class="map" href="guide.html">📋 去討論區勾選 →</a></div>';
- }
+ h+='<div style="font-size:12px;color:#6b7a89;margin:2px 0 8px">共 '+all.length+' 項；✅ 標記為家人已投票的品項。</div>';
  var pn={miyako:'🏝 宮古島',naha:'🌺 那霸',ishigaki:'🪨 石垣島'};
  ['miyako','naha','ishigaki'].forEach(function(pk){
   var sv=list.filter(function(c){return c.place===pk;});
@@ -1243,13 +1236,7 @@ function openGifts(mode,cat){
    h+='<div class="ggrid">'+byCat[k].map(gcardHTML).join('')+'</div>';
   });
  });
- if(!list.length){
-  if(GMODE==='mine'&&GCAT!=='all'&&cats[GCAT]){
-   h+='<div style="padding:16px;text-align:center;color:#8a7a5c;font-size:13.5px">「'+esc(GCAT)+'」還沒有人勾選。<br><button class="gchip" style="margin-top:8px" onclick="openGifts(\'all\',\''+esc(GCAT)+'\')">📦 看全部 '+cats[GCAT]+' 項</button></div>';
-  }else if(GMODE!=='mine'||checked.length){
-   h+='<div style="padding:16px;text-align:center;color:#8a7a5c">這個類別沒有項目</div>';
-  }
- }
+ if(!list.length)h+='<div style="padding:16px;text-align:center;color:#8a7a5c">這個類別沒有項目</div>';
  document.getElementById('giftsheet').innerHTML=h;
  document.getElementById('giftov').classList.add('open');
 }
