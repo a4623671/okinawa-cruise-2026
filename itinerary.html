@@ -385,7 +385,7 @@ var GH_REPO='https://api.github.com/repos/a4623671/cruise-votes/contents/plan.js
 var RAW='https://raw.githubusercontent.com/a4623671/cruise-votes/main/';
 var _p1='Z2l0aHViX3BhdF8xMUFISU5ORVEwV1JKV05mNFNvWHZCXzNtTUJVTWRaa0hDQV',_p2='hNbHA3QUFublh0bmNhTDN3NXZYd0tGbXlsYnlacmdVV0dFUTNSVm5KaXVMS1VW';
 var GH_TOKEN=atob(_p1+_p2);
-var VER='20261024-f21（卡片可調停留時間（含週邊細部）；原 f20：PARCO CITY 時段顯示；原 f19：第1天登船流程：集合→報到→登船→自助餐→SPA；定稿＋文字版：一鍵複製／下載純文字行程；原 f17 功能：空檔可切交通前/後＋時段設定＋開門等待＋卡片圖片輪播滿版＋餐廳推薦菜色＋右上氣溫＋地圖真實路徑＋多時段天氣＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
+var VER='20261027-f22（效能：交通/天氣快取、編輯後保留天氣、停留=時段同步；原 f21：卡片可調停留時間（含週邊細部）；原 f20：PARCO CITY 時段顯示；原 f19：第1天登船流程：集合→報到→登船→自助餐→SPA；定稿＋文字版：一鍵複製／下載純文字行程；原 f17 功能：空檔可切交通前/後＋時段設定＋開門等待＋卡片圖片輪播滿版＋餐廳推薦菜色＋右上氣溫＋地圖真實路徑＋多時段天氣＋交通方式選擇＋定位/方向＋週邊摺疊與細部地圖＋伴手禮圖文分類＋天氣風浪靠港評估）';
 var FS=['1','1.12','1.25'];
 
 /* ================= 狀態 ================= */
@@ -449,6 +449,7 @@ function loadPlan(){
   .catch(raw);
 }
 function savePlan(msg){
+ PLAN.updated=new Date().toISOString();
  var body={message:msg||'plan: update (from 定稿)',content:btoa(unescape(encodeURIComponent(JSON.stringify(PLAN))))};
  var put=function(sha){if(sha)body.sha=sha;
   return fetch(GH_REPO,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)})
@@ -468,15 +469,26 @@ function estMode(mode,km,drive){
  if(mode==='taxi'){var w=2;if(drive)return pack(w,drive.min,drive.km,'OSRM實測');return pack(w,km*1.3/28*60,km*1.3,'估算');}
  if(mode==='bus')return pack(6,km*1.4/16*60,km*1.4,'等車6分+車速估');
  return pack(5,km*1.25/28*60,km*1.25,'等車5分+車速估');}
-var DRIVE={};
+var DRIVE={},DRVLS={},DRVDIRTY=false;
+try{DRVLS=JSON.parse(localStorage.getItem('ok_drive_v2')||'{}')||{};}catch(e){DRVLS={};}
+function flushDriveCache(){
+ if(!DRVDIRTY)return;
+ try{var now=Date.now();Object.keys(DRVLS).forEach(function(k){if(!DRVLS[k]||now-DRVLS[k].ts>7*864e5)delete DRVLS[k];});
+  var s=JSON.stringify(DRVLS);if(s.length<3500000)localStorage.setItem('ok_drive_v2',s);}catch(e){}
+ DRVDIRTY=false;
+}
 function queryDrive(a,b){var key=a[0].toFixed(4)+','+a[1].toFixed(4)+'>'+b[0].toFixed(4)+','+b[1].toFixed(4);
  if(DRIVE[key])return Promise.resolve(DRIVE[key]);
+ var _c=DRVLS[key];
+ if(_c&&_c.ts&&Date.now()-_c.ts<7*864e5&&_c.min!=null){DRIVE[key]={min:_c.min,km:_c.km,coords:_c.coords||null};return Promise.resolve(DRIVE[key]);}
  var u='https://router.project-osrm.org/route/v1/driving/'+a[1]+','+a[0]+';'+b[1]+','+b[0]+'?overview=full&geometries=geojson';
  return fetch(u).then(function(r){return r.json();}).then(function(j){
   if(j&&j.routes&&j.routes[0]){
    var g=(j.routes[0].geometry&&j.routes[0].geometry.coordinates)||[];
    var coords=g.map(function(c){return [c[1],c[0]];});
    DRIVE[key]={min:j.routes[0].duration/60,km:j.routes[0].distance/1000,coords:coords};
+   DRVLS[key]={min:DRIVE[key].min,km:DRIVE[key].km,coords:coords.map(function(p2){return [+p2[0].toFixed(5),+p2[1].toFixed(5)];}),ts:Date.now()};
+   DRVDIRTY=true;
    return DRIVE[key];}
   return null;}).catch(function(){return null;});}
 function computeAll(){
@@ -540,6 +552,7 @@ function computeAll(){
    if(_a&&_b){var a=hm(_a),b=hm(_b);if(a!=null&&b!=null)cap=Math.max(0,b-a-((+it.mealMin)||0));}
    cache.totals[d.k]={used:used,cap:cap,over:cap!=null?Math.max(0,used-cap):0,miss:miss};
   });
+  flushDriveCache();
  });
 }
 
@@ -547,9 +560,13 @@ function computeAll(){
 function wxIcon(c){c=+c;if(c===0)return['☀️','晴'];if(c<=2)return['🌤','晴時多雲'];if(c===3)return['☁️','陰'];
  if(c<=48)return['🌫','霧'];if(c<=57)return['🌦','毛毛雨'];if(c<=67)return['🌧','雨'];if(c<=77)return['🌨','雪'];
  if(c<=82)return['🌧','陣雨'];if(c<=86)return['🌨','陣雪'];return['⛈','雷雨'];}
+var WXREADY=false;
 function wxLoad(){
  var daysAhead=Math.floor((Date.parse(DAYS[0].k+'T00:00:00+08:00')-Date.now())/86400000);
  WXMODE=daysAhead<=16?'fc':'hist';
+ var WXKEY=WXMODE+'|'+DAYS[0].k+'|'+DAYS[4].k;
+ try{var _c=JSON.parse(sessionStorage.getItem('ok_wx_v2')||'null');
+  if(_c&&_c.k===WXKEY&&Date.now()-_c.ts<20*60*1000&&_c.d){WXC=_c.d;WXREADY=true;return Promise.resolve();}}catch(e){}
  var jobs=[];
  Object.keys(WXCITY).forEach(function(n){
   var c=WXCITY[n];
@@ -572,7 +589,9 @@ function wxLoad(){
   jobs.push(j.then(function(j2){WXC[n]={j:(j2&&!j2.error)?j2:null,hist:j2&&j2._hist?j2._hist:null,marine:j2&&j2._marine?j2._marine:null};})
    .catch(function(){WXC[n]={j:null,hist:null,marine:null};}));
  });
- return Promise.all(jobs);
+ return Promise.all(jobs).then(function(){WXREADY=true;
+  try{sessionStorage.setItem('ok_wx_v2',JSON.stringify({k:WXKEY,ts:Date.now(),d:WXC}));}catch(e){}
+ });
 }
 function wxDayInfo(port,dayK,di){
  var w=WXC[port];if(!w||!w.j)return null;
@@ -690,7 +709,7 @@ function legbarHTML(C,toName){
 }
 function kvHTML(o,mc,late,di,k){
  var rows=[];
- rows.push(['⏱ 停留時間','<span style="display:inline-flex;align-items:center;gap:6px">'+fmtMin(o.min||0)+'<button class="mined" onclick="event.stopPropagation();openMinEdit('+di+','+k+')">✏️ 調整</button></span>']);
+ rows.push(['⏱ 停留時間','<span style="display:inline-flex;align-items:center;gap:6px">'+fmtMin(o.min||0)+'<button class="mined" title="調整停留時間" aria-label="調整停留時間" onclick="event.stopPropagation();openMinEdit('+di+','+k+')">✏️ 調整</button></span>']);
  if(o.from)rows.push(['🕙 預定時段',esc(o.from+(o.to?('–'+o.to):' 起'))]);
  if(o.kind)rows.push(['🎯 類型',esc(KINDN[o.kind]||o.kind)]);
  if(o.dishes&&o.dishes.length)rows.push(['🍴 推薦菜色',o.dishes.map(esc).join('<br>')]);
@@ -865,6 +884,7 @@ function renderAll(){
  DAYS.forEach(function(d,di){h+='<div class="plan'+(d.k===curDay?' on':'')+'" id="day'+di+'">'+dayHTML(d,di)+'</div>';});
  document.getElementById('content').innerHTML=h;
  document.getElementById('ver').textContent='版本 '+VER+'・有問題請截圖此行';
+ if(WXREADY)try{wxPaint();}catch(e){}
  paintNowline();
 }
 
@@ -1123,7 +1143,7 @@ function buildSubBody(di,k){
     }).join('');
     h+='<div class="sleg"><span class="smodes">'+sbtns+'</span>'+(C.km!=null?('・'+C.km.toFixed(1)+'km'):'')+'</div>';
    }
-   h+='<div class="srow'+(s.note?' note':'')+'"><span class="snm">'+(s.note?'📝 ':((locNo(i)||'·')+'. '))+esc(s.t)+'</span><span class="sdur">'+(s.note?'註解':('+'+fmtMin(t)+'・停留 '+fmtMin(s.min||0)+' <button class="mined" onclick="event.stopPropagation();openMinEdit('+di+','+k+','+i+')">✏️</button>'))+'</span></div>';
+   h+='<div class="srow'+(s.note?' note':'')+'"><span class="snm">'+(s.note?'📝 ':((locNo(i)||'·')+'. '))+esc(s.t)+'</span><span class="sdur">'+(s.note?'註解':('+'+fmtMin(t)+'・停留 '+fmtMin(s.min||0)+' <button class="mined" title="調整停留時間" aria-label="調整停留時間" onclick="event.stopPropagation();openMinEdit('+di+','+k+','+i+')">✏️</button>'))+'</span></div>';
    if(!s.note){t+=(+s.min||0);tot+=(+s.min||0);}
   });
   var over=Math.max(0,tot-(+p.min||0));
@@ -1238,7 +1258,8 @@ function saveMinEdit(){
  v=Math.min(600,v);
  var di=EDIT.di,k=EDIT.k,si=EDIT.si;
  var seq=flatOf(DAYS[di]);var x=seq[k];if(!x){closeMinEdit();return;}
- if(si==null)x.o.min=v;else x.o.sub[si].min=v;
+ if(si==null){x.o.min=v;if(x.o.from&&x.o.to&&hm(x.o.from)!=null){x.o.to=hm2s(hm(x.o.from)+v);}}
+ else x.o.sub[si].min=v;
  closeMinEdit();
  toast('停留改為 '+fmtMin(v)+'・儲存中…');
  computeAll().then(function(){renderAll();}).then(function(){
@@ -1298,7 +1319,7 @@ function buildTripText(){
    var ml=meta.length?('　　'+meta.join('・')):'';
    if(o.from)ml+=(ml?'｜':'　　')+'🕙 '+o.from+(o.to?('–'+o.to):' 起');
    if(ml)L.push(ml);
-   if(o.dishes&&o.dishes.length)L.push('　　🍴 '+o.dishes.map(esc).join('、'));
+   if(o.dishes&&o.dishes.length)L.push('　　🍴 '+o.dishes.map(function(d){return String(d);}).join('、'));
    if(o.sub&&o.sub.length)L.push('　　🧭 週邊：'+o.sub.map(function(s){return String(s.t).replace(/✅/g,'').trim()+(s.min?('（'+s.min+'分）'):'');}).join('、'));
    if(mx==null||x.e>mx)mx=x.e;
    prev=x.k;
