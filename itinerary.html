@@ -1243,7 +1243,13 @@ function openGifts(mode,cat){
    h+='<div class="ggrid">'+byCat[k].map(gcardHTML).join('')+'</div>';
   });
  });
- if(!list.length&&(GMODE!=='mine'||checked.length))h+='<div style="padding:16px;text-align:center;color:#8a7a5c">這個類別沒有項目</div>';
+ if(!list.length){
+  if(GMODE==='mine'&&GCAT!=='all'&&cats[GCAT]){
+   h+='<div style="padding:16px;text-align:center;color:#8a7a5c;font-size:13.5px">「'+esc(GCAT)+'」還沒有人勾選。<br><button class="gchip" style="margin-top:8px" onclick="openGifts(\'all\',\''+esc(GCAT)+'\')">📦 看全部 '+cats[GCAT]+' 項</button></div>';
+  }else if(GMODE!=='mine'||checked.length){
+   h+='<div style="padding:16px;text-align:center;color:#8a7a5c">這個類別沒有項目</div>';
+  }
+ }
  document.getElementById('giftsheet').innerHTML=h;
  document.getElementById('giftov').classList.add('open');
 }

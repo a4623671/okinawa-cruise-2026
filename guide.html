@@ -266,7 +266,7 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 <div id="gate"><div class="box"><h2>💬 三港討論區</h2><p>先寫下你的名字再進入<br>投票會記名，每家店／景點每人限一票</p><input id="nameInput" maxlength="12" placeholder="例如：小明"><div id="knownNames"></div><button onclick="enter()">進入討論區</button></div></div>
 
 <div class="topbar"><div class="logo">💬 討論區</div><a href="index.html" style="font-size:13px;color:#10293f;text-decoration:none;font-weight:700;white-space:nowrap">‹ 入口</a><a href="plan.html" style="font-size:13px;color:#10293f;text-decoration:none;font-weight:700;white-space:nowrap">🗓 排程</a><div class="sp"></div><span class="who" id="who"></span><button onclick="rename()" title="改名">✏️</button></div>
-<div class="hero"><h1>沖繩選物清單</h1><p>✅ 勾選想買的伴手禮／用品／電器，定稿的「🎁 伴手禮」會依這份清單顯示。價格為約略值，出發前複查。</p></div>
+<div class="hero"><h1>沖繩選物清單</h1><p>✅ 勾選想買的伴手禮／美妝／電器，定稿的「🎁 伴手禮」會依這份清單顯示。價格為約略值，出發前複查。</p></div>
 <div class="cats">
 <div class="catrow"><span class="catlabel">地點</span><button class="cat place on" onclick="swPlace('naha',this)">🌺 那霸</button>
 <button class="cat place" onclick="swPlace('miyako',this)">🏝 宮古島</button>
@@ -284,7 +284,7 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
  <div class="lvbar">
   <div class="lvseg" data-k="port"><span class="lbl">日期</span><button data-v="all" class="on">全部</button><button data-v="s-miyako">12/17 🏝 宮古島</button><button data-v="s-naha">12/18 🌺 那霸</button><button data-v="s-ishigaki">12/19 🪨 石垣島</button></div>
   <div class="lvseg" data-k="kind"><span class="lbl">類型</span><button data-v="all">全部</button><button data-v="souv" class="on">🎁 伴手禮</button><button data-v="food">🍜 餐廳</button><button data-v="spot">📷 景點</button><button data-v="shop">🛍 購物</button><button data-v="feat">✨ 特色</button></div>
-  <div class="lvseg" data-k="cat"><span class="lbl">細項</span><button data-v="all" class="on">全部</button><button data-v="食品">食品</button><button data-v="酒類">酒類</button><button data-v="用品">用品</button><button data-v="電器">電器</button><button data-v="紀念品">紀念品</button></div>
+  <div class="lvseg" data-k="cat"><span class="lbl">細項</span><button data-v="all" class="on">全部</button><button data-v="食品">食品</button><button data-v="酒類">酒類</button><button data-v="美妝">💄 美妝</button><button data-v="電器">電器</button><button data-v="紀念品">紀念品</button></div>
   <div class="lvseg" data-k="store"><span class="lbl">店家</span><button data-v="all" class="on">全部</button><button data-v="唐吉軻德">唐吉軻德</button><button data-v="Bic Camera">Bic Camera</button><button data-v="藥妝店">💊 藥妝店</button></div>
   <div class="lvsearch"><input id="lvq" placeholder="搜尋品項（例：ちんすこう、電器）"><button id="lvmine" onclick="toggleLvMine()">只看我勾</button><button onclick="openRankOv()" style="white-space:nowrap">🏆 排行</button></div>
  </div>
@@ -1243,6 +1243,7 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 <p class="kv"><b>價格：</b>約¥1,500–2,000｜<b>參考：</b>Amazon 醫藥品暢銷 #13</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%82%AD%E3%83%A5%E3%83%BC%E3%83%94%E3%83%BC%E3%82%B3%E3%83%BC%E3%83%AF%E3%82%B4%E3%83%BC%E3%83%AB%E3%83%89%CE%B1%E3%83%97%E3%83%AC%E3%83%9F%E3%82%A2%E3%83%A0" target="_blank">🗺 地圖</a></div>
 
+<h2 class="st" data-c="souv">💄 美妝彩妝（藥妝店必買）</h2>
 <div class="card" data-cat="美妝" data-price="依店內" data-store="藥妝店" data-amzrank="1"><h3>VTCOSMETICS フェイスマスク スキンケア 単品</h3><div class="en">Amazon 美妝 #1</div>
 <img class="ph" loading="lazy" src="images/goods/beauty-1.jpg" onerror="imgRetry(this)" alt="美妝">
 <img class="ph" loading="lazy" src="images/goods/beauty-1.jpg" onerror="imgRetry(this)" alt="">
@@ -1381,6 +1382,61 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 <p>介紹：Melano CC 药用集中渗透 高级美容液 20毫升 (x 1) | 商品カテゴリ検索、日常ケア、使いやすい</p>
 <p class="kv"><b>價格：</b>依店內｜<b>參考：</b>Amazon 美妝 暢銷 #20</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=Melano%20CC%20%E8%8D%AF%E7%94%A8%E9%9B%86%E4%B8%AD%E6%B8%97%E9%80%8F%20%E9%AB%98%E7%BA%A7%E7%BE%8E%E5%AE%B9%E6%B6%B2%2020%E6%AF%AB%E5%8D%87%20%7C%20%E5%95%86%E5%93%81%E3%82%AB%E3%83%86%E3%82%B4%E3%83%AA%E6%A4%9C%E7%B4%A2%E3%80%81%E6%97%A5" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="美妝" data-price="¥1,540" data-store="藥妝店"><h3>KATE リップモンスター（持色唇膏）</h3><div class="en">KATE Lip Monster</div>
+<img class="ph" loading="lazy" src="images/goods/kate-lip-monster.jpg" onerror="imgRetry(this)" alt="KATE リップモンスター">
+<p>介紹：開架傳說級持色唇膏，喝水吃東西後仍留色。05 ダークフィグ、03 陽炎最熱門，藥妝店常缺貨，看到現貨先拿。</p>
+<p class="kv"><b>價格：</b>約¥1,540｜<b>哪買：</b>松本清、大國藥妝、唐吉訶德</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=KATE+%E3%83%AA%E3%83%83%E3%83%97%E3%83%A2%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%BC" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="美妝" data-price="¥770" data-store="藥妝店"><h3>CANMAKE むちぷるティント（水潤染唇）</h3><div class="en">CANMAKE Muchi Puru Tint</div>
+<img class="ph" loading="lazy" src="images/goods/canmake-muchipuru-tint.jpg" onerror="imgRetry(this)" alt="CANMAKE むちぷるティント">
+<p>介紹：770 日圓的平價染唇，光澤感＋持色力兼具，台灣潮濕天氣也好用。02、05 フィグピューレ是日常色。</p>
+<p class="kv"><b>價格：</b>約¥770｜<b>哪買：</b>藥妝店、唐吉訶德</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=CANMAKE+%E3%82%80%E3%81%A1%E3%81%B7%E3%82%8B%E3%83%86%E3%82%A3%E3%83%B3%E3%83%88" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="美妝" data-price="¥550" data-store="藥妝店"><h3>CEZANNE チークブラッシュ（腮紅）</h3><div class="en">CEZANNE Cheek Blush</div>
+<img class="ph" loading="lazy" src="images/goods/cezanne-cheek.jpg" onerror="imgRetry(this)" alt="CEZANNE チークブラッシュ">
+<p>介紹：@cosme 常勝軍、550 日圓。粉質細緻、自然血色，01 フォギーローズ、05 メープルアプリコット最百搭。</p>
+<p class="kv"><b>價格：</b>約¥550｜<b>哪買：</b>藥妝店、唐吉訶德</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=CEZANNE+%E3%83%81%E3%83%BC%E3%82%AF%E3%83%96%E3%83%A9%E3%83%83%E3%82%B7%E3%83%A5" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="美妝" data-price="¥1,078" data-store="藥妝店"><h3>CANMAKE プティパレットアイズ（8 色眼影盤）</h3><div class="en">CANMAKE Petit Palette Eyes</div>
+<img class="ph" loading="lazy" src="images/goods/canmake-petit-palette.jpg" onerror="imgRetry(this)" alt="CANMAKE プティパレットアイズ">
+<p>介紹：手掌大小的 8 色眼影盤，旅行帶一盤就能畫全妝，發色清淡不易失手，新手與送禮都適合。</p>
+<p class="kv"><b>價格：</b>約¥1,078｜<b>哪買：</b>藥妝店、唐吉訶德</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=CANMAKE+%E3%83%97%E3%83%86%E3%82%A3%E3%83%91%E3%83%AC%E3%83%83%E3%83%88%E3%82%A2%E3%82%A4%E3%82%BA" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="美妝" data-price="¥1,320" data-store="藥妝店"><h3>ヒロインメイク ロング＆カールマスカラ</h3><div class="en">Heroine Make Long & Curl Mascara</div>
+<img class="ph" loading="lazy" src="images/goods/heroine-mascara.jpg" onerror="imgRetry(this)" alt="ヒロインメイク マスカラ">
+<p>介紹：抗汗抗油、捲翹持久，溫水可卸。沖繩海邊玩水也不易暈，開架睫毛膏長銷冠軍。</p>
+<p class="kv"><b>價格：</b>約¥1,320｜<b>哪買：</b>藥妝店、唐吉訶德</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%92%E3%83%AD%E3%82%A4%E3%83%B3%E3%83%A1%E3%82%A4%E3%82%AF+%E3%83%9E%E3%82%B9%E3%82%AB%E3%83%A9" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="美妝" data-price="¥1,320" data-store="藥妝店"><h3>マジョリカ マジョルカ ラッシュエキスパンダー</h3><div class="en">Majolica Majorca Lash Expander</div>
+<img class="ph" loading="lazy" src="images/goods/majolica-mascara.jpg" onerror="imgRetry(this)" alt="マジョリカ マジョルカ マスカラ">
+<p>介紹：資生堂旗下開架經典，束感纖長、娃娃睫毛效果，包裝可愛，送禮自用都適合。</p>
+<p class="kv"><b>價格：</b>約¥1,320｜<b>哪買：</b>藥妝店、唐吉訶德</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%9E%E3%82%B8%E3%83%A7%E3%83%AA%E3%82%AB+%E3%83%9E%E3%82%B8%E3%83%A7%E3%83%AB%E3%82%AB+%E3%83%9E%E3%82%B9%E3%82%AB%E3%83%A9" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="美妝" data-price="¥660" data-store="藥妝店"><h3>CEZANNE 皮脂テカリ防止下地（控油粧前乳）</h3><div class="en">CEZANNE Sebum Control Primer</div>
+<img class="ph" loading="lazy" src="images/goods/cezanne-primer.jpg" onerror="imgRetry(this)" alt="CEZANNE 皮脂テカリ防止下地">
+<p>介紹：控油持妝神器，海島高溫潮濕也不易脫妝。SPF28 PA++，660 日圓的爆款，藍色款修飾蠟黃。</p>
+<p class="kv"><b>價格：</b>約¥660｜<b>哪買：</b>藥妝店、唐吉訶德</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=CEZANNE+%E7%9A%AE%E8%84%82%E3%83%86%E3%82%AB%E3%83%AA%E9%98%B2%E6%AD%A2%E4%B8%8B%E5%9C%B0" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="美妝" data-price="¥3,058" data-store="藥妝店"><h3>ANESSA パーフェクトUV スキンケアミルク NA</h3><div class="en">ANESSA Perfect UV Skincare Milk NA</div>
+<img class="ph" loading="lazy" src="images/goods/anessa-uv-milk.jpg" onerror="imgRetry(this)" alt="ANESSA 日焼け止め">
+<p>介紹：SPF50+ PA++++、耐水耐摩擦，沖繩海邊與浮潛必備。日本藥妝價比台灣便宜，回程前補貨。</p>
+<p class="kv"><b>價格：</b>約¥3,058（60mL）｜<b>哪買：</b>藥妝店、唐吉訶德、機場免稅</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=ANESSA+%E3%83%91%E3%83%BC%E3%83%95%E3%82%A7%E3%82%AF%E3%83%88UV+%E3%82%B9%E3%82%AD%E3%83%B3%E3%82%B1%E3%82%A2%E3%83%9F%E3%83%AB%E3%82%AF" target="_blank">🗺 地圖</a></div>
+
+<div class="card" data-cat="美妝" data-price="¥1,095" data-store="藥妝店"><h3>ビオレUV アクアリッチ ウォータリーエッセンス</h3><div class="en">Biore UV Aqua Rich Watery Essence</div>
+<img class="ph" loading="lazy" src="images/goods/biore-uv-essence.jpg" onerror="imgRetry(this)" alt="ビオレUV アクアリッチ">
+<p>介紹：水感清爽、不泛白，日常補擦不黏膩。SPF50+ PA++++，70g 大容量，CP 值最高的隨身防曬。</p>
+<p class="kv"><b>價格：</b>約¥1,095（70g）｜<b>哪買：</b>藥妝店、超市、唐吉訶德</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%93%E3%82%AA%E3%83%ACUV+%E3%82%A2%E3%82%AF%E3%82%A2%E3%83%AA%E3%83%83%E3%83%81+%E3%82%A6%E3%82%A9%E3%83%BC%E3%82%BF%E3%83%AA%E3%83%BC%E3%82%A8%E3%83%83%E3%82%BB%E3%83%B3%E3%82%B9" target="_blank">🗺 地圖</a></div>
+
 
 <div class="card" data-cat="貼布" data-price="依店內" data-store="藥妝店" data-amzrank="1"><h3>by Amazon ユーシップFRテープVα 50枚</h3><div class="en">Amazon 貼布 #1</div>
 <img class="ph" loading="lazy" src="images/goods/patch-1.jpg" onerror="imgRetry(this)" alt="">
@@ -1628,123 +1684,6 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 <p class="kv"><b>價格：</b>依店內｜<b>參考：</b>Amazon 保健品 暢銷 #20</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=DHC%20DHA%2030%E6%97%A5%E5%88%86%20%7C%20%5B%E5%8A%9F%E8%83%BD%E6%80%A7%E6%A0%87%E7%A4%BA%E9%A3%9F%E5%93%81%5D" target="_blank">🗺 地圖</a></div>
 
-<div class="card" data-cat="小物" data-price="依店內" data-store="藥妝店" data-amzrank="1"><h3>卡西穆拉 海外用转换插头 SE型 2个装 NTI-159</h3><div class="en">Amazon 小物 #1</div>
-<img class="ph" loading="lazy" src="images/goods/goods-1.jpg" onerror="imgRetry(this)" alt="旅行小物">
-<p>介紹：卡西穆拉 海外用转换插头 SE型 2个装 NTI-159</p>
-<p class="kv"><b>價格：</b>依店內｜<b>參考：</b>Amazon 小物 暢銷 #1</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E5%8D%A1%E8%A5%BF%E7%A9%86%E6%8B%89%20%E6%B5%B7%E5%A4%96%E7%94%A8%E8%BD%AC%E6%8D%A2%E6%8F%92%E5%A4%B4%20SE%E5%9E%8B%202%E4%B8%AA%E8%A3%85%20NTI-159" target="_blank">🗺 地圖</a></div>
-
-<div class="card" data-cat="小物" data-price="依店內" data-store="藥妝店" data-amzrank="2"><h3>HOME【旅行新必备!小巧4用折叠衣架 4个套装 折叠 带洗衣夹 夹式衣架标签用品 </h3><div class="en">Amazon 小物 #2</div>
-<img class="ph" loading="lazy" src="images/goods/goods-2.jpg" onerror="imgRetry(this)" alt="旅行小物">
-<p>介紹：HOME【旅行新必备!小巧4用折叠衣架 4个套装(各色1个) 折叠 带洗衣夹 夹式衣架标签用品 洗衣晾衣架 旅行用 海外旅行 住院 便利商品 旅行用品 旅行用品 旅行小物件</p>
-<p class="kv"><b>價格：</b>依店內｜<b>參考：</b>Amazon 小物 暢銷 #2</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=HOME%E3%80%90%E6%97%85%E8%A1%8C%E6%96%B0%E5%BF%85%E5%A4%87%21%E5%B0%8F%E5%B7%A74%E7%94%A8%E6%8A%98%E5%8F%A0%E8%A1%A3%E6%9E%B6%204%E4%B8%AA%E5%A5%97%E8%A3%85%20%E6%8A%98%E5%8F%A0%20%E5%B8%A6%E6%B4%97%E8%A1%A3%E5%A4%B9%20%E5%A4%B9%E5%BC%8F%E8%A1%A3%E6%9E%B6%E6%A0%87%E7%AD%BE%E7%94%A8" target="_blank">🗺 地圖</a></div>
-
-<div class="card" data-cat="小物" data-price="依店內" data-store="藥妝店" data-amzrank="3"><h3>Tiny Bliss 热压贴 收纳袋 旅行 便利商品 100个装 ) | 旅行商品袋</h3><div class="en">Amazon 小物 #3</div>
-<p>介紹：Tiny Bliss 热压贴 收纳袋 旅行 便利商品 【元CA监制】 【轻松旅行支度】 100个装 (混载(各20个)) | 旅行商品袋容器补充袋旅行用品旅行用品补充容器出差化妆品</p>
-<p class="kv"><b>價格：</b>依店內｜<b>參考：</b>Amazon 小物 暢銷 #3</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=Tiny%20Bliss%20%E7%83%AD%E5%8E%8B%E8%B4%B4%20%E6%94%B6%E7%BA%B3%E8%A2%8B%20%E6%97%85%E8%A1%8C%20%E4%BE%BF%E5%88%A9%E5%95%86%E5%93%81%20100%E4%B8%AA%E8%A3%85%20%29%20%7C%20%E6%97%85%E8%A1%8C%E5%95%86" target="_blank">🗺 地圖</a></div>
-
-<div class="card" data-cat="小物" data-price="依店內" data-store="藥妝店" data-amzrank="4"><h3>行李箱 轮胎 脚轮 更换用 4个套装 50毫米 拉杆箱 车轮 修理 自己更换 套装</h3><div class="en">Amazon 小物 #4</div>
-<img class="ph" loading="lazy" src="images/goods/goods-4.jpg" onerror="imgRetry(this)" alt="旅行小物">
-<p>介紹：行李箱 轮胎 脚轮 更换用 4个套装 50毫米 拉杆箱 车轮 修理 自己更换 套装</p>
-<p class="kv"><b>價格：</b>依店內｜<b>參考：</b>Amazon 小物 暢銷 #4</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E8%A1%8C%E6%9D%8E%E7%AE%B1%20%E8%BD%AE%E8%83%8E%20%E8%84%9A%E8%BD%AE%20%E6%9B%B4%E6%8D%A2%E7%94%A8%204%E4%B8%AA%E5%A5%97%E8%A3%85%2050%E6%AF%AB%E7%B1%B3%20%E6%8B%89%E6%9D%86%E7%AE%B1%20%E8%BD%A6%E8%BD%AE%20%E4%BF%AE%E7%90%86%20%E8%87%AA%E5%B7%B1%E6%9B%B4%E6%8D%A2%20%E5%A5%97" target="_blank">🗺 地圖</a></div>
-
-<div class="card" data-cat="小物" data-price="依店內" data-store="藥妝店" data-amzrank="5"><h3>[IUGGAN] 脚轮套 行李箱 轮胎罩 10个 便携箱 车轮套 便携包车轮套 硅胶</h3><div class="en">Amazon 小物 #5</div>
-<img class="ph" loading="lazy" src="images/goods/goods-5.jpg" onerror="imgRetry(this)" alt="旅行小物">
-<p>介紹：[IUGGAN] 脚轮套 行李箱 轮胎罩 10个 便携箱 车轮套 便携包车轮套 硅胶 防刮 静音 污垢 防滚动 行李保护 地面保护 行李用轮套 旅行用 车轮保护, 黑色 | 厳選シ</p>
-<p class="kv"><b>價格：</b>依店內｜<b>參考：</b>Amazon 小物 暢銷 #5</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=%5BIUGGAN%5D%20%E8%84%9A%E8%BD%AE%E5%A5%97%20%E8%A1%8C%E6%9D%8E%E7%AE%B1%20%E8%BD%AE%E8%83%8E%E7%BD%A9%2010%E4%B8%AA%20%E4%BE%BF%E6%90%BA%E7%AE%B1%20%E8%BD%A6%E8%BD%AE%E5%A5%97%20%E4%BE%BF%E6%90%BA%E5%8C%85%E8%BD%A6%E8%BD%AE%E5%A5%97%20" target="_blank">🗺 地圖</a></div>
-
-<div class="card" data-cat="小物" data-price="依店內" data-store="藥妝店" data-amzrank="6"><h3>可收纳包的腰带 黑色 黑色×黑色 43253-1052 | 旅行行李固定带,可以牢牢</h3><div class="en">Amazon 小物 #6</div>
-<img class="ph" loading="lazy" src="images/goods/goods-6.jpg" onerror="imgRetry(this)" alt="旅行小物">
-<p>介紹：可收纳包的腰带 黑色 黑色×黑色 43253-1052 | 旅行行李固定带,可以牢牢固定在行李箱上,防止滑落的宽幅设计,加厚超粗橡胶,53~68厘米的长度调节调节功能,可以安装在拉</p>
-<p class="kv"><b>價格：</b>依店內｜<b>參考：</b>Amazon 小物 暢銷 #6</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E5%8F%AF%E6%94%B6%E7%BA%B3%E5%8C%85%E7%9A%84%E8%85%B0%E5%B8%A6%20%E9%BB%91%E8%89%B2%20%E9%BB%91%E8%89%B2%C3%97%E9%BB%91%E8%89%B2%2043253-1052%20%7C%20%E6%97%85%E8%A1%8C%E8%A1%8C%E6%9D%8E%E5%9B%BA%E5%AE%9A%E5%B8%A6%2C%E5%8F%AF%E4%BB%A5" target="_blank">🗺 地圖</a></div>
-
-<div class="card" data-cat="小物" data-price="依店內" data-store="藥妝店" data-amzrank="7"><h3>イビキ防止 鼻通り対策 ノーズクリップ 内側から鼻を広げる バネのようにアームが広が</h3><div class="en">Amazon 小物 #7</div>
-<img class="ph" loading="lazy" src="images/goods/goods-7.jpg" onerror="imgRetry(this)" alt="旅行小物">
-<p>介紹：【意匠登録済】イビキ防止 鼻通り対策 ノーズクリップ 内側から鼻を広げる バネのようにアームが広がる 【ノーマルサイズ】日本製 つけるだけで鼻スッキリ! 簡単装着 オープンノーズ </p>
-<p class="kv"><b>價格：</b>依店內｜<b>參考：</b>Amazon 小物 暢銷 #7</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%82%A4%E3%83%93%E3%82%AD%E9%98%B2%E6%AD%A2%20%E9%BC%BB%E9%80%9A%E3%82%8A%E5%AF%BE%E7%AD%96%20%E3%83%8E%E3%83%BC%E3%82%BA%E3%82%AF%E3%83%AA%E3%83%83%E3%83%97%20%E5%86%85%E5%81%B4%E3%81%8B%E3%82%89%E9%BC%BB%E3%82%92%E5%BA%83%E3%81%92%E3%82%8B%20%E3%83%90%E3%83%8D%E3%81%AE%E3%82%88%E3%81%86%E3%81%AB%E3%82%A2%E3%83%BC%E3%83%A0%E3%81%8C" target="_blank">🗺 地圖</a></div>
-
-<div class="card" data-cat="小物" data-price="依店內" data-store="藥妝店" data-amzrank="8"><h3>[日本技研工业] 带拉链 小物件袋 拉链袋 A尺寸 20片装 透明 可书写备忘录 厚</h3><div class="en">Amazon 小物 #8</div>
-<img class="ph" loading="lazy" src="images/goods/goods-8.jpg" onerror="imgRetry(this)" alt="旅行小物">
-<p>介紹：[日本技研工业] 带拉链 小物件袋 拉链袋 A尺寸 20片装 透明 可书写备忘录 厚0.08毫米 用于整理邮票和夹子的小物品 宽50×长70毫米 PS-A</p>
-<p class="kv"><b>價格：</b>依店內｜<b>參考：</b>Amazon 小物 暢銷 #8</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=%5B%E6%97%A5%E6%9C%AC%E6%8A%80%E7%A0%94%E5%B7%A5%E4%B8%9A%5D%20%E5%B8%A6%E6%8B%89%E9%93%BE%20%E5%B0%8F%E7%89%A9%E4%BB%B6%E8%A2%8B%20%E6%8B%89%E9%93%BE%E8%A2%8B%20A%E5%B0%BA%E5%AF%B8%2020%E7%89%87%E8%A3%85%20%E9%80%8F%E6%98%8E%20%E5%8F%AF%E4%B9%A6%E5%86%99%E5%A4%87%E5%BF%98%E5%BD%95" target="_blank">🗺 地圖</a></div>
-
-<div class="card" data-cat="小物" data-price="依店內" data-store="藥妝店" data-amzrank="9"><h3>旅寝工房 tabine 旅行 洗衣袋 15片装 洗衣袋 7升 随处洗涤 出差 旅行 </h3><div class="en">Amazon 小物 #9</div>
-<img class="ph" loading="lazy" src="images/goods/goods-9.jpg" onerror="imgRetry(this)" alt="旅行小物">
-<p>介紹：旅寝工房 tabine 旅行 洗衣袋 15片装 洗衣袋 7升 随处洗涤 出差 旅行 旅行 防灾 带洗涤剂 旅行用垫洗涤剂</p>
-<p class="kv"><b>價格：</b>依店內｜<b>參考：</b>Amazon 小物 暢銷 #9</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E6%97%85%E5%AF%9D%E5%B7%A5%E6%88%BF%20tabine%20%E6%97%85%E8%A1%8C%20%E6%B4%97%E8%A1%A3%E8%A2%8B%2015%E7%89%87%E8%A3%85%20%E6%B4%97%E8%A1%A3%E8%A2%8B%207%E5%8D%87%20%E9%9A%8F%E5%A4%84%E6%B4%97%E6%B6%A4%20%E5%87%BA%E5%B7%AE%20%E6%97%85" target="_blank">🗺 地圖</a></div>
-
-<div class="card" data-cat="小物" data-price="依店內" data-store="藥妝店" data-amzrank="10"><h3>Kasimura 卡西姆拉 旅行国内海外两用 多电压负离子吹风机 电压切换式 100</h3><div class="en">Amazon 小物 #10</div>
-<img class="ph" loading="lazy" src="images/goods/goods-10.jpg" onerror="imgRetry(this)" alt="旅行小物">
-<p>介紹：Kasimura 卡西姆拉 旅行国内海外两用 多电压负离子吹风机 电压切换式 100V-120V/220-240V 对应 负离子功能 风量切换 折叠 NTI-189</p>
-<p class="kv"><b>價格：</b>依店內｜<b>參考：</b>Amazon 小物 暢銷 #10</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=Kasimura%20%E5%8D%A1%E8%A5%BF%E5%A7%86%E6%8B%89%20%E6%97%85%E8%A1%8C%E5%9B%BD%E5%86%85%E6%B5%B7%E5%A4%96%E4%B8%A4%E7%94%A8%20%E5%A4%9A%E7%94%B5%E5%8E%8B%E8%B4%9F%E7%A6%BB%E5%AD%90%E5%90%B9%E9%A3%8E%E6%9C%BA%20%E7%94%B5%E5%8E%8B%E5%88%87%E6%8D%A2%E5%BC%8F%201" target="_blank">🗺 地圖</a></div>
-
-<div class="card" data-cat="小物" data-price="依店內" data-store="藥妝店" data-amzrank="11"><h3>Kashimura 卡西姆拉 海外用转换插头 O型 2个装 NTI-158</h3><div class="en">Amazon 小物 #11</div>
-<img class="ph" loading="lazy" src="images/goods/goods-11.jpg" onerror="imgRetry(this)" alt="旅行小物">
-<p>介紹：Kashimura 卡西姆拉 海外用转换插头 O型 2个装 NTI-158</p>
-<p class="kv"><b>價格：</b>依店內｜<b>參考：</b>Amazon 小物 暢銷 #11</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=Kashimura%20%E5%8D%A1%E8%A5%BF%E5%A7%86%E6%8B%89%20%E6%B5%B7%E5%A4%96%E7%94%A8%E8%BD%AC%E6%8D%A2%E6%8F%92%E5%A4%B4%20O%E5%9E%8B%202%E4%B8%AA%E8%A3%85%20NTI-158" target="_blank">🗺 地圖</a></div>
-
-<div class="card" data-cat="小物" data-price="依店內" data-store="藥妝店" data-amzrank="12"><h3>NAGAO 日本制 旅行瓶 150毫升 2个装 带止逆阀 洗发水瓶 替换装 便携式</h3><div class="en">Amazon 小物 #12</div>
-<p>介紹：NAGAO 日本制 旅行瓶 150毫升 2个装 带止逆阀 洗发水瓶 替换装 便携式</p>
-<p class="kv"><b>價格：</b>依店內｜<b>參考：</b>Amazon 小物 暢銷 #12</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=NAGAO%20%E6%97%A5%E6%9C%AC%E5%88%B6%20%E6%97%85%E8%A1%8C%E7%93%B6%20150%E6%AF%AB%E5%8D%87%202%E4%B8%AA%E8%A3%85%20%E5%B8%A6%E6%AD%A2%E9%80%86%E9%98%80%20%E6%B4%97%E5%8F%91%E6%B0%B4%E7%93%B6%20%E6%9B%BF%E6%8D%A2%E8%A3%85%20%E4%BE%BF%E6%90%BA" target="_blank">🗺 地圖</a></div>
-
-<div class="card" data-cat="小物" data-price="依店內" data-store="藥妝店" data-amzrank="13"><h3>Sanwa Supply 海外电源转换适配器 白色 TR-AD4W</h3><div class="en">Amazon 小物 #13</div>
-<img class="ph" loading="lazy" src="images/goods/goods-13.jpg" onerror="imgRetry(this)" alt="旅行小物">
-<p>介紹：Sanwa Supply 海外电源转换适配器 白色 TR-AD4W</p>
-<p class="kv"><b>價格：</b>依店內｜<b>參考：</b>Amazon 小物 暢銷 #13</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=Sanwa%20Supply%20%E6%B5%B7%E5%A4%96%E7%94%B5%E6%BA%90%E8%BD%AC%E6%8D%A2%E9%80%82%E9%85%8D%E5%99%A8%20%E7%99%BD%E8%89%B2%20TR-AD4W" target="_blank">🗺 地圖</a></div>
-
-<div class="card" data-cat="小物" data-price="依店內" data-store="藥妝店" data-amzrank="14"><h3>旅行便利商品 Easy Hang 便携衣架 黑色 GW-3103-009</h3><div class="en">Amazon 小物 #14</div>
-<img class="ph" loading="lazy" src="images/goods/goods-14.jpg" onerror="imgRetry(this)" alt="旅行小物">
-<p>介紹：旅行便利商品 Easy Hang 便携衣架 黑色 GW-3103-009</p>
-<p class="kv"><b>價格：</b>依店內｜<b>參考：</b>Amazon 小物 暢銷 #14</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E6%97%85%E8%A1%8C%E4%BE%BF%E5%88%A9%E5%95%86%E5%93%81%20Easy%20Hang%20%E4%BE%BF%E6%90%BA%E8%A1%A3%E6%9E%B6%20%E9%BB%91%E8%89%B2%20GW-3103-009" target="_blank">🗺 地圖</a></div>
-
-<div class="card" data-cat="小物" data-price="依店內" data-store="藥妝店" data-amzrank="15"><h3>夏日夏娃 旅行套装（女性洗液 日常平衡 1个 + 湿巾 3片）</h3><div class="en">Amazon 小物 #15</div>
-<img class="ph" loading="lazy" src="images/goods/goods-15.jpg" onerror="imgRetry(this)" alt="旅行小物">
-<p>介紹：夏日夏娃 旅行套装（女性洗液 日常平衡 1个 + 湿巾 3片）</p>
-<p class="kv"><b>價格：</b>依店內｜<b>參考：</b>Amazon 小物 暢銷 #15</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E5%A4%8F%E6%97%A5%E5%A4%8F%E5%A8%83%20%E6%97%85%E8%A1%8C%E5%A5%97%E8%A3%85%EF%BC%88%E5%A5%B3%E6%80%A7%E6%B4%97%E6%B6%B2%20%E6%97%A5%E5%B8%B8%E5%B9%B3%E8%A1%A1%201%E4%B8%AA%20%2B%20%E6%B9%BF%E5%B7%BE%203%E7%89%87%EF%BC%89" target="_blank">🗺 地圖</a></div>
-
-<div class="card" data-cat="小物" data-price="依店內" data-store="藥妝店" data-amzrank="16"><h3>台和 水罐 水罐 5升 带喷嘴 半透明 日本制造 防灾 轻量 易开合 水箱 塑料桶 </h3><div class="en">Amazon 小物 #16</div>
-<img class="ph" loading="lazy" src="images/goods/goods-16.jpg" onerror="imgRetry(this)" alt="旅行小物">
-<p>介紹：台和 水罐 水罐 5升 带喷嘴 半透明 日本制造 防灾 轻量 易开合 水箱 塑料桶 户外</p>
-<p class="kv"><b>價格：</b>依店內｜<b>參考：</b>Amazon 小物 暢銷 #16</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E5%8F%B0%E5%92%8C%20%E6%B0%B4%E7%BD%90%20%E6%B0%B4%E7%BD%90%205%E5%8D%87%20%E5%B8%A6%E5%96%B7%E5%98%B4%20%E5%8D%8A%E9%80%8F%E6%98%8E%20%E6%97%A5%E6%9C%AC%E5%88%B6%E9%80%A0%20%E9%98%B2%E7%81%BE%20%E8%BD%BB%E9%87%8F%20%E6%98%93%E5%BC%80%E5%90%88%20%E6%B0%B4%E7%AE%B1%20%E5%A1%91%E6%96%99" target="_blank">🗺 地圖</a></div>
-
-<div class="card" data-cat="小物" data-price="依店內" data-store="藥妝店" data-amzrank="17"><h3>行李箱 轮胎罩 50个装/100个装 透明 防污 防灰尘 安装简单 防尘罩 收纳 保</h3><div class="en">Amazon 小物 #17</div>
-<img class="ph" loading="lazy" src="images/goods/goods-17.jpg" onerror="imgRetry(this)" alt="旅行小物">
-<p>介紹：行李箱 轮胎罩 50个装/100个装 透明 防污 防灰尘 安装简单 防尘罩 收纳 保管 车轮保护 防滚动 防滑 通用(50个装)</p>
-<p class="kv"><b>價格：</b>依店內｜<b>參考：</b>Amazon 小物 暢銷 #17</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E8%A1%8C%E6%9D%8E%E7%AE%B1%20%E8%BD%AE%E8%83%8E%E7%BD%A9%2050%E4%B8%AA%E8%A3%85/100%E4%B8%AA%E8%A3%85%20%E9%80%8F%E6%98%8E%20%E9%98%B2%E6%B1%A1%20%E9%98%B2%E7%81%B0%E5%B0%98%20%E5%AE%89%E8%A3%85%E7%AE%80%E5%8D%95%20%E9%98%B2%E5%B0%98%E7%BD%A9%20%E6%94%B6%E7%BA%B3" target="_blank">🗺 地圖</a></div>
-
-<div class="card" data-cat="小物" data-price="依店內" data-store="藥妝店" data-amzrank="18"><h3>ミヨシ株式会社 MCO 可折叠旅行热水壶 500毫升 电压切换式 白色 MBE-TK</h3><div class="en">Amazon 小物 #18</div>
-<img class="ph" loading="lazy" src="images/goods/goods-18.jpg" onerror="imgRetry(this)" alt="旅行小物">
-<p>介紹：ミヨシ株式会社 MCO 可折叠旅行热水壶 500毫升 电压切换式 白色 MBE-TK02/WH</p>
-<p class="kv"><b>價格：</b>依店內｜<b>參考：</b>Amazon 小物 暢銷 #18</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%9F%E3%83%A8%E3%82%B7%E6%A0%AA%E5%BC%8F%E4%BC%9A%E7%A4%BE%20MCO%20%E5%8F%AF%E6%8A%98%E5%8F%A0%E6%97%85%E8%A1%8C%E7%83%AD%E6%B0%B4%E5%A3%B6%20500%E6%AF%AB%E5%8D%87%20%E7%94%B5%E5%8E%8B%E5%88%87%E6%8D%A2%E5%BC%8F%20%E7%99%BD%E8%89%B2%20MBE-" target="_blank">🗺 地圖</a></div>
-
-<div class="card" data-cat="小物" data-price="依店內" data-store="藥妝店" data-amzrank="19"><h3>贝印 软瓶 60ml 瓶装 化妆瓶 透明 容器 旅行 旅行 YOU TIME 1个</h3><div class="en">Amazon 小物 #19</div>
-<img class="ph" loading="lazy" src="images/goods/goods-19.jpg" onerror="imgRetry(this)" alt="旅行小物">
-<p>介紹：贝印(Kai Corporation) 软瓶 60ml 瓶装 化妆瓶 透明 容器 旅行 旅行 YOU TIME (洗发水、护发素等) 1个</p>
-<p class="kv"><b>價格：</b>依店內｜<b>參考：</b>Amazon 小物 暢銷 #19</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E8%B4%9D%E5%8D%B0%20%E8%BD%AF%E7%93%B6%2060ml%20%E7%93%B6%E8%A3%85%20%E5%8C%96%E5%A6%86%E7%93%B6%20%E9%80%8F%E6%98%8E%20%E5%AE%B9%E5%99%A8%20%E6%97%85%E8%A1%8C%20%E6%97%85%E8%A1%8C%20YOU%20TIME%201" target="_blank">🗺 地圖</a></div>
-
-<div class="card" data-cat="小物" data-price="依店內" data-store="藥妝店" data-amzrank="20"><h3>fogman 旅行瓶 分装瓶 旅行用 洗发水 小袋 便携式 20个套装</h3><div class="en">Amazon 小物 #20</div>
-<img class="ph" loading="lazy" src="images/goods/goods-20.jpg" onerror="imgRetry(this)" alt="旅行小物">
-<p>介紹：fogman 旅行瓶 分装瓶 旅行用 洗发水 小袋 便携式 20个套装 (30毫升)</p>
-<p class="kv"><b>價格：</b>依店內｜<b>參考：</b>Amazon 小物 暢銷 #20</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=fogman%20%E6%97%85%E8%A1%8C%E7%93%B6%20%E5%88%86%E8%A3%85%E7%93%B6%20%E6%97%85%E8%A1%8C%E7%94%A8%20%E6%B4%97%E5%8F%91%E6%B0%B4%20%E5%B0%8F%E8%A2%8B%20%E4%BE%BF%E6%90%BA%E5%BC%8F%2020%E4%B8%AA%E5%A5%97%E8%A3%85" target="_blank">🗺 地圖</a></div>
 </div>
 
 <!-- ================= MIYAKO ================= -->
@@ -2087,9 +2026,9 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 <div id="rankOv"><div class="ipanel"><span class="ix" onclick="closeRankOv()">✕</span>
  <h3 style="font-size:18px;padding-right:30px">🏆 人氣 TOP 30</h3>
  <div class="rk-tabs"><button id="rkDonki" class="on" onclick="renderRankOv('唐吉軻德')">🛒 唐吉軻德</button><button id="rkBic" onclick="renderRankOv('Bic Camera')">🔌 Bic Camera</button><button id="rkDrug" onclick="renderRankOv('藥妝店')">💊 藥妝店</button></div>
- <div class="rk-tabs" id="rkSub" style="display:none;gap:4px"><button data-c="藥品" class="on" onclick="rkSub('藥品')">藥品</button><button data-c="美妝" onclick="rkSub('美妝')">美妝</button><button data-c="貼布" onclick="rkSub('貼布')">貼布</button><button data-c="保健品" onclick="rkSub('保健品')">保健品</button><button data-c="小物" onclick="rkSub('小物')">小物</button></div>
+ <div class="rk-tabs" id="rkSub" style="display:none;gap:4px"><button data-c="藥品" class="on" onclick="rkSub('藥品')">藥品</button><button data-c="美妝" onclick="rkSub('美妝')">美妝</button><button data-c="貼布" onclick="rkSub('貼布')">貼布</button><button data-c="保健品" onclick="rkSub('保健品')">保健品</button></div>
  <div id="rkBody"></div>
- <div style="font-size:11.5px;color:#8a7a5c;margin-top:12px">人氣分＝唐吉：三大榜單；Bic：Amazon 耳機榜；藥妝：Amazon 分類暢銷榜（醫藥品／美妝／貼布／保健品／旅行小物，各取前 20）。全部再加家人勾選×10；點品項可看大圖與說明。</div>
+ <div style="font-size:11.5px;color:#8a7a5c;margin-top:12px">人氣分＝唐吉：三大榜單；Bic：Amazon 耳機榜；藥妝：Amazon 分類暢銷榜（醫藥品／美妝／貼布／保健品，各取前 20）。全部再加家人勾選×10；點品項可看大圖與說明。</div>
 </div></div>
 <div style="text-align:center;font-size:12px;color:#999;padding:16px 0 70px">版本 20261027-by<span id="jsok"></span><span id="jsdiag"></span>・有問題請截圖此行</div>
 <button id="statsBtn" onclick="openStats()">📊</button>
@@ -2104,7 +2043,7 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 var PLACES=[['s-naha','那霸'],['s-miyako','宮古島'],['s-ishigaki','石垣島']];
 var CATS=['food','spot','shop','souv','feat'];
 var CATN={food:'餐廳',spot:'景點',shop:'購物',souv:'伴手禮',feat:'當地特色'};
-var CARDMAP={'s-naha': ['food', 'food', 'food', 'food', 'food', 'food', 'food', 'food', 'food', 'food', 'food', 'spot', 'spot', 'spot', 'spot', 'spot', 'spot', 'spot', 'spot', 'spot', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'spot', 'spot', 'spot', 'spot', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'feat', 'spot', 'spot', 'spot', 'food', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'food', 'shop', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'shop', 'shop', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv'], 's-miyako': ['spot', 'spot', 'spot', 'spot', 'spot', 'food', 'food', 'shop', 'spot', 'spot', 'spot', 'spot', 'spot', 'shop', 'shop', 'souv', 'souv', 'souv', 'souv', 'souv', 'feat', 'spot', 'spot', 'shop', 'shop', 'shop'], 's-ishigaki': ['spot', 'spot', 'spot', 'spot', 'food', 'food', 'food', 'food', 'food', 'shop', 'spot', 'spot', 'spot', 'spot', 'shop', 'souv', 'souv', 'souv', 'souv', 'souv', 'feat', 'shop', 'shop', 'shop']};
+var CARDMAP={'s-naha': ['food', 'food', 'food', 'food', 'food', 'food', 'food', 'food', 'food', 'food', 'food', 'spot', 'spot', 'spot', 'spot', 'spot', 'spot', 'spot', 'spot', 'spot', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'spot', 'spot', 'spot', 'spot', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'feat', 'spot', 'spot', 'spot', 'food', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'shop', 'food', 'shop', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'shop', 'shop', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv', 'souv'], 's-miyako': ['spot', 'spot', 'spot', 'spot', 'spot', 'food', 'food', 'shop', 'spot', 'spot', 'spot', 'spot', 'spot', 'shop', 'shop', 'souv', 'souv', 'souv', 'souv', 'souv', 'feat', 'spot', 'spot', 'shop', 'shop', 'shop'], 's-ishigaki': ['spot', 'spot', 'spot', 'spot', 'food', 'food', 'food', 'food', 'food', 'shop', 'spot', 'spot', 'spot', 'spot', 'shop', 'souv', 'souv', 'souv', 'souv', 'souv', 'feat', 'shop', 'shop', 'shop']};
 var GROUPS=[];PLACES.forEach(function(s){CATS.forEach(function(c){GROUPS.push(s[1]+CATN[c]);});});
 var curP='s-naha',curC='food';
 var VKEY='discuss_votes_v1',NKEY='discuss_name_v1';
@@ -2406,7 +2345,7 @@ function refreshRanks(){var v=loadV(),n=me();document.querySelectorAll('tr.srow'
 function toggle(id){var n=me();if(!n){document.getElementById('gate').classList.remove('hide');return;}if(GH_BUSY)return;GH_BUSY=true;
 ghGet().then(function(remote){var arr=remote[id]||[];var want=arr.indexOf(n)<0;function attempt(t){if(want){if(arr.indexOf(n)<0)arr.push(n);}else{var ix=arr.indexOf(n);if(ix>=0)arr.splice(ix,1);}if(!arr.length)delete remote[id];else remote[id]=arr;return ghPut(remote,GH_SHA).catch(function(e){if(t<=0)throw e;return ghGet().then(function(r2){remote=r2;arr=remote[id]||[];return attempt(t-1);});});}return attempt(2);}).then(function(v){saveV(v);setMode('online');refreshVotes();GH_BUSY=false;}).catch(function(e){GH_BUSY=false;setMode('offline');try{localStorage.setItem(GH_DIRTY,'1');}catch(x){}var v=loadV();var arr=v[id]||[];var ix=arr.indexOf(n);if(ix>=0)arr.splice(ix,1);else arr.push(n);if(!arr.length)delete v[id];else v[id]=arr;saveV(v);refreshVotes();alert('連線失敗，已暫存本機，連網後自動上傳');});}
 
-/* ===== 清單模式（勾選伴手禮／用品／電器）===== */
+/* ===== 清單模式（勾選伴手禮／美妝／電器）===== */
 var LVS={port:'all',kind:'souv',cat:'all',store:'all',mine:false,q:''};
 function lvData(){
  var out=[];
@@ -2448,7 +2387,7 @@ function lvRender(){
   var g=gk+'|'+(o.cat||CATN[o.kind]||'其他');(groups[g]=groups[g]||[]).push(o);});
  var h='',cnt=0,totalChecked=0;
  all.forEach(function(o){if((v[o.cid]||[]).length&&(o.kind==='souv'))totalChecked++;});
- var pr={DONKI:1,BIC:2,DRUG:3,miyako:4,naha:5,ishigaki:6},cr={'食品':1,'酒類':2,'用品':3,'電器':4,'紀念品':5,'伴手禮':6};
+ var pr={DONKI:1,BIC:2,DRUG:3,miyako:4,naha:5,ishigaki:6},cr={'食品':1,'酒類':2,'美妝':3,'用品':4,'電器':5,'紀念品':6,'伴手禮':7};
  Object.keys(groups).sort(function(a,b){
   var aa=a.split('|'),bb=b.split('|');
   var pa=pr[aa[0].replace('s-','')]||9,pb=pr[bb[0].replace('s-','')]||9;
@@ -2459,7 +2398,7 @@ function lvRender(){
   h+='<div class="lvsec"><span>'+(pn[p]||pn[p.replace('s-','')])+'・'+escH(c)+'</span><span>'+arr.length+' 項</span></div>';
   arr.forEach(function(o){
    var vv=v[o.cid]||[],on=vv.indexOf(mine)>=0;if(on)cnt++;
-   var emo={'食品':'🍬','酒類':'🍶','用品':'🧴','電器':'🔌','紀念品':'🎐','伴手禮':'🎁'}[o.cat]||'🎁';
+   var emo={'食品':'🍬','酒類':'🍶','美妝':'💄','用品':'🧴','電器':'🔌','紀念品':'🎐','伴手禮':'🎁'}[o.cat]||'🎁';
    h+='<div class="lvrow'+(on?' on':'')+'" data-cid="'+o.cid+'">'
     +'<button class="lvchk" aria-label="勾選" onclick="event.stopPropagation();lvToggle(\''+o.cid+'\')">'+(on?'✓':'')+'</button>'
     +(o.img?('<img class="lvthumb" loading="lazy" src="'+escH(o.img)+'" onerror="this.style.display=\'none\'">'):('<div class="lvthumb em">'+emo+'</div>'))
@@ -2557,15 +2496,15 @@ function renderRankOv(store){
  if(RKS==='藥妝店'){items=items.filter(function(o){return (o.cat||'')===RKSUB;});}
  var scored=items.map(function(o){return {o:o,pi:popScore(o,v[o.cid]||[])};});
  scored.sort(function(a,b){if(a.o.amzrank&&b.o.amzrank&&a.o.amzrank!==b.o.amzrank)return a.o.amzrank-b.o.amzrank;if(b.pi.score!==a.pi.score)return b.pi.score-a.pi.score;return a.o.name.localeCompare(b.o.name,'zh-Hant');});
- var top=scored.slice(0,20);
+ var lim=(RKS==='藥妝店'&&RKSUB==='美妝')?30:20;var top=scored.slice(0,lim);
  var h='',checked=items.filter(function(o){return (v[o.cid]||[]).indexOf(mine)>=0;}).length;
- h+='<div style="font-size:12px;color:#6b7a89;margin-bottom:2px">🏆 '+(RKS==='藥妝店'?RKSUB+' TOP 20':('人氣 TOP '+top.length))+'／共 '+items.length+' 項・你已勾 '+checked+' 項</div>';
+ h+='<div style="font-size:12px;color:#6b7a89;margin-bottom:2px">🏆 '+(RKS==='藥妝店'?RKSUB+' TOP '+top.length:('人氣 TOP '+top.length))+'／共 '+items.length+' 項・你已勾 '+checked+' 項</div>';
  var lastCat='';
  top.forEach(function(row,i){
    var o=row.o,pi=row.pi,vv=v[o.cid]||[],on=vv.indexOf(mine)>=0;
    var c=o.cat||'伴手禮';
    if(c!==lastCat){h+='<div class="rksec">'+escH(c)+'</div>';lastCat=c;}
-   var emo={'食品':'🍬','酒類':'🍶','用品':'🧴','電器':'🔌','紀念品':'🎐','伴手禮':'🎁'}[o.cat]||'🎁';
+   var emo={'食品':'🍬','酒類':'🍶','美妝':'💄','用品':'🧴','電器':'🔌','紀念品':'🎐','伴手禮':'🎁'}[o.cat]||'🎁';
    h+='<div class="rkrow"><div class="rkno">'+(i+1)+'</div>'
     +(o.img?('<img class="rkthumb" loading="lazy" src="'+escH(o.img)+'" onerror="this.style.display=\'none\'">'):('<div class="rkthumb em">'+emo+'</div>'))
     +'<div class="rkname" onclick="openRankItem(\''+o.cid+'\')">'+escH(o.name)
