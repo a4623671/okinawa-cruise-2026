@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f6f2">
-  <title>沖繩郵輪｜三港討論區與行程</title>
-  <link rel="stylesheet" href="naha.css">
+  <title>沖繩郵輪｜三港行程與討論</title>
+  <link rel="stylesheet" href="naha.css?v=20261116-ports-r2">
   <script src="trip-data.js" defer></script>
   <script src="trip-timing.js" defer></script>
   <script src="naha-plan.js" defer></script>
-  <script src="naha-content.js" defer></script>
-  <script src="naha.js" defer></script>
+  <script src="naha-content.js?v=20261116-ports-r2" defer></script>
+  <script src="naha.js?v=20261116-ports-r2" defer></script>
 </head>
 <body>
   <header class="top">
@@ -44,43 +44,61 @@
 
     <nav class="views" aria-label="港口頁面">
       <a href="#itinerary" data-view="itinerary" aria-current="page">行程</a>
-      <a href="#guide" data-view="guide">討論與攻略</a>
+      <a href="#schedule" data-view="schedule">排程</a>
+      <a href="#guide" data-view="guide">攻略投票</a>
       <a href="#shopping" data-view="shopping">我的採買 <span id="shop-count" hidden></span></a>
     </nav>
 
     <div id="sync-banner" class="notice sync-banner" hidden>
       <p id="sync-message"></p>
-      <button id="sync-button" class="button compact" type="button" hidden>同步變更</button>
+      <button id="sync-button" class="button compact" type="button" hidden>再試一次</button>
     </div>
     <p id="notice" class="sr-only" role="status" aria-live="polite"></p>
 
     <section id="itinerary" class="pane" aria-labelledby="itinerary-heading">
       <div class="section-head">
         <h2 id="itinerary-heading">當天行程</h2>
-        <a id="plan-link" class="text-link" href="plan.html?day=2026-12-18">開啟排程板 ↗</a>
+        <a id="final-link" class="text-link" href="final.html?day=2026-12-18">岸上觀光定稿 ↗</a>
       </div>
       <div id="plan-highlights" class="plan-highlights" hidden></div>
       <p id="plan-status" class="muted" role="status">正在讀取那霸的行程…</p>
       <ol id="timeline" class="timeline" aria-label="停靠站順序"></ol>
       <div class="pane-links">
+        <a href="#schedule">編輯排程</a>
         <a href="#guide">看精選攻略和影片</a>
-        <a href="offline.html" download="沖繩離線行程.html">下載離線行程</a>
       </div>
+    </section>
+
+    <section id="schedule" class="pane embedded-pane" aria-labelledby="schedule-heading" hidden>
+      <div class="section-head">
+        <h1 id="schedule-heading">當天排程</h1>
+        <a class="text-link frame-link" href="plan.html" target="_blank" rel="noopener">全螢幕排程 ↗</a>
+      </div>
+      <iframe id="schedule-frame" class="view-frame" data-src="plan.html" title="共用行程排程板" allow="clipboard-write"></iframe>
     </section>
 
     <section id="guide" class="pane" aria-labelledby="guide-heading" hidden>
       <div class="section-head">
-        <h1 id="guide-heading">三港討論區</h1>
-        <a class="text-link guide-full" href="guide.html">完整清單・共用投票 ↗</a>
+        <h1 id="guide-heading">那霸攻略與投票</h1>
       </div>
+      <p class="vote-help">喜歡就按「投一票」。按「已投票」可以取消。</p>
       <div id="card-filters" class="filters" role="group" aria-label="篩選精選推薦"></div>
       <div id="cards" class="cards"></div>
+      <div class="pane-links"><a class="frame-link" href="#discussion">看完整項目清單 →</a></div>
+    </section>
+
+    <section id="discussion" class="pane embedded-pane" aria-labelledby="discussion-heading" hidden>
+      <div class="section-head">
+        <h1 id="discussion-heading">完整項目清單</h1>
+        <a class="text-link frame-link" href="#guide">回精選攻略</a>
+      </div>
+      <iframe id="discussion-frame" class="view-frame" data-src="guide.html" title="共用投票、留言與完整清單" allow="clipboard-write"></iframe>
     </section>
 
     <section id="shopping" class="pane" aria-labelledby="shopping-heading" hidden>
       <div class="section-head">
         <h1 id="shopping-heading">我的採買</h1>
-        <p>到店按清單勾選</p>
+        <p>你投過票的商品，到店買完就勾起來。</p>
       </div>
       <div id="shopping-list"></div>
     </section>
@@ -89,17 +107,17 @@
       <span id="data-status">正在讀取共用資料</span>
       <button id="reload-data" class="quiet" type="button">更新資料</button>
     </footer>
-    <noscript><p><a href="guide.html">開啟完整討論清單</a> · <a href="offline.html">開啟離線行程</a></p></noscript>
+    <noscript><p><a href="guide.html">開啟完整討論清單</a> · <a href="plan.html">開啟排程板</a></p></noscript>
   </main>
 
   <dialog id="name-dialog" aria-labelledby="name-title">
     <form id="name-form">
-      <h2 id="name-title">家人怎麼稱呼你？</h2>
+      <h2 id="name-title">你叫什麼名字？</h2>
       <label for="member-name">名字</label>
       <input id="member-name" name="member" maxlength="12" autocomplete="nickname" required>
       <div class="dialog-actions">
         <button class="button secondary" type="button" data-close>取消</button>
-        <button class="button" type="submit">使用這個名字</button>
+        <button id="name-submit" class="button" type="submit">儲存名字</button>
       </div>
     </form>
   </dialog>
@@ -111,9 +129,9 @@
     </div>
     <div id="comments-list" class="comments-list"></div>
     <form id="comment-form">
-      <label for="comment-input">留給家人的一句話</label>
+      <label for="comment-input">你想說什麼？</label>
       <textarea id="comment-input" rows="3" maxlength="140" required></textarea>
-      <div class="dialog-actions"><button id="comment-submit" class="button" type="submit">儲存留言草稿</button></div>
+      <div class="dialog-actions"><button id="comment-submit" class="button" type="submit">送出留言</button></div>
     </form>
   </dialog>
 
@@ -137,13 +155,5 @@
     </form>
   </dialog>
 
-  <dialog id="video-dialog" class="video-dialog" aria-labelledby="video-title">
-    <div class="dialog-heading">
-      <h2 id="video-title">影片</h2>
-      <button class="quiet" type="button" data-close>關閉</button>
-    </div>
-    <div id="video-player"></div>
-    <div class="dialog-actions"><a class="text-link" id="video-source" target="_blank" rel="noopener">在 YouTube 播放 ↗</a></div>
-  </dialog>
 </body>
 </html>

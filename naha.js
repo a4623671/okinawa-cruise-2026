@@ -81,7 +81,7 @@ const NahaShared = (() => {
       signal: AbortSignal.timeout(10000),
     });
     if (response.status === 409 || response.status === 422) {
-      const error = new Error(file === "plan" ? "共用排程已更新，請重新估算再排入" : "家人剛更新資料，請再同步一次");
+      const error = new Error(file === "plan" ? "共用排程已更新，請重新估算再排入" : "資料剛更新，請再試一次");
       if (file === "plan") {
         try { error.plan = await readPublic("plan"); } catch {}
       }
@@ -91,7 +91,22 @@ const NahaShared = (() => {
     return next;
   }
 
-  return { files, encode, plain, list, cardOf, readPublic, withChanges, writeChanges };
+  async function writeDiscussion(file, actions, client) {
+    // Reuse the discussion page's existing write path without reading its credentials.
+    const read = file === "votes" ? client.ghGet : client.chGet;
+    const write = file === "votes" ? client.ghPut : client.chPut;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const original = await read.call(client);
+      const revision = file === "votes" ? client.GH_SHA : client.CMT_SHA;
+      if (!revision || !validate(file, original)) throw new Error("共用資料讀取失敗");
+      const next = withChanges(file, original, actions);
+      if (next === original) return original;
+      try { return await write.call(client, next, revision); }
+      catch (error) { if (error.message !== "conflict" || attempt === 2) throw error; }
+    }
+  }
+
+  return { files, encode, plain, list, cardOf, readPublic, withChanges, writeChanges, writeDiscussion };
 })();
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -102,11 +117,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const cacheKey = "okinawa-naha-public-v1";
   const boughtKey = "okinawa-naha-bought-v1";
   const slotLabels = { morning: "上午", afternoon: "下午", evening: "晚上" };
-  const panels = ["itinerary", "guide", "shopping"];
-  const portParam = new URLSearchParams(location.search).get("port");
-  const port = OKINAWA_PORTS.find(item => item.id === portParam) || OKINAWA_PORTS.find(item => item.id === "naha");
-  const hasPlanner = port.id === "naha";
-  const isFood = card => card.category === "現場吃";
+  const panels = ["itinerary", "schedule", "guide", "discussion", "shopping"];
+  const framedPanels = ["schedule", "discussion"];
+  const portLinks = document.querySelectorAll("[data-port]");
+  const viewLinks = document.querySelectorAll(".views [data-view]");
+  const shoppingCategories = new Set(["帶回家", "藥妝・美妝", "電器比價"]);
+  const canSend = action => action.file === "plan" ? TripData.canWrite() : action.publish === true;
+  const portFromAddress = () => {
+    const requested = new URLSearchParams(location.search).get("port") || "naha";
+    return OKINAWA_PORTS.find(item => item.id === requested) || OKINAWA_PORTS.find(item => item.id === "naha");
+  };
+  let port = portFromAddress();
   const dateFormat = new Intl.DateTimeFormat("zh-TW", { dateStyle: "short", timeStyle: "short", timeZone: "Asia/Tokyo" });
   const timeFormat = new Intl.DateTimeFormat("sv-SE", { dateStyle: "short", timeStyle: "short", timeZone: "Asia/Tokyo" });
 
@@ -125,7 +146,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let shared = readStorage(cacheKey, {});
   let pending = readStorage(changesKey, []);
   let bought = readStorage(boughtKey, {});
-  let storageOK = true;
   let displayStatus = "正在讀取共用資料";
   let syncError = "";
   let loading = false;
@@ -139,26 +159,97 @@ document.addEventListener("DOMContentLoaded", () => {
   const validCard = id => typeof id === "string" && Boolean(cardOf(id) || /^(?:s-naha#\d+|x-naha-[\w-]+)$/.test(id));
   const cleanTitle = text => String(text || "").replace(/\s*✅\s*$/, "");
   const external = (url, label) => `<a class="text-link" href="${e(url)}" target="_blank" rel="noopener">${e(label)} ↗</a>`;
+  const videoURL = ({ id, start }) => `https://www.youtube.com/watch?v=${id}${start ? "&t=" + start + "s" : ""}`;
   const google = label => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(label);
   const announce = message => { $("notice").textContent = message; };
+  const matchesStop = (card, stop) => card.id === stop.id ||
+    Boolean(card.planTitle && cleanTitle(stop.t).startsWith(card.planTitle));
+
+  function routeURL(id, view) {
+    const url = new URL(location.href);
+    if (id === "naha") url.searchParams.delete("port");
+    else url.searchParams.set("port", id);
+    url.hash = view;
+    return url.href;
+  }
 
   function showView(view, scroll = true) {
-    view = panels.includes(view) ? view : hasPlanner ? "itinerary" : "guide";
-    $("port-page").dataset.view = view;
-    for (const pane of panels) {
-      $(pane).hidden = pane !== view;
-      const link = document.querySelector(`[data-view="${pane}"]`);
-      if (pane === view) link.setAttribute("aria-current", "page");
+    view = panels.includes(view) ? view : port.id === "naha" ? "itinerary" : "guide";
+    const page = $("port-page");
+    const previous = page.dataset.view;
+    page.dataset.view = view;
+    for (const pane of panels) $(pane).hidden = pane !== view;
+    const active = view === "discussion" ? "guide" : view;
+    for (const link of viewLinks) {
+      if (link.dataset.view === active) link.setAttribute("aria-current", "page");
       else link.removeAttribute("aria-current");
     }
+    for (const link of portLinks) link.href = routeURL(link.dataset.port, view);
+    if (framedPanels.includes(view)) {
+      const frame = $(view + "-frame");
+      if (!frame.hasAttribute("src")) frame.src = frame.dataset.src;
+    }
+    if (previous !== view && framedPanels.includes(previous)) {
+      const latestName = readName();
+      if (latestName !== name) {
+        name = validName(latestName) ? latestName : "";
+        render();
+      }
+      void loadShared();
+    }
     if (scroll) {
-      history.replaceState(null, "", "#" + view);
+      const url = routeURL(port.id, view);
+      if (url !== location.href) history.pushState(null, "", url);
       window.scrollTo(0, 0);
     }
   }
 
-  function selected(card) {
-    const action = pending.find(action => action.file === "votes" && action.card === card && action.name === name);
+  function alignFrame(panel) {
+    const frame = $(panel + "-frame");
+    const page = frame.contentDocument;
+    if (!page || page.URL !== frame.src) return;
+    if (panel === "discussion") {
+      page.querySelector(`.lvseg[data-k="port"] [data-v="s-${port.id}"]`)?.click();
+      return;
+    }
+    const board = frame.contentWindow;
+    if (board.curDay === port.date || typeof board.curDay !== "string") return;
+    if (board.PLAN && page.querySelector("#days button")) board.pickDay(port.date);
+    else board.curDay = port.date;
+  }
+
+  function updatePortHeader() {
+    $("port-date").dateTime = port.date;
+    $("port-date").textContent = port.dateLabel;
+    $("harbor-title").textContent = port.name;
+    $("port-pier").href = google(port.coordinates);
+    $("port-pier").textContent = port.pier + "・看碼頭地圖 ↗";
+    $("depart-time").textContent = port.depart;
+    $("guide-heading").textContent = port.name + "攻略與投票";
+    $("schedule-heading").textContent = port.name + "排程";
+    $("final-link").href = `final.html?day=${port.date}`;
+    for (const link of portLinks) {
+      if (link.dataset.port === port.id) link.setAttribute("aria-current", "page");
+      else link.removeAttribute("aria-current");
+    }
+  }
+
+  function selectPort(next) {
+    if (!next || next === port) return;
+    port = next;
+    updatePortHeader();
+    createCards();
+    render();
+    for (const pane of framedPanels) alignFrame(pane);
+  }
+
+  function pendingVote(card, includeDrafts) {
+    return pending.find(action => action.file === "votes" && action.card === card && action.name === name &&
+      (includeDrafts || action.publish));
+  }
+
+  function selected(card, includeDrafts = true) {
+    const action = pendingVote(card, includeDrafts);
     return action ? action.selected : Boolean(name && list(shared.votes, card).includes(name));
   }
 
@@ -174,30 +265,38 @@ document.addEventListener("DOMContentLoaded", () => {
   function createCards() {
     $("cards").innerHTML = port.cards.map(card => {
       const first = card.videos[0];
+      const thumbnail = `https://i.ytimg.com/vi/${first.id}/hqdefault.jpg`;
+      const image = card.image || thumbnail;
       return `<article class="card" id="card-${e(card.id)}">
-        <button class="media" type="button" data-video="${e(card.id)}" data-chapter="0" aria-label="${e(first.label)} · ${e(card.title)}">
-          <img class="${card.image.startsWith("images/") ? "contain" : ""}" src="${e(card.image)}" alt="${e(card.imageAlt)}" loading="lazy" decoding="async">
-          <span class="play">▶ ${e(first.label)}</span>
-        </button>
         <div class="card-body">
-          <p class="card-category">${e(card.category)}</p>
-          <h3 tabindex="-1">${e(card.title)}</h3>
-          <div class="card-place"><p class="venue">${e(card.venue)}</p>${external(google(card.mapQuery || card.venue), "地圖")}</div>
-          <p class="card-story">${e(card.description)}</p>
-          <p class="tip">${e(card.tip)}</p>
-          <details class="sources">
-            <summary>影片出處 · ${e(first.author)}</summary>
-            <div class="link-list">${card.videos.map((video, index) =>
-              `<button class="quiet" type="button" data-video="${e(card.id)}" data-chapter="${index}">${e(video.author)} · ${e(video.label)}</button>`
-            ).join("")}</div>
-            ${card.disclosure ? `<p class="disclosure">${e(card.disclosure)}</p>` : ""}
-            <div class="link-list">${card.sources.map(source => external(source.url, source.label)).join("")}</div>
-          </details>
-          <div class="card-actions">
-            <button class="button" type="button" data-vote="${e(card.id)}" aria-pressed="false">${isFood(card) ? "想吃" : "想買"}</button>
-            <button class="quiet" type="button" data-discuss="${e(card.id)}" data-title="${e(card.venue)}">留言</button>
-            ${card.stop ? `<button class="quiet" type="button" data-schedule="${e(card.id)}">排入當天</button>` : ""}
+          <div class="card-lead">
+            <div>
+              <p class="card-category">${e(card.category)}<span class="card-route" hidden>已在當天行程</span></p>
+              <h3 tabindex="-1">${e(card.title)}</h3>
+              <p class="venue">${e(card.venue)}</p>
+            </div>
+            <img class="card-thumb ${image.startsWith("images/") ? "contain" : ""}" src="${e(image)}"
+              alt="${e(card.imageAlt || first.author + "的影片封面")}" loading="lazy" decoding="async">
           </div>
+          <div class="card-actions">
+            <button class="button" type="button" data-vote="${e(card.id)}" aria-pressed="false">投一票</button>
+            <span class="vote-count">0 票</span>
+            <a class="quiet card-video" href="${e(videoURL(first))}" target="_blank" rel="noopener">看影片 ↗</a>
+            <button class="quiet" type="button" data-discuss="${e(card.id)}" data-title="${e(card.venue)}">留言</button>
+          </div>
+          <details class="card-details">
+            <summary>看介紹、地圖和出處</summary>
+            <p class="card-story">${e(card.description)}</p>
+            <p class="tip">${e(card.tip)}</p>
+            <div class="sources">
+              <div class="link-list">${external(google(card.mapQuery || card.venue), "店家地圖")}
+                ${card.sources.map(source => external(source.url, source.label)).join("")}
+              </div>
+              <div class="link-list">${card.videos.map(video => external(videoURL(video), `${video.author} · ${video.label}`)).join("")}</div>
+              ${card.disclosure ? `<p class="disclosure">${e(card.disclosure)}</p>` : ""}
+              ${card.stop ? `<button class="quiet" type="button" data-schedule="${e(card.id)}">試排時間</button>` : ""}
+            </div>
+          </details>
           <p class="card-state"></p>
         </div>
       </article>`;
@@ -219,27 +318,31 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function updateCards() {
+    const day = NahaPlan.dayOf(shared.plan, port.date);
+    const stops = day ? NahaPlan.rows(day).map(row => row.stop).filter(stop => !stop.skip) : [];
     for (const card of port.cards) {
       const container = $("card-" + card.id);
       const button = container.querySelector("[data-vote]");
-      const active = selected(card.id);
+      const action = pendingVote(card.id, false);
+      const active = selected(card.id, false);
       const count = list(shared.votes, card.id).length;
-      const label = isFood(card) ? "想吃" : "想買";
-      button.textContent = (active ? "已標記" + label : label) + (count ? ` · ${count}` : "");
+      button.textContent = action ? (syncError ? "待送出" : active ? "投票中…" : "取消中…") : active ? "已投票" : "投一票";
+      button.disabled = Boolean(action);
       button.setAttribute("aria-pressed", String(active));
       button.classList.toggle("selected", active);
-      button.title = count ? `${count} 位家人${label}` : label;
+      button.title = active ? "再按一次取消投票" : "投一票";
+      container.querySelector(".vote-count").textContent = `${count} 票`;
       const messages = list(shared.comments, card.id).length;
       container.querySelector("[data-discuss]").textContent = "留言" + (messages ? ` · ${messages}` : "");
+      container.querySelector(".card-route").hidden = !stops.some(stop => matchesStop(card, stop));
       const schedule = container.querySelector("[data-schedule]");
       const states = [];
-      if (pending.some(action => action.card === card.id && action.file !== "plan")) states.push("本機有待同步變更");
       if (schedule) {
         const status = scheduleState(card.id);
         const blocked = NahaPlan.lockMessage(shared.plan);
         const final = status.startsWith("已排進共用") || status === "行程已定案" || status === "行程已略過";
         schedule.disabled = Boolean(blocked || final);
-        schedule.textContent = final ? status : status ? "編輯本機草稿" : "排入當天";
+        schedule.textContent = final ? status : status ? "編輯本機草稿" : TripData.canWrite() ? "排入當天" : "試排時間";
         if (status && !final) states.push(status);
         if (blocked && !final && NahaPlan.dayOf(shared.plan)) states.push(blocked);
       }
@@ -264,17 +367,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderPortPlan() {
     const day = NahaPlan.dayOf(shared.plan, port.date);
-    const times = day ? NahaPlan.clock(day) : { off: "—", board: "—" };
-    $("off-time").textContent = times.off;
-    $("return-time").textContent = times.board;
+    $("off-time").textContent = day?.off || day?.arr || port.arrive;
+    $("return-time").textContent = day?.board || day?.by || port.boardBy;
     $("plan-stage").textContent = !day ? (loading ? "行程載入中" : "行程待載入") : shared.plan.finalized ? "已定案" : "共用草稿";
+    $("plan-highlights").hidden = true;
     const rows = day ? NahaPlan.rows(day).filter(({ stop }) => !stop.skip) : [];
     $("plan-status").textContent = day ? "當天還沒有排入停靠站。" : loading ? "正在讀取行程…" : "暫時讀不到行程，可開啟離線行程。";
     $("plan-status").hidden = Boolean(rows.length);
-    $("timeline").innerHTML = rows.map(({ slot, stop }) => `<li>
+    $("timeline").innerHTML = rows.map(({ slot, stop }) => {
+      const card = port.cards.find(item => matchesStop(item, stop));
+      return `<li>
       <span class="timeline-time">${e(stop.from || slotLabels[slot])}</span>
-      <strong class="simple-stop">${e(cleanTitle(stop.t))}</strong>
-    </li>`).join("");
+      <div class="simple-stop"><strong>${e(cleanTitle(stop.t))}</strong>
+        ${card ? `<button class="quiet" type="button" data-open-card="${e(card.id)}">看攻略與影片</button>` : ""}
+      </div>
+    </li>`;
+    }).join("");
   }
 
   function renderPlan() {
@@ -330,10 +438,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const title = cleanTitle(stop.t);
       const products = NAHA_CARDS.filter(card => card.parentStop === id && selected(card.id));
       const subStops = Array.isArray(stop.sub) ? stop.sub.filter(child => child?.t && !child.skip) : [];
-      const linkedCard = cardOf(id);
+      const linkedCard = port.cards.find(card => matchesStop(card, stop));
       const places = linkedCard || id ? `<div class="link-list">
-        ${linkedCard ? `<button class="quiet" type="button" data-open-card="${e(id)}">看攻略與影片</button>` : ""}
-        <button class="quiet" type="button" data-discuss="${e(id)}" data-title="${e(title)}">留言 ${list(shared.comments, id).length || ""}</button>
+        ${linkedCard ? `<button class="quiet" type="button" data-open-card="${e(linkedCard.id)}">看攻略與影片</button>` : ""}
+        ${id ? `<button class="quiet" type="button" data-discuss="${e(id)}" data-title="${e(title)}">留言 ${list(shared.comments, id).length || ""}</button>` : ""}
       </div>` : "";
       const navigation = !stop.gap && title
         ? external(google(Number.isFinite(stop.lat) && Number.isFinite(stop.lng) ? `${stop.lat},${stop.lng}` : title + " 那霸"), "地圖")
@@ -358,13 +466,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderShopping() {
-    const cards = port.cards.filter(card => !isFood(card) && selected(card.id));
+    const cards = port.cards.filter(card => shoppingCategories.has(card.category) && selected(card.id));
     const count = $("shop-count");
     count.textContent = String(cards.length);
     count.hidden = !cards.length;
     const target = $("shopping-list");
     if (!cards.length) {
-      target.innerHTML = '<p class="notice">在攻略按「想買」，這裡就會依店家列出你的品項。</p><div class="pane-links"><a href="#guide">去看攻略</a></div>';
+      target.innerHTML = '<p class="notice">在商品卡按「投一票」，就會在這裡看到它。</p><div class="pane-links"><a href="#guide">去看攻略</a></div>';
       return;
     }
     const groups = new Map();
@@ -386,17 +494,15 @@ document.addEventListener("DOMContentLoaded", () => {
     $("identity-button").setAttribute("aria-label", name ? "切換名字，目前是 " + name : "設定我的名字");
     $("data-status").textContent = displayStatus;
     $("reload-data").disabled = loading || syncing;
-    $("sync-banner").hidden = !pending.length;
-    $("sync-button").hidden = !TripData.canWrite();
+    $("sync-banner").hidden = !syncError;
+    $("sync-button").hidden = !pending.some(canSend);
     $("sync-button").disabled = syncing || loading;
-    $("comment-submit").textContent = TripData.canWrite() ? "送出留言" : "儲存留言草稿";
-    $("sync-message").textContent = syncing ? "正在同步給家人…" : syncError ||
-      (storageOK ? `${pending.length} 筆變更留在這台裝置，等待共用同步。` : "這台裝置無法儲存變更。請保留這個頁面。");
+    $("sync-message").textContent = syncError;
   }
 
   function render() {
     updateCards();
-    if (hasPlanner) renderPlan();
+    if (port.id === "naha") renderPlan();
     else renderPortPlan();
     renderShopping();
     renderSync();
@@ -417,11 +523,33 @@ document.addEventListener("DOMContentLoaded", () => {
       ? "部分共用資料暫無法更新" : "目前無法連線讀取共用資料";
     loading = false;
     render();
+    void syncPending();
+  }
+
+  function discussionClient() {
+    const frame = $("discussion-frame");
+    const ready = () => frame.contentDocument?.URL === frame.src && typeof frame.contentWindow.ghGet === "function";
+    if (ready()) return Promise.resolve(frame.contentWindow);
+    return new Promise((resolve, reject) => {
+      const loaded = () => {
+        clearTimeout(timer);
+        if (ready()) resolve(frame.contentWindow);
+        else reject(new Error("無法開啟投票"));
+      };
+      const timer = setTimeout(() => {
+        frame.removeEventListener("load", loaded);
+        if ($("discussion").hidden) frame.removeAttribute("src");
+        reject(new Error("連線逾時"));
+      }, 12000);
+      frame.addEventListener("load", loaded, { once: true });
+      if (!frame.hasAttribute("src")) frame.src = frame.dataset.src;
+    });
   }
 
   async function syncPending() {
-    if (!TripData.canWrite() || syncing || loading || !pending.length) return;
-    const batch = pending.slice();
+    if (syncing || loading) return;
+    const batch = pending.filter(canSend);
+    if (!batch.length) return;
     syncing = true;
     syncError = "";
     renderSync();
@@ -429,23 +557,25 @@ document.addEventListener("DOMContentLoaded", () => {
       const actions = batch.filter(action => action.file === file);
       if (!actions.length) continue;
       try {
-        shared[file] = await NahaShared.writeChanges(file, actions);
+        if (TripData.canWrite()) shared[file] = await NahaShared.writeChanges(file, actions);
+        else shared[file] = await NahaShared.writeDiscussion(file, actions, await discussionClient());
         const finished = new Set(actions.map(action => action.token));
         pending = pending.filter(action => !finished.has(action.token));
-        storageOK = writeStorage(changesKey, pending);
+        writeStorage(changesKey, pending);
         writeStorage(cacheKey, shared);
       } catch (error) {
         if (error.plan) {
           shared.plan = error.plan;
           writeStorage(cacheKey, shared);
         }
-        syncError ||= error.message || "共用同步未完成";
+        syncError ||= file === "plan" ? error.message :
+          file === "votes" ? "投票還沒送出，請再試一次。" : "留言還沒送出，請再試一次。";
       }
     }
     syncing = false;
     if (!syncError) {
-      displayStatus = "共用變更已儲存";
-      announce(displayStatus);
+      displayStatus = "已送出";
+      announce(batch.every(action => action.file === "votes") ? "投票已更新" : "已送出");
     } else announce(syncError);
     render();
     if (!syncError && pending.length) void syncPending();
@@ -456,17 +586,18 @@ document.addEventListener("DOMContentLoaded", () => {
       pending = pending.filter(action => action.file !== change.file || action.card !== change.card ||
         (change.file === "votes" && action.name !== change.name));
     }
-    pending.push({ ...change, token: newToken() });
-    storageOK = writeStorage(changesKey, pending);
+    pending.push({ ...change, publish: change.file !== "plan", token: newToken() });
+    const saved = writeStorage(changesKey, pending);
     syncError = "";
     render();
-    announce(storageOK ? "變更已暫存在這台裝置" : "變更暫存在這個頁面");
+    announce(change.file === "plan" ? (saved ? "本機草稿已儲存" : "草稿只保留在這個頁面") : "正在送出");
     void syncPending();
   }
 
-  function askName(action) {
+  function askName(action, submitLabel = "儲存名字") {
     if (name && action) return action();
     nameAction = action;
+    $("name-submit").textContent = submitLabel;
     $("member-name").value = name;
     $("name-dialog").showModal();
     $("member-name").focus();
@@ -474,7 +605,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function vote(id) {
     if (!cardOf(id)) return;
-    askName(() => queue({ file: "votes", card: id, name, selected: !selected(id) }));
+    askName(() => queue({ file: "votes", card: id, name, selected: !selected(id, false) }), "儲存並投票");
   }
 
   function renderComments() {
@@ -485,7 +616,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const time = Date.parse(comment?.ts);
         return `<div class="comment"><b>${e(plain(comment?.n))}</b>${Number.isFinite(time) ? `<time>${e(dateFormat.format(time))}</time>` : ""}<p>${e(plain(comment?.t))}</p></div>`;
       }).join("") + drafts.map(comment =>
-        `<div class="comment"><b>${e(comment.name)}</b><time>本機待同步</time><p>${e(comment.text)}</p></div>`
+        `<div class="comment"><b>${e(comment.name)}</b><time>${comment.publish ? (syncError ? "待送出" : "送出中…") : "本機草稿"}</time><p>${e(comment.text)}</p></div>`
       ).join("")
       : '<p class="muted">這裡目前沒有留言。</p>';
   }
@@ -536,24 +667,6 @@ document.addEventListener("DOMContentLoaded", () => {
     $("schedule-dialog").showModal();
   }
 
-  function openVideo(id, chapter) {
-    const card = cardOf(id);
-    const video = card?.videos[chapter];
-    if (!video) return;
-    if (navigator.onLine === false) { announce("影片需要網路連線"); }
-    $("video-title").textContent = video.author + "・" + video.label;
-    const player = document.createElement("iframe");
-    player.title = video.author + " 的影片";
-    player.allowFullscreen = true;
-    player.allow = "accelerometer; autoplay; encrypted-media; picture-in-picture";
-    player.referrerPolicy = "strict-origin-when-cross-origin";
-    player.src = `https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&start=${video.start || 0}`;
-    $("video-player").replaceChildren(player);
-    $("video-source").href = `https://www.youtube.com/watch?v=${video.id}${video.start ? "&t=" + video.start + "s" : ""}`;
-    $("video-dialog").showModal();
-  }
-
-  $("video-dialog").addEventListener("close", () => $("video-player").replaceChildren());
   $("name-dialog").addEventListener("close", () => { nameAction = null; });
   $("name-form").addEventListener("submit", event => {
     event.preventDefault();
@@ -581,7 +694,7 @@ document.addEventListener("DOMContentLoaded", () => {
     askName(() => {
       queue({ file: "comments", card: id, name, text, ts: new Date().toISOString() });
       $("comment-input").value = "";
-    });
+    }, "儲存並留言");
   });
   $("schedule-form").addEventListener("input", previewSchedule);
   $("schedule-form").addEventListener("submit", event => {
@@ -600,17 +713,25 @@ document.addEventListener("DOMContentLoaded", () => {
   $("sync-button").addEventListener("click", () => void syncPending());
   $("identity-button").addEventListener("click", () => askName());
   $("reload-data").addEventListener("click", () => void loadShared());
+  window.addEventListener("online", () => void syncPending());
   window.addEventListener("trip-sync-settings-changed", () => { renderSync(); void syncPending(); });
-  window.addEventListener("hashchange", () => showView(location.hash.slice(1), false));
+  function restoreRoute() {
+    selectPort(portFromAddress());
+    showView(location.hash.slice(1), false);
+  }
+  window.addEventListener("hashchange", restoreRoute);
+  window.addEventListener("popstate", restoreRoute);
 
   document.addEventListener("click", event => {
     const target = event.target.closest("button, a");
     if (!target) return;
-    if (target.dataset.itineraryDay) {
-      try { localStorage.setItem("ok_it_day", target.dataset.itineraryDay); } catch {}
+    const alternateClick = event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
+    if (target.dataset.port && !alternateClick) {
+      event.preventDefault();
+      selectPort(OKINAWA_PORTS.find(item => item.id === target.dataset.port));
+      showView($("port-page").dataset.view);
     } else if (target.matches("[data-close]")) target.closest("dialog").close();
     else if (target.hasAttribute("data-filter")) filterCards(target.dataset.filter);
-    else if (target.dataset.video) openVideo(target.dataset.video, Number(target.dataset.chapter));
     else if (target.dataset.vote) vote(target.dataset.vote);
     else if (target.dataset.discuss) openDiscussion(target.dataset.discuss, target.dataset.title);
     else if (target.dataset.schedule) openSchedule(target.dataset.schedule);
@@ -620,8 +741,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (card.hidden) filterCards("");
       card.scrollIntoView({ block: "start" });
       card.querySelector("h3").focus({ preventScroll: true });
-    } else if (target.matches("a[href^='#']") && panels.includes(target.hash.slice(1)) &&
-      !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
+    } else if (target.matches("a[href^='#']") && panels.includes(target.hash.slice(1)) && !alternateClick) {
       event.preventDefault();
       showView(target.hash.slice(1));
     }
@@ -634,22 +754,31 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   $("itinerary-heading").tabIndex = -1;
-  $("port-date").dateTime = port.date;
-  $("port-date").textContent = port.dateLabel;
-  $("harbor-title").textContent = port.name;
-  $("port-pier").href = google(port.coordinates);
-  $("port-pier").textContent = port.pier + "・看碼頭地圖 ↗";
-  $("depart-time").textContent = port.depart;
-  for (const link of document.querySelectorAll("[data-port]")) {
-    if (link.dataset.port === port.id) link.setAttribute("aria-current", "page");
-    else link.removeAttribute("aria-current");
+  for (const pane of framedPanels) {
+    const frame = $(pane + "-frame");
+    frame.addEventListener("load", () => {
+      const page = frame.contentDocument;
+      if (!page || page.URL !== frame.src) return;
+      for (const link of page.querySelectorAll('.topbar > a[href="index.html"], .topbar > a[href="guide.html"], .topbar > a[href="plan.html"]')) {
+        link.style.display = "none";
+      }
+      if (pane === "discussion") {
+        for (const label of page.querySelectorAll('.legend, [id^="newprop-"], #rkBody + div')) {
+          label.textContent = label.textContent.replace("同步給家人", "同步").replace("家人勾選", "投票").replaceAll("家人", "");
+        }
+      }
+      if (pane === "schedule") {
+        page.getElementById("days")?.addEventListener("click", () => {
+          const next = OKINAWA_PORTS.find(item => item.date === frame.contentWindow.curDay);
+          if (!next || next === port) return;
+          selectPort(next);
+          showView("schedule");
+        });
+      }
+      alignFrame(pane);
+    });
   }
-  if (!hasPlanner) {
-    const link = $("plan-link");
-    link.href = `itinerary.html?day=${port.date}`;
-    link.dataset.itineraryDay = port.date;
-    link.textContent = "開啟詳細行程 ↗";
-  }
+  updatePortHeader();
   createCards();
   showView(location.hash.slice(1), false);
   void loadShared();
