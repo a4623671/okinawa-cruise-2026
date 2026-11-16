@@ -28,7 +28,7 @@ const NAHA_CARDS = [
     sources: [{ label: "市場代煮流程", url: "https://www.makishi-public-market.jp/about/howto/" }],
   },
   {
-    id: "naha-parco-food-terrace", category: "景點", planTitle: "PARCO CITY",
+    id: "naha-parco-food-terrace", category: "景點", planTitle: "PARCO CITY", catalogGroup: "shop",
     title: "PARCO CITY 海景餐區，靠窗看西海岸",
     venue: "浦添西海岸 PARCO CITY", mapQuery: "サンエー浦添西海岸 PARCO CITY",
     description: "オキチル逛完伴手禮區，直接拍到餐區窗外的西海岸。想各買各的午餐，可以先看二樓「フードホール」有哪些選擇。",
@@ -56,6 +56,7 @@ const NAHA_CARDS = [
     id: "s-naha#31",
     category: "帶回家",
     title: "紅芋塔，先買一顆再決定",
+    shopping: { name: "御菓子御殿 紅芋塔", original: "元祖 紅いもタルト" },
     venue: "御菓子御殿 國際通松尾店",
     mapQuery: "御菓子御殿 国際通り松尾店 那覇市松尾1-2-5",
     parentStop: "s-naha#14",
@@ -70,6 +71,7 @@ const NAHA_CARDS = [
     id: "s-naha#168",
     category: "藥妝・美妝",
     title: "KATE 怪獸唇膏，03 還是 05？",
+    shopping: { name: "KATE 怪獸唇膏", original: "KATE リップモンスター" },
     venue: "大國藥妝 國際通 Lantana 店",
     mapQuery: "ダイコクドラッグ 国際通りランタナ店 那覇市松尾2丁目8-1",
     parentStop: "s-naha#14",
@@ -91,6 +93,10 @@ const NAHA_CARDS = [
     id: "naha-panasonic-es-pv6a",
     category: "電器比價",
     title: "Panasonic 掌上刮鬍刀 ES-PV6A",
+    shopping: {
+      name: "Panasonic 掌上刮鬍刀 ES-PV6A", original: "ラムダッシュ パームイン ES-PV6A",
+      image: "https://panasonicjp.scene7.com/is/image/panasonicjp/ES-PV6A-W-2?fmt=png-alpha&wid=240",
+    },
     venue: "Bic Camera Select 那霸國際通店",
     mapQuery: "ビックカメラSelect 那覇国際通り店 那覇市久茂地3丁目29番2号",
     parentStop: "s-naha#14",
@@ -118,6 +124,10 @@ const NAHA_CARDS = [
   {
     id: "naha-canmake-creamy-liner", category: "藥妝・美妝",
     title: "CANMAKE 眼線膠筆，02 和 03 怎麼選",
+    shopping: {
+      name: "CANMAKE 眼線膠筆 02／03", original: "クリーミータッチライナー 02／03",
+      image: "https://www.canmake.com/wp-content/uploads/2025/08/C05_36_col02_img_00.jpg",
+    },
     venue: "國際通藥妝店・大國藥妝 Lantana 店", mapQuery: "ダイコクドラッグ 国際通りランタナ店",
     description: "02 ミディアムブラウン畫起來比較柔和，03 ダークブラウン適合眼尾想要更深一點。先看同一隻手臂上的試色，再決定想要哪種深度。",
     tip: "認「クリーミータッチライナー」與色號。筆芯少轉一點，一次夠畫就好。到店再確認有沒有試用品。",
@@ -134,6 +144,10 @@ const NAHA_CARDS = [
   {
     id: "naha-panasonic-eh-na0j", category: "電器比價",
     title: "Panasonic NA0J 吹風機，到店試重量和風量",
+    shopping: {
+      name: "Panasonic 奈米水離子吹風機 EH-NA0J", original: "ナノケア EH-NA0J",
+      image: "https://panasonicjp.scene7.com/is/image/panasonicjp/EH-NA0J-A_%E6%A8%99%E6%BA%96%E3%83%95%E3%83%AA-1?fmt=png-alpha&wid=240",
+    },
     venue: "Bic Camera Select 那霸國際通店", mapQuery: "ビックカメラSelect 那覇国際通り店",
     description: "同一把拿到手，先確認吹後腦時手腕會不會累，再感受熱風。Rentio 借實機試吹，整理了出風與切換模式的使用心得。",
     tip: "日本 EH-NA0J 標示 AC100V。打算帶回台灣，當場確認可用電壓、保固與現貨。",
@@ -144,7 +158,7 @@ const NAHA_CARDS = [
     ],
   },
   {
-    id: "naha-shuri-seiden", category: "景點",
+    id: "naha-shuri-seiden", catalogId: "s-naha#12", category: "景點",
     title: "首里城，走到高台再決定進不進正殿",
     venue: "首里城公園", mapQuery: "首里城公園 那覇市 首里",
     description: "想看琉球王國的朱紅城門和石牆，從守禮門往上走。沖繩電視台的現地報導能先看到復原過程，想進正殿內部可從官網查可預約時段。",
@@ -199,6 +213,10 @@ const OKINAWA_PORTS = [
       {
         id: "miyako-montedoll-banana", category: "帶回家",
         title: "蒙特多爾香蕉蛋糕，買小包分著吃",
+        shopping: {
+          name: "蒙特多爾迷你香蕉蛋糕", original: "モンテドール ミニバナナケーキ", store: "蒙特多爾本店",
+          image: "https://img07.shop-pro.jp/PA01452/785/product/181721025.jpg?cmsp_timestamp=20240719174756",
+        },
         venue: "モンテドール 本店", mapQuery: "モンテドール本店 宮古島市平良西里7-2",
         description: "《オレンジページ》作者在宮古島超市買來試吃，切開是鬆軟的香蕉蛋糕。自己留著配咖啡買一條，想分送可找一人份的迷你款。",
         tip: "在平良市區找「バナナケーキ」。影片是早期包裝，到店對品名和份量。",
@@ -220,8 +238,9 @@ const OKINAWA_PORTS = [
         sources: [{ label: "沖繩觀光局海灘資訊", url: "https://www.okinawastory.jp/spot/1099" }],
       },
       {
-        id: "miyako-yukishio-chinsuko", category: "帶回家",
+        id: "miyako-yukishio-chinsuko", catalogId: "s-naha#57", category: "帶回家",
         title: "雪塩金楚糕，原味和牛奶味各拆一包",
+        shopping: { name: "南風堂 雪鹽金楚糕", original: "雪塩ちんすこう（南風堂）" },
         venue: "島の駅みやこ・宮古島伴手禮區", mapQuery: "島の駅みやこ 宮古島市平良久貝",
         description: "酥鬆的沖繩餅乾拌雪鹽。齋ちゃんねる拆開原味與牛奶兩種比較。想要奶香選ミルク風味，想配無糖茶先試原味。",
         tip: "找「雪塩ちんすこう」。挑之前看盒上的入數與個別包裝，方便拆開分送。門市口味以現場為準。",
@@ -299,8 +318,9 @@ const OKINAWA_PORTS = [
         ],
       },
       {
-        id: "ishigaki-royce-kokuto", category: "帶回家",
+        id: "ishigaki-royce-kokuto", catalogId: "s-naha#70", category: "帶回家",
         title: "ROYCE’ 石垣島黑糖巧克力，薄片分送",
+        shopping: { name: "ROYCE’ 石垣島黑糖巧克力", original: "ロイズ石垣島 黒糖チョコレート" },
         venue: "ちゅらさん（ユーグレナモール）", mapQuery: "ちゅらさん ユーグレナモール 石垣市大川218",
         description: "打開是 32 片薄薄的黑糖巧克力，拆一片配無糖茶，剩下順手分同事。影片會帶你認包裝，石垣島ナビ有拆盒與薄片照片。",
         tip: "逛ユーグレナモール時可到「ちゅらさん」找「黒糖チョコレート」。店家列在品牌經銷名單，當天庫存請看現場。",
@@ -315,8 +335,12 @@ const OKINAWA_PORTS = [
         ],
       },
       {
-        id: "ishigaki-penguin-chili", category: "帶回家",
+        id: "ishigaki-penguin-chili", catalogId: "s-ishigaki#18", category: "帶回家",
         title: "邊銀食堂石垣島辣油，想配水餃找原味瓶",
+        shopping: {
+          name: "邊銀食堂 石垣島辣油", original: "辺銀食堂の石垣島ラー油",
+          image: "https://penshoku.com/wp/wp-content/themes/pc/img/prod_ishira.png",
+        },
         venue: "石垣ペンギン", mapQuery: "石垣ペンギン 辺銀食堂 石垣島",
         description: "這款辣油有島唐辛子和多種香料，適合舀一點拌白飯、豆腐或水餃。架上有原味和「激辛」，送人可以先挑原味。",
         tip: "找瓶身「辺銀食堂の石垣島ラー油」。品牌另列島內經銷點，市區本店沒買到可就近查。",
