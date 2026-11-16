@@ -196,6 +196,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (view === "discussion" || view === "shopping") void loadCatalog();
     if (view === "discussion") renderCatalog();
     if (previous === "schedule" && previous !== view) {
+      if (scheduleFrame.contentDocument?.URL === scheduleFrame.src) scheduleFrame.contentWindow.closePlanMap?.();
       const latestName = readName();
       if (latestName !== name) {
         name = validName(latestName) ? latestName : "";
@@ -215,8 +216,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!page || page.URL !== scheduleFrame.src) return;
     const board = scheduleFrame.contentWindow;
     if (board.curDay === port.date || typeof board.curDay !== "string") return;
-    if (board.PLAN && page.querySelector("#days button")) board.pickDay(port.date);
-    else board.curDay = port.date;
+    if (board.PLAN && page.querySelector("#days button")) {
+      board.MSUB = null;
+      board.pickDay(port.date);
+    }
+    else {
+      board.curDay = port.date;
+      if (board.MAPBYK !== "all") board.MAPBYK = port.date;
+    }
   }
 
   function updatePortHeader() {
@@ -555,7 +562,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <span class="shop-thumb" aria-hidden="true">${item.image ? `<img src="${e(item.image)}" alt="" loading="lazy" decoding="async">` : ""}</span>
             <span class="shop-names"><strong>${e(title)}</strong>${original ? `<small class="shop-original" lang="ja">${e(original)}</small>` : ""}</span>
           </label>
-          <button class="quiet shop-detail" type="button" data-catalog-item="${e(item.id)}" aria-label="查看${e(title)}資料">查看資料</button>
+          <button class="quiet shop-detail" type="button" data-catalog-item="${e(item.id)}" aria-label="查看${e(title)}資料">詳情</button>
         </li>`;
       }).join("")}</ul>
     </section>`).join("");
@@ -876,12 +883,16 @@ document.addEventListener("DOMContentLoaded", () => {
     for (const link of page.querySelectorAll('.topbar > a[href="index.html"], .topbar > a[href="guide.html"], .topbar > a[href="plan.html"]')) {
       link.style.display = "none";
     }
-    page.getElementById("days")?.addEventListener("click", () => {
+    TripBoardUI.mount(scheduleFrame);
+    const matchBoardDate = event => {
+      if (!event.target.closest(".day")) return;
       const next = OKINAWA_PORTS.find(item => item.date === scheduleFrame.contentWindow.curDay);
       if (!next || next === port) return;
       selectPort(next);
-      showView("schedule");
-    });
+      showView("schedule", false);
+      history.pushState(null, "", routeURL(port.id, "schedule"));
+    };
+    for (const id of ["days", "mapdays"]) page.getElementById(id)?.addEventListener("click", matchBoardDate);
     alignSchedule();
   });
   updatePortHeader();

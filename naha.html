@@ -5,15 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f6f2">
   <title>沖繩郵輪｜三港行程與討論</title>
-  <link rel="stylesheet" href="naha.css?v=20261116-ports-r5">
-  <link id="board-style" rel="stylesheet" href="trip-board.css?v=20261116-ports-r3">
+  <link rel="stylesheet" href="naha.css?v=20261117-ports-r6">
+  <link id="board-style" rel="stylesheet" href="trip-board.css?v=20261117-ports-r6">
   <script src="trip-data.js" defer></script>
   <script src="trip-timing.js" defer></script>
   <script src="naha-plan.js" defer></script>
   <script src="naha-content.js?v=20261116-ports-r5" defer></script>
   <script src="naha-shopping-names.js?v=20261116-ports-r4" defer></script>
   <script src="naha-catalog.js?v=20261116-ports-r5" defer></script>
-  <script src="naha.js?v=20261116-ports-r5" defer></script>
+  <script src="trip-board-ui.js?v=20261117-ports-r6" defer></script>
+  <script src="naha.js?v=20261117-ports-r6" defer></script>
 </head>
 <body>
   <header class="top">
@@ -74,7 +75,9 @@
         <h1 id="schedule-heading">當天排程</h1>
         <a id="schedule-full" class="text-link frame-link" href="naha.html?full=1#schedule" target="_blank" rel="noopener">全螢幕排程 ↗</a>
       </div>
-      <iframe id="schedule-frame" class="view-frame" data-src="plan.html" title="共用行程排程板" allow="clipboard-write"></iframe>
+      <div class="schedule-frame-slot">
+        <iframe id="schedule-frame" class="view-frame" data-src="plan.html" title="共用行程排程板" allow="clipboard-write"></iframe>
+      </div>
     </section>
 
     <section id="discussion" class="pane" aria-labelledby="discussion-heading" hidden>
