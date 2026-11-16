@@ -118,9 +118,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const boughtKey = "okinawa-naha-bought-v1";
   const slotLabels = { morning: "上午", afternoon: "下午", evening: "晚上" };
   const panels = ["itinerary", "schedule", "guide", "discussion", "shopping"];
-  const framedPanels = ["schedule", "discussion"];
+  const scheduleFrame = $("schedule-frame");
   const portLinks = document.querySelectorAll("[data-port]");
   const viewLinks = document.querySelectorAll(".views [data-view]");
+  const fullSchedule = new URLSearchParams(location.search).get("full") === "1";
   const shoppingCategories = new Set(["帶回家", "藥妝・美妝", "電器比價"]);
   const canSend = action => action.file === "plan" ? TripData.canWrite() : action.publish === true;
   const portFromAddress = () => {
@@ -153,10 +154,15 @@ document.addEventListener("DOMContentLoaded", () => {
   let nameAction;
   let choice;
   let discussion;
-  let planned;
+  let catalog = [];
+  let catalogIndex = new Map();
+  let catalogState = "idle";
+  let catalogGroup = "all";
+  let catalogPage = 0;
+  const catalogPageSize = 8;
   if (!Array.isArray(pending)) pending = [];
   const newToken = () => globalThis.crypto?.randomUUID?.() || Date.now() + "-" + Math.random().toString(36).slice(2);
-  const validCard = id => typeof id === "string" && Boolean(cardOf(id) || /^(?:s-naha#\d+|x-naha-[\w-]+)$/.test(id));
+  const validCard = id => typeof id === "string" && Boolean(cardOf(id) || catalogIndex.has(id) || /^(?:s-naha#\d+|x-naha-[\w-]+)$/.test(id));
   const cleanTitle = text => String(text || "").replace(/\s*✅\s*$/, "");
   const external = (url, label) => `<a class="text-link" href="${e(url)}" target="_blank" rel="noopener">${e(label)} ↗</a>`;
   const videoURL = ({ id, start }) => `https://www.youtube.com/watch?v=${id}${start ? "&t=" + start + "s" : ""}`;
@@ -178,6 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const page = $("port-page");
     const previous = page.dataset.view;
     page.dataset.view = view;
+    document.body.classList.toggle("schedule-full", fullSchedule && view === "schedule");
     for (const pane of panels) $(pane).hidden = pane !== view;
     const active = view === "discussion" ? "guide" : view;
     for (const link of viewLinks) {
@@ -185,11 +192,10 @@ document.addEventListener("DOMContentLoaded", () => {
       else link.removeAttribute("aria-current");
     }
     for (const link of portLinks) link.href = routeURL(link.dataset.port, view);
-    if (framedPanels.includes(view)) {
-      const frame = $(view + "-frame");
-      if (!frame.hasAttribute("src")) frame.src = frame.dataset.src;
-    }
-    if (previous !== view && framedPanels.includes(previous)) {
+    if (view === "schedule" && !scheduleFrame.hasAttribute("src")) scheduleFrame.src = scheduleFrame.dataset.src;
+    if (view === "discussion" || view === "shopping") void loadCatalog();
+    if (view === "discussion") renderCatalog();
+    if (previous === "schedule" && previous !== view) {
       const latestName = readName();
       if (latestName !== name) {
         name = validName(latestName) ? latestName : "";
@@ -204,15 +210,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function alignFrame(panel) {
-    const frame = $(panel + "-frame");
-    const page = frame.contentDocument;
-    if (!page || page.URL !== frame.src) return;
-    if (panel === "discussion") {
-      page.querySelector(`.lvseg[data-k="port"] [data-v="s-${port.id}"]`)?.click();
-      return;
-    }
-    const board = frame.contentWindow;
+  function alignSchedule() {
+    const page = scheduleFrame.contentDocument;
+    if (!page || page.URL !== scheduleFrame.src) return;
+    const board = scheduleFrame.contentWindow;
     if (board.curDay === port.date || typeof board.curDay !== "string") return;
     if (board.PLAN && page.querySelector("#days button")) board.pickDay(port.date);
     else board.curDay = port.date;
@@ -221,12 +222,20 @@ document.addEventListener("DOMContentLoaded", () => {
   function updatePortHeader() {
     $("port-date").dateTime = port.date;
     $("port-date").textContent = port.dateLabel;
-    $("harbor-title").textContent = port.name;
+    $("itinerary-heading").textContent = port.name + "行程";
     $("port-pier").href = google(port.coordinates);
-    $("port-pier").textContent = port.pier + "・看碼頭地圖 ↗";
+    $("port-pier").textContent = port.pier + "・碼頭地圖 ↗";
     $("depart-time").textContent = port.depart;
     $("guide-heading").textContent = port.name + "攻略與投票";
     $("schedule-heading").textContent = port.name + "排程";
+    const fullLink = $("schedule-full");
+    const scheduleURL = new URL(routeURL(port.id, "schedule"));
+    if (fullSchedule) scheduleURL.searchParams.delete("full");
+    else scheduleURL.searchParams.set("full", "1");
+    fullLink.href = scheduleURL.href;
+    fullLink.target = fullSchedule ? "_self" : "_blank";
+    fullLink.textContent = fullSchedule ? "回整合頁" : "全螢幕排程 ↗";
+    $("discussion-heading").textContent = port.name + "完整項目";
     $("final-link").href = `final.html?day=${port.date}`;
     for (const link of portLinks) {
       if (link.dataset.port === port.id) link.setAttribute("aria-current", "page");
@@ -239,8 +248,11 @@ document.addEventListener("DOMContentLoaded", () => {
     port = next;
     updatePortHeader();
     createCards();
+    catalogPage = 0;
+    updateCatalogStores();
     render();
-    for (const pane of framedPanels) alignFrame(pane);
+    if (!$("discussion").hidden) renderCatalog();
+    alignSchedule();
   }
 
   function pendingVote(card, includeDrafts) {
@@ -251,6 +263,19 @@ document.addEventListener("DOMContentLoaded", () => {
   function selected(card, includeDrafts = true) {
     const action = pendingVote(card, includeDrafts);
     return action ? action.selected : Boolean(name && list(shared.votes, card).includes(name));
+  }
+
+  function paintVote(button) {
+    const id = button.dataset.vote;
+    const action = pendingVote(id, false);
+    const active = selected(id, false);
+    const count = list(shared.votes, id).length;
+    button.textContent = action ? (syncError ? "待送出" : active ? "投票中…" : "取消中…") : active ? "已投票" : "投一票";
+    button.disabled = Boolean(action);
+    button.setAttribute("aria-pressed", String(active));
+    button.classList.toggle("selected", active);
+    button.title = active ? "再按一次取消投票" : "投一票";
+    button.parentElement.querySelector(".vote-count").textContent = `${count} 票`;
   }
 
   function scheduleState(id) {
@@ -322,16 +347,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const stops = day ? NahaPlan.rows(day).map(row => row.stop).filter(stop => !stop.skip) : [];
     for (const card of port.cards) {
       const container = $("card-" + card.id);
-      const button = container.querySelector("[data-vote]");
-      const action = pendingVote(card.id, false);
-      const active = selected(card.id, false);
-      const count = list(shared.votes, card.id).length;
-      button.textContent = action ? (syncError ? "待送出" : active ? "投票中…" : "取消中…") : active ? "已投票" : "投一票";
-      button.disabled = Boolean(action);
-      button.setAttribute("aria-pressed", String(active));
-      button.classList.toggle("selected", active);
-      button.title = active ? "再按一次取消投票" : "投一票";
-      container.querySelector(".vote-count").textContent = `${count} 票`;
+      paintVote(container.querySelector("[data-vote]"));
       const messages = list(shared.comments, card.id).length;
       container.querySelector("[data-discuss]").textContent = "留言" + (messages ? ` · ${messages}` : "");
       container.querySelector(".card-route").hidden = !stops.some(stop => matchesStop(card, stop));
@@ -350,6 +366,97 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function updateCatalogStores() {
+    const control = $("catalog-store");
+    const previous = control.value;
+    const stores = [...new Set(NahaCatalog.forPort(catalog, port.id).map(item => item.store).filter(Boolean))];
+    stores.sort((a, b) => a.localeCompare(b, "zh-TW"));
+    control.replaceChildren(new Option("所有店家", ""), ...stores.map(store => new Option(store, store)));
+    if (stores.includes(previous)) control.value = previous;
+  }
+
+  async function loadCatalog() {
+    if (catalogState === "ready" || catalogState === "loading") return;
+    catalogState = "loading";
+    $("catalog-status").textContent = "正在讀取完整項目…";
+    $("catalog-retry").hidden = true;
+    try {
+      catalog = NahaCatalog.read(await discussionClient());
+      if (!catalog.length) throw new Error("缺少項目");
+      catalogIndex = new Map(catalog.map(item => [item.id, item]));
+      catalogState = "ready";
+    } catch {
+      catalogState = "error";
+      $("catalog-status").textContent = "完整項目暫時讀不到。";
+      $("catalog-retry").hidden = false;
+      return;
+    }
+    $("catalog-tools").hidden = false;
+    $("catalog-filters").innerHTML = Object.entries(NahaCatalog.categories).map(([group, label]) =>
+      `<button type="button" data-catalog-filter="${e(group)}" aria-pressed="false">${e(label)}</button>`
+    ).join("");
+    updateCatalogStores();
+    renderCatalog();
+    renderShopping();
+  }
+
+  function catalogVote(id) {
+    return `<button class="button" type="button" data-vote="${e(id)}" aria-pressed="false">投一票</button><span class="vote-count">0 票</span>`;
+  }
+
+  function renderCatalog() {
+    if (catalogState !== "ready") return;
+    const portItems = NahaCatalog.forPort(catalog, port.id);
+    const showMine = $("catalog-mine").checked;
+    const choices = { query: $("catalog-query").value, group: catalogGroup, store: $("catalog-store").value, selected: showMine };
+    const found = NahaCatalog.match(portItems, choices, id => selected(id, false));
+    if ($("catalog-sort").value === "votes") found.sort((a, b) => list(shared.votes, b.id).length - list(shared.votes, a.id).length);
+    const pages = Math.max(1, Math.ceil(found.length / catalogPageSize));
+    catalogPage = Math.min(catalogPage, pages - 1);
+    const first = catalogPage * catalogPageSize;
+    const visible = found.slice(first, first + catalogPageSize);
+    for (const button of $("catalog-filters").querySelectorAll("button")) {
+      button.setAttribute("aria-pressed", String(button.dataset.catalogFilter === catalogGroup));
+    }
+    $("catalog-status").textContent = found.length ? `共 ${found.length} 項 · 顯示 ${first + 1}–${first + visible.length} 項` :
+      showMine ? "這組條件下還沒有你投票的項目。" : "沒有符合的項目，換個關鍵字或選「全部」。";
+    $("catalog-items").innerHTML = visible.map(item => `<article class="card catalog-item">
+      <button class="catalog-preview" type="button" data-catalog-item="${e(item.id)}" aria-label="看${e(item.title)}詳細資料">
+        ${item.image ? `<img src="${e(item.image)}" alt="" loading="lazy" decoding="async">` : ""}
+        <strong>${e(item.title)}</strong>
+        <span>${e([item.category, item.store].filter(Boolean).join(" · "))}</span>
+        ${item.price ? `<span class="catalog-price">${e(item.price)}</span>` : ""}
+      </button>
+      <div class="card-actions">${catalogVote(item.id)}</div>
+    </article>`).join("");
+    for (const image of $("catalog-items").querySelectorAll("img")) {
+      image.addEventListener("error", () => { image.hidden = true; });
+    }
+    for (const button of $("catalog-items").querySelectorAll("[data-vote]")) paintVote(button);
+    $("catalog-pages").hidden = pages === 1;
+    $("catalog-page").textContent = `第 ${catalogPage + 1} / ${pages} 頁`;
+    $("catalog-prev").disabled = catalogPage === 0;
+    $("catalog-next").disabled = catalogPage === pages - 1;
+  }
+
+  function showCatalogItem(id) {
+    const item = catalogIndex.get(id);
+    if (!item) return;
+    $("catalog-title").textContent = item.title;
+    const content = $("catalog-detail");
+    content.replaceChildren();
+    const summary = document.createElement("p");
+    summary.className = "muted";
+    summary.textContent = [item.category, item.store, item.price].filter(Boolean).join(" · ");
+    content.append(summary, NahaCatalog.detail(item));
+    const votes = $("catalog-detail-actions");
+    votes.innerHTML = `${catalogVote(id)}
+      <button class="quiet" type="button" data-discuss="${e(id)}" data-title="${e(item.title)}">留言</button>
+      ${port.cards.some(card => card.id === id) ? `<button class="quiet" type="button" data-open-card="${e(id)}">看攻略與影片</button>` : ""}`;
+    paintVote(votes.querySelector("[data-vote]"));
+    $("catalog-dialog").showModal();
+  }
+
   function pendingPlan(exceptId) {
     const base = NahaPlan.revision(shared.plan);
     if (NahaPlan.lockMessage(shared.plan)) return shared.plan;
@@ -365,47 +472,11 @@ document.addEventListener("DOMContentLoaded", () => {
     return `預估回船前約 ${Math.floor(margin)} 分鐘`;
   }
 
-  function renderPortPlan() {
-    const day = NahaPlan.dayOf(shared.plan, port.date);
-    $("off-time").textContent = day?.off || day?.arr || port.arrive;
-    $("return-time").textContent = day?.board || day?.by || port.boardBy;
-    $("plan-stage").textContent = !day ? (loading ? "行程載入中" : "行程待載入") : shared.plan.finalized ? "已定案" : "共用草稿";
-    $("plan-highlights").hidden = true;
-    const rows = day ? NahaPlan.rows(day).filter(({ stop }) => !stop.skip) : [];
-    $("plan-status").textContent = day ? "當天還沒有排入停靠站。" : loading ? "正在讀取行程…" : "暫時讀不到行程，可開啟離線行程。";
-    $("plan-status").hidden = Boolean(rows.length);
-    $("timeline").innerHTML = rows.map(({ slot, stop }) => {
-      const card = port.cards.find(item => matchesStop(item, stop));
-      return `<li>
-      <span class="timeline-time">${e(stop.from || slotLabels[slot])}</span>
-      <div class="simple-stop"><strong>${e(cleanTitle(stop.t))}</strong>
-        ${card ? `<button class="quiet" type="button" data-open-card="${e(card.id)}">看攻略與影片</button>` : ""}
-      </div>
-    </li>`;
-    }).join("");
-  }
-
-  function renderPlan() {
-    planned = pendingPlan();
-    const day = NahaPlan.dayOf(planned);
-    const timeline = $("timeline");
+  function renderForecast(forecast) {
     const highlights = $("plan-highlights");
-    if (!day) {
-      $("off-time").textContent = "—";
-      $("return-time").textContent = "—";
-      $("plan-stage").textContent = loading ? "行程載入中" : "行程待載入";
-      $("plan-status").textContent = loading ? "正在讀取那霸的行程…" : "暫時讀不到行程，可開啟離線行程或更新資料。";
-      $("plan-status").hidden = false;
-      highlights.hidden = true;
-      timeline.replaceChildren();
-      return;
-    }
-    const { off, board } = NahaPlan.clock(day);
-    $("off-time").textContent = off;
-    $("return-time").textContent = board;
-    $("plan-stage").textContent = shared.plan.finalized ? "已定案" : planned === shared.plan ? "共用行程草稿" : "含本機草稿";
-    const forecast = NahaPlan.forecast(day);
-    const upcoming = forecast.rows.filter(({ stop }) => !stop.skip && !stop.gap);
+    const upcoming = forecast?.rows.filter(({ stop }) => !stop.skip && !stop.gap) || [];
+    highlights.hidden = !upcoming.length;
+    if (!upcoming.length) return;
     const today = timeFormat.format(new Date());
     const nowParts = today.match(/^(\d{4}-\d{2}-\d{2})\s+(\d{2}):(\d{2})/);
     let first = upcoming[0], firstLabel = "首站";
@@ -414,59 +485,79 @@ document.addEventListener("DOMContentLoaded", () => {
       first = upcoming.find(row => row.end > now);
       firstLabel = first && first.start <= now ? "這一站" : "下一站";
     }
-    highlights.hidden = !upcoming.length;
     highlights.classList.toggle("over", forecast.margin < 0);
-    highlights.replaceChildren();
-    if (upcoming.length) {
-      const lead = document.createElement("b");
-      lead.textContent = first ? firstLabel + " · " + cleanTitle(first.stop.t) : "回船";
-      const timing = document.createElement("span");
-      timing.textContent = marginText(forecast.margin);
-      highlights.append(lead, timing);
-    }
-    const stamp = Date.parse(shared.plan.updated);
-    $("plan-status").hidden = false;
-    $("plan-status").textContent = upcoming.length
-      ? `時間含交通與預留用餐概算${Number.isFinite(stamp) ? " · 資料版本 " + dateFormat.format(stamp) : ""}`
-      : "那霸當天還沒有排入停靠站。";
+    const lead = document.createElement("b");
+    lead.textContent = first ? firstLabel + " · " + cleanTitle(first.stop.t) : "回船";
+    const timing = document.createElement("span");
+    timing.textContent = marginText(forecast.margin);
+    highlights.replaceChildren(lead, timing);
+  }
 
+  function renderItinerary() {
+    const isNaha = port.id === "naha";
+    const planned = isNaha ? pendingPlan() : shared.plan;
+    const day = NahaPlan.dayOf(planned, port.date);
+    const clock = isNaha && day ? NahaPlan.clock(day) : null;
+    $("off-time").textContent = clock?.off || day?.off || day?.arr || port.arrive || "—";
+    $("return-time").textContent = clock?.board || day?.board || day?.by || port.boardBy || "—";
+    $("plan-stage").textContent = !day ? (loading ? "行程載入中" : "行程待載入") :
+      shared.plan.finalized ? "已定案" : planned === shared.plan ? "共用草稿" : "含本機草稿";
+    const forecast = isNaha && day ? NahaPlan.forecast(day) : null;
+    renderForecast(forecast);
+    const rows = forecast?.rows || (day ? NahaPlan.rows(day).filter(({ stop }) => !stop.skip) : []);
+    const status = $("plan-status");
+    const stamp = Date.parse(shared.plan?.updated);
+    status.hidden = rows.length > 0 && !forecast;
+    status.textContent = rows.length ? `時間含交通與預留用餐概算${Number.isFinite(stamp) ? " · 資料版本 " + dateFormat.format(stamp) : ""}` :
+      day ? "當天還沒有排入停靠站。" : loading ? "正在讀取行程…" : "暫時讀不到行程，可開啟岸上觀光定稿。";
+    const timeline = $("timeline");
     const opened = new Set(Array.from(timeline.querySelectorAll("details[open]"), node => node.dataset.stop));
-    const sharedStops = new Set(NahaPlan.rows(NahaPlan.dayOf(shared.plan)).map(({ stop }) => stop.id));
-    timeline.innerHTML = forecast.rows.map(({ stop, start, slot }, index) => {
+    const sharedDay = NahaPlan.dayOf(shared.plan, port.date);
+    const sharedStops = new Set(sharedDay ? NahaPlan.rows(sharedDay).map(({ stop }) => stop.id) : []);
+    const groups = { morning: [], afternoon: [], evening: [] };
+    for (const [index, { slot, stop, start }] of rows.entries()) {
       const id = validCard(stop.id) ? stop.id : "";
-      const key = id || `row-${index}`;
+      const key = `${port.id}-${id || index}`;
       const title = cleanTitle(stop.t);
-      const products = NAHA_CARDS.filter(card => card.parentStop === id && selected(card.id));
+      const products = port.cards.filter(card => id && card.parentStop === id && selected(card.id));
       const subStops = Array.isArray(stop.sub) ? stop.sub.filter(child => child?.t && !child.skip) : [];
       const linkedCard = port.cards.find(card => matchesStop(card, stop));
-      const places = linkedCard || id ? `<div class="link-list">
-        ${linkedCard ? `<button class="quiet" type="button" data-open-card="${e(linkedCard.id)}">看攻略與影片</button>` : ""}
-        ${id ? `<button class="quiet" type="button" data-discuss="${e(id)}" data-title="${e(title)}">留言 ${list(shared.comments, id).length || ""}</button>` : ""}
-      </div>` : "";
       const navigation = !stop.gap && title
-        ? external(google(Number.isFinite(stop.lat) && Number.isFinite(stop.lng) ? `${stop.lat},${stop.lng}` : title + " 那霸"), "地圖")
+        ? external(google(Number.isFinite(stop.lat) && Number.isFinite(stop.lng) ? `${stop.lat},${stop.lng}` : `${title} ${port.name}`), "地圖")
         : "";
-      return `<li class="${stop.skip ? "skipped" : ""}">
-        <span class="timeline-time">${e(stop.skip ? "略過" : start === null ? slotLabels[slot] : NahaPlan.format(start))}</span>
-        <details data-stop="${e(key)}" ${opened.has(key) ? "open" : ""}>
-          <summary>${e(title)}${stop.skip ? "" : `<span class="time-note">${Number(stop.min) > 0 ? e(stop.min) + " 分" : ""}${
-            id && !sharedStops.has(id) ? " · 本機草稿" : ""}</span>`}</summary>
-          <div class="stop-details">
-            ${navigation}
-            ${stop.from ? `<p class="muted">原定時間 ${e(stop.from)}${stop.to ? "–" + e(stop.to) : " 起"}</p>` : ""}
-            ${subStops.length ? `<ul>${subStops.map(child => "<li>" + e(cleanTitle(child.t)) + "</li>").join("")}</ul>` : ""}
-            ${products.length ? `<div class="stop-purchases"><h3>這一站的採買</h3><ul>${products.map(card =>
-              `<li><button class="quiet" type="button" data-open-card="${e(card.id)}">${e(card.title)}</button></li>`
-            ).join("")}</ul></div>` : ""}
-            ${places}
-          </div>
-        </details>
-      </li>`;
-    }).join("");
+      const when = Number.isFinite(start) ? NahaPlan.format(start) : stop.from || "";
+      const meta = stop.skip ? "略過" : [when, Number(stop.min) > 0 ? `停留 ${stop.min} 分` : "",
+        id && !sharedStops.has(id) ? "本機草稿" : ""].filter(Boolean).join(" · ");
+      const details = navigation || id || subStops.length || products.length ? `<details class="stop-details" data-stop="${e(key)}" ${opened.has(key) ? "open" : ""}>
+        <summary>站點詳情</summary>
+        ${stop.from && forecast ? `<p class="muted">原定時間 ${e(stop.from)}${stop.to ? "–" + e(stop.to) : " 起"}</p>` : ""}
+        ${subStops.length ? `<ul>${subStops.map(child => `<li>${e(cleanTitle(child.t))}</li>`).join("")}</ul>` : ""}
+        ${products.length ? `<div class="stop-purchases"><strong>這一站的採買</strong><ul>${products.map(card =>
+          `<li><button class="quiet" type="button" data-open-card="${e(card.id)}">${e(card.title)}</button></li>`).join("")}</ul></div>` : ""}
+        <div class="link-list">${navigation}
+          ${id ? `<button class="quiet" type="button" data-discuss="${e(id)}" data-title="${e(title)}">留言 ${list(shared.comments, id).length || ""}</button>` : ""}
+        </div>
+      </details>` : "";
+      const guide = linkedCard ? `<button class="quiet" type="button" data-open-card="${e(linkedCard.id)}">看攻略與影片</button>` : "";
+      groups[slot].push(`<li class="item${stop.skip ? " skipped" : ""}">
+        <div class="nm">${e(title)}</div>
+        ${meta ? `<p class="meta">${e(meta)}</p>` : ""}
+        ${guide || details ? `<div class="stop-actions">${guide}${details}</div>` : ""}
+      </li>`);
+    }
+    timeline.innerHTML = Object.entries(groups).filter(([, items]) => items.length).map(([slot, items]) =>
+      `<section class="slot" data-slot="${slot}">
+        <h3>${slotLabels[slot]} <span class="cnt">(${items.length})</span></h3>
+        <ol class="board-stops">${items.join("")}</ol>
+      </section>`).join("");
   }
 
   function renderShopping() {
-    const cards = port.cards.filter(card => shoppingCategories.has(card.category) && selected(card.id));
+    const curated = port.cards.filter(card => shoppingCategories.has(card.category) && selected(card.id));
+    const included = new Set(curated.map(card => card.id));
+    const catalogProducts = NahaCatalog.forPort(catalog, port.id).filter(item => item.shopping && !included.has(item.id) && selected(item.id))
+      .map(item => ({ ...item, venue: item.store || "其他商品", catalogItem: true }));
+    const cards = [...curated, ...catalogProducts];
     const count = $("shop-count");
     count.textContent = String(cards.length);
     count.hidden = !cards.length;
@@ -481,10 +572,10 @@ document.addEventListener("DOMContentLoaded", () => {
       groups.get(card.venue).push(card);
     }
     target.innerHTML = [...groups].map(([venue, items]) => `<section class="shop-group">
-      <div class="shop-heading"><h3>${e(venue)}</h3>${external(google(items[0].mapQuery || venue), "地圖")}</div>
+      <div class="shop-heading"><h3>${e(venue)}</h3>${venue === "其他商品" ? "" : external(google(items[0].mapQuery || venue), "地圖")}</div>
       <ul>${items.map(card => `<li>
         <label class="shop-item"><input class="shop-check" type="checkbox" aria-label="已買 ${e(card.title)}" data-bought="${e(card.id)}" ${bought[name]?.[card.id] ? "checked" : ""}><span>${e(card.title)}</span></label>
-        <button class="quiet" type="button" data-open-card="${e(card.id)}">看攻略</button>
+        <button class="quiet" type="button" ${card.catalogItem ? "data-catalog-item" : "data-open-card"}="${e(card.id)}">${card.catalogItem ? "查看資料" : "看攻略"}</button>
       </li>`).join("")}</ul>
     </section>`).join("");
   }
@@ -502,10 +593,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function render() {
     updateCards();
-    if (port.id === "naha") renderPlan();
-    else renderPortPlan();
+    renderItinerary();
     renderShopping();
     renderSync();
+    if (!$("discussion").hidden && ($("catalog-mine").checked || $("catalog-sort").value === "votes")) renderCatalog();
+    else for (const button of $("catalog-items").querySelectorAll("[data-vote]")) paintVote(button);
+    if ($("catalog-dialog").open) paintVote($("catalog-detail-actions").querySelector("[data-vote]"));
     if ($("comment-dialog").open && discussion) renderComments();
   }
 
@@ -534,11 +627,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const loaded = () => {
         clearTimeout(timer);
         if (ready()) resolve(frame.contentWindow);
-        else reject(new Error("無法開啟投票"));
+        else {
+          frame.removeAttribute("src");
+          reject(new Error("無法開啟投票"));
+        }
       };
       const timer = setTimeout(() => {
         frame.removeEventListener("load", loaded);
-        if ($("discussion").hidden) frame.removeAttribute("src");
+        frame.removeAttribute("src");
         reject(new Error("連線逾時"));
       }, 12000);
       frame.addEventListener("load", loaded, { once: true });
@@ -604,7 +700,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function vote(id) {
-    if (!cardOf(id)) return;
+    if (!cardOf(id) && !catalogIndex.has(id)) return;
     askName(() => queue({ file: "votes", card: id, name, selected: !selected(id, false) }), "儲存並投票");
   }
 
@@ -732,10 +828,16 @@ document.addEventListener("DOMContentLoaded", () => {
       showView($("port-page").dataset.view);
     } else if (target.matches("[data-close]")) target.closest("dialog").close();
     else if (target.hasAttribute("data-filter")) filterCards(target.dataset.filter);
+    else if (target.dataset.catalogFilter) {
+      catalogGroup = target.dataset.catalogFilter;
+      catalogPage = 0;
+      renderCatalog();
+    } else if (target.dataset.catalogItem) showCatalogItem(target.dataset.catalogItem);
     else if (target.dataset.vote) vote(target.dataset.vote);
     else if (target.dataset.discuss) openDiscussion(target.dataset.discuss, target.dataset.title);
     else if (target.dataset.schedule) openSchedule(target.dataset.schedule);
     else if (target.dataset.openCard) {
+      if ($("catalog-dialog").open) $("catalog-dialog").close();
       showView("guide");
       const card = $("card-" + target.dataset.openCard);
       if (card.hidden) filterCards("");
@@ -746,6 +848,21 @@ document.addEventListener("DOMContentLoaded", () => {
       showView(target.hash.slice(1));
     }
   });
+  $("catalog-query").addEventListener("input", () => {
+    catalogPage = 0;
+    renderCatalog();
+  });
+  for (const id of ["catalog-mine", "catalog-store", "catalog-sort"]) {
+    $(id).addEventListener("change", () => { catalogPage = 0; renderCatalog(); });
+  }
+  $("catalog-retry").addEventListener("click", () => void loadCatalog());
+  for (const [id, offset] of [["catalog-prev", -1], ["catalog-next", 1]]) {
+    $(id).addEventListener("click", () => {
+      catalogPage += offset;
+      renderCatalog();
+      $("catalog-status").scrollIntoView({ block: "start" });
+    });
+  }
   $("shopping-list").addEventListener("change", event => {
     const id = event.target.dataset.bought;
     if (!id || !name) return;
@@ -754,30 +871,26 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   $("itinerary-heading").tabIndex = -1;
-  for (const pane of framedPanels) {
-    const frame = $(pane + "-frame");
-    frame.addEventListener("load", () => {
-      const page = frame.contentDocument;
-      if (!page || page.URL !== frame.src) return;
-      for (const link of page.querySelectorAll('.topbar > a[href="index.html"], .topbar > a[href="guide.html"], .topbar > a[href="plan.html"]')) {
-        link.style.display = "none";
-      }
-      if (pane === "discussion") {
-        for (const label of page.querySelectorAll('.legend, [id^="newprop-"], #rkBody + div')) {
-          label.textContent = label.textContent.replace("同步給家人", "同步").replace("家人勾選", "投票").replaceAll("家人", "");
-        }
-      }
-      if (pane === "schedule") {
-        page.getElementById("days")?.addEventListener("click", () => {
-          const next = OKINAWA_PORTS.find(item => item.date === frame.contentWindow.curDay);
-          if (!next || next === port) return;
-          selectPort(next);
-          showView("schedule");
-        });
-      }
-      alignFrame(pane);
+  scheduleFrame.addEventListener("load", () => {
+    const page = scheduleFrame.contentDocument;
+    if (!page || page.URL !== scheduleFrame.src) return;
+    const stylesheet = page.createElement("link");
+    stylesheet.rel = "stylesheet";
+    stylesheet.href = $("board-style").href;
+    page.head.append(stylesheet);
+    page.body.classList.add("board-theme", "embedded-board");
+    page.getElementById("dayinfo")?.classList.add("dayinfo");
+    for (const link of page.querySelectorAll('.topbar > a[href="index.html"], .topbar > a[href="guide.html"], .topbar > a[href="plan.html"]')) {
+      link.style.display = "none";
+    }
+    page.getElementById("days")?.addEventListener("click", () => {
+      const next = OKINAWA_PORTS.find(item => item.date === scheduleFrame.contentWindow.curDay);
+      if (!next || next === port) return;
+      selectPort(next);
+      showView("schedule");
     });
-  }
+    alignSchedule();
+  });
   updatePortHeader();
   createCards();
   showView(location.hash.slice(1), false);

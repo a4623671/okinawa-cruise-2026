@@ -5,12 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f6f2">
   <title>沖繩郵輪｜三港行程與討論</title>
-  <link rel="stylesheet" href="naha.css?v=20261116-ports-r2">
+  <link rel="stylesheet" href="naha.css?v=20261116-ports-r3">
+  <link id="board-style" rel="stylesheet" href="trip-board.css?v=20261116-ports-r3">
   <script src="trip-data.js" defer></script>
   <script src="trip-timing.js" defer></script>
   <script src="naha-plan.js" defer></script>
   <script src="naha-content.js?v=20261116-ports-r2" defer></script>
-  <script src="naha.js?v=20261116-ports-r2" defer></script>
+  <script src="naha-catalog.js?v=20261116-ports-r3" defer></script>
+  <script src="naha.js?v=20261116-ports-r3" defer></script>
 </head>
 <body>
   <header class="top">
@@ -30,18 +32,6 @@
       <a href="naha.html?port=ishigaki#guide" data-port="ishigaki">石垣島<span>12/19</span></a>
     </nav>
 
-    <section class="harbor" aria-labelledby="harbor-title">
-      <div>
-        <p class="date"><time id="port-date" datetime="2026-12-18">12/18 星期五</time><span id="plan-stage">行程載入中</span></p>
-        <h1 id="harbor-title">那霸</h1>
-        <a id="port-pier" class="pier" href="https://www.google.com/maps/search/?api=1&amp;query=26.2364909%2C127.6777349" target="_blank" rel="noopener">安謝新港・看碼頭地圖 ↗</a>
-      </div>
-      <div class="ship-times">
-        <div class="boarding"><span>最晚回船</span><strong id="return-time">—</strong></div>
-        <div class="ship-facts"><span>下船 <b id="off-time">—</b></span><span>啟航 <b id="depart-time">19:00</b></span></div>
-      </div>
-    </section>
-
     <nav class="views" aria-label="港口頁面">
       <a href="#itinerary" data-view="itinerary" aria-current="page">行程</a>
       <a href="#schedule" data-view="schedule">排程</a>
@@ -55,24 +45,33 @@
     </div>
     <p id="notice" class="sr-only" role="status" aria-live="polite"></p>
 
-    <section id="itinerary" class="pane" aria-labelledby="itinerary-heading">
+    <section id="itinerary" class="pane board-theme" aria-labelledby="itinerary-heading">
       <div class="section-head">
-        <h2 id="itinerary-heading">當天行程</h2>
+        <h1 id="itinerary-heading">那霸行程</h1>
         <a id="final-link" class="text-link" href="final.html?day=2026-12-18">岸上觀光定稿 ↗</a>
+      </div>
+      <div class="dayinfo">
+        <p class="day-meta"><time id="port-date" datetime="2026-12-18">12/18 星期五</time><span id="plan-stage">行程載入中</span></p>
+        <dl class="day-times">
+          <div><dt>下船</dt><dd id="off-time">—</dd></div>
+          <div class="return-time"><dt>最晚回船</dt><dd id="return-time">—</dd></div>
+          <div><dt>啟航</dt><dd id="depart-time">19:00</dd></div>
+        </dl>
+        <a id="port-pier" class="text-link" href="https://www.google.com/maps/search/?api=1&amp;query=26.2364909%2C127.6777349" target="_blank" rel="noopener">安謝新港・碼頭地圖 ↗</a>
       </div>
       <div id="plan-highlights" class="plan-highlights" hidden></div>
       <p id="plan-status" class="muted" role="status">正在讀取那霸的行程…</p>
-      <ol id="timeline" class="timeline" aria-label="停靠站順序"></ol>
+      <div id="timeline" class="timeline" aria-label="停靠站順序"></div>
       <div class="pane-links">
         <a href="#schedule">編輯排程</a>
         <a href="#guide">看精選攻略和影片</a>
       </div>
     </section>
 
-    <section id="schedule" class="pane embedded-pane" aria-labelledby="schedule-heading" hidden>
+    <section id="schedule" class="pane" aria-labelledby="schedule-heading" hidden>
       <div class="section-head">
         <h1 id="schedule-heading">當天排程</h1>
-        <a class="text-link frame-link" href="plan.html" target="_blank" rel="noopener">全螢幕排程 ↗</a>
+        <a id="schedule-full" class="text-link frame-link" href="naha.html?full=1#schedule" target="_blank" rel="noopener">全螢幕排程 ↗</a>
       </div>
       <iframe id="schedule-frame" class="view-frame" data-src="plan.html" title="共用行程排程板" allow="clipboard-write"></iframe>
     </section>
@@ -80,19 +79,41 @@
     <section id="guide" class="pane" aria-labelledby="guide-heading" hidden>
       <div class="section-head">
         <h1 id="guide-heading">那霸攻略與投票</h1>
+        <a class="text-link" href="#discussion">完整項目清單 →</a>
       </div>
       <p class="vote-help">喜歡就按「投一票」。按「已投票」可以取消。</p>
       <div id="card-filters" class="filters" role="group" aria-label="篩選精選推薦"></div>
       <div id="cards" class="cards"></div>
-      <div class="pane-links"><a class="frame-link" href="#discussion">看完整項目清單 →</a></div>
     </section>
 
-    <section id="discussion" class="pane embedded-pane" aria-labelledby="discussion-heading" hidden>
+    <section id="discussion" class="pane" aria-labelledby="discussion-heading" hidden>
       <div class="section-head">
         <h1 id="discussion-heading">完整項目清單</h1>
         <a class="text-link frame-link" href="#guide">回精選攻略</a>
       </div>
-      <iframe id="discussion-frame" class="view-frame" data-src="guide.html" title="共用投票、留言與完整清單" allow="clipboard-write"></iframe>
+      <div id="catalog-tools" hidden>
+        <label class="sr-only" for="catalog-query">搜尋完整項目</label>
+        <input id="catalog-query" class="catalog-search" type="search" placeholder="搜尋品名、景點或店家" autocomplete="off">
+        <div id="catalog-filters" class="filters catalog-filters" role="group" aria-label="類別"></div>
+        <div class="catalog-options">
+          <label><input id="catalog-mine" type="checkbox"> 只看我投的</label>
+          <details>
+            <summary>店家與排序</summary>
+            <div class="catalog-selects">
+              <label>店家<select id="catalog-store"><option value="">所有店家</option></select></label>
+              <label>排序<select id="catalog-sort"><option value="default">預設順序</option><option value="votes">票數優先</option></select></label>
+            </div>
+          </details>
+        </div>
+      </div>
+      <p id="catalog-status" class="muted catalog-status" role="status">正在讀取完整項目…</p>
+      <button id="catalog-retry" class="button secondary" type="button" hidden>重新讀取</button>
+      <div id="catalog-items" class="catalog-grid"></div>
+      <nav id="catalog-pages" class="catalog-pages" aria-label="項目清單頁數" hidden>
+        <button id="catalog-prev" class="button secondary" type="button">上一頁</button>
+        <span id="catalog-page"></span>
+        <button id="catalog-next" class="button secondary" type="button">下一頁</button>
+      </nav>
     </section>
 
     <section id="shopping" class="pane" aria-labelledby="shopping-heading" hidden>
@@ -109,6 +130,17 @@
     </footer>
     <noscript><p><a href="guide.html">開啟完整討論清單</a> · <a href="plan.html">開啟排程板</a></p></noscript>
   </main>
+
+  <iframe id="discussion-frame" data-src="guide.html" title="項目資料" tabindex="-1" aria-hidden="true" hidden></iframe>
+
+  <dialog id="catalog-dialog" aria-labelledby="catalog-title">
+    <div class="dialog-heading">
+      <h2 id="catalog-title">項目介紹</h2>
+      <button class="quiet" type="button" data-close>關閉</button>
+    </div>
+    <div id="catalog-detail"></div>
+    <div id="catalog-detail-actions" class="card-actions"></div>
+  </dialog>
 
   <dialog id="name-dialog" aria-labelledby="name-title">
     <form id="name-form">
