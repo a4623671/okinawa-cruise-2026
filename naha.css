@@ -87,11 +87,13 @@ html.board-map-open { overflow: hidden; }
 .button.compact { flex-shrink: 0; }
 .catalog-search, .catalog-selects select { width: 100%; min-height: 44px; padding: 7px 11px; border: 1px solid #acc5bb; border-radius: 10px; color: var(--ink); background: var(--white); }
 .catalog-quick { margin: 10px 0 8px; }
-.catalog-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.catalog-group { min-width: 0; padding: 8px; border: 1px solid var(--line); border-radius: 12px; background: var(--white); }
+.catalog-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 8px; border: 1px solid var(--line); border-radius: 12px; background: var(--white); }
+.catalog-group { min-width: 0; padding: 0 10px; }
+.catalog-group + .catalog-group { border-left: 1px solid var(--line); }
 .catalog-group h2 { margin: 0 0 5px; font-size: .92rem; }
 .catalog-group .filters { gap: 4px; margin: 0; }
-.catalog-group .filters button { padding: 4px 7px; font-size: .8rem; }
+.catalog-group .filters button { min-width: 0; padding: 4px 7px; border: 0; border-radius: 8px; font-size: .8rem; }
+.catalog-group .filters button[aria-pressed="false"] { background: var(--paper); }
 .catalog-options { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 0 16px; font-size: .88rem; }
 .catalog-options > label, .catalog-options summary { min-height: 44px; padding-block: 11px; color: var(--teal); font-weight: 700; cursor: pointer; }
 .catalog-options input { width: 17px; height: 17px; vertical-align: middle; accent-color: var(--teal); }
@@ -162,6 +164,14 @@ textarea { resize: vertical; }
 }
 @media (max-width: 420px) {
   .views { grid-template-columns: repeat(2, minmax(0, .8fr)) minmax(0, 1.12fr) minmax(0, 1.28fr); }
+}
+@media (max-width: 560px) {
+  .catalog-groups { grid-template-columns: minmax(0, 1fr); padding: 4px 6px; }
+  .catalog-group { display: grid; grid-template-columns: 3.25rem minmax(0, 1fr); align-items: center; gap: 8px; padding: 5px 0; }
+  .catalog-group + .catalog-group { border-top: 1px solid var(--line); border-left: 0; }
+  .catalog-group h2 { margin: 0; font-size: .8rem; }
+  .catalog-group .filters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+  .catalog-group .filters button { padding: 4px 2px; line-height: 1.25; overflow-wrap: anywhere; }
 }
 @media (max-width: 359px) {
   .shell { width: calc(100% - 22px); }
