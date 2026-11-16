@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f6f2">
+  <title>沖繩郵輪｜三港討論區與行程</title>
+  <link rel="stylesheet" href="naha.css">
+  <script src="trip-data.js" defer></script>
+  <script src="trip-timing.js" defer></script>
+  <script src="naha-plan.js" defer></script>
+  <script src="naha-content.js" defer></script>
+  <script src="naha.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <div class="shell top-inner">
+      <a class="brand" href="index.html">‹ 沖繩郵輪</a>
+      <div class="top-actions">
+        <button id="identity-button" class="quiet" type="button">我的名字</button>
+        <button id="settings-button" class="quiet" type="button" data-trip-sync hidden>共用設定</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="port-page" class="shell" data-view="itinerary">
+    <nav class="ports" aria-label="停靠港口">
+      <a href="naha.html?port=miyako#guide" data-port="miyako">宮古島<span>12/17</span></a>
+      <a href="naha.html#guide" data-port="naha" aria-current="page">那霸<span>12/18</span></a>
+      <a href="naha.html?port=ishigaki#guide" data-port="ishigaki">石垣島<span>12/19</span></a>
+    </nav>
+
+    <section class="harbor" aria-labelledby="harbor-title">
+      <div>
+        <p class="date"><time id="port-date" datetime="2026-12-18">12/18 星期五</time><span id="plan-stage">行程載入中</span></p>
+        <h1 id="harbor-title">那霸</h1>
+        <a id="port-pier" class="pier" href="https://www.google.com/maps/search/?api=1&amp;query=26.2364909%2C127.6777349" target="_blank" rel="noopener">安謝新港・看碼頭地圖 ↗</a>
+      </div>
+      <div class="ship-times">
+        <div class="boarding"><span>最晚回船</span><strong id="return-time">—</strong></div>
+        <div class="ship-facts"><span>下船 <b id="off-time">—</b></span><span>啟航 <b id="depart-time">19:00</b></span></div>
+      </div>
+    </section>
+
+    <nav class="views" aria-label="港口頁面">
+      <a href="#itinerary" data-view="itinerary" aria-current="page">行程</a>
+      <a href="#guide" data-view="guide">討論與攻略</a>
+      <a href="#shopping" data-view="shopping">我的採買 <span id="shop-count" hidden></span></a>
+    </nav>
+
+    <div id="sync-banner" class="notice sync-banner" hidden>
+      <p id="sync-message"></p>
+      <button id="sync-button" class="button compact" type="button" hidden>同步變更</button>
+    </div>
+    <p id="notice" class="sr-only" role="status" aria-live="polite"></p>
+
+    <section id="itinerary" class="pane" aria-labelledby="itinerary-heading">
+      <div class="section-head">
+        <h2 id="itinerary-heading">當天行程</h2>
+        <a id="plan-link" class="text-link" href="plan.html?day=2026-12-18">開啟排程板 ↗</a>
+      </div>
+      <div id="plan-highlights" class="plan-highlights" hidden></div>
+      <p id="plan-status" class="muted" role="status">正在讀取那霸的行程…</p>
+      <ol id="timeline" class="timeline" aria-label="停靠站順序"></ol>
+      <div class="pane-links">
+        <a href="#guide">看精選攻略和影片</a>
+        <a href="offline.html" download="沖繩離線行程.html">下載離線行程</a>
+      </div>
+    </section>
+
+    <section id="guide" class="pane" aria-labelledby="guide-heading" hidden>
+      <div class="section-head">
+        <h1 id="guide-heading">三港討論區</h1>
+        <a class="text-link guide-full" href="guide.html">完整清單・共用投票 ↗</a>
+      </div>
+      <div id="card-filters" class="filters" role="group" aria-label="篩選精選推薦"></div>
+      <div id="cards" class="cards"></div>
+    </section>
+
+    <section id="shopping" class="pane" aria-labelledby="shopping-heading" hidden>
+      <div class="section-head">
+        <h1 id="shopping-heading">我的採買</h1>
+        <p>到店按清單勾選</p>
+      </div>
+      <div id="shopping-list"></div>
+    </section>
+
+    <footer class="page-footer">
+      <span id="data-status">正在讀取共用資料</span>
+      <button id="reload-data" class="quiet" type="button">更新資料</button>
+    </footer>
+    <noscript><p><a href="guide.html">開啟完整討論清單</a> · <a href="offline.html">開啟離線行程</a></p></noscript>
+  </main>
+
+  <dialog id="name-dialog" aria-labelledby="name-title">
+    <form id="name-form">
+      <h2 id="name-title">家人怎麼稱呼你？</h2>
+      <label for="member-name">名字</label>
+      <input id="member-name" name="member" maxlength="12" autocomplete="nickname" required>
+      <div class="dialog-actions">
+        <button class="button secondary" type="button" data-close>取消</button>
+        <button class="button" type="submit">使用這個名字</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="comment-dialog" aria-labelledby="comment-title">
+    <div class="dialog-heading">
+      <h2 id="comment-title">留言</h2>
+      <button class="quiet" type="button" data-close>關閉</button>
+    </div>
+    <div id="comments-list" class="comments-list"></div>
+    <form id="comment-form">
+      <label for="comment-input">留給家人的一句話</label>
+      <textarea id="comment-input" rows="3" maxlength="140" required></textarea>
+      <div class="dialog-actions"><button id="comment-submit" class="button" type="submit">儲存留言草稿</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="schedule-dialog" aria-labelledby="schedule-title">
+    <form id="schedule-form">
+      <h2 id="schedule-title">排入那霸草稿</h2>
+      <p id="schedule-venue" class="muted"></p>
+      <div class="form-grid">
+        <label>時段
+          <select name="slot"><option value="morning">上午</option><option value="afternoon" selected>下午</option><option value="evening">晚上</option></select>
+        </label>
+        <label>停留分鐘
+          <input name="duration" type="number" inputmode="numeric" min="5" max="120" step="1" required>
+        </label>
+      </div>
+      <div id="schedule-preview" class="notice" role="status"></div>
+      <div class="dialog-actions">
+        <button class="button secondary" type="button" data-close>取消</button>
+        <button id="schedule-submit" class="button" type="submit">排入草稿</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="video-dialog" class="video-dialog" aria-labelledby="video-title">
+    <div class="dialog-heading">
+      <h2 id="video-title">影片</h2>
+      <button class="quiet" type="button" data-close>關閉</button>
+    </div>
+    <div id="video-player"></div>
+    <div class="dialog-actions"><a class="text-link" id="video-source" target="_blank" rel="noopener">在 YouTube 播放 ↗</a></div>
+  </dialog>
+</body>
+</html>
