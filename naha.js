@@ -352,7 +352,7 @@ document.addEventListener("DOMContentLoaded", () => {
       showMine ? "這組條件下還沒有你投票的項目。" : "沒有符合的項目，換個關鍵字或選「全部」。";
     $("catalog-items").innerHTML = visible.map(item => {
       const { title, original } = NahaCatalog.names(item);
-      const video = item.recommendation?.videos[0];
+      const video = item.videos[0];
       return `<article class="card catalog-item">
         <div>
           <button class="catalog-preview" type="button" data-catalog-item="${e(item.id)}" aria-label="看${e(title)}詳細資料">
@@ -362,12 +362,15 @@ document.addEventListener("DOMContentLoaded", () => {
             <span>${e([item.category, item.store].filter(Boolean).join(" · "))}</span>
             ${item.price ? `<span class="catalog-price">${e(item.price)}</span>` : ""}
           </button>
-          ${video ? `<a class="catalog-yt-link" href="${e(videoURL(video))}" target="_blank" rel="noopener" aria-label="看${e(title)}的 YouTube 推薦影片">YT 推薦 ↗</a>` : ""}
+          ${video ? `<a class="catalog-yt-link" href="${e(videoURL(video))}" target="_blank" rel="noopener" aria-label="${e(video.author)}，在 YouTube 看${e(title)}">
+            <img src="images/youtube-icon.png" width="29" height="25" alt="">
+            <span>${e(video.author)}</span>
+          </a>` : ""}
         </div>
         <div class="card-actions">${catalogVote(item.id)}</div>
       </article>`;
     }).join("");
-    for (const image of $("catalog-items").querySelectorAll("img")) {
+    for (const image of $("catalog-items").querySelectorAll(".catalog-preview img")) {
       image.addEventListener("error", () => { image.hidden = true; });
     }
     for (const button of $("catalog-items").querySelectorAll("[data-vote]")) paintVote(button);
@@ -397,15 +400,16 @@ document.addEventListener("DOMContentLoaded", () => {
     summary.textContent = [item.category, item.store, item.price].filter(Boolean).join(" · ");
     content.append(summary);
     const card = item.recommendation;
-    if (card) {
+    if (item.videos.length) {
       const note = document.createElement("section");
       note.className = "catalog-recommendation";
-      note.innerHTML = `<h3>YT 推薦</h3><p class="venue">${e(card.venue)}</p>
-        <p>${e(card.description)}</p><p class="tip">${e(card.tip)}</p>
-        <div class="link-list">${card.videos.map(video => external(videoURL(video), `${video.author} · ${video.label}`)).join("")}</div>
-        <div class="link-list">${external(google(card.mapQuery || card.venue), "推薦地點")}
-          ${card.sources.map(source => external(source.url, source.label)).join("")}</div>
-        ${card.disclosure ? `<p class="muted">${e(card.disclosure)}</p>` : ""}`;
+      note.innerHTML = `<h3>推薦影片</h3>
+        ${card ? `<p class="venue">${e(card.venue)}</p>
+          <p>${e(card.description)}</p><p class="tip">${e(card.tip)}</p>` : ""}
+        <div class="link-list">${item.videos.map(video => external(videoURL(video), `${video.author} · ${video.label}`)).join("")}</div>
+        ${card ? `<div class="link-list">${external(google(card.mapQuery || card.venue), "推薦地點")}
+          ${card.sources.map(source => external(source.url, source.label)).join("")}</div>` : ""}
+        ${card?.disclosure ? `<p class="muted">${e(card.disclosure)}</p>` : ""}`;
       content.append(note);
     }
     content.append(NahaCatalog.detail(item));

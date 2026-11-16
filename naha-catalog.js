@@ -71,6 +71,7 @@ const NahaCatalog = (() => {
       const source = client.cardByCid(row.cid);
       const group = categoryOf(row);
       const pack = packaging.get(tidy(row.name));
+      const video = OKINAWA_CATALOG_VIDEOS.get(row.cid);
       return {
         id: row.cid,
         port: row.sid.replace(/^s-/, ""),
@@ -84,6 +85,7 @@ const NahaCatalog = (() => {
         mapURL: safeURL(source?.querySelector(".map[href]")?.getAttribute("href"), base),
         common: group !== "shop" && widerStores.has(row.store),
         shopping: shoppingGroups.has(group),
+        videos: video ? [video] : [],
         search: searchable(`${row.name} ${row.store} ${row.cat} ${source?.textContent || ""}`),
         source,
         base,
@@ -100,7 +102,7 @@ const NahaCatalog = (() => {
       category: categories[group], store: card.shopping ? card.shopping.store || card.venue : "",
       storeSearch: card.shopping ? card.mapQuery : "", price: "",
       image: card.shopping?.image || card.image || `https://i.ytimg.com/vi/${card.videos[0].id}/hqdefault.jpg`,
-      shopping: shoppingGroups.has(group), recommendation: card,
+      shopping: shoppingGroups.has(group), recommendation: card, videos: card.videos,
     };
   }
 
@@ -110,20 +112,22 @@ const NahaCatalog = (() => {
       const entry = recommended(card);
       const original = items.get(entry.id);
       items.set(entry.id, original ? {
-        ...original, recommendation: card,
+        ...original, recommendation: card, videos: [...entry.videos, ...original.videos],
         image: card.shopping?.image || original.image || entry.image,
       } : entry);
     }
-    return [...items.values()].map(item => ({
-      ...item,
-      search: searchable(`${item.search || ""} ${names(item).title} ${names(item).original} ${item.recommendation?.venue || ""}`),
-    }));
+    return [...items.values()].map(item => {
+      const { title, original } = names(item);
+      const channels = item.videos.map(video => video.author).join(" ");
+      const search = [item.search, title, original, item.recommendation?.venue, channels].join(" ");
+      return { ...item, search: searchable(search) };
+    });
   }
 
   function match(items, { query, group, store, selected, recommendedOnly }, voter) {
     const terms = searchable(query).split(" ").filter(Boolean);
     return items.filter(item => (group === "all" || item.group === group) && (!store || item.store === store) &&
-      (!selected || voter(item.id)) && (!recommendedOnly || item.recommendation?.videos.length) &&
+      (!selected || voter(item.id)) && (!recommendedOnly || item.videos.length) &&
       terms.every(term => item.search.includes(term)));
   }
 

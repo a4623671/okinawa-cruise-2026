@@ -94,7 +94,10 @@ button:disabled { cursor: default; opacity: .65; }
 .catalog-status { margin-block: 5px 10px; scroll-margin-top: 58px; }
 .catalog-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
 .catalog-item { grid-template-rows: 1fr auto; min-width: 0; }
-.catalog-item .catalog-yt-link { display: inline-flex; min-height: 44px; align-items: center; padding-inline: 10px; color: var(--teal); font-weight: 750; font-size: .82rem; }
+.catalog-yt-link { display: flex; min-height: 44px; align-items: center; gap: 5px; margin: 0 9px 4px; color: var(--teal); font-size: .8rem; font-weight: 700; line-height: 1.3; text-decoration: none; }
+.catalog-yt-link img { flex: none; }
+.catalog-yt-link span { min-width: 0; overflow-wrap: anywhere; }
+.catalog-yt-link:hover span { text-decoration: underline; }
 .catalog-recommendation { border: 1px solid var(--line); background: var(--paper); border-radius: 10px; padding: 10px; margin: 8px 0 10px; }
 .catalog-recommendation h3 { font-size: 1rem; margin-bottom: 5px; }
 .catalog-recommendation .text-link { min-height: 44px; display: inline-flex; align-items: center; }

@@ -9,7 +9,7 @@ const NAHA_CARDS = [
     image: "https://i.ytimg.com/vi/2rmukiVXUwk/hqdefault.jpg",
     imageAlt: "玩轉沖繩介紹國際通及ポーたま試吃的影片封面",
     videos: [
-      { id: "2rmukiVXUwk", author: "玩轉沖繩", label: "看試吃" },
+      { id: "2rmukiVXUwk", author: "玩轉沖繩 Kokoni_Okinawa", label: "看試吃" },
       { id: "oCc2TUTo1bg", author: "60MAMA", label: "看排隊與取餐" },
     ],
     sources: [
@@ -64,7 +64,7 @@ const NAHA_CARDS = [
     tip: "找日文「元祖 紅いもタルト」。順路採買時加進這間店的清單。",
     image: "images/goods/benitart.jpg",
     imageAlt: "御菓子御殿紅芋塔商品照",
-    videos: [{ id: "pcILfvB16tM", start: 78, author: "Irene 麻糬", label: "看開箱 01:18" }],
+    videos: [{ id: "pcILfvB16tM", start: 78, author: "Irene麻糬", label: "看開箱 01:18" }],
     sources: [{ label: "松尾店與製作現場", url: "https://www.okashigoten.co.jp/matsuo-shop/" }],
   },
   {
@@ -104,7 +104,7 @@ const NAHA_CARDS = [
     tip: "順路看價，確認現貨、保固與批號。舊批附贈 USB 線有召回公告。",
     image: "https://i.ytimg.com/vi/l96eK6AeTvM/hqdefault.jpg",
     imageAlt: "イエスタLife 實測 Panasonic 掌上刮鬍刀的影片封面",
-    videos: [{ id: "l96eK6AeTvM", start: 505, author: "イエスタLife", label: "看實際刮鬍 08:25" }],
+    videos: [{ id: "l96eK6AeTvM", start: 505, author: "飯塚健太 - イエスタLife", label: "看實際刮鬍 08:25" }],
     disclosure: "作者文章含分潤連結",
     sources: [
       { label: "兩年使用心得", url: "https://www.iestalife.tech/en/lamdash-palm-in-2-years-review/" },
@@ -118,7 +118,7 @@ const NAHA_CARDS = [
     venue: "Calbee PLUS 沖繩國際通店", mapQuery: "カルビープラス 沖縄国際通り店 牧志",
     description: "點沖繩限定的「スイートポテりこ 紅芋」。剛炸好外層微酥，咬開有紅芋的甜味。ももかっちゃんねる拍了實際買一杯來吃的樣子。",
     tip: "到現炸櫃台看紅芋口味是否供應。想帶回去分，可以另外逛貨架上的盒裝零食。",
-    videos: [{ id: "NoB5xMxDMYI", author: "ももかっちゃんねる", label: "看紅芋薯條試吃" }],
+    videos: [{ id: "NoB5xMxDMYI", author: "ももかっちゃんねる【おばー&ひ孫の沖縄紹介チャンネル】", label: "看紅芋薯條試吃" }],
     sources: [{ label: "那霸觀光協會店家資訊", url: "https://www.naha-navi.or.jp/spot/1876/" }],
   },
   {
@@ -151,7 +151,7 @@ const NAHA_CARDS = [
     venue: "Bic Camera Select 那霸國際通店", mapQuery: "ビックカメラSelect 那覇国際通り店",
     description: "同一把拿到手，先確認吹後腦時手腕會不會累，再感受熱風。Rentio 借實機試吹，整理了出風與切換模式的使用心得。",
     tip: "日本 EH-NA0J 標示 AC100V。打算帶回台灣，當場確認可用電壓、保固與現貨。",
-    videos: [{ id: "jASTXBsmRFc", author: "Panasonic 官方", label: "看吹整示範" }],
+    videos: [{ id: "jASTXBsmRFc", author: "Panasonic Japan（パナソニック公式）", label: "看吹整示範" }],
     sources: [
       { label: "Rentio 實機試用", url: "https://www.rentio.jp/matome/nanocare-eh-na0j-review/" },
       { label: "官方電壓與規格", url: "https://panasonic.jp/hair/products/EH-NA0J/spec.html" },
@@ -245,7 +245,7 @@ const OKINAWA_PORTS = [
         description: "酥鬆的沖繩餅乾拌雪鹽。齋ちゃんねる拆開原味與牛奶兩種比較。想要奶香選ミルク風味，想配無糖茶先試原味。",
         tip: "找「雪塩ちんすこう」。挑之前看盒上的入數與個別包裝，方便拆開分送。門市口味以現場為準。",
         image: "images/goods/shio-chinsuko.jpg", imageAlt: "雪塩金楚糕商品照",
-        videos: [{ id: "hS4pmKcFS3Q", author: "齋ちゃんねる", label: "看兩種金楚糕試吃" }],
+        videos: [{ id: "hS4pmKcFS3Q", author: "齋ちゃんねる【旅行とグルメと心強さと】", label: "看兩種金楚糕試吃" }],
         sources: [
           { label: "南風堂口味與包裝", url: "https://www.nanpudo.co.jp/products/yukishiochinsuko" },
           { label: "島の駅みやこ", url: "https://shimanoeki-miyako.com/" },
@@ -344,7 +344,7 @@ const OKINAWA_PORTS = [
         venue: "石垣ペンギン", mapQuery: "石垣ペンギン 辺銀食堂 石垣島",
         description: "這款辣油有島唐辛子和多種香料，適合舀一點拌白飯、豆腐或水餃。架上有原味和「激辛」，送人可以先挑原味。",
         tip: "找瓶身「辺銀食堂の石垣島ラー油」。品牌另列島內經銷點，市區本店沒買到可就近查。",
-        videos: [{ id: "brHjhQt2Qnk", author: "パインネコの石垣島だより", label: "看石垣島特產介紹" }],
+        videos: [{ id: "brHjhQt2Qnk", author: "🐾 パインネコの石垣島だより", label: "看石垣島特產介紹" }],
         sources: [
           { label: "原味與激辛品項", url: "https://penshoku.com/items-about/" },
           { label: "石垣ペンギン店面", url: "https://penshoku.com/items-store/" },
@@ -376,3 +376,54 @@ const OKINAWA_PORTS = [
 ];
 
 const OKINAWA_CARDS = OKINAWA_PORTS.flatMap(port => port.cards);
+
+// Chapters for existing catalog entries. The source IDs keep votes and shopping lists attached to the same items.
+const OKINAWA_CATALOG_VIDEOS = new Map([
+  // 那霸地點
+  ["s-naha#1", { id: "5PzvR9faE38", author: "Emma Around", label: "看暖暮拉麵牧志店探店" }],
+  ["s-naha#5", { id: "jjsQGpn5yy0", author: "Mura桑介紹日本", label: "看傑克牛排館的牛排和店內座位" }],
+  ["s-naha#8", { id: "KlnGf0f45Pk", author: "皮老先生", label: "看琉球之牛國際通店的燒肉" }],
+  ["s-naha#11", { id: "G_k6ljE-Wbw", author: "西西漫走筆記", label: "看波上宮、懸崖和市區沙灘" }],
+  ["s-naha#14", { id: "UAmzoG9pVm4", start: 197, author: "Allen單艾倫", label: "逛國際通與和平通 03:17" }],
+  ["s-naha#23", { id: "UAmzoG9pVm4", start: 517, author: "Allen單艾倫", label: "看國際通唐吉訶德的賣場 08:37" }],
+  ["s-naha#25", { id: "T1ZPbl_Xxso", start: 46, author: "niti log", label: "逛壺屋通找手作陶器 00:46" }],
+  ["s-naha#55", { id: "2u8j0BG5rkw", author: "日常的LIao", label: "看花商的花生豆腐試吃" }],
+
+  // 那霸與跨港採買
+  ["s-naha#57", { id: "GYeSkvHl6T4", start: 502, author: "しえ / Shie Travel Vlog", label: "看雪鹽金楚糕試吃 08:22" }],
+  ["s-naha#66", { id: "n1nv6zorgZc", start: 150, author: "變裝獵食旅人‧金霜Nico", label: "看 newQ 鳳梨塔切面和試吃 02:30" }],
+  ["s-naha#67", { id: "NxY9jblH4fY", start: 338, author: "雙人徐", label: "看沖繩島辣椒蝦餅試吃 05:38" }],
+  ["s-naha#69", { id: "JQb_Fxuf34Y", start: 1167, author: "おきぴよ!沖縄観光紹介チャンネル", label: "看三矢本舖的沖繩炸甜甜圈 19:27" }],
+  ["s-naha#72", { id: "n1nv6zorgZc", start: 694, author: "變裝獵食旅人‧金霜Nico", label: "看雪鹽厚夾心餅試吃 11:34" }],
+  ["s-naha#75", { id: "lCILC1b-go0", start: 72, author: "〔こるたび〕korutabi", label: "看 oHacorté 香檸蛋糕開箱 01:12" }],
+  ["s-naha#88", { id: "sFElH41zvHk", start: 243, author: "Joeman", label: "看 AirPods Pro 3 降噪與通透對比 04:03" }],
+  ["s-naha#116", { id: "QRYjPGEcZGI", start: 391, author: "APPLEFANS蘋果迷", label: "聽 Sony XM6 和 XM5 的實測比較 06:31" }],
+  ["s-naha#169", { id: "WOl5Gd1ZpzM", author: "都试一下咯Jane Neal", label: "看 CANMAKE 水潤染唇 01–05 實擦" }],
+  ["s-naha#170", { id: "n6KToAJh1eU", author: "Make Bloom._Shoko", label: "看 CEZANNE 腮紅包含 06 色的對比" }],
+  ["s-naha#171", { id: "5xVgmS1WFFI", author: "濱田あおい", label: "看 CANMAKE 八色眼影盤試色" }],
+
+  // 宮古島地點與特色小物
+  ["s-miyako#0", { id: "88jdTMJo_bE", start: 142, author: "Nick's Snaps / 旅日週誌", label: "看與那霸前濱海灘的宮古藍 02:22" }],
+  ["s-miyako#1", { id: "iQKeTHpd0h4", start: 2661, author: "bien旅行🤧国内旅行Vlogと観光スポット紹介", label: "走東平安名岬看海岸 44:21" }],
+  ["s-miyako#2", { id: "iQKeTHpd0h4", start: 1305, author: "bien旅行🤧国内旅行Vlogと観光スポット紹介", label: "看步行到砂山海灘的路 21:45" }],
+  ["s-miyako#4", { id: "yFo5ko5ElZ0", start: 186, author: "沖繩 Oki-Family 日本在地香港人", label: "看伊良部大橋的車窗風景 03:06" }],
+  ["s-miyako#7", { id: "yFo5ko5ElZ0", start: 754, author: "沖繩 Oki-Family 日本在地香港人", label: "逛島之站的土產市場 12:34" }],
+  ["s-miyako#12", { id: "Bi2Pw_2oYeU", start: 466, author: "ria_ log", label: "看下地島 17END 海景 07:46" }],
+  ["s-miyako#14", { id: "NWpV8NNDyxw", start: 36, author: "アラ還ゆったり旅", label: "逛唐吉訶德宮古島店 00:36" }],
+  ["s-miyako#15", { id: "wswTShKHfAM", author: "【ぽらぽら。】Panda Travellers -ぱんだトラベラーズ-", label: "看雪鹽博物館與雪鹽商品" }],
+  ["s-miyako#16", { id: "B-bQo3TWS3E", author: "Okame to Hyottoko おかめとひょっとこ", label: "看宮古甘蔗煮成黑糖做甜點" }],
+  ["s-miyako#19", { id: "VBTQRpb5MNU", start: 54, author: "アラ還ゆったり旅", label: "看まもる君周邊商品 00:54" }],
+
+  // 石垣島地點與特色小物
+  ["s-ishigaki#0", { id: "I9bUj-8_Bz8", start: 619, author: "1000步要去哪裡", label: "看川平灣玻璃船與海底 10:19" }],
+  ["s-ishigaki#1", { id: "YOuU5SPkVuE", start: 351, author: "meoto kikou.【大人な旅先案内人】", label: "看石垣民俗村的松鼠猴 05:51" }],
+  ["s-ishigaki#3", { id: "nZ_gaiERLgw", author: "ゆっくり休日Vlog", label: "看 Fusaki 海灘夕陽" }],
+  ["s-ishigaki#5", { id: "KCblnBYVm6Q", start: 183, author: "meoto kikou.【大人な旅先案内人】", label: "看明石食堂軟骨排骨和麵 03:03" }],
+  ["s-ishigaki#6", { id: "I9bUj-8_Bz8", start: 730, author: "1000步要去哪裡", label: "看 MARU 的石垣牛燒肉 12:10" }],
+  ["s-ishigaki#7", { id: "XMZ9yw-3SEQ", start: 217, author: "石垣島ゆんたく散歩", label: "看ひとし石敢當店的生魚片拼盤 03:37" }],
+  ["s-ishigaki#8", { id: "I_qEw4KxSRs", author: "大伴旅人", label: "看石垣乳飲 Genki Cool 試喝" }],
+  ["s-ishigaki#13", { id: "rdH6g_VO-uc", start: 481, author: "Okinawa Life Nozomi Vlog", label: "走進米子燒風獅爺園區 08:01" }],
+  ["s-ishigaki#14", { id: "K7Z3vsoT_GA", start: 64, author: "アラ還ゆったり旅", label: "逛石垣島唐吉訶德伴手禮貨架 01:04" }],
+  ["s-ishigaki#16", { id: "rGGdyooXldk", start: 732, author: "Okinawa Life Nozomi Vlog", label: "看工藝館的八重山傳統織品 12:12" }],
+  ["s-ishigaki#22", { id: "1OGkPO6cugE", author: "ぜりおチャンネル", label: "逛石垣島共同賣店的在地選物" }],
+]);
