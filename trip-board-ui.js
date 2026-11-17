@@ -75,7 +75,6 @@ const TripBoardUI = (() => {
     title.id = "board-map-title";
     title.textContent = "行程地圖";
     close.textContent = "關閉";
-    heading.append(title, close);
     gap.textContent = "加入空檔";
     candidate.setAttribute("aria-controls", candidateBar.id);
     days.setAttribute("role", "group");
@@ -84,7 +83,8 @@ const TripBoardUI = (() => {
     const tools = page.createElement("div");
     tools.className = "board-map-tools";
     tools.append(candidate, gap);
-    bar.replaceChildren(days, tools);
+    heading.append(title, tools, close);
+    bar.replaceChildren(days);
 
     const content = page.createElement("div");
     content.className = "board-map-content";
@@ -168,6 +168,14 @@ const TripBoardUI = (() => {
     };
     new MutationObserver(showMap).observe(overlay, { attributes: true, attributeFilter: ["class"] });
     if (overlay.classList.contains("on")) showMap();
+
+    if (board.ResizeObserver) {
+      const mapResizeObserver = new board.ResizeObserver(() => {
+        if (!overlay.classList.contains("on") || !board.PMAP || typeof board.PMAP.invalidateSize !== "function") return;
+        board.PMAP.invalidateSize({ pan: false });
+      });
+      mapResizeObserver.observe(map);
+    }
 
     page.addEventListener("keydown", event => {
       if (event.key !== "Escape" || !overlay.classList.contains("on")) return;
