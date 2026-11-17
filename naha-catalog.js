@@ -7,6 +7,59 @@ const NahaCatalog = (() => {
   const drugCategories = new Set(["醫藥品", "藥品", "美妝", "貼布", "保健品"]);
   const shoppingGroups = new Set(["gift", "beauty", "electronics"]);
   const shopLocations = new Set(["s-naha#56", "s-naha#86", "s-naha#87"]);
+  // Extra photos tied to a specific catalog item, with the page that published each one.
+  const photos = new Map(Object.entries({
+    "s-miyako#23": {
+      url: "https://miyakojima-bb.com/wp-content/uploads/2023/08/kaikobo03.jpg",
+      source: "https://miyakojima-bb.com/item/umikoubou/",
+      alt: "宮古島海工房的手作飾品",
+    },
+    "s-miyako#25": {
+      url: "https://www.cnew.jp/img/magazine-015-e1696859297236-1024x577.jpg",
+      source: "https://www.cnew.jp/magazine/2771",
+      alt: "宮古島 BANBAN 店內的球池及遊具",
+    },
+    "s-naha#46": {
+      url: "https://megry.a-bisu.jp/upload/tenant_1/260325_ganguroadworks-30.webp",
+      source: "https://megry.a-bisu.jp/souvenirs/toy-road-works",
+      alt: "玩具ロードワークス店面外觀",
+    },
+    "s-naha#48": {
+      url: "https://kaiten-portal.jp/media/wp-content/uploads/2019/02/Toys-A_181229_0002.jpg",
+      source: "https://kaiten-portal.jp/media/okinawa/retail/toys-a/",
+      alt: "那霸 Toys-A 玩具店",
+    },
+    "s-naha#49": {
+      url: "https://www.animate.co.jp/assets/uploads/2024/08/1728470695-40a834c7694c04a8f1e75377bf555f71.jpg",
+      source: "https://www.animate.co.jp/shop/naha/",
+      alt: "Animate 那霸國際通店",
+    },
+    "s-naha#50": {
+      url: "https://bandainamco-am.co.jp/images/others/gashapon/store/naha/img_store_naha.jpg",
+      source: "https://bandainamco-am.co.jp/others/gashapon-bandai-officialshop/store/naha/",
+      alt: "萬代扭蛋官方店 那霸 Main Place 分店",
+    },
+    "s-naha#52": {
+      url: "https://www.okinawa-americanvillage.com/amevi/wp-content/uploads/2023/05/saikorodo-seaside-pict01-768x768.jpg",
+      source: "https://www.okinawa-americanvillage.com/shop/saikorodo/",
+      alt: "北谷美國村的 Saikorodo Seaside 桌遊店",
+    },
+    "s-naha#53": {
+      url: "https://assets.gigo.co.jp/img/shops/chatan-01.jpg",
+      source: "https://www.gigo.co.jp/shops/chatan",
+      alt: "GiGO 北谷店",
+    },
+    "s-naha#54": {
+      url: "https://images.ctfassets.net/hznkfxjwz4hy/2PAEDPNXlFJA3CdYJFthZn/8426e8aa42dd8708e82f3bdf500d8472/news_litor.png?w=640&fm=jpg&q=80",
+      source: "https://pnrm.co.jp/news/litor-open/",
+      alt: "LITOR 那霸推出的漢堡",
+    },
+    "s-naha#56": {
+      url: "https://nantou-seika.com/images/top/nantou2022.jpg",
+      source: "https://nantou-seika.com/",
+      alt: "那霸南島製菓的店面外觀",
+    },
+  }));
   const packaging = new Map([
     ["Naturemade 大塚製薬超级维生素D 90粒 90天份 | 健康リスクに立ち向", {
       original: "ネイチャーメイド スーパービタミンD 90粒",
@@ -52,6 +105,16 @@ const NahaCatalog = (() => {
   const searchable = value => tidy(value).normalize("NFKC").toLocaleLowerCase("zh-TW");
   const primaryId = id => aliases.get(id) || id;
   const itemIds = id => sameItems.get(primaryId(id)) || [id];
+  const videoCover = item => {
+    const id = item.videos[0]?.id || "";
+    return /^[\w-]{11}$/.test(id) ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : "";
+  };
+
+  function withCover(item) {
+    if (item.image) return item;
+    const cover = videoCover(item);
+    return cover ? { ...item, image: cover, imageIsCover: true } : item;
+  }
 
   function names(item) {
     const raw = tidy(item.title);
@@ -71,6 +134,8 @@ const NahaCatalog = (() => {
       const group = categoryOf(row);
       const pack = packaging.get(tidy(row.name));
       const video = OKINAWA_CATALOG_VIDEOS.get(row.cid);
+      const image = safeURL(row.img, base) || safeURL(pack?.image, base);
+      const photo = image ? undefined : photos.get(row.cid);
       return {
         id: row.cid,
         port: row.sid.replace(/^s-/, ""),
@@ -79,7 +144,8 @@ const NahaCatalog = (() => {
         group,
         store: row.store,
         price: row.price,
-        image: safeURL(row.img || pack?.image, base),
+        image: image || photo?.url || "",
+        photo,
         packageName: pack?.original,
         shopping: shoppingGroups.has(group),
         videos: video ? [video] : [],
@@ -92,13 +158,13 @@ const NahaCatalog = (() => {
 
   function recommended(card) {
     const group = card.catalogGroup || ({ "現場吃": "food", 景點: "spot", "藥妝・美妝": "beauty", 電器比價: "electronics" }[card.category] || "gift");
-    return {
+    return withCover({
       id: primaryId(card.id), title: card.title, group,
       category: categories[group], store: card.shopping ? card.shopping.store || card.venue : "",
       storeSearch: card.shopping ? card.mapQuery : "", price: "",
-      image: card.shopping?.image || card.image || `https://i.ytimg.com/vi/${card.videos[0].id}/hqdefault.jpg`,
+      image: card.shopping?.image || card.image,
       shopping: shoppingGroups.has(group), recommendation: card, videos: card.videos,
-    };
+    });
   }
 
   function itemsForPort(catalog, port) {
@@ -117,9 +183,12 @@ const NahaCatalog = (() => {
     for (const card of port.cards) {
       const entry = recommended(card);
       const original = items.get(entry.id);
+      const image = card.shopping?.image || original?.image || entry.image;
       items.set(entry.id, original ? {
         ...original, recommendation: card, videos: [...entry.videos, ...original.videos],
-        image: card.shopping?.image || original.image || entry.image,
+        image,
+        photo: image === original.image ? original.photo : undefined,
+        imageIsCover: image === entry.image && entry.imageIsCover,
       } : entry);
     }
     return [...items.values()].map(item => {
@@ -128,7 +197,7 @@ const NahaCatalog = (() => {
       const legacyText = item.location?.store ? "" : item.search;
       const search = [legacyText, item.title, title, original, item.category, item.store, item.storeSearch,
         item.recommendation?.venue, channels].join(" ");
-      return { ...item, search: searchable(search) };
+      return withCover({ ...item, search: searchable(search) });
     });
   }
 
@@ -159,7 +228,8 @@ const NahaCatalog = (() => {
     const fragment = document.createDocumentFragment();
     const source = item.source;
     const images = new Map();
-    if (item.image) images.set(item.image, names(item).title);
+    if (item.image) images.set(item.image, item.photo?.alt ||
+      names(item).title + (item.imageIsCover ? "（影片封面）" : ""));
     for (const node of source?.querySelectorAll("img.ph") || []) {
       const url = safeURL(node.getAttribute("src"), item.base);
       if (url) images.set(url, node.alt || item.title);
@@ -169,9 +239,13 @@ const NahaCatalog = (() => {
       gallery.className = "catalog-gallery";
       for (const [url, alt] of images) {
         const image = document.createElement("img");
-        image.src = url;
         image.alt = alt;
         image.loading = "lazy";
+        image.addEventListener("error", () => {
+          image.remove();
+          if (!gallery.childElementCount) gallery.remove();
+        }, { once: true });
+        image.src = url;
         gallery.append(image);
       }
       fragment.append(gallery);
@@ -202,6 +276,7 @@ const NahaCatalog = (() => {
       const url = safeURL(link.getAttribute("href"), item.base);
       if (url) links.set(url, tidy(link.textContent) || "來源");
     }
+    if (item.photo) links.set(item.photo.source, "照片來源");
     const actions = document.createElement("div");
     actions.className = "link-list catalog-links";
     for (const [url, label] of links) {
@@ -217,5 +292,5 @@ const NahaCatalog = (() => {
     return fragment;
   }
 
-  return { categories, placeGroups, read, itemsForPort, recommended, itemIds, primaryId, names, match, detail };
+  return { categories, placeGroups, read, itemsForPort, recommended, itemIds, primaryId, names, match, detail, videoCover };
 })();

@@ -340,6 +340,38 @@ document.addEventListener("DOMContentLoaded", () => {
     return `<button class="button" type="button" data-vote="${e(id)}" aria-pressed="false">投一票</button><span class="vote-count">0 票</span>`;
   }
 
+  function photoSlot(item, className) {
+    const cover = NahaCatalog.videoCover(item);
+    const fallback = item.image && cover && cover !== item.image ? cover : "";
+    return `<span class="photo-frame ${className}" aria-hidden="true">
+      ${item.image ? `<img data-photo-url="${e(item.image)}"${fallback ? ` data-photo-fallback="${e(fallback)}"` : ""} alt="" loading="lazy" decoding="async">` : ""}
+      ${className === "catalog-photo" && (item.imageIsCover || fallback) ? `<span class="photo-cover"${item.imageIsCover ? "" : " hidden"}>影片封面</span>` : ""}
+      <span class="photo-message"${item.image ? " hidden" : ""}>暫無照片</span>
+    </span>`;
+  }
+
+  function loadPhotos(container) {
+    for (const image of container.querySelectorAll("img[data-photo-url]")) {
+      const frame = image.parentElement;
+      const coverLabel = frame.querySelector(".photo-cover");
+      const message = frame.querySelector(".photo-message");
+      image.addEventListener("error", () => {
+        if (image.dataset.photoFallback) {
+          const fallback = image.dataset.photoFallback;
+          delete image.dataset.photoFallback;
+          if (coverLabel) coverLabel.hidden = false;
+          image.src = fallback;
+          return;
+        }
+        image.hidden = true;
+        if (coverLabel) coverLabel.hidden = true;
+        message.textContent = "載入失敗";
+        message.hidden = false;
+      });
+      image.src = image.dataset.photoUrl;
+    }
+  }
+
   function renderCatalog() {
     if (catalogState !== "ready") return;
     const showMine = $("catalog-mine").checked;
@@ -363,7 +395,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return `<article class="card catalog-item">
         <div>
           <button class="catalog-preview" type="button" data-catalog-item="${e(item.id)}" aria-label="看${e(title)}詳細資料">
-            ${item.image ? `<img src="${e(item.image)}" alt="" loading="lazy" decoding="async">` : ""}
+            ${photoSlot(item, "catalog-photo")}
             <strong>${e(title)}</strong>
             ${original ? `<span lang="ja">${e(original)}</span>` : ""}
             <span>${e([item.category, item.store].filter(Boolean).join(" · "))}</span>
@@ -377,9 +409,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="card-actions">${catalogVote(item.id)}</div>
       </article>`;
     }).join("");
-    for (const image of $("catalog-items").querySelectorAll(".catalog-preview img")) {
-      image.addEventListener("error", () => { image.hidden = true; });
-    }
+    loadPhotos($("catalog-items"));
     for (const button of $("catalog-items").querySelectorAll("[data-vote]")) paintVote(button);
     $("catalog-pages").hidden = pages === 1;
     $("catalog-page").textContent = `第 ${catalogPage + 1} / ${pages} 頁`;
@@ -560,14 +590,14 @@ document.addEventListener("DOMContentLoaded", () => {
         return `<li>
           <label class="shop-item">
             <input class="shop-check" type="checkbox" aria-label="已買 ${e(title)}" data-bought="${e(item.id)}" ${checked ? "checked" : ""}>
-            <span class="shop-thumb" aria-hidden="true">${item.image ? `<img src="${e(item.image)}" alt="" loading="lazy" decoding="async">` : ""}</span>
+            ${photoSlot(item, "shop-thumb")}
             <span class="shop-names"><strong>${e(title)}</strong>${original ? `<small class="shop-original" lang="ja">${e(original)}</small>` : ""}</span>
           </label>
           <button class="quiet shop-detail" type="button" data-catalog-item="${e(item.id)}" aria-label="查看${e(title)}資料">詳情</button>
         </li>`;
       }).join("")}</ul>
     </section>`).join("");
-    for (const image of target.querySelectorAll("img")) image.addEventListener("error", () => { image.hidden = true; });
+    loadPhotos(target);
   }
 
   function renderSync() {
