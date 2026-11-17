@@ -114,7 +114,6 @@ const NahaPlan = (() => {
       min: duration,
       src: "user",
       by: name,
-      endorse: [],
     });
     return next;
   }

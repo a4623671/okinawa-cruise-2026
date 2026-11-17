@@ -44,7 +44,7 @@ const TripBoardUI = (() => {
       link.textContent = title.textContent;
       title.replaceChildren(link);
     }
-    for (const leg of list.querySelectorAll(".mleg[onclick]")) {
+    for (const leg of list.querySelectorAll("div.mleg[onclick]")) {
       leg.tabIndex = 0;
       leg.setAttribute("role", "button");
       leg.querySelector(".msw").textContent = "調整交通";
@@ -90,30 +90,23 @@ const TripBoardUI = (() => {
     content.className = "board-map-content";
     content.append(...card.children);
     card.append(heading, content);
+    const routeHeading = page.createElement("div");
+    routeHeading.className = "board-map-route-heading";
     const routeTitle = page.createElement("h3");
-    routeTitle.className = "board-map-route-title";
     routeTitle.textContent = "行程順序";
-    list.before(routeTitle);
+    const routeHint = page.createElement("span");
+    routeHint.className = "route-swipe";
+    routeHint.textContent = "左右滑動";
+    routeHeading.append(routeTitle, routeHint);
+    list.before(routeHeading);
     card.setAttribute("role", "dialog");
     card.setAttribute("aria-modal", "true");
     card.setAttribute("aria-labelledby", title.id);
 
-    const footer = page.querySelector(".bar");
-    const reload = footer.querySelector(".ghost");
-    reload.textContent = "更新";
-    reload.setAttribute("aria-label", "更新排程");
-    trigger.textContent = "行程地圖";
-    trigger.setAttribute("aria-haspopup", "dialog");
-    footer.insertBefore(trigger, reload);
     const stops = page.getElementById("board");
     const updateBoardControls = () => {
       trigger.disabled = !board.PLAN;
-      for (const button of stops.querySelectorAll(".item .mv button")) {
-        button.setAttribute("aria-label", button.textContent === "▲" ? "往前移" : "往後移");
-      }
-      for (const button of stops.querySelectorAll('.item .ops button[onclick^="openItemMenu"]')) {
-        button.textContent = "更多";
-      }
+      routeHint.textContent = list.querySelector(".route-grip") ? "左右滑動 · 拖曳把手排序" : "左右滑動";
     };
     new MutationObserver(updateBoardControls).observe(stops, { childList: true });
     updateBoardControls();
@@ -139,7 +132,10 @@ const TripBoardUI = (() => {
         content.scrollTop = 0;
       }
     }, { capture: true });
-    new MutationObserver(() => labelRouteControls(page, list)).observe(list, { childList: true });
+    new MutationObserver(() => {
+      labelRouteControls(page, list);
+      updateBoardControls();
+    }).observe(list, { childList: true });
     labelRouteControls(page, list);
 
     list.addEventListener("click", event => {
@@ -147,7 +143,7 @@ const TripBoardUI = (() => {
       if (stop && !event.target.closest(".act")) map.scrollIntoView({ block: "nearest" });
     });
     list.addEventListener("keydown", event => {
-      if (event.target.matches('.mleg[role="button"]') && (event.key === "Enter" || event.key === " ")) {
+      if (event.target.matches('div.mleg[role="button"]') && (event.key === "Enter" || event.key === " ")) {
         event.preventDefault();
         event.target.click();
       }
