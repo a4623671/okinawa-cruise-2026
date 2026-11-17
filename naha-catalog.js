@@ -4,7 +4,6 @@ const NahaCatalog = (() => {
     gift: "食品與小物", beauty: "藥妝美妝", electronics: "電器",
   };
   const placeGroups = ["food", "spot", "shop"];
-  const widerStores = new Set(["唐吉軻德", "Bic Camera", "藥妝店", "3COINS"]);
   const drugCategories = new Set(["醫藥品", "藥品", "美妝", "貼布", "保健品"]);
   const shoppingGroups = new Set(["gift", "beauty", "electronics"]);
   const shopLocations = new Set(["s-naha#56", "s-naha#86", "s-naha#87"]);
@@ -82,8 +81,6 @@ const NahaCatalog = (() => {
         price: row.price,
         image: safeURL(row.img || pack?.image, base),
         packageName: pack?.original,
-        mapURL: safeURL(source?.querySelector(".map[href]")?.getAttribute("href"), base),
-        common: group !== "shop" && widerStores.has(row.store),
         shopping: shoppingGroups.has(group),
         videos: video ? [video] : [],
         search: searchable(`${row.name} ${row.store} ${row.cat} ${source?.textContent || ""}`),
@@ -92,8 +89,6 @@ const NahaCatalog = (() => {
       };
     });
   }
-
-  const forPort = (items, port) => items.filter(item => item.port === port || item.common);
 
   function recommended(card) {
     const group = card.catalogGroup || ({ "現場吃": "food", 景點: "spot", "藥妝・美妝": "beauty", 電器比價: "electronics" }[card.category] || "gift");
@@ -107,7 +102,18 @@ const NahaCatalog = (() => {
   }
 
   function itemsForPort(catalog, port) {
-    const items = new Map(forPort(catalog, port.id).map(item => [item.id, item]));
+    const items = new Map();
+    for (const item of catalog) {
+      const location = OkinawaCatalogLocations.forItem(item.id, item.port, port.id);
+      if (!location) continue;
+      const store = location.store || item.store;
+      const storeSearch = location.query || (item.shopping ? OkinawaCatalogLocations.storeQuery(store, port.id, port.name) : "");
+      items.set(item.id, {
+        ...item, store, storeSearch, location,
+        // A product can be sold at several ports. Its visit or store video belongs to its source port.
+        videos: item.port === port.id ? item.videos : [],
+      });
+    }
     for (const card of port.cards) {
       const entry = recommended(card);
       const original = items.get(entry.id);
@@ -119,7 +125,9 @@ const NahaCatalog = (() => {
     return [...items.values()].map(item => {
       const { title, original } = names(item);
       const channels = item.videos.map(video => video.author).join(" ");
-      const search = [item.search, title, original, item.recommendation?.venue, channels].join(" ");
+      const legacyText = item.location?.store ? "" : item.search;
+      const search = [legacyText, item.title, title, original, item.category, item.store, item.storeSearch,
+        item.recommendation?.venue, channels].join(" ");
       return { ...item, search: searchable(search) };
     });
   }
@@ -173,7 +181,7 @@ const NahaCatalog = (() => {
     notes.className = "catalog-notes";
     const body = source.querySelector(".ovbody") || source;
     for (const child of body.children) {
-      if (child.tagName !== "A") copyNote(child, notes);
+      if (child.tagName !== "A" && !(item.location?.store && child.matches(".kv"))) copyNote(child, notes);
     }
     for (const child of source.querySelectorAll(".credit")) {
       const credit = document.createElement("small");
@@ -183,7 +191,14 @@ const NahaCatalog = (() => {
     fragment.append(notes);
 
     const links = new Map();
+    if (item.storeSearch && !item.recommendation?.mapQuery) {
+      links.set(OkinawaCatalogLocations.mapURL(item.storeSearch), "採買地點");
+    }
+    if (item.location?.source && !item.recommendation?.sources.some(source => source.url === item.location.source)) {
+      links.set(item.location.source, "店家與商品來源");
+    }
     for (const link of source.querySelectorAll("a[href]")) {
+      if (item.storeSearch && link.matches(".map")) continue;
       const url = safeURL(link.getAttribute("href"), item.base);
       if (url) links.set(url, tidy(link.textContent) || "來源");
     }

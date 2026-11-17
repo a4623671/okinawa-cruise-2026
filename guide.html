@@ -268,6 +268,7 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 #rkDetail .ipanel{background:#fff;border-radius:18px 18px 0 0;max-width:720px;width:100%;max-height:90vh;overflow-y:auto;padding:18px 16px calc(24px + env(safe-area-inset-bottom));position:relative}
 #rkDetail .ix{position:absolute;top:10px;right:16px;font-size:18px;cursor:pointer;background:#f0ece2;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:#4a5b6c}
 </style>
+<script src="trip-catalog-locations.js?v=20261117-ports-r8"></script>
 </head>
 <body class="lv">
 <div id="gate"><div class="box"><h2>💬 三港討論區</h2><p>先寫下你的名字再進入<br>投票會記名，每家店／景點每人限一票</p><input id="nameInput" maxlength="12" placeholder="例如：小明"><div id="knownNames"></div><button onclick="enter()">進入討論區</button></div></div>
@@ -569,13 +570,13 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=末吉宮" target="_blank">🗺 地圖</a></div>
 
 <h2 class="st" data-c="souv">🎁 伴手禮（那霸必買清單）</h2>
-<div class="card" data-cat="食品" data-price="¥800（5入）" data-store="唐吉軻德"><h3>御菓子御殿 紅芋塔 ✅</h3><div class="en">Beniimo Tart (元祖)</div>
+<div class="card" data-cat="食品" data-price="¥800（5入）" data-store="御菓子御殿 國際通松尾店"><h3>御菓子御殿 紅芋塔 ✅</h3><div class="en">Beniimo Tart (元祖)</div>
 <img class="ph" loading="lazy" src="images/goods/benitart.jpg" onerror="imgRetry(this)" alt="御菓子御殿 紅芋塔">
 <div class="credit">圖：御菓子御殿官方商品圖</div>
 <div class="stars"><b>🔥🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚💚</span></div>
 <p>介紹：沖繩伴手禮之王，紅芋蛋塔酥鬆香甜。國際通店款式最多，機場免稅也有（比價後下手）。恩納本店附設紅芋工廠見學，岸上時間不合可略過。</p>
-<p class="kv"><b>價格：</b>12入約¥1,200–1,500⚠️｜<b>哪買：</b>國際通店、平和通、唐吉訶德、機場</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=御菓子御殿+国際通り" target="_blank">🗺 地圖</a></div>
+<p class="kv"><b>價格：</b>12入約¥1,200–1,500⚠️｜<b>哪買：</b>御菓子御殿 國際通松尾店</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&amp;query=%E5%BE%A1%E8%8F%93%E5%AD%90%E5%BE%A1%E6%AE%BF%20%E5%9B%BD%E9%9A%9B%E9%80%9A%E3%82%8A%E6%9D%BE%E5%B0%BE%E5%BA%97%20%E9%82%A3%E8%A6%87" target="_blank">🗺 地圖</a></div>
 
 <div class="card" data-cat="食品" data-store="唐吉軻德"><h3>ちんすこう（金楚糕）✅</h3><div class="en">Chinsuko</div>
 <img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/0/05/Chinsuko.jpg/960px-Chinsuko.jpg" onerror="imgRetry(this)" alt="金楚糕"><div class="credit">圖：Wikimedia Commons</div>
@@ -718,11 +719,11 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 <p class="kv"><b>位置：</b>那覇市牧志1-3-24 南都ビル2F（國際通旁）｜直賣時間需確認｜ちんすこう・菓子</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=%E5%8D%97%E9%83%BD%E8%A3%BD%E8%8F%93%20%E9%82%A3%E8%A6%87" target="_blank">🗺 地圖</a></div>
 
-<div class="card" data-cat="食品" data-price="¥170 起・48入 ¥1,296" data-store="唐吉軻德"><h3>雪塩ちんすこう（南風堂）</h3><div class="en">Shio Chinsuko</div>
+<div class="card" data-cat="食品" data-price="¥170 起・48入 ¥1,296" data-store="那霸機場 ANA FESTA"><h3>雪塩ちんすこう（南風堂）</h3><div class="en">Shio Chinsuko</div>
 <img class="ph" loading="lazy" src="images/goods/shio-chinsuko.jpg" onerror="imgRetry(this)" alt="雪塩ちんすこう（南風堂）">
 <p>介紹：宮古島雪鹽×ちんすこう，鹹甜平衡、入口即化，小包裝好分送。</p>
-<p class="kv"><b>價格：</b>¥170 起・48入 ¥1,296｜<b>店家：</b>唐吉軻德</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E9%9B%AA%E5%A1%A9%E3%81%A1%E3%82%93%E3%81%99%E3%81%93%E3%81%86" target="_blank">🗺 地圖</a></div>
+<p class="kv"><b>價格：</b>¥170 起・48入 ¥1,296｜<b>店家：</b>那霸機場 ANA FESTA</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&amp;query=ANA%20FESTA%20%E9%82%A3%E8%A6%87%E7%A9%BA%E6%B8%AF%20%E5%9B%BD%E5%86%85%E7%B7%9A%E3%83%AD%E3%83%93%E3%83%BC" target="_blank">🗺 地圖</a></div>
 
 <div class="card" data-cat="食品" data-price="¥1,760" data-store="唐吉軻德"><h3>雪塩ラングドシャ</h3><div class="en">Shio Langue de Chocolat</div>
 <img class="ph" loading="lazy" src="images/goods/shio-langue.jpg" onerror="imgRetry(this)" alt="雪塩ラングドシャ">
@@ -772,11 +773,11 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 <p class="kv"><b>價格：</b>¥298｜<b>店家：</b>唐吉軻德</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=%E6%98%8E%E6%B2%BB%E3%83%9E%E3%82%AB%E3%83%80%E3%83%9F%E3%82%A2%20%E9%BB%92%E7%B3%96" target="_blank">🗺 地圖</a></div>
 
-<div class="card" data-cat="食品" data-price="¥1,759" data-store="唐吉軻德"><h3>パパパパパインタルト（newQ）</h3><div class="en">Papa Pine Tart</div>
+<div class="card" data-cat="食品" data-price="¥1,759" data-store="newQ 國際通店"><h3>パパパパパインタルト（newQ）</h3><div class="en">Papa Pine Tart</div>
 <img class="ph" loading="lazy" src="images/goods/pine-tart.jpg" onerror="imgRetry(this)" alt="パパパパパインタルト（newQ）">
 <p>介紹：鳳梨造型巧克力塔，黑糖餅乾＋鳳梨果醬，8 入。</p>
-<p class="kv"><b>價格：</b>¥1,759｜<b>店家：</b>唐吉軻德</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%91%E3%83%91%E3%83%91%E3%83%91%E3%83%91%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%AB%E3%83%88" target="_blank">🗺 地圖</a></div>
+<p class="kv"><b>價格：</b>¥1,759｜<b>店家：</b>newQ 國際通店</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&amp;query=newQ%20%E5%9B%BD%E9%9A%9B%E9%80%9A%E3%82%8A%E5%BA%97%20%E9%82%A3%E8%A6%87" target="_blank">🗺 地圖</a></div>
 
 <div class="card" data-cat="食品" data-price="¥698" data-store="唐吉軻德"><h3>唐辛子えびせんべい</h3><div class="en">Togarashi Ebi Senbei</div>
 <img class="ph" loading="lazy" src="images/goods/ebi-senbei.jpg" onerror="imgRetry(this)" alt="唐辛子えびせんべい">
@@ -790,17 +791,17 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 <p class="kv"><b>價格：</b>¥698｜<b>店家：</b>唐吉軻德</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=%E6%B2%96%E7%B8%84%E5%94%90%E8%BE%9B%E5%AD%90%E3%83%9D%E3%83%86%E3%83%88%E3%82%B9%E3%83%86%E3%82%A3%E3%83%83%E3%82%AF" target="_blank">🗺 地圖</a></div>
 
-<div class="card" data-cat="食品" data-price="¥140／個" data-store="唐吉軻德"><h3>サーターアンダギー（三矢本舗）</h3><div class="en">Sata Andagi</div>
+<div class="card" data-cat="食品" data-price="¥140／個" data-store="三矢本舖（恩納村）"><h3>サーターアンダギー（三矢本舗）</h3><div class="en">Sata Andagi</div>
 <img class="ph" loading="lazy" src="images/goods/sata-andagi.jpg" onerror="imgRetry(this)" alt="サーターアンダギー（三矢本舗）">
 <p>介紹：沖繩炸甜甜圈；買常溫包裝版帶回，現炸當場吃最好。</p>
-<p class="kv"><b>價格：</b>¥140／個｜<b>店家：</b>唐吉軻德</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%82%B5%E3%83%BC%E3%82%BF%E3%83%BC%E3%82%A2%E3%83%B3%E3%83%80%E3%82%AE%E3%83%BC" target="_blank">🗺 地圖</a></div>
+<p class="kv"><b>價格：</b>¥140／個｜<b>店家：</b>三矢本舖（恩納村）</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&amp;query=%E4%B8%89%E7%9F%A2%E6%9C%AC%E8%88%97%20%E6%81%A9%E7%B4%8D%E5%BA%97%20%E6%B2%96%E7%B8%84" target="_blank">🗺 地圖</a></div>
 
-<div class="card" data-cat="食品" data-price="¥1,350" data-store="唐吉軻德"><h3>ロイズ石垣島 黒糖チョコレート</h3><div class="en">Royce Kokuto Chocolate</div>
+<div class="card" data-cat="食品" data-price="¥1,350" data-store="那霸機場 ANA FESTA"><h3>ロイズ石垣島 黒糖チョコレート</h3><div class="en">Royce Kokuto Chocolate</div>
 <img class="ph" loading="lazy" src="images/goods/royce.jpg" onerror="imgRetry(this)" alt="ロイズ石垣島 黒糖チョコレート">
 <p>介紹：石垣黑糖巧克力片，32 枚盒裝。</p>
-<p class="kv"><b>價格：</b>¥1,350｜<b>店家：</b>唐吉軻德</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%83%AD%E3%82%A4%E3%82%BA%E7%9F%B3%E5%9E%A3%E5%B3%B6%20%E9%BB%92%E7%B3%96%E3%83%81%E3%83%A7%E3%82%B3%E3%83%AC%E3%83%BC%E3%83%88" target="_blank">🗺 地圖</a></div>
+<p class="kv"><b>價格：</b>¥1,350｜<b>店家：</b>那霸機場 ANA FESTA</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&amp;query=ANA%20FESTA%20%E9%82%A3%E8%A6%87%E7%A9%BA%E6%B8%AF%20%E5%9B%BD%E5%86%85%E7%B7%9A%E3%83%AD%E3%83%93%E3%83%BC" target="_blank">🗺 地圖</a></div>
 
 <div class="card" data-cat="食品" data-price="¥980" data-store="唐吉軻德"><h3>ジミー バナナケーキ</h3><div class="en">Jimmy Banana Cake</div>
 <img class="ph" loading="lazy" src="images/goods/banana-cake.jpg" onerror="imgRetry(this)" alt="ジミー バナナケーキ">
@@ -808,11 +809,11 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 <p class="kv"><b>價格：</b>¥980｜<b>店家：</b>唐吉軻德</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=%E3%82%B8%E3%83%9F%E3%83%BC%20%E3%83%90%E3%83%8A%E3%83%8A%E3%82%B1%E3%83%BC%E3%82%AD" target="_blank">🗺 地圖</a></div>
 
-<div class="card" data-cat="食品" data-price="¥1,200" data-store="其他"><h3>雪塩さんど</h3><div class="en">Shio Sando</div>
+<div class="card" data-cat="食品" data-price="¥1,200" data-store="雪鹽夾心餅 國際通本店"><h3>雪塩さんど</h3><div class="en">Shio Sando</div>
 <img class="ph" loading="lazy" src="images/goods/shio-sando.jpg" onerror="imgRetry(this)" alt="雪塩さんど">
 <p>介紹：雪鹽白巧克力夾心餅，酥脆輕盈。</p>
-<p class="kv"><b>價格：</b>¥1,200｜<b>店家：</b>其他</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=%E9%9B%AA%E5%A1%A9%E3%81%95%E3%82%93%E3%81%A9" target="_blank">🗺 地圖</a></div>
+<p class="kv"><b>價格：</b>¥1,200｜<b>店家：</b>雪鹽夾心餅 國際通本店</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&amp;query=%E9%9B%AA%E5%A1%A9%E3%81%95%E3%82%93%E3%81%A9%20%E5%9B%BD%E9%9A%9B%E9%80%9A%E3%82%8A%E6%9C%AC%E5%BA%97%20%E9%82%A3%E8%A6%87%E5%B8%82%E4%B9%85%E8%8C%82%E5%9C%B03%E4%B8%81%E7%9B%AE1-1" target="_blank">🗺 地圖</a></div>
 
 <div class="card" data-cat="食品" data-price="¥2,500" data-store="其他"><h3>紅芋いっぱいまんじゅう（おきなわ屋）</h3><div class="en">Beni-imo Manju</div>
 <img class="ph" loading="lazy" src="images/goods/beni-manju.jpg" onerror="imgRetry(this)" alt="紅芋いっぱいまんじゅう（おきなわ屋）">
@@ -1404,11 +1405,11 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 <p class="kv"><b>價格：</b>依店內｜<b>參考：</b>Amazon 美妝 暢銷 #20</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=Melano%20CC%20%E8%8D%AF%E7%94%A8%E9%9B%86%E4%B8%AD%E6%B8%97%E9%80%8F%20%E9%AB%98%E7%BA%A7%E7%BE%8E%E5%AE%B9%E6%B6%B2%2020%E6%AF%AB%E5%8D%87%20%7C%20%E5%95%86%E5%93%81%E3%82%AB%E3%83%86%E3%82%B4%E3%83%AA%E6%A4%9C%E7%B4%A2%E3%80%81%E6%97%A5" target="_blank">🗺 地圖</a></div>
 
-<div class="card" data-cat="美妝" data-price="¥1,540" data-store="藥妝店"><h3>KATE リップモンスター（持色唇膏）</h3><div class="en">KATE Lip Monster</div>
+<div class="card" data-cat="美妝" data-price="¥1,540" data-store="大國藥妝 國際通 Lantana 店"><h3>KATE リップモンスター（持色唇膏）</h3><div class="en">KATE Lip Monster</div>
 <img class="ph" loading="lazy" src="images/goods/kate-lip-monster.jpg" onerror="imgRetry(this)" alt="KATE リップモンスター">
 <p>介紹：開架傳說級持色唇膏，喝水吃東西後仍留色。05 ダークフィグ、03 陽炎最熱門，藥妝店常缺貨，看到現貨先拿。</p>
-<p class="kv"><b>價格：</b>約¥1,540｜<b>哪買：</b>松本清、大國藥妝、唐吉訶德</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=KATE+%E3%83%AA%E3%83%83%E3%83%97%E3%83%A2%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%BC" target="_blank">🗺 地圖</a></div>
+<p class="kv"><b>價格：</b>約¥1,540｜<b>哪買：</b>大國藥妝 國際通 Lantana 店</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&amp;query=%E3%83%80%E3%82%A4%E3%82%B3%E3%82%AF%E3%83%89%E3%83%A9%E3%83%83%E3%82%B0%20%E5%9B%BD%E9%9A%9B%E9%80%9A%E3%82%8A%E3%83%A9%E3%83%B3%E3%82%BF%E3%83%8A%E5%BA%97%20%E9%82%A3%E8%A6%87" target="_blank">🗺 地圖</a></div>
 
 <div class="card" data-cat="美妝" data-price="¥770" data-store="藥妝店"><h3>CANMAKE むちぷるティント（水潤染唇）</h3><div class="en">CANMAKE Muchi Puru Tint</div>
 <img class="ph" loading="lazy" src="images/goods/canmake-muchipuru-tint.jpg" onerror="imgRetry(this)" alt="CANMAKE むちぷるティント">
@@ -1966,12 +1967,12 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=ドン・キホーテ宮古島店" target="_blank">🗺 地圖</a></div>
 
 <h2 class="st" data-c="souv">🎁 伴手禮（宮古必買）</h2>
-<div class="card" data-cat="食品" data-store="唐吉軻德"><h3>雪塩（宮古島の雪塩）✅</h3><div class="en">Yukishio Salt</div>
+<div class="card" data-cat="食品" data-store="雪鹽博物館"><h3>雪塩（宮古島の雪塩）✅</h3><div class="en">Yukishio Salt</div>
 <img class="ph" loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Miyako%20miyako%20paradise.jpg?width=960" onerror="imgRetry(this)" alt="雪塩製塩所"><div class="credit">圖：雪塩製塩所／Wikimedia Commons</div>
 <div class="stars"><b>🔥🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚💚</span></div>
 <p>介紹：宮古島第一伴手禮，粉末雪鹽＋各種調味鹽，煮飯撒一點就升級。雪塩館款式最齊，買小包裝多種口味分送。</p>
-<p class="kv"><b>價格：</b>小包約¥500–1,000⚠️｜<b>哪買：</b>雪塩館、島の駅、サンエー</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=雪塩+宮古島+お土産" target="_blank">🗺 地圖</a></div>
+<p class="kv"><b>價格：</b>小包約¥500–1,000⚠️｜<b>哪買：</b>雪鹽博物館</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&amp;query=%E9%9B%AA%E5%A1%A9%E3%83%9F%E3%83%A5%E3%83%BC%E3%82%B8%E3%82%A2%E3%83%A0%20%E5%AE%AE%E5%8F%A4%E5%B3%B6%E5%B8%82%E5%B9%B3%E8%89%AF%E7%8B%A9%E4%BF%A3191" target="_blank">🗺 地圖</a></div>
 
 <div class="card" data-cat="食品" data-store="唐吉軻德"><h3>宮古黑糖 ✅</h3><div class="en">Miyako Brown Sugar</div>
 <img class="ph" loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Muscovadosugar.jpg?width=960" onerror="imgRetry(this)" alt="黑糖"><div class="credit">圖：Wikimedia Commons</div>
@@ -2141,12 +2142,12 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 <p class="kv"><b>價格：</b>小瓶約¥1,000–2,000⚠️｜<b>哪買：</b>公設市場、ユーグレナモール、ドンキ</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=請福+泡盛+石垣" target="_blank">🗺 地圖</a></div>
 
-<div class="card" data-cat="紀念品" data-store="唐吉軻德"><h3>ミンサー織小物 ✅</h3><div class="en">Minsa Textile (足守り伝説)</div>
+<div class="card" data-cat="紀念品" data-store="あざみ屋 八重山織布工藝館"><h3>ミンサー織小物 ✅</h3><div class="en">Minsa Textile (足守り伝説)</div>
 <img class="ph" loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Ishigaki%20Island%20minsa.jpg?width=960" onerror="imgRetry(this)" alt="ミンサー織"><div class="credit">圖：Wikimedia Commons</div>
 <div class="stars"><b>🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚</span></div>
 <p>介紹：五格四格絣紋有「永遠相守」之意，杯墊＋包包＋領帶最實用，女生收到都開心。</p>
-<p class="kv"><b>價格：</b>小物約¥1,000–3,000⚠️｜<b>哪買：</b>公設市場、ユーグレナモール</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=ミンサー織+石垣" target="_blank">🗺 地圖</a></div>
+<p class="kv"><b>價格：</b>小物約¥1,000–3,000⚠️｜<b>哪買：</b>あざみ屋 八重山織布工藝館</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&amp;query=%E3%81%82%E3%81%96%E3%81%BF%E5%B1%8B%20%E3%81%BF%E3%82%93%E3%81%95%E3%83%BC%E5%B7%A5%E8%8A%B8%E9%A4%A8%20%E7%9F%B3%E5%9E%A3%E5%B8%82%E7%99%BB%E9%87%8E%E5%9F%8E909" target="_blank">🗺 地圖</a></div>
 
 <div class="card" data-cat="食品" data-store="唐吉軻德"><h3>黑糖かりんとう ✅</h3><div class="en">Brown Sugar Karinto</div>
 <img class="ph" loading="lazy" src="https://commons.wikimedia.org/wiki/Special:FilePath/Karint%C5%8D%20001.jpg?width=960" onerror="imgRetry(this)" alt="黑糖かりんとう"><div class="credit">圖：Wikimedia Commons</div>
@@ -2155,12 +2156,12 @@ body.lv #statsBtn{bottom:calc(86px + env(safe-area-inset-bottom))}
 <p class="kv"><b>價格：</b>約¥400–800⚠️｜<b>哪買：</b>公設市場、ドンキ、超市</p>
 <a class="map" href="https://www.google.com/maps/search/?api=1&query=黒糖かりんとう+石垣" target="_blank">🗺 地圖</a></div>
 
-<div class="card" data-cat="食品" data-store="唐吉軻德"><h3>石垣島ラー油（辺銀食堂）✅</h3><div class="en">Taberu Rayu (吃著吃的辣油・元祖)</div>
+<div class="card" data-cat="食品" data-store="石垣ペンギン"><h3>石垣島ラー油（辺銀食堂）✅</h3><div class="en">Taberu Rayu (吃著吃的辣油・元祖)</div>
 <img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/%E3%83%A9%E3%83%BC%E6%B2%B90588.JPG/960px-%E3%83%A9%E3%83%BC%E6%B2%B90588.JPG" onerror="imgRetry(this)" alt="石垣島ラー油"><div class="credit">圖：Wikimedia Commons</div>
 <div class="stars"><b>🔥🔥🔥🔥🔥</b> <span class="rec">💚💚💚💚💚</span></div>
 <p>介紹：「食べるラー油」元祖，辺銀食堂用石垣島食材做的料多辣油，拌飯拌麵都絕配，Tabelog 長年排隊名物。島上經常賣到缺貨⚠️，看到就先拿。</p>
-<p class="kv"><b>價格：</b>約¥800–1,000/瓶⚠️｜<b>哪買：</b>公設市場、ユーグレナモール、辺銀食堂本店、ドンキ（缺貨是常態）</p>
-<a class="map" href="https://www.google.com/maps/search/?api=1&query=石垣島ラー油+辺銀食堂" target="_blank">🗺 地圖</a></div>
+<p class="kv"><b>價格：</b>約¥800–1,000/瓶⚠️｜<b>哪買：</b>石垣ペンギン</p>
+<a class="map" href="https://www.google.com/maps/search/?api=1&amp;query=%E7%9F%B3%E5%9E%A3%E3%83%9A%E3%83%B3%E3%82%AE%E3%83%B3%20%E8%BE%BA%E9%8A%80%E9%A3%9F%E5%A0%82%20%E7%9F%B3%E5%9E%A3%E5%B3%B6" target="_blank">🗺 地圖</a></div>
 
 <div class="card" data-cat="食品" data-store="唐吉軻德"><h3>ピパーツ（島胡椒）✅</h3><div class="en">Pipatsu (八重山山椒・長胡椒)</div>
 <img class="ph" loading="lazy" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Piper_retrofractum.jpg/960px-Piper_retrofractum.jpg" onerror="imgRetry(this)" alt="ピパーツ原植物"><div class="credit">圖：島胡椒原植物／Wikimedia Commons</div>
@@ -2534,13 +2535,16 @@ function lvData(){
  });
  return out;
 }
+function lvPort(sid){return (LVS.port==='all'?sid:LVS.port).replace(/^s-/,'');}
+function lvPlacement(o){return OkinawaCatalogLocations.forItem(o.cid,o.sid.replace(/^s-/,''),lvPort(o.sid));}
 function lvMatch(o){
- var isStore=(o.store==='唐吉軻德'||o.store==='Bic Camera'||o.store==='藥妝店'||o.store==='3COINS');
- if(!isStore&&LVS.port!=='all'&&o.sid!==LVS.port)return false;
+ var location=lvPlacement(o);
+ if(!location)return false;
+ var store=location.store||o.store;
  if(LVS.kind!=='all'&&o.kind!==LVS.kind)return false;
  if(LVS.cat!=='all'&&o.cat!==LVS.cat)return false;
- if(LVS.store!=='all'&&o.store!==LVS.store)return false;
- if(LVS.q){var q=LVS.q.toLowerCase(),hay=(o.name+' '+(o.cat||'')+' '+(o.store||'')).toLowerCase();if(hay.indexOf(q)<0)return false;}
+ if(LVS.store!=='all'&&store!==LVS.store)return false;
+ if(LVS.q){var q=LVS.q.toLowerCase(),hay=(o.name+' '+(o.cat||'')+' '+(store||'')).toLowerCase();if(hay.indexOf(q)<0)return false;}
  if(LVS.mine){var v=loadV()[o.cid]||[];if(v.indexOf(me())<0)return false;}
  return true;
 }
@@ -2553,15 +2557,16 @@ function lvTags(o,vc){
 }
 function lvRender(){
  var all=lvData(),v=loadV(),mine=me();
- var rows=all.filter(lvMatch);
+ var rows=all.filter(lvMatch).map(function(o){
+  return Object.assign({},o,{sid:'s-'+lvPort(o.sid),store:lvPlacement(o).store||o.store});
+ });
  rows.sort(function(a,b){var va=(v[a.cid]||[]).length,vb=(v[b.cid]||[]).length;if(vb!==va)return vb-va;return a.name.localeCompare(b.name,'zh-Hant');});
- var pn={DONKI:'🛒 唐吉軻德・全沖繩門市共通',BIC:'🔌 Bic Camera・那霸（國際通／機場）',DRUG:'💊 藥妝店・松本清／大國藥妝／唐吉',THREE:'🛍 3COINS・那霸 Main Place／PARCO CITY／Rycom',miyako:'🏝 宮古島・12/17（四）',naha:'🌺 那霸・12/18（五）',ishigaki:'🪨 石垣島・12/19（六）'};
+ var pn={miyako:'🏝 宮古島・12/17（四）',naha:'🌺 那霸・12/18（五）',ishigaki:'🪨 石垣島・12/19（六）'};
  var groups={};rows.forEach(function(o){
-  var gk=(o.store==='唐吉軻德')?'DONKI':((o.store==='Bic Camera')?'BIC':((o.store==='藥妝店')?'DRUG':((o.store==='3COINS')?'THREE':o.sid)));
-  var g=gk+'|'+(o.cat||CATN[o.kind]||'其他');(groups[g]=groups[g]||[]).push(o);});
+  var g=o.sid+'|'+(o.cat||CATN[o.kind]||'其他');(groups[g]=groups[g]||[]).push(o);});
  var h='',cnt=0,totalChecked=0;
  all.forEach(function(o){if((v[o.cid]||[]).length&&(o.kind==='souv'))totalChecked++;});
- var pr={DONKI:1,BIC:2,THREE:3,DRUG:4,miyako:5,naha:6,ishigaki:7},cr={'食品':1,'酒類':2,'美妝':3,'用品':4,'電器':5,'紀念品':6,'伴手禮':7,'3COINS':8};
+ var pr={miyako:1,naha:2,ishigaki:3},cr={'食品':1,'酒類':2,'美妝':3,'用品':4,'電器':5,'紀念品':6,'伴手禮':7,'3COINS':8};
  Object.keys(groups).sort(function(a,b){
   var aa=a.split('|'),bb=b.split('|');
   var pa=pr[aa[0].replace('s-','')]||9,pb=pr[bb[0].replace('s-','')]||9;
@@ -2598,7 +2603,9 @@ function syncLvMore(){var el=document.getElementById('lvmore'),b=document.getEle
 function lvCopy(){
  var all=lvData(),v=loadV(),byStore={},lines=[];
  all.forEach(function(o){var vv=v[o.cid]||[];if(!vv.length||o.kind!=='souv')return;
-  var s=o.store||'其他店';(byStore[s]=byStore[s]||[]).push('- '+o.name+(o.price?('（'+o.price+'）'):'')+'・'+vv.length+'人：'+vv.join('、'));});
+  var port=o.sid.replace(/^s-/,'');
+  var location=OkinawaCatalogLocations.forItem(o.cid,port,port);
+  var s=(location&&location.store)||o.store||'其他店';(byStore[s]=byStore[s]||[]).push('- '+o.name+(o.price?('（'+o.price+'）'):'')+'・'+vv.length+'人：'+vv.join('、'));});
  Object.keys(byStore).forEach(function(s){lines.push('【'+s+'】');byStore[s].forEach(function(l){lines.push(l);});lines.push('');});
  var txt=lines.join('\n')||'（還沒有人勾選）';
  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){alert('📋 已複製伴手禮清單')},function(){alert(txt)});}
@@ -2724,6 +2731,8 @@ function escH(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,
 function ovSyncVote(cid){var b=document.getElementById('ovvbtn');if(!b)return;var v=loadV()[cid]||[];var voted=v.indexOf(me())>=0;b.textContent=(voted?'✅ 已投':'👍 投票')+'（'+v.length+'票）';b.classList.toggle('voted',voted);}
 function ovVote(cid){toggle(cid);setTimeout(function(){ovSyncVote(cid);},400);}
 function openOvDetail(cid){var c=cardByCid(cid);if(!c)return;
+ var sid=cid.split('#')[0],home=sid.replace(/^s-/,'');
+ var location=OkinawaCatalogLocations.forItem(cid,home,document.body.classList.contains('lv')?lvPort(sid):home);
  var h=c.querySelector('h3');
  var html='<h3 style="font-size:18px;padding-right:30px">'+escH(h?cleanT(h.textContent):cid)+'</h3>';
  var en=c.querySelector('.en');if(en)html+='<div class="en">'+en.innerHTML+'</div>';
@@ -2736,10 +2745,16 @@ function openOvDetail(cid){var c=cardByCid(cid);if(!c)return;
   if(el.tagName==='H3'||el.tagName==='IMG'||el.tagName==='A')return;
   if(el.classList.contains('vote')||el.classList.contains('cmt')||el.classList.contains('ovdet'))return;
   if(el.classList.contains('en')||el.classList.contains('credit')||el.classList.contains('stars'))return;
+  if(location&&location.store&&el.classList.contains('kv'))return;
   html+=el.outerHTML;
  });
  var t=cleanT(h?h.textContent:''),mp=c.querySelector('a.map');
- html+='<div style="margin:10px 0"><a class="map" href="'+(mp?mp.getAttribute('href'):('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(t)))+'" target="_blank">🗺 地圖</a> <a class="map" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(t)+'" target="_blank">💬 評論</a></div>';
+ var query=location&&location.query;
+ var mapURL=query?OkinawaCatalogLocations.mapURL(query):(mp?mp.getAttribute('href'):OkinawaCatalogLocations.mapURL(t));
+ if(location&&location.store)html+='<p class="kv"><b>採買地點：</b>'+escH(location.store)+'</p>';
+ html+='<div style="margin:10px 0"><a class="map" href="'+mapURL+'" target="_blank" rel="noopener">🗺 地圖</a> <a class="map" href="'+OkinawaCatalogLocations.mapURL(query||t)+'" target="_blank" rel="noopener">💬 評論</a>';
+ if(location&&location.source)html+=' <a href="'+location.source+'" target="_blank" rel="noopener">店家與商品來源</a>';
+ html+='</div>';
  html+='<div style="margin-top:12px"><button id="ovvbtn" class="ovvbtn" onclick="ovVote(\''+cid+'\')"></button></div>';
  document.getElementById('iboby').innerHTML=html;
  IIMGS=imgs.map(function(im){return {s:im.src,a:im.alt};});IIDX=0;updI();bindItrk();

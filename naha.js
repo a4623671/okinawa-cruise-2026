@@ -388,8 +388,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function showCatalogItem(id) {
-    const fallback = cardOf(id);
-    const item = catalogIndex.get(NahaCatalog.primaryId(id)) || (fallback && NahaCatalog.recommended(fallback));
+    const primary = NahaCatalog.primaryId(id);
+    const fallback = port.cards.find(card => NahaCatalog.primaryId(card.id) === primary);
+    const item = catalogIndex.get(primary) || (fallback && NahaCatalog.recommended(fallback));
     if (!item) return;
     const { title, original } = NahaCatalog.names(item);
     $("catalog-title").textContent = title;
@@ -552,7 +553,7 @@ document.addEventListener("DOMContentLoaded", () => {
       groups.get(venue).push(item);
     }
     target.innerHTML = [...groups].map(([venue, items]) => `<section class="shop-group">
-      <div class="shop-heading"><h3>${e(venue)}</h3>${venue === "其他商品" ? "" : external(google(items[0].storeSearch || venue), "地圖")}</div>
+      <div class="shop-heading"><h3>${e(venue)}</h3>${items[0].storeSearch ? external(OkinawaCatalogLocations.mapURL(items[0].storeSearch), "地圖") : ""}</div>
       <ul>${items.map(item => {
         const { title, original } = NahaCatalog.names(item);
         const checked = NahaCatalog.itemIds(item.id).some(id => bought[name]?.[id]);
