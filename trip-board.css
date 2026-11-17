@@ -158,6 +158,17 @@
 }
 @media (max-width: 560px) {
   .embedded-board .bar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .embedded-board .item { display: block; }
-  .embedded-board .item-actions { margin-top: 5px; justify-content: space-between; }
+  .embedded-board .item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1px 6px;
+    padding: 6px 7px;
+  }
+  .embedded-board .item .body { display: contents; }
+  .embedded-board .item .nm { grid-column: 1 / -1; min-width: 0; line-height: 1.35; overflow-wrap: anywhere; }
+  .embedded-board .item .meta { grid-column: 1; min-width: 0; align-self: center; line-height: 1.3; overflow-wrap: anywhere; }
+  .embedded-board .item-actions { grid-column: 2; margin: 0; gap: 4px; justify-content: flex-end; align-items: center; }
+  .embedded-board .item .mv { gap: 3px; }
+  .embedded-board .item .ops button { padding-inline: 8px; }
+  .embedded-board.locked .item .meta { grid-column: 1 / -1; }
 }

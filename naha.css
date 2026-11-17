@@ -130,6 +130,9 @@ html.board-map-open { overflow: hidden; }
 #catalog-detail strong { overflow-wrap: anywhere; }
 .notice { padding: 10px 12px; border-radius: 9px; background: var(--soft); color: #244b43; font-size: .89rem; }
 .notice.over { background: var(--alert); color: var(--alarm); }
+.shopping-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-width: 0; }
+.shopping-tools .button { text-decoration: none; }
+#catalog-shopping-toggle { margin-bottom: 10px; }
 .sync-banner { display: flex; justify-content: space-between; gap: 10px; align-items: center; margin-bottom: 16px; }
 .shop-group { background: var(--white); border: 1px solid var(--line); border-radius: 14px; padding: 12px 15px; margin: 0 0 10px; }
 .shop-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }

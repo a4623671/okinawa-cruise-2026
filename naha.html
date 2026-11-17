@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f6f2">
   <title>沖繩郵輪｜三港行程與討論</title>
-  <link rel="stylesheet" href="naha.css?v=20261117-ports-r9">
-  <link id="board-style" rel="stylesheet" href="trip-board.css?v=20261117-ports-r10">
+  <link rel="stylesheet" href="naha.css?v=20261117-ports-r11">
+  <link id="board-style" rel="stylesheet" href="trip-board.css?v=20261117-ports-r11">
   <script src="trip-data.js" defer></script>
   <script src="trip-timing.js" defer></script>
   <script src="naha-plan.js?v=20261117-ports-r10" defer></script>
@@ -15,7 +15,7 @@
   <script src="trip-catalog-locations.js?v=20261117-ports-r8" defer></script>
   <script src="naha-catalog.js?v=20261117-ports-r9" defer></script>
   <script src="trip-board-ui.js?v=20261117-ports-r10" defer></script>
-  <script src="naha.js?v=20261117-ports-r9" defer></script>
+  <script src="naha.js?v=20261117-ports-r11" defer></script>
 </head>
 <body>
   <header class="top">
@@ -126,7 +126,10 @@
     <section id="shopping" class="pane" aria-labelledby="shopping-heading" hidden>
       <div class="section-head">
         <h1 id="shopping-heading">我的採買</h1>
-        <p>你投過票的商品，到店買完就勾起來。</p>
+        <div class="shopping-tools">
+          <button id="shopping-identity" class="quiet" type="button">設定名字</button>
+          <a id="shop-browse" class="button secondary" href="#discussion">選商品</a>
+        </div>
       </div>
       <div id="shopping-list"></div>
     </section>
@@ -145,6 +148,7 @@
       <h2 id="catalog-title">項目介紹</h2>
       <button class="quiet" type="button" data-close>關閉</button>
     </div>
+    <button id="catalog-shopping-toggle" class="button" type="button" hidden>加入採買</button>
     <div id="catalog-detail"></div>
     <div id="catalog-detail-actions" class="card-actions"></div>
   </dialog>

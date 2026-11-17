@@ -116,6 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const changesKey = "okinawa-naha-pending-v1";
   const cacheKey = "okinawa-naha-public-v1";
   const boughtKey = "okinawa-naha-bought-v1";
+  const shoppingKey = identity => "okinawa-shopping-v1:" + identity;
   const slotLabels = { morning: "上午", afternoon: "下午", evening: "晚上" };
   const panels = ["itinerary", "schedule", "discussion", "shopping"];
   const scheduleFrame = $("schedule-frame");
@@ -145,7 +146,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!validName(name)) name = "";
   let shared = readStorage(cacheKey, {});
   let pending = readStorage(changesKey, []);
-  let bought = readStorage(boughtKey, {});
+  const legacyBought = readStorage(boughtKey, {});
+  const shoppingProfiles = new Map();
   let displayStatus = "正在讀取共用資料";
   let syncError = "";
   let loading = false;
@@ -323,6 +325,7 @@ document.addEventListener("DOMContentLoaded", () => {
       catalogState = "error";
       $("catalog-status").textContent = "完整項目暫時讀不到。";
       $("catalog-retry").hidden = false;
+      renderShopping();
       return;
     }
     $("catalog-tools").hidden = false;
@@ -424,6 +427,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!item) return;
     const { title, original } = NahaCatalog.names(item);
     $("catalog-title").textContent = title;
+    const shoppingButton = $("catalog-shopping-toggle");
+    shoppingButton.hidden = !item.shopping;
+    shoppingButton.dataset.shoppingItem = item.id;
     const content = $("catalog-detail");
     content.replaceChildren();
     if (original) {
@@ -462,6 +468,12 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateCatalogDetail() {
     const details = $("catalog-detail-actions");
     paintVote(details.querySelector("[data-vote]"));
+    const shoppingButton = $("catalog-shopping-toggle");
+    if (!shoppingButton.hidden) {
+      const added = hasShoppingItem(shoppingProfile(), shoppingButton.dataset.shoppingItem);
+      shoppingButton.textContent = added ? "從採買移除" : "加入採買";
+      shoppingButton.classList.toggle("secondary", added);
+    }
     const schedule = details.querySelector("[data-schedule]");
     if (!schedule) return;
     const state = scheduleState(schedule.dataset.schedule);
@@ -566,14 +578,72 @@ document.addEventListener("DOMContentLoaded", () => {
       </section>`).join("");
   }
 
+  function saveShoppingProfile(profile) {
+    shoppingProfiles.set(name, profile);
+    return writeStorage(shoppingKey(name), profile);
+  }
+
+  function shoppingProfile() {
+    if (!name) return null;
+    let profile = shoppingProfiles.get(name);
+    if (!profile) {
+      const saved = readStorage(shoppingKey(name), null);
+      if (saved?.items && typeof saved.items === "object" && !Array.isArray(saved.items)) {
+        profile = saved;
+      } else {
+        const previous = Object.hasOwn(legacyBought, name) ? legacyBought[name] : {};
+        const items = Object.fromEntries(Object.entries(previous || {})
+          .filter(([, checked]) => checked === true)
+          .map(([id]) => [NahaCatalog.primaryId(id), true]));
+        profile = { items, importedVotes: false };
+      }
+      shoppingProfiles.set(name, profile);
+    }
+    if (profile.importedVotes || catalogState !== "ready" || loading || !shared.votes) return profile;
+    const products = new Set([...catalog, ...OKINAWA_CARDS.map(NahaCatalog.recommended)]
+      .filter(item => item.shopping).map(item => NahaCatalog.primaryId(item.id)));
+    const items = { ...profile.items };
+    for (const id of products) if (!Object.hasOwn(items, id) && selected(id)) items[id] = false;
+    // A removal made before votes loaded must also survive the one-time import.
+    for (const id of Object.keys(items)) if (items[id] === null) delete items[id];
+    profile = { items, importedVotes: true };
+    saveShoppingProfile(profile);
+    return profile;
+  }
+
+  const hasShoppingItem = (profile, id) => typeof profile?.items[id] === "boolean";
+
+  function toggleShoppingItem(id) {
+    const primary = NahaCatalog.primaryId(id);
+    if (!catalogIndex.get(primary)?.shopping) return;
+    askName(() => {
+      const profile = shoppingProfile();
+      const items = { ...profile.items };
+      const added = hasShoppingItem(profile, primary);
+      if (!added) items[primary] = false;
+      else if (profile.importedVotes) delete items[primary];
+      else items[primary] = null;
+      const saved = saveShoppingProfile({ ...profile, items });
+      render();
+      announce(saved ? (added ? "已移除商品" : "已加入採買") : "這次變更只保留在目前頁面");
+    }, "儲存並加入採買");
+  }
+
   function renderShopping() {
-    const cards = portCatalog.filter(item => item.shopping && selected(item.id));
+    const profile = shoppingProfile();
+    const cards = portCatalog.filter(item => item.shopping && hasShoppingItem(profile, item.id));
     const count = $("shop-count");
     count.textContent = String(cards.length);
     count.hidden = !cards.length;
+    const identity = $("shopping-identity");
+    identity.textContent = name || "設定名字";
+    identity.setAttribute("aria-label", name ? "切換採買名字，目前是 " + name : "設定採買名字");
     const target = $("shopping-list");
     if (!cards.length) {
-      target.innerHTML = '<p class="notice">在商品卡按「投一票」，就會在這裡看到它。</p><div class="pane-links"><a href="#discussion">去看攻略</a></div>';
+      const message = !name ? "選擇名字後，就能建立自己的採買清單。" :
+        catalogState === "error" ? "商品資料暫時讀不到，請到「選商品」重新讀取。" :
+        catalogState !== "ready" ? "正在讀取商品…" : "這一港還沒有採買項目。打開商品詳情，按「加入採買」。";
+      target.replaceChildren(Object.assign(document.createElement("p"), { className: "notice", textContent: message }));
       return;
     }
     const groups = new Map();
@@ -586,7 +656,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="shop-heading"><h3>${e(venue)}</h3>${items[0].storeSearch ? external(OkinawaCatalogLocations.mapURL(items[0].storeSearch), "地圖") : ""}</div>
       <ul>${items.map(item => {
         const { title, original } = NahaCatalog.names(item);
-        const checked = NahaCatalog.itemIds(item.id).some(id => bought[name]?.[id]);
+        const checked = profile.items[item.id];
         return `<li>
           <label class="shop-item">
             <input class="shop-check" type="checkbox" aria-label="已買 ${e(title)}" data-bought="${e(item.id)}" ${checked ? "checked" : ""}>
@@ -836,6 +906,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   $("sync-button").addEventListener("click", () => void syncPending());
   $("identity-button").addEventListener("click", () => askName());
+  $("shopping-identity").addEventListener("click", () => askName());
+  $("catalog-shopping-toggle").addEventListener("click", event => toggleShoppingItem(event.currentTarget.dataset.shoppingItem));
+  window.addEventListener("storage", event => {
+    if (!name || event.key !== shoppingKey(name)) return;
+    shoppingProfiles.delete(name);
+    renderShopping();
+    if ($("catalog-dialog").open) updateCatalogDetail();
+  });
   $("reload-data").addEventListener("click", () => void loadShared());
   window.addEventListener("online", () => void syncPending());
   window.addEventListener("trip-sync-settings-changed", () => { renderSync(); void syncPending(); });
@@ -865,6 +943,16 @@ document.addEventListener("DOMContentLoaded", () => {
     else if (target.dataset.discuss) openDiscussion(target.dataset.discuss, target.dataset.title);
     else if (target.dataset.schedule) openSchedule(target.dataset.schedule);
     else if (target.dataset.openCard) showCatalogItem(target.dataset.openCard);
+    else if (target.id === "shop-browse" && !alternateClick) {
+      event.preventDefault();
+      catalogGroup = "gift";
+      catalogPage = 0;
+      $("catalog-query").value = "";
+      $("catalog-store").value = "";
+      $("catalog-mine").checked = false;
+      $("catalog-yt").setAttribute("aria-pressed", "false");
+      showView("discussion");
+    }
     else if (target.matches("a[href^='#']") && panels.includes(target.hash.slice(1)) && !alternateClick) {
       event.preventDefault();
       showView(target.hash.slice(1));
@@ -894,11 +982,10 @@ document.addEventListener("DOMContentLoaded", () => {
   $("shopping-list").addEventListener("change", event => {
     const id = event.target.dataset.bought;
     if (!id || !name) return;
-    const checked = { ...bought[name] };
-    for (const key of NahaCatalog.itemIds(id)) delete checked[key];
-    if (event.target.checked) checked[id] = true;
-    bought = { ...bought, [name]: checked };
-    if (!writeStorage(boughtKey, bought)) announce("這次勾選只保留在目前頁面");
+    const profile = shoppingProfile();
+    if (!hasShoppingItem(profile, id)) return;
+    const items = { ...profile.items, [id]: event.target.checked };
+    if (!saveShoppingProfile({ ...profile, items })) announce("這次勾選只保留在目前頁面");
   });
 
   $("itinerary-heading").tabIndex = -1;
