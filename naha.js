@@ -123,12 +123,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const portLinks = document.querySelectorAll("[data-port]");
   const viewLinks = document.querySelectorAll(".views [data-view]");
   const market = new URLSearchParams(location.search).get("area") === "shopping" || location.hash === "#shopping";
-  const groupNames = { ...NahaCatalog.categories, ...(market && { beauty: "藥妝", cosmetics: "美妝" }) };
+  const groupNames = { all: "全部", ...NahaCatalog.categories, ...(market && { beauty: "藥妝", cosmetics: "美妝" }) };
   document.body.classList.toggle("market", market);
   document.querySelector(".market-nav").hidden = !market;
   if (market) {
     document.title = "我的採買｜沖繩郵輪";
-    $("catalog-yt").textContent = "有影片";
+    const videoFilter = $("catalog-yt");
+    videoFilter.textContent = "有影片";
+    document.querySelector(".catalog-quick").hidden = true;
+    document.querySelector(".catalog-options").append(videoFilter);
     $("catalog-products-title").textContent = "商品類別";
     $("catalog-products").setAttribute("aria-label", "商品類別");
   }
@@ -402,7 +405,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `<button type="button" data-catalog-filter="${e(group)}" aria-pressed="false">${e(groupNames[group])}</button>`
     ).join("");
     $("catalog-places").innerHTML = filters(NahaCatalog.placeGroups);
-    $("catalog-products").innerHTML = filters(market ? ["beauty", "cosmetics", "electronics", "gift"] : ["gift"]);
+    $("catalog-products").innerHTML = filters(market ? ["all", "beauty", "cosmetics", "electronics", "gift"] : ["gift"]);
     updatePortCatalog();
     renderCatalog();
     renderShopping();
@@ -458,7 +461,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const first = catalogPage * catalogPageSize;
     const visible = found.slice(first, first + catalogPageSize);
     for (const button of $("catalog-tools").querySelectorAll("[data-catalog-filter]")) {
-      const active = button.dataset.catalogFilter === catalogGroup && (catalogGroup !== "all" || !recommendedOnly);
+      const active = button.dataset.catalogFilter === catalogGroup && (market || catalogGroup !== "all" || !recommendedOnly);
       button.setAttribute("aria-pressed", String(active));
     }
     $("catalog-status").textContent = found.length ? `共 ${found.length} 項 · 顯示 ${first + 1}–${first + visible.length} 項` :
@@ -1044,7 +1047,7 @@ document.addEventListener("DOMContentLoaded", () => {
     else if (target.dataset.catalogFilter) {
       typeChoice = "";
       catalogGroup = target.dataset.catalogFilter;
-      if (catalogGroup === "all") $("catalog-yt").setAttribute("aria-pressed", "false");
+      if (!market && catalogGroup === "all") $("catalog-yt").setAttribute("aria-pressed", "false");
       catalogPage = 0;
       renderCatalog();
     } else if (target.dataset.catalogItem) showCatalogItem(target.dataset.catalogItem);
