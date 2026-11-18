@@ -421,12 +421,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function photoSlot(item, className) {
-    const cover = NahaCatalog.videoCover(item);
-    const fallback = item.image && cover && cover !== item.image ? cover : "";
+    const image = market && item.imageIsCover ? "" : item.image;
+    const cover = market ? "" : NahaCatalog.videoCover(item);
+    const fallback = image && cover && cover !== image ? cover : "";
     return `<span class="photo-frame ${className}" aria-hidden="true">
-      ${item.image ? `<img data-photo-url="${e(item.image)}"${fallback ? ` data-photo-fallback="${e(fallback)}"` : ""} alt="" loading="lazy" decoding="async">` : ""}
-      ${className === "catalog-photo" && (item.imageIsCover || fallback) ? `<span class="photo-cover"${item.imageIsCover ? "" : " hidden"}>影片封面</span>` : ""}
-      <span class="photo-message"${item.image ? " hidden" : ""}>暫無照片</span>
+      ${image ? `<img data-photo-url="${e(image)}"${fallback ? ` data-photo-fallback="${e(fallback)}"` : ""} alt="" loading="lazy" decoding="async">` : ""}
+      ${className === "catalog-photo" && (!market && item.imageIsCover || fallback) ? `<span class="photo-cover"${item.imageIsCover ? "" : " hidden"}>影片封面</span>` : ""}
+      ${className === "catalog-photo" && item.photo?.label ? `<span class="photo-cover photo-example">${e(item.photo.label)}</span>` : ""}
+      <span class="photo-message"${image ? " hidden" : ""}>暫無照片</span>
     </span>`;
   }
 
@@ -474,6 +476,7 @@ document.addEventListener("DOMContentLoaded", () => {
     $("catalog-items").innerHTML = visible.map(item => {
       const { title, original } = NahaCatalog.names(item);
       const video = item.videos[0];
+      const cover = market ? NahaCatalog.videoCover(item) : "";
       return `<article class="card catalog-item">
         <div>
           <button class="catalog-preview" type="button" data-catalog-item="${e(item.id)}" aria-label="看${e(title)}詳細資料">
@@ -484,7 +487,9 @@ document.addEventListener("DOMContentLoaded", () => {
             ${item.price ? `<span class="catalog-price">${e(item.price)}</span>` : ""}
           </button>
           ${video ? `<a class="catalog-yt-link" href="${e(videoURL(video))}" target="_blank" rel="noopener" aria-label="${e(video.author)}，在 YouTube 看${e(title)}">
-            <img src="images/youtube-icon.png" width="29" height="25" alt="">
+            ${cover ? `<span class="catalog-video-cover">
+              <img src="${e(cover)}" width="48" height="32" alt="" loading="lazy">
+            </span>` : `<img src="images/youtube-icon.png" width="29" height="25" alt="">`}
             <span>${e(video.author)}</span>
           </a>` : ""}
         </div>
@@ -525,6 +530,8 @@ document.addEventListener("DOMContentLoaded", () => {
     summary.className = "muted";
     summary.textContent = [item.category, item.store, item.price].filter(Boolean).join(" · ");
     content.append(summary);
+    const detail = NahaCatalog.detail(market && item.imageIsCover ? { ...item, image: "" } : item);
+    if (market) content.append(detail);
     const card = item.recommendation;
     if (item.videos.length) {
       const note = document.createElement("section");
@@ -545,7 +552,7 @@ document.addEventListener("DOMContentLoaded", () => {
       sources.innerHTML = external(item.productSource, "原廠產品說明");
       content.append(sources);
     }
-    content.append(NahaCatalog.detail(item));
+    if (!market) content.append(detail);
     const votes = $("catalog-detail-actions");
     votes.innerHTML = market ? "" : `${catalogVote(item.id)}
       <button class="quiet" type="button" data-discuss="${e(item.id)}" data-title="${e(title)}">留言</button>

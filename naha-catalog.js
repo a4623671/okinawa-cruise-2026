@@ -294,13 +294,14 @@ const NahaCatalog = (() => {
 
   function withShoppingRankVideos(products) {
     for (const { title, group, match, note: shoppingNote, video } of OkinawaShoppingRanks.productVideos) {
+      const photo = OkinawaShoppingPhotos.get(title);
       const existing = match && [...products.values()].find(item => item.group === group &&
         match.test([item.title, names(item).title].join(" ")));
       if (existing) {
         const videos = [video, ...existing.videos.filter(previous => previous.id !== video.id || previous.start !== video.start)];
-        const image = existing.imageIsCover ? "" : existing.image;
-        products.set(existing.id, withCover({ ...existing, image, shoppingNote, videos,
-          search: searchable(existing.search + " " + title + " " + video.author) }));
+        const image = photo?.url || (existing.imageIsCover ? "" : existing.image);
+        products.set(existing.id, { ...existing, image, imageIsCover: false, photo: photo || existing.photo, shoppingNote, videos,
+          search: searchable(existing.search + " " + title + " " + video.author) });
         continue;
       }
       // A saved item keeps its ID when its rank or featured video changes.
@@ -311,9 +312,9 @@ const NahaCatalog = (() => {
         group === "beauty" ? beautyType({ title, group }, title) :
         group === "gift" ? catalogType({ title, group }, title) : "沖繩紀念品";
       const category = { gift: "伴手禮", electronics: "電器", cosmetics: "美妝", beauty: "藥妝", smallGoods: "小物" }[group];
-      products.set(key, withCover({ id: key, title, group, category, catalogType: type, shopping: true, shoppingNote,
+      products.set(key, { id: key, title, group, category, catalogType: type, shopping: true, shoppingNote, image: photo?.url || "", photo,
         store: title.startsWith("3COINS") ? "3COINS" : "",
-        videos: [video], search: searchable([title, category, type, video.author].join(" ")) }));
+        videos: [video], search: searchable([title, category, type, video.author].join(" ")) });
     }
     return [...products.values()];
   }
@@ -345,11 +346,11 @@ const NahaCatalog = (() => {
     const fragment = document.createDocumentFragment();
     const source = item.source;
     const images = new Map();
-    if (item.image) images.set(item.image, item.photo?.alt ||
-      names(item).title + (item.imageIsCover ? "（影片封面）" : ""));
+    if (item.image) images.set(new URL(item.image, document.baseURI).href, item.photo?.alt ||
+      names(item).title + (item.imageIsCover ? "（影片封面）" : item.photo?.label ? "（" + item.photo.label + "）" : ""));
     for (const node of source?.querySelectorAll("img.ph") || []) {
       const url = safeURL(node.getAttribute("src"), item.base);
-      if (url) images.set(url, node.alt || item.title);
+      if (url && !images.has(url)) images.set(url, node.alt || item.title);
     }
     if (images.size) {
       const gallery = document.createElement("div");
@@ -367,14 +368,14 @@ const NahaCatalog = (() => {
       }
       fragment.append(gallery);
     }
-    if (!source) return fragment;
+    if (!source && !item.photo?.source) return fragment;
     const notes = document.createElement("div");
     notes.className = "catalog-notes";
-    const body = source.querySelector(".ovbody") || source;
-    for (const child of body.children) {
+    const body = source?.querySelector(".ovbody") || source;
+    for (const child of body?.children || []) {
       if (child.tagName !== "A" && !(item.location?.store && child.matches(".kv"))) copyNote(child, notes);
     }
-    for (const child of source.querySelectorAll(".credit")) {
+    for (const child of source?.querySelectorAll(".credit") || []) {
       const credit = document.createElement("small");
       credit.textContent = tidy(child.textContent);
       notes.append(credit);
@@ -388,12 +389,12 @@ const NahaCatalog = (() => {
     if (item.location?.source && !item.recommendation?.sources.some(source => source.url === item.location.source)) {
       links.set(item.location.source, "店家與商品來源");
     }
-    for (const link of source.querySelectorAll("a[href]")) {
+    for (const link of source?.querySelectorAll("a[href]") || []) {
       if (item.storeSearch && link.matches(".map")) continue;
       const url = safeURL(link.getAttribute("href"), item.base);
       if (url) links.set(url, tidy(link.textContent) || "來源");
     }
-    if (item.photo) links.set(item.photo.source, "照片來源");
+    if (item.photo?.source) links.set(item.photo.source, item.photo.label ? item.photo.label + " · 照片來源" : "照片來源");
     const actions = document.createElement("div");
     actions.className = "link-list catalog-links";
     for (const [url, label] of links) {

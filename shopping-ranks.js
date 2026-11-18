@@ -42,7 +42,42 @@
         link.href = url;
         link.textContent = label + " ↗";
       }
-      item.append(name, description, link);
+      const photo = OkinawaShoppingPhotos.get(title);
+      const media = document.createElement(photo?.source ? "a" : "div");
+      media.className = "rank-photo photo-frame";
+      if (photo?.source) {
+        media.href = photo.source;
+        media.target = "_blank";
+        media.rel = "noopener";
+        media.setAttribute("aria-label", title + "圖片來源");
+      }
+      const missing = document.createElement("span");
+      missing.className = "photo-message";
+      missing.textContent = "暫無商品照";
+      missing.hidden = Boolean(photo);
+      if (photo) {
+        const image = document.createElement("img");
+        image.src = photo.url;
+        image.alt = photo.alt || title;
+        image.loading = "lazy";
+        image.decoding = "async";
+        image.addEventListener("error", () => {
+          image.hidden = true;
+          missing.hidden = false;
+          media.querySelector(".rank-photo-label")?.remove();
+        }, { once: true });
+        media.append(image);
+      }
+      media.append(missing);
+      if (photo?.label) {
+        const label = document.createElement("span");
+        label.className = "rank-photo-label";
+        label.textContent = photo.label;
+        media.append(label);
+      }
+      const info = document.createElement("div");
+      info.append(name, description, link);
+      item.append(media, info);
       return item;
     }));
   }
