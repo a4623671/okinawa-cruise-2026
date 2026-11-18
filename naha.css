@@ -265,3 +265,13 @@ textarea { resize: vertical; }
 
 #ranks { margin-inline: auto; }
 .rank-save { display: block; width: 100%; margin-block: 3px 5px; }
+
+.trip-navigation { position: sticky; top: 0; z-index: 2; padding-top: 2px; background: var(--paper); }
+.trip-navigation .ports { margin: 3px 0 0; }
+.trip-navigation .views { position: static; padding-top: 0; }
+.market .trip-navigation, .schedule-full .trip-navigation { display: none; }
+#recent-names { margin-block: 10px; }
+#catalog-status { scroll-margin-top: 108px; }
+.market #catalog-status { scroll-margin-top: 58px; }
+
+.final-header #offline-status { flex-basis: 100%; font-size: .8rem; }

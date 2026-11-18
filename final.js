@@ -1,4 +1,40 @@
 const frame = document.getElementById("final-frame");
+const download = document.getElementById("offline-download");
+const offlineStatus = document.getElementById("offline-status");
+const fallback = document.getElementById("offline-fallback");
+const currentSnapshot = () => OfflineTrip.snapshot(frame.contentWindow.PLAN, frame.contentWindow.DAYS);
+
+function checkSnapshot() {
+  const next = currentSnapshot();
+  if (!next) return null;
+  offlineStatus.textContent = next.label;
+  download.disabled = false;
+  fallback.hidden = true;
+  return next;
+}
+
+download.addEventListener("click", () => {
+  const next = checkSnapshot();
+  if (!next) return;
+  const url = URL.createObjectURL(new Blob([OfflineTrip.render(next)], { type: "text/html;charset=utf-8" }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "沖繩離線行程.html";
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+
+const deadline = Date.now() + 20_000;
+const timer = setInterval(() => {
+  if (checkSnapshot()) {
+    clearInterval(timer);
+  } else if (Date.now() >= deadline) {
+    clearInterval(timer);
+    offlineStatus.textContent = "線上排程暫時讀不到。";
+    fallback.hidden = false;
+  }
+}, 250);
+
 const day = new URLSearchParams(location.search).get("day");
 
 frame.addEventListener("load", () => {

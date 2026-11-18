@@ -113,6 +113,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const { encode: e, plain, list, cardOf, files } = NahaShared;
   const $ = id => document.getElementById(id);
   const nameKey = "discuss_name_v1";
+  const recentNamesKey = "discuss_names_v1";
+  const lastPortKey = "okinawa-last-port-v1";
   const changesKey = "okinawa-naha-pending-v1";
   const cacheKey = "okinawa-naha-public-v1";
   const boughtKey = "okinawa-naha-bought-v1";
@@ -139,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const fullSchedule = new URLSearchParams(location.search).get("full") === "1";
   const canSend = action => action.file === "plan" ? TripData.canWrite() : action.publish === true;
   const portFromAddress = () => {
-    const requested = new URLSearchParams(location.search).get("port") || "naha";
+    const requested = new URLSearchParams(location.search).get("port") || (!market && readStorage(lastPortKey, "naha"));
     return OKINAWA_PORTS.find(item => item.id === requested) || OKINAWA_PORTS.find(item => item.id === "naha");
   };
   let port = portFromAddress();
@@ -156,6 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try { return localStorage.getItem(nameKey) || ""; } catch { return ""; }
   }
   const validName = text => text && text.length <= 12 && !/[<>\x00-\x1f\x7f]/.test(text);
+  let confirmVoteId = "";
   let name = readName();
   if (!validName(name)) name = "";
   let shared = readStorage(cacheKey, {});
@@ -191,8 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function routeURL(id, view) {
     const url = new URL(location.href);
-    if (id === "naha") url.searchParams.delete("port");
-    else url.searchParams.set("port", id);
+    if (!market) url.searchParams.set("port", id);
     if (market) { url.searchParams.set("area", "shopping"); url.searchParams.delete("port"); }
     url.hash = view;
     return url.href;
@@ -273,6 +275,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function selectPort(next) {
     if (!next || next === port) return;
     port = next;
+    if (!market) writeStorage(lastPortKey, next.id);
     updatePortHeader();
     catalogPage = 0;
     updatePortCatalog();
@@ -768,7 +771,7 @@ document.addEventListener("DOMContentLoaded", () => {
     count.setAttribute("aria-label", `待買 ${remaining} 件`);
     count.hidden = !remaining;
     const identity = $("shopping-identity");
-    identity.textContent = name || "設定名字";
+    identity.textContent = name || "選擇身分";
     identity.setAttribute("aria-label", name ? "切換採買名字，目前是 " + name : "設定採買名字");
     const target = $("shopping-list");
     if (!cards.length) {
@@ -809,7 +812,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderSync() {
-    $("identity-button").textContent = name || "我的名字";
+    $("identity-button").textContent = name || "目前身分";
     $("identity-button").setAttribute("aria-label", name ? "切換名字，目前是 " + name : "設定我的名字");
     $("data-status").textContent = displayStatus;
     $("reload-data").disabled = loading || syncing;
@@ -925,20 +928,55 @@ document.addEventListener("DOMContentLoaded", () => {
     if (name && action) return action();
     nameAction = action;
     $("name-submit").textContent = submitLabel;
-    $("member-name").value = name;
+    const input = $("member-name");
+    input.setCustomValidity("");
+    input.value = name;
+    const recent = $("recent-names");
+    const storedNames = readStorage(recentNamesKey, []);
+    const names = [...new Set([name, ...(Array.isArray(storedNames) ? storedNames : [])])].filter(value =>
+      typeof value === "string" && validName(value)).slice(0, 12);
+    recent.hidden = !names.length;
+    recent.replaceChildren(...names.map(identity => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.dataset.identity = identity;
+      button.textContent = identity;
+      button.setAttribute("aria-pressed", String(name === identity));
+      return button;
+    }));
     $("name-dialog").showModal();
-    $("member-name").focus();
+    (recent.firstElementChild || input).focus();
+  }
+
+  function submitVote(id) {
+    const ids = NahaCatalog.itemIds(id);
+    const active = ids.filter(key => selectedVote(key, false));
+    const targets = active.length ? active : [ids[0]];
+    queue(...targets.map(card => ({ file: "votes", card, name, selected: !active.length })));
   }
 
   function vote(id) {
-    if (!cardOf(id) && !catalogIndex.has(NahaCatalog.primaryId(id))) return;
+    const item = catalogIndex.get(NahaCatalog.primaryId(id));
+    const card = cardOf(id);
+    if (!item && !card) return;
+    if (name) return submitVote(id);
     askName(() => {
-      const ids = NahaCatalog.itemIds(id);
-      const active = ids.filter(key => selectedVote(key, false));
-      const targets = active.length ? active : [ids[0]];
-      queue(...targets.map(card => ({ file: "votes", card, name, selected: !active.length })));
-    }, "儲存並投票");
+      confirmVoteId = id;
+      const title = item ? NahaCatalog.names(item).title : card.title;
+      $("vote-confirm-item").textContent = name + " · " + title;
+      $("vote-confirm-submit").textContent = selected(id, false) ? "取消這一票" : "投一票";
+      render();
+      $("vote-confirm-dialog").showModal();
+    });
   }
+
+  $("vote-confirm-dialog").addEventListener("close", () => { confirmVoteId = ""; });
+  $("vote-confirm-form").addEventListener("submit", event => {
+    event.preventDefault();
+    const id = confirmVoteId;
+    $("vote-confirm-dialog").close();
+    if (id && name) submitVote(id);
+  });
 
   function renderComments() {
     const ids = NahaCatalog.itemIds(discussion.id);
@@ -1012,11 +1050,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     name = value;
     try { localStorage.setItem(nameKey, name); } catch {}
+    const previousNames = readStorage(recentNamesKey, []);
+    writeStorage(recentNamesKey, [...new Set([name, ...(Array.isArray(previousNames) ? previousNames : [])])]);
     const action = nameAction;
     nameAction = null;
     $("name-dialog").close();
     if (action) action();
     else render();
+  });
+  $("recent-names").addEventListener("click", event => {
+    const identity = event.target.closest("[data-identity]")?.dataset.identity;
+    if (!identity) return;
+    $("member-name").setCustomValidity("");
+    $("member-name").value = identity;
+    $("name-form").requestSubmit();
   });
   $("member-name").addEventListener("input", () => $("member-name").setCustomValidity(""));
   $("comment-form").addEventListener("submit", event => {
@@ -1211,9 +1258,14 @@ document.addEventListener("DOMContentLoaded", () => {
     alignSchedule();
   });
   if (market) OkinawaRankView(paintShoppingButtons);
+  if (!market && new URLSearchParams(location.search).has("port")) writeStorage(lastPortKey, port.id);
   updatePortHeader();
   updatePortCatalog();
-  showView(location.hash.slice(1), false);
+  const initialView = location.hash.slice(1) || new URLSearchParams(location.search).get("view") || "";
+  showView(initialView, false);
+  if (!market && initialView === "discussion") {
+    window.addEventListener("load", () => window.scrollTo(0, 0), { once: true });
+  }
   void loadShared();
   render();
 });

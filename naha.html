@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f6f2">
   <title>沖繩郵輪｜三港行程與討論</title>
-  <link rel="stylesheet" href="naha.css?v=20261118-rank-save">
+  <link rel="stylesheet" href="naha.css?v=20261118-system">
   <link id="board-style" rel="stylesheet" href="trip-board.css?v=20261117-ports-r12">
   <script src="trip-data.js" defer></script>
   <script src="trip-timing.js" defer></script>
@@ -13,36 +13,38 @@
   <script src="naha-content.js?v=20261116-ports-r5" defer></script>
   <script src="naha-shopping-names.js?v=20261116-ports-r4" defer></script>
   <script src="trip-catalog-locations.js?v=20261117-ports-r8" defer></script>
-  <script src="shopping-photos.js?v=20261118-rank-save" defer></script>
-  <script src="shopping-ranks-data.js?v=20261118-rank-save" defer></script>
-  <script src="naha-catalog.js?v=20261118-rank-save" defer></script>
+  <script src="shopping-photos.js?v=20261118-system" defer></script>
+  <script src="shopping-ranks-data.js?v=20261118-system" defer></script>
+  <script src="naha-catalog.js?v=20261118-system" defer></script>
   <script src="trip-board-ui.js?v=20261117-ports-r12" defer></script>
-  <script src="shopping-ranks.js?v=20261118-rank-save" defer></script>
-  <script src="naha.js?v=20261118-rank-save" defer></script>
+  <script src="shopping-ranks.js?v=20261118-system" defer></script>
+  <script src="naha.js?v=20261118-system" defer></script>
 </head>
 <body>
   <header class="top">
     <div class="shell top-inner">
       <a class="brand" href="index.html">‹ 沖繩郵輪</a>
       <div class="top-actions">
-        <button id="identity-button" class="quiet" type="button">我的名字</button>
+        <button id="identity-button" class="quiet" type="button">目前身分</button>
         <button id="settings-button" class="quiet" type="button" data-trip-sync hidden>共用設定</button>
       </div>
     </div>
   </header>
 
   <main id="port-page" class="shell" data-view="itinerary">
-    <nav class="ports" aria-label="停靠港口">
-      <a href="naha.html?port=miyako#discussion" data-port="miyako">宮古島<span>12/17</span></a>
-      <a href="naha.html#discussion" data-port="naha" aria-current="page">那霸<span>12/18</span></a>
-      <a href="naha.html?port=ishigaki#discussion" data-port="ishigaki">石垣島<span>12/19</span></a>
-    </nav>
+    <div class="trip-navigation">
+      <nav class="ports" aria-label="停靠港口">
+        <a href="naha.html?port=miyako#discussion" data-port="miyako">宮古島<span>12/17</span></a>
+        <a href="naha.html#discussion" data-port="naha" aria-current="page">那霸<span>12/18</span></a>
+        <a href="naha.html?port=ishigaki#discussion" data-port="ishigaki">石垣島<span>12/19</span></a>
+      </nav>
 
-    <nav class="views" aria-label="港口頁面">
-      <a href="#itinerary" data-view="itinerary" aria-current="page">行程</a>
-      <a href="#schedule" data-view="schedule">排程</a>
-      <a href="#discussion" data-view="discussion">攻略投票</a>
-    </nav>
+      <nav class="views" aria-label="港口頁面">
+        <a href="#itinerary" data-view="itinerary" aria-current="page">行程</a>
+        <a href="#schedule" data-view="schedule">排程</a>
+        <a href="#discussion" data-view="discussion">攻略投票</a>
+      </nav>
+    </div>
     <nav class="views market-nav" hidden aria-label="採買專區">
       <a href="?area=shopping#discussion" data-view="discussion">找商品</a>
       <a href="?area=shopping#ranks" data-view="ranks">推薦排行</a>
@@ -91,7 +93,7 @@
     <section id="discussion" class="pane" aria-labelledby="discussion-heading" hidden>
       <div class="section-head">
         <h1 id="discussion-heading">完整項目清單</h1>
-        <a id="catalog-ranks" class="text-link" data-view="ranks" href="?area=shopping&amp;v=20261118-rank-save#ranks" hidden>推薦排行 ↗</a>
+        <a id="catalog-ranks" class="text-link" data-view="ranks" href="?area=shopping&amp;v=20261118-system#ranks" hidden>推薦排行 ↗</a>
       </div>
       <div id="catalog-tools" hidden>
         <label class="sr-only" for="catalog-query">搜尋完整項目</label>
@@ -151,7 +153,7 @@
       <div class="section-head">
         <h1 id="shopping-heading">我的採買</h1>
         <div class="shopping-tools">
-          <button id="shopping-identity" class="quiet" type="button">設定名字</button>
+          <button id="shopping-identity" class="quiet" type="button">選擇身分</button>
           <a id="shop-browse" class="button secondary" href="?area=shopping#discussion">選商品</a>
         </div>
       </div>
@@ -196,12 +198,25 @@
 
   <dialog id="name-dialog" aria-labelledby="name-title">
     <form id="name-form">
-      <h2 id="name-title">你叫什麼名字？</h2>
+      <h2 id="name-title">選擇身分</h2>
+      <p class="muted">選用之前的名字，就能接著用這個瀏覽器裡的採買清單。</p>
+      <div id="recent-names" class="filters recent-names" role="group" aria-label="這台裝置用過的名字" hidden></div>
       <label for="member-name">名字</label>
-      <input id="member-name" name="member" maxlength="12" autocomplete="nickname" required>
+      <input id="member-name" name="member" placeholder="例如：小林" maxlength="12" autocomplete="nickname" required>
       <div class="dialog-actions">
         <button class="button secondary" type="button" data-close>取消</button>
         <button id="name-submit" class="button" type="submit">儲存名字</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="vote-confirm-dialog" aria-labelledby="vote-confirm-title">
+    <form id="vote-confirm-form">
+      <h2 id="vote-confirm-title">確認投票</h2>
+      <p id="vote-confirm-item"></p>
+      <div class="dialog-actions">
+        <button class="button secondary" type="button" data-close>取消</button>
+        <button id="vote-confirm-submit" class="button" type="submit">投一票</button>
       </div>
     </form>
   </dialog>
