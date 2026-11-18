@@ -167,6 +167,24 @@ const NahaCatalog = (() => {
     });
   }
 
+  function beautyType(item, title) {
+    if (item.group !== "beauty") return "";
+    const product = title + " " + item.title;
+    if (/貼布|テープ|つぼ膏|パットEX/.test(product)) return "貼布";
+    if (/感冒|かぜ薬|風邪薬|葛根湯/.test(product)) return "感冒藥・漢方";
+    if (/眼藥水|目薬/.test(product)) return "眼藥水";
+    if (/鼻用|Alesion|Allegra/i.test(product)) return "鼻炎・過敏";
+    if (/頭痛薬|EVE |Loxonin .*錠|Calonal|洛索洛芬錠/i.test(product)) return "止痛藥";
+    if (/Bio-?Three|Biofermin|便秘|胃散/i.test(product)) return "腸胃藥";
+    if (/防曬|日焼け止め/.test(product)) return "防曬";
+    if (/面膜|フェイスマスク/.test(product)) return "面膜";
+    if (/睫毛|眼線|唇膏|口紅|チーク/.test(product)) return "彩妝";
+    if (item.category === "美妝") return "清潔保養";
+    if (item.category === "保健品") return "保健品";
+    if (/外用液|撒隆巴斯液|凝膠|萬金油/.test(product)) return "外用藥";
+    return "其他藥妝";
+  }
+
   function itemsForPort(catalog, port) {
     const items = new Map();
     for (const item of catalog) {
@@ -197,7 +215,9 @@ const NahaCatalog = (() => {
       const legacyText = item.location?.store ? "" : item.search;
       const search = [legacyText, item.title, title, original, item.category, item.store, item.storeSearch,
         item.recommendation?.venue, channels].join(" ");
-      return withCover({ ...item, search: searchable(search) });
+      const store = item.store === "國際通藥妝店・大國藥妝 Lantana 店" ? "大國藥妝 國際通 Lantana 店" : item.store;
+      const type = beautyType(item, title);
+      return withCover({ ...item, store, beautyType: type, search: searchable(search + " " + type) });
     });
   }
 

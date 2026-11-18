@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f6f2">
   <title>沖繩郵輪｜三港行程與討論</title>
-  <link rel="stylesheet" href="naha.css?v=20261118-shopping">
+  <link rel="stylesheet" href="naha.css?v=20261118-stores">
   <link id="board-style" rel="stylesheet" href="trip-board.css?v=20261117-ports-r12">
   <script src="trip-data.js" defer></script>
   <script src="trip-timing.js" defer></script>
@@ -13,9 +13,9 @@
   <script src="naha-content.js?v=20261116-ports-r5" defer></script>
   <script src="naha-shopping-names.js?v=20261116-ports-r4" defer></script>
   <script src="trip-catalog-locations.js?v=20261117-ports-r8" defer></script>
-  <script src="naha-catalog.js?v=20261117-ports-r9" defer></script>
+  <script src="naha-catalog.js?v=20261118-stores" defer></script>
   <script src="trip-board-ui.js?v=20261117-ports-r12" defer></script>
-  <script src="naha.js?v=20261118-shopping2" defer></script>
+  <script src="naha.js?v=20261118-stores" defer></script>
 </head>
 <body>
   <header class="top">
@@ -102,15 +102,14 @@
             <div id="catalog-products" class="filters" role="group" aria-label="伴手禮類別"></div>
           </section>
         </div>
+        <section id="beauty-types" aria-labelledby="beauty-types-title" hidden>
+          <h2 id="beauty-types-title">品項快找</h2>
+          <div id="beauty-choices" role="group" aria-label="藥妝細項分類"></div>
+        </section>
         <div class="catalog-options">
+          <button id="catalog-store" class="store-trigger" aria-haspopup="dialog" aria-controls="store-dialog" type="button" value="">所有店家</button>
           <label><input id="catalog-mine" type="checkbox"> 只看我投的</label>
-          <details>
-            <summary>店家與排序</summary>
-            <div class="catalog-selects">
-              <label>店家<select id="catalog-store"><option value="">所有店家</option></select></label>
-              <label>排序<select id="catalog-sort"><option value="default">預設順序</option><option value="votes">票數優先</option></select></label>
-            </div>
-          </details>
+          <label><input id="catalog-sort" type="checkbox"> 票數優先</label>
         </div>
       </div>
       <p id="catalog-status" class="muted catalog-status" role="status">正在讀取完整項目…</p>
@@ -150,6 +149,15 @@
   </main>
 
   <iframe id="discussion-frame" data-src="guide.html" title="項目資料" tabindex="-1" aria-hidden="true" hidden></iframe>
+
+  <dialog id="store-dialog" aria-labelledby="store-title">
+    <header class="store-head">
+      <h2 id="store-title" tabindex="-1">選擇店家</h2>
+      <button type="button" class="quiet" data-close aria-label="關閉店家篩選">關閉</button>
+    </header>
+    <input id="store-query" type="search" placeholder="搜尋店家名稱" aria-label="搜尋店家名稱">
+    <div id="store-options" role="group" aria-label="店家選項"></div>
+  </dialog>
 
   <dialog id="catalog-dialog" aria-labelledby="catalog-title">
     <div class="dialog-heading">
