@@ -4,32 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>採買推薦排行｜沖繩郵輪</title>
-  <link rel="stylesheet" href="naha.css?v=20261118-product-photos">
-  <script src="shopping-photos.js?v=20261118-product-photos" defer></script>
-  <script src="shopping-ranks-data.js?v=20261118-product-photos" defer></script>
-  <script src="shopping-ranks.js?v=20261118-product-photos" defer></script>
+  <script>
+    const target = new URL("naha.html?area=shopping&v=20261118-rank-save#ranks", location.href);
+    const category = new URLSearchParams(location.search).get("category");
+    if (category) target.searchParams.set("category", category);
+    location.replace(target);
+  </script>
 </head>
 <body>
-  <header class="top">
-    <div class="shell top-inner">
-      <a class="brand" href="naha.html?area=shopping&amp;v=20261118-product-photos#discussion">‹ 找商品</a>
-      <a class="text-link" href="naha.html?area=shopping&amp;v=20261118-product-photos#shopping">我的採買</a>
-    </div>
-  </header>
-  <main class="shell ranks-page">
-    <h1>採買推薦排行</h1>
-    <div class="filters rank-groups" id="rank-groups" role="group" aria-label="商品分類"></div>
-    <div class="filters rank-sources" id="rank-sources" role="group" aria-label="榜單來源">
-      <button type="button" data-source="video" aria-pressed="true">YouTuber 推薦</button>
-      <button type="button" data-source="taiwan" aria-pressed="false">網友推薦</button>
-    </div>
-    <p class="muted" id="rank-focus"></p>
-    <ol id="rank-list" class="rank-list" aria-label="前十名"></ol>
-    <details class="ranks-method">
-      <summary>榜單怎麼整理</summary>
-      <p>YouTuber 榜依影片能否對到單品、是否有實物介紹，以及沖繩行程中的實用性排序。網友推薦榜採用公開的實買分享、試用心得和旅遊編輯選物，優先考慮能辨認品項及行前採買的實用性。兩榜均為本站編輯選物，名次代表瀏覽順序。</p>
-    </details>
-    <noscript><p>請啟用 JavaScript 後查看推薦排行。</p></noscript>
-  </main>
+  <a href="naha.html?area=shopping&amp;v=20261118-rank-save#ranks">開啟採買推薦排行</a>
 </body>
 </html>

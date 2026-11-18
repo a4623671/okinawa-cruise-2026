@@ -1,4 +1,4 @@
-(() => {
+const OkinawaRankView = (onRender => {
   const { groups, sources, youtube } = OkinawaShoppingRanks;
   const groupMenu = document.getElementById("rank-groups");
   const sourceMenu = document.getElementById("rank-sources");
@@ -75,11 +75,18 @@
         label.textContent = photo.label;
         media.append(label);
       }
+      const save = document.createElement("button");
+      save.type = "button";
+      save.className = "shop-save rank-save";
+      save.dataset.rankTitle = title;
+      save.disabled = true;
+      save.textContent = "＋ 加入採買";
       const info = document.createElement("div");
-      info.append(name, description, link);
+      info.append(name, description, link, save);
       item.append(media, info);
       return item;
     }));
+    onRender();
   }
 
   groupMenu.addEventListener("click", event => {
@@ -95,4 +102,4 @@
     render();
   });
   render();
-})();
+});

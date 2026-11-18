@@ -292,31 +292,51 @@ const NahaCatalog = (() => {
     }));
   }
 
-  function withShoppingRankVideos(products) {
-    for (const { title, group, match, note: shoppingNote, video } of OkinawaShoppingRanks.productVideos) {
+  function withShoppingRanks(products) {
+    const groups = OkinawaShoppingRanks.groups;
+    const rankedIds = new Map();
+    const equivalentTitles = new Map([["3COINS 衣物壓縮袋", "3COINS 旅行衣物壓縮袋"]]);
+
+    function addChoice({ title, group, match, note, video, source }) {
       const photo = OkinawaShoppingPhotos.get(title);
-      const existing = match && [...products.values()].find(item => item.group === group &&
-        match.test([item.title, names(item).title].join(" ")));
+      const equivalent = equivalentTitles.get(title);
+      const existing = products.get(rankedIds.get(equivalent || title)) || [...products.values()].find(item => {
+        if (item.group !== group) return false;
+        const name = names(item).title;
+        if (video) return match?.test([item.title, name].join(" "));
+        return searchable(name) === searchable(title) ||
+          (photo?.url.startsWith("images/goods/") && !photo.label && item.image?.endsWith(photo.url));
+      });
       if (existing) {
+        rankedIds.set(title, existing.id);
+        if (!video) return;
         const videos = [video, ...existing.videos.filter(previous => previous.id !== video.id || previous.start !== video.start)];
         const image = photo?.url || (existing.imageIsCover ? "" : existing.image);
-        products.set(existing.id, { ...existing, image, imageIsCover: false, photo: photo || existing.photo, shoppingNote, videos,
+        products.set(existing.id, { ...existing, image, imageIsCover: false, photo: photo || existing.photo, shoppingNote: note, videos,
           search: searchable(existing.search + " " + title + " " + video.author) });
-        continue;
+        return;
       }
-      // A saved item keeps its ID when its rank or featured video changes.
-      const key = "rank-" + group + "-" + encodeURIComponent(title);
+
+      const id = "rank-" + group + "-" + encodeURIComponent(title);
       const type = group === "smallGoods" && title.startsWith("3COINS") ? "生活小物" :
         group === "cosmetics" ? (/面膜/.test(title) ? "面膜" : "彩妝保養") :
         group === "electronics" ? kindRules.electronics.find(([, pattern]) => pattern.test(title))?.[0] || "其他電器" :
         group === "beauty" ? beautyType({ title, group }, title) :
         group === "gift" ? catalogType({ title, group }, title) : "沖繩紀念品";
       const category = { gift: "伴手禮", electronics: "電器", cosmetics: "美妝", beauty: "藥妝", smallGoods: "小物" }[group];
-      products.set(key, { id: key, title, group, category, catalogType: type, shopping: true, shoppingNote, image: photo?.url || "", photo,
+      products.set(id, { id, title, group, category, catalogType: type, shopping: true, shoppingNote: note, rankSource: source, image: photo?.url || "", photo,
         store: title.startsWith("3COINS") ? "3COINS" : "",
-        videos: [video], search: searchable([title, category, type, video.author].join(" ")) });
+        videos: video ? [video] : [], search: searchable([title, category, type, video?.author].join(" ")) });
+      rankedIds.set(title, id);
     }
-    return [...products.values()];
+
+    for (const product of OkinawaShoppingRanks.productVideos) addChoice(product);
+    for (const { group, taiwan } of groups) {
+      for (const [title, key, note] of taiwan) {
+        addChoice({ title, group, note, source: OkinawaShoppingRanks.sources[key] });
+      }
+    }
+    return { items: [...products.values()], rankedIds };
   }
 
   function match(items, { query, group, store, selected, recommendedOnly }, voter) {
@@ -410,5 +430,5 @@ const NahaCatalog = (() => {
     return fragment;
   }
 
-  return { categories, placeGroups, coldProducts, withShoppingRankVideos, read, itemsForPort, recommended, itemIds, primaryId, names, match, detail, videoCover };
+  return { categories, placeGroups, coldProducts, withShoppingRanks, read, itemsForPort, recommended, itemIds, primaryId, names, match, detail, videoCover };
 })();

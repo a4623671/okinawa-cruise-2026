@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const boughtKey = "okinawa-naha-bought-v1";
   const shoppingKey = identity => "okinawa-shopping-v1:" + identity;
   const slotLabels = { morning: "上午", afternoon: "下午", evening: "晚上" };
-  const panels = ["itinerary", "schedule", "discussion", "shopping"];
+  const panels = ["itinerary", "schedule", "discussion", "shopping", "ranks"];
   const scheduleFrame = $("schedule-frame");
   const portLinks = document.querySelectorAll("[data-port]");
   const viewLinks = document.querySelectorAll(".views [data-view]");
@@ -172,6 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let catalog = [];
   let portCatalog = [];
   let catalogIndex = new Map();
+  let rankedIds = new Map();
   let catalogState = "idle";
   let catalogGroup = "all";
   let typeChoice = "";
@@ -198,7 +199,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function showView(view, scroll = true) {
-    if (market && view !== "discussion") view = "shopping";
+    if (market && !["discussion", "ranks", "shopping"].includes(view)) view = "shopping";
+    if (!market && view === "ranks") view = "discussion";
     if (view === "guide") view = "discussion";
     view = panels.includes(view) ? view : port.id === "naha" ? "itinerary" : "discussion";
     const page = $("port-page");
@@ -212,7 +214,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     for (const link of portLinks) link.href = routeURL(link.dataset.port, view);
     if (view === "schedule" && !scheduleFrame.hasAttribute("src")) scheduleFrame.src = scheduleFrame.dataset.src;
-    if (view === "discussion" || view === "shopping") void loadCatalog();
+    if (view === "discussion" || view === "shopping" || view === "ranks") void loadCatalog();
     if (view === "discussion") renderCatalog();
     if (previous === "schedule" && previous !== view) {
       if (scheduleFrame.contentDocument?.URL === scheduleFrame.src) scheduleFrame.contentWindow.closePlanMap?.();
@@ -379,7 +381,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
       for (const item of NahaCatalog.coldProducts()) products.set(item.id, item);
-      portCatalog = NahaCatalog.withShoppingRankVideos(products);
+      const ranked = NahaCatalog.withShoppingRanks(products);
+      portCatalog = ranked.items;
+      rankedIds = ranked.rankedIds;
       portCatalog.sort((a, b) => Number(Boolean(b.videos[0]?.taiwan)) - Number(Boolean(a.videos[0]?.taiwan)));
     } else {
       portCatalog = NahaCatalog.itemsForPort(catalog, port).filter(item =>
@@ -394,6 +398,7 @@ document.addEventListener("DOMContentLoaded", () => {
     catalogState = "loading";
     $("catalog-status").textContent = "正在讀取完整項目…";
     $("catalog-retry").hidden = true;
+    paintShoppingButtons();
     try {
       catalog = NahaCatalog.read(await discussionClient());
       if (!catalog.length) throw new Error("缺少項目");
@@ -402,6 +407,7 @@ document.addEventListener("DOMContentLoaded", () => {
       catalogState = "error";
       $("catalog-status").textContent = "完整項目暫時讀不到。";
       $("catalog-retry").hidden = false;
+      paintShoppingButtons();
       renderShopping();
       return;
     }
@@ -546,6 +552,12 @@ document.addEventListener("DOMContentLoaded", () => {
           ${card.sources.map(source => external(source.url, source.label)).join("")}</div>` : ""}
         ${card?.disclosure ? `<p class="muted">${e(card.disclosure)}</p>` : ""}`;
       content.append(note);
+    }
+    if (item.rankSource) {
+      const source = document.createElement("div");
+      source.className = "catalog-recommendation";
+      source.innerHTML = `<p>${e(item.shoppingNote)}</p>${external(item.rankSource[1], item.rankSource[0])}`;
+      content.append(source);
     }
     if (item.productSource) {
       const sources = document.createElement("p");
@@ -724,7 +736,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function paintShoppingButtons() {
     const profile = shoppingProfile();
-    for (const button of $("catalog-items").querySelectorAll("[data-shop-save]")) {
+    if (market) {
+      const status = $("ranks-load-status");
+      status.hidden = catalogState === "ready";
+      status.textContent = catalogState === "error" ? "暫時無法讀取採買資料。" : "正在載入採買資料…";
+      $("ranks-retry").hidden = catalogState !== "error";
+      for (const button of $("rank-list").querySelectorAll("[data-rank-title]")) {
+        const id = rankedIds.get(button.dataset.rankTitle);
+        button.disabled = catalogState !== "ready" || !id;
+        if (id) button.dataset.shopSave = id;
+      }
+    }
+    for (const button of document.querySelectorAll("[data-shop-save]")) {
       const saved = hasShoppingItem(profile, button.dataset.shopSave);
       button.setAttribute("aria-pressed", String(saved));
       button.textContent = saved ? "✓ 已加入採買" : "＋ 加入採買";
@@ -1126,6 +1149,7 @@ document.addEventListener("DOMContentLoaded", () => {
     $(id).addEventListener("change", () => { catalogPage = 0; renderCatalog(); });
   }
   $("catalog-retry").addEventListener("click", () => void loadCatalog());
+  $("ranks-retry").addEventListener("click", () => void loadCatalog());
   for (const [id, offset] of [["catalog-prev", -1], ["catalog-next", 1]]) {
     $(id).addEventListener("click", () => {
       catalogPage += offset;
@@ -1186,6 +1210,7 @@ document.addEventListener("DOMContentLoaded", () => {
     for (const id of ["days", "mapdays"]) page.getElementById(id)?.addEventListener("click", matchBoardDate);
     alignSchedule();
   });
+  if (market) OkinawaRankView(paintShoppingButtons);
   updatePortHeader();
   updatePortCatalog();
   showView(location.hash.slice(1), false);

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f6f2">
   <title>沖繩郵輪｜三港行程與討論</title>
-  <link rel="stylesheet" href="naha.css?v=20261118-product-photos">
+  <link rel="stylesheet" href="naha.css?v=20261118-rank-save">
   <link id="board-style" rel="stylesheet" href="trip-board.css?v=20261117-ports-r12">
   <script src="trip-data.js" defer></script>
   <script src="trip-timing.js" defer></script>
@@ -13,11 +13,12 @@
   <script src="naha-content.js?v=20261116-ports-r5" defer></script>
   <script src="naha-shopping-names.js?v=20261116-ports-r4" defer></script>
   <script src="trip-catalog-locations.js?v=20261117-ports-r8" defer></script>
-  <script src="shopping-photos.js?v=20261118-product-photos" defer></script>
-  <script src="shopping-ranks-data.js?v=20261118-product-photos" defer></script>
-  <script src="naha-catalog.js?v=20261118-product-photos" defer></script>
+  <script src="shopping-photos.js?v=20261118-rank-save" defer></script>
+  <script src="shopping-ranks-data.js?v=20261118-rank-save" defer></script>
+  <script src="naha-catalog.js?v=20261118-rank-save" defer></script>
   <script src="trip-board-ui.js?v=20261117-ports-r12" defer></script>
-  <script src="naha.js?v=20261118-product-photos" defer></script>
+  <script src="shopping-ranks.js?v=20261118-rank-save" defer></script>
+  <script src="naha.js?v=20261118-rank-save" defer></script>
 </head>
 <body>
   <header class="top">
@@ -44,6 +45,7 @@
     </nav>
     <nav class="views market-nav" hidden aria-label="採買專區">
       <a href="?area=shopping#discussion" data-view="discussion">找商品</a>
+      <a href="?area=shopping#ranks" data-view="ranks">推薦排行</a>
       <a href="?area=shopping#shopping" data-view="shopping">我的採買 <span id="shop-count" hidden></span></a>
     </nav>
 
@@ -89,7 +91,7 @@
     <section id="discussion" class="pane" aria-labelledby="discussion-heading" hidden>
       <div class="section-head">
         <h1 id="discussion-heading">完整項目清單</h1>
-        <a id="catalog-ranks" class="text-link" href="shopping-ranks.html?v=20261118-product-photos" hidden>推薦排行 ↗</a>
+        <a id="catalog-ranks" class="text-link" data-view="ranks" href="?area=shopping&amp;v=20261118-rank-save#ranks" hidden>推薦排行 ↗</a>
       </div>
       <div id="catalog-tools" hidden>
         <label class="sr-only" for="catalog-query">搜尋完整項目</label>
@@ -126,6 +128,23 @@
         <span id="catalog-page"></span>
         <button id="catalog-next" class="button secondary" type="button">下一頁</button>
       </nav>
+    </section>
+
+    <section id="ranks" class="pane ranks-page" aria-labelledby="ranks-heading" hidden>
+      <h1 id="ranks-heading">採買推薦排行</h1>
+      <p id="ranks-load-status" class="muted" role="status" hidden></p>
+      <button id="ranks-retry" class="button secondary" type="button" hidden>重新讀取</button>
+      <div class="filters rank-groups" id="rank-groups" role="group" aria-label="商品分類"></div>
+      <div class="filters rank-sources" id="rank-sources" role="group" aria-label="榜單來源">
+        <button type="button" data-source="video" aria-pressed="true">YouTuber 推薦</button>
+        <button type="button" data-source="taiwan" aria-pressed="false">網友推薦</button>
+      </div>
+      <p class="muted" id="rank-focus"></p>
+      <ol id="rank-list" class="rank-list" aria-label="前十名"></ol>
+      <details class="ranks-method">
+        <summary>榜單怎麼整理</summary>
+        <p>YouTuber 榜依影片能否對到單品、是否有實物介紹，以及沖繩行程中的實用性排序。網友推薦榜採用公開的實買分享、試用心得和旅遊編輯選物，優先考慮能辨認品項及行前採買的實用性。兩榜均為本站編輯選物，名次代表瀏覽順序。</p>
+      </details>
     </section>
 
     <section id="shopping" class="pane" aria-labelledby="shopping-heading" hidden>
