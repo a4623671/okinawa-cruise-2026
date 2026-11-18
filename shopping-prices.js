@@ -90,13 +90,53 @@ const OkinawaShoppingPrices = (() => {
     ["山田電機 那霸本店", "https://www.yamada-denki.jp/store/contents/?d=1054"],
     ["唐吉訶德 國際通店", "https://www.donki.com/store/shop_detail.php?shop_id=323"],
   ];
+  const coinsKeywords = new Map([
+    ["3COINS 玩偶收納袋", "ぬいぐるみ ポーチ"],
+    ["3COINS 耳環", "イヤリング"],
+    ["3COINS 多功能手機支架", "スマホスタンド"],
+    ["3COINS 懶人曬衣架", "ハンガー"],
+    ["3COINS 可調隔板收納盒", "仕切り 収納ボックス"],
+    ["3COINS 扭蛋／徽章收納盒", "缶バッジ 収納"],
+  ]);
 
-  function forItem(item, title) {
-    const data = comparison.find(([match]) => match.test(title) || match.test(item.title.normalize("NFKC")));
-    const offers = data?.[2] || [];
+  const normalize = value => String(value || "").normalize("NFKC").trim().replace(/\s+/g, " ").toLowerCase();
+  const extra = new Map(OkinawaPriceList.flatMap(([titles, spec, offers]) =>
+    titles.map(title => [normalize(title), { spec, offers }])
+  ));
+  const retailerGroup = store => /Bic Camera|Kojima Net/.test(store) ? "Bic / Kojima" : store;
+
+  function forItem(item, title, original) {
+    const data = comparison.find(([match]) => match.test(title) || match.test(item.title) || match.test(original || ""));
+    const added = extra.get(normalize(item.title)) || extra.get(normalize(title)) || extra.get(normalize(original));
+    const spec = added?.spec || data?.[1];
+    const entries = new Map();
+    for (const offer of data?.[1] === spec ? data?.[2] || [] : []) {
+      entries.set(offer[0] + offer[2], offer);
+    }
+    for (const offer of added?.offers || []) entries.set(offer[0] + offer[2], offer);
+    const offers = [...entries.values()];
+    const sellerCount = new Set(offers.filter(([, , kind]) => kind === "store" || kind === "online")
+      .map(([store]) => retailerGroup(store))).size;
+    const drug = ["beauty", "cosmetics"].includes(item.group);
     const stores = item.group === "electronics" ? electronicsStores :
-      ["beauty", "cosmetics"].includes(item.group) ? drugStores : [];
-    return { spec: data?.[1], offers, stores };
+      drug ? drugStores : [];
+    const term = encodeURIComponent((original || item.title).split(/[|｜]/)[0].trim());
+    const coins = title.startsWith("3COINS ");
+    const coinsProduct = coins && item.source?.querySelector('a[href^="https://www.palcloset.jp/display/item/"]')?.href;
+    const search = sellerCount >= 2 || (coins && offers.length) ? [] : coins ? [
+      ["3COINS 官網商品", coinsProduct || "https://www.palcloset.jp/display/display/?b=3coins&mode=zSearch&SearchItem.KEYWORD=" +
+        encodeURIComponent(coinsKeywords.get(title) || (original || title).replace(/^3COINS\s*/, ""))],
+    ] : item.group === "electronics" ? [
+      ["Bic Camera 搜尋", "https://www.biccamera.com/bc/category/?q=" + term],
+      ["山田電機搜尋", yamada + "search/" + term + "/"],
+    ] : drug ? [
+      ["SUNDRUG 搜尋", sundrug + "search.html?p=" + term],
+      ["鶴羽藥妝搜尋", "https://store.shopping.yahoo.co.jp/tsuruha/search.html?p=" + term],
+    ] : [
+      ["SAN-A 搜尋", "https://store.shopping.yahoo.co.jp/san-a/search.html?p=" + term],
+      ["わした沖繩物產搜尋", "https://www.washita.co.jp/products/list?name=" + term],
+    ];
+    return { spec, offers, stores, search, sellerCount };
   }
 
   return { checked, forItem };

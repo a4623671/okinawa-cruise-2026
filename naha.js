@@ -486,7 +486,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const { title, original } = NahaCatalog.names(item);
       const video = item.videos[0];
       const cover = market ? NahaCatalog.videoCover(item) : "";
-      const hasComparison = item.shopping && OkinawaShoppingPrices.forItem(item, title).offers.length;
+      const hasComparison = item.shopping && OkinawaShoppingPrices.forItem(item, title, original).offers.length;
       return `<article class="card catalog-item">
         <div>
           <button class="catalog-preview" type="button" data-catalog-item="${e(item.id)}" aria-label="看${e(title)}詳細資料">
@@ -538,11 +538,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     const summary = document.createElement("p");
     summary.className = "muted";
-    const pricing = item.shopping && OkinawaShoppingPrices.forItem(item, title);
+    const pricing = item.shopping && OkinawaShoppingPrices.forItem(item, title, original);
     const hasComparison = Boolean(pricing?.offers.length);
     summary.textContent = [item.category, item.store, hasComparison ? "" : item.price].filter(Boolean).join(" · ");
     content.append(summary);
-    if (hasComparison) content.insertAdjacentHTML("beforeend", shoppingPrices(pricing));
+    if (pricing && (hasComparison || market)) content.insertAdjacentHTML("beforeend", shoppingPrices(pricing));
     const detail = NahaCatalog.detail(market && item.imageIsCover ? { ...item, image: "" } : item, { hideLegacyPrice: hasComparison });
     if (market) content.append(detail);
     const card = item.recommendation;
@@ -761,31 +761,37 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function shoppingPrices({ spec, offers, stores }) {
-    if (!offers.length && !stores.length) return "";
-    const localOffers = offers.filter(([, , kind]) => kind === "store");
-    const onlineOffers = offers.filter(([, , kind]) => kind === "online");
+  function shoppingPrices({ spec, offers, stores, search, sellerCount }) {
+    const byPrice = (a, b) => a[1] - b[1];
+    const localOffers = offers.filter(([, , kind]) => kind === "store").sort(byPrice);
+    const onlineOffers = offers.filter(([, , kind]) => kind === "online").sort(byPrice);
     const yen = amount => "¥" + amount.toLocaleString("ja-JP");
     const labels = { store: "門市刊登", history: "歷史門市價", online: "網路價", reference: "參考價" };
     const onlineAmounts = [...new Set(onlineOffers.map(([, amount]) => amount))];
     const reference = offers.find(([, , kind]) => kind === "reference");
     const summary = localOffers.length ? "門市刊登 " + yen(localOffers[0][1]) :
       onlineAmounts.length ? "網路價 " + yen(Math.min(...onlineAmounts)) + (onlineAmounts.length > 1 ? " 起" : "") :
-      reference ? "參考價 " + yen(reference[1]) : "門市價待確認";
+      reference ? "參考價 " + yen(reference[1]) : "價格待確認";
     const showOffers = list => list.map(([store, amount, kind, url, note]) => `<div class="shop-price-row">
       <div>${external(url, store)}<small>${labels[kind]}${note ? " · " + e(note) : ""}</small></div>
       <strong>${yen(amount)}</strong>
     </div>`).join("");
     const unknown = stores.filter(([store]) => !localOffers.some(([quotedStore]) => store === quotedStore));
     return `<details class="shop-prices">
-      <summary><span>店家比價</span><small>${summary}</small></summary>
+      <summary><span>${sellerCount > 1 ? "店家比價" : offers.length ? "查看報價" : "查商品價格"}</span><small>${summary}</small></summary>
       <div class="shop-price-body">
         ${spec ? `<p class="shop-price-spec">${e(spec)} <small>日圓含稅 · 查閱 ${OkinawaShoppingPrices.checked}</small></p>` : ""}
         ${showOffers(localOffers)}
-        ${showOffers(offers.filter(([, , kind]) => kind !== "store"))}
-        ${unknown.map(([store, url]) => `<div class="shop-price-row">
-          <div>${external(url, store)}</div><small>門市價待確認</small>
-        </div>`).join("")}
+        ${showOffers(onlineOffers)}
+        ${showOffers(offers.filter(([, , kind]) => kind === "history" || kind === "reference"))}
+        ${search.length ? `<div class="shop-price-links">
+          <p>${sellerCount ? "目前只有 1 個通路有可核對的報價" : "目前缺少可核對的報價"}，可開啟店家頁查詢。</p>
+          <div class="link-list">${search.map(([label, url]) => external(url, label)).join("")}</div>
+        </div>` : ""}
+        ${unknown.length ? `<div class="shop-price-links">
+          <p>以下分店的門市價與庫存待確認</p>
+          <div class="link-list">${unknown.map(([store, url]) => external(url, store)).join("")}</div>
+        </div>` : ""}
         ${offers.length ? '<p class="shop-price-note">到店以當天標價為準。網路運費、點數和折扣券依來源頁。</p>' : ""}
       </div>
     </details>`;
@@ -831,7 +837,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <ul>${items.map(item => {
         const { title, original } = item.note ? { title: item.note } : NahaCatalog.names(item);
         const checked = profile.items[item.id];
-        const pricing = item.note ? null : OkinawaShoppingPrices.forItem(item, title);
+        const pricing = item.note ? null : OkinawaShoppingPrices.forItem(item, title, original);
         const legacyPrice = !pricing?.offers.length && /\d/.test(item.price || "") ? item.price : "";
         return `<li>
           <label class="shop-item${item.note ? " shop-note-item" : ""}">

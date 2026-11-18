@@ -177,6 +177,9 @@ html.board-map-open { overflow: hidden; }
 .shop-price-row small, .shop-price-spec small, .shop-price-note { color: var(--muted); font-size: .76rem; font-weight: 400; }
 .shop-price-row small { display: block; }
 .shop-price-note { margin: 5px 0 0; }
+.shop-price-links { border-top: 1px solid var(--line); padding-block: 8px 4px; overflow-wrap: anywhere; }
+.shop-price-links p { color: var(--muted); font-size: .8rem; }
+.shop-price-links .text-link { font-size: .84rem; }
 .page-footer { border-top: 1px solid var(--line); margin: 22px 0 20px; color: var(--muted); font-size: .82rem; display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
 dialog { color: var(--ink); border-radius: 17px; border: 1px solid var(--line); padding: clamp(16px, 5vw, 24px); width: min(100% - 28px, 510px); max-height: 85dvh; }
 dialog::backdrop { background: rgb(16 43 50 / 58%); }
