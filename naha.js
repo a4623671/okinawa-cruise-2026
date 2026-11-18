@@ -486,6 +486,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const { title, original } = NahaCatalog.names(item);
       const video = item.videos[0];
       const cover = market ? NahaCatalog.videoCover(item) : "";
+      const hasComparison = item.shopping && OkinawaShoppingPrices.forItem(item, title).offers.length;
       return `<article class="card catalog-item">
         <div>
           <button class="catalog-preview" type="button" data-catalog-item="${e(item.id)}" aria-label="看${e(title)}詳細資料">
@@ -493,7 +494,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <strong>${e(title)}</strong>
             ${original ? `<span lang="ja">${e(original)}</span>` : ""}
             <span>${e([item.category, item.store].filter(Boolean).join(" · "))}</span>
-            ${item.price ? `<span class="catalog-price">${e(item.price)}</span>` : ""}
+            ${item.price && !hasComparison ? `<span class="catalog-price">${e(item.price)}</span>` : ""}
           </button>
           ${video ? `<a class="catalog-yt-link" href="${e(videoURL(video))}" target="_blank" rel="noopener" aria-label="${e(video.author)}，在 YouTube 看${e(title)}">
             ${cover ? `<span class="catalog-video-cover">
@@ -537,9 +538,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     const summary = document.createElement("p");
     summary.className = "muted";
-    summary.textContent = [item.category, item.store, item.price].filter(Boolean).join(" · ");
+    const pricing = item.shopping && OkinawaShoppingPrices.forItem(item, title);
+    const hasComparison = Boolean(pricing?.offers.length);
+    summary.textContent = [item.category, item.store, hasComparison ? "" : item.price].filter(Boolean).join(" · ");
     content.append(summary);
-    const detail = NahaCatalog.detail(market && item.imageIsCover ? { ...item, image: "" } : item);
+    if (hasComparison) content.insertAdjacentHTML("beforeend", shoppingPrices(pricing));
+    const detail = NahaCatalog.detail(market && item.imageIsCover ? { ...item, image: "" } : item, { hideLegacyPrice: hasComparison });
     if (market) content.append(detail);
     const card = item.recommendation;
     if (item.videos.length) {
@@ -757,6 +761,36 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function shoppingPrices({ spec, offers, stores }) {
+    if (!offers.length && !stores.length) return "";
+    const localOffers = offers.filter(([, , kind]) => kind === "store");
+    const onlineOffers = offers.filter(([, , kind]) => kind === "online");
+    const yen = amount => "¥" + amount.toLocaleString("ja-JP");
+    const labels = { store: "門市刊登", history: "歷史門市價", online: "網路價", reference: "參考價" };
+    const onlineAmounts = [...new Set(onlineOffers.map(([, amount]) => amount))];
+    const reference = offers.find(([, , kind]) => kind === "reference");
+    const summary = localOffers.length ? "門市刊登 " + yen(localOffers[0][1]) :
+      onlineAmounts.length ? "網路價 " + yen(Math.min(...onlineAmounts)) + (onlineAmounts.length > 1 ? " 起" : "") :
+      reference ? "參考價 " + yen(reference[1]) : "門市價待確認";
+    const showOffers = list => list.map(([store, amount, kind, url, note]) => `<div class="shop-price-row">
+      <div>${external(url, store)}<small>${labels[kind]}${note ? " · " + e(note) : ""}</small></div>
+      <strong>${yen(amount)}</strong>
+    </div>`).join("");
+    const unknown = stores.filter(([store]) => !localOffers.some(([quotedStore]) => store === quotedStore));
+    return `<details class="shop-prices">
+      <summary><span>店家比價</span><small>${summary}</small></summary>
+      <div class="shop-price-body">
+        ${spec ? `<p class="shop-price-spec">${e(spec)} <small>日圓含稅 · 查閱 ${OkinawaShoppingPrices.checked}</small></p>` : ""}
+        ${showOffers(localOffers)}
+        ${showOffers(offers.filter(([, , kind]) => kind !== "store"))}
+        ${unknown.map(([store, url]) => `<div class="shop-price-row">
+          <div>${external(url, store)}</div><small>門市價待確認</small>
+        </div>`).join("")}
+        ${offers.length ? '<p class="shop-price-note">到店以當天標價為準。網路運費、點數和折扣券依來源頁。</p>' : ""}
+      </div>
+    </details>`;
+  }
+
   function renderShopping() {
     const profile = shoppingProfile();
     const cards = portCatalog.filter(item => item.shopping && hasShoppingItem(profile, item.id));
@@ -797,14 +831,17 @@ document.addEventListener("DOMContentLoaded", () => {
       <ul>${items.map(item => {
         const { title, original } = item.note ? { title: item.note } : NahaCatalog.names(item);
         const checked = profile.items[item.id];
+        const pricing = item.note ? null : OkinawaShoppingPrices.forItem(item, title);
+        const legacyPrice = !pricing?.offers.length && /\d/.test(item.price || "") ? item.price : "";
         return `<li>
           <label class="shop-item${item.note ? " shop-note-item" : ""}">
             <input class="shop-check" type="checkbox" aria-label="已買 ${e(title)}" data-bought="${e(item.id)}" ${checked ? "checked" : ""}>
             ${item.note ? "" : photoSlot(item, "shop-thumb")}
-            <span class="shop-names"><strong>${e(title)}</strong>${item.price ? `<small class="shop-original">${e(item.price)}</small>` : ""}${original ? `<small class="shop-original" lang="ja">${e(original)}</small>` : ""}</span>
+            <span class="shop-names"><strong>${e(title)}</strong>${original ? `<small class="shop-original" lang="ja">${e(original)}</small>` : ""}${legacyPrice ? `<small class="shop-original">原清單參考 ${e(legacyPrice)}</small>` : ""}</span>
           </label>
           ${item.note ? `<button class="quiet shop-detail" type="button" data-remove-note="${e(item.id)}" aria-label="移除${e(title)}">移除</button>` :
             `<button class="quiet shop-detail" type="button" data-catalog-item="${e(item.id)}" aria-label="查看${e(title)}資料">詳情</button>`}
+          ${pricing ? shoppingPrices(pricing) : ""}
         </li>`;
       }).join("")}</ul>
     </section>`).join("");

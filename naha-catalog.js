@@ -362,7 +362,7 @@ const NahaCatalog = (() => {
     if (copy.textContent.trim() || node.tagName === "BR") into.append(copy);
   }
 
-  function detail(item) {
+  function detail(item, { hideLegacyPrice = false } = {}) {
     const fragment = document.createDocumentFragment();
     const source = item.source;
     const images = new Map();
@@ -393,6 +393,7 @@ const NahaCatalog = (() => {
     notes.className = "catalog-notes";
     const body = source?.querySelector(".ovbody") || source;
     for (const child of body?.children || []) {
+      if (hideLegacyPrice && child.matches(".kv") && child.textContent.includes("價格")) continue;
       if (child.tagName !== "A" && !(item.location?.store && child.matches(".kv"))) copyNote(child, notes);
     }
     for (const child of source?.querySelectorAll(".credit") || []) {

@@ -163,6 +163,20 @@ html.board-map-open { overflow: hidden; }
 .shop-detail { padding-inline: 8px; white-space: nowrap; }
 .shop-check { width: 19px; height: 19px; margin: 0; accent-color: var(--teal); }
 .shop-check:checked ~ .shop-names strong { text-decoration: line-through; color: var(--muted); }
+.shop-prices { grid-column: 1 / -1; margin-bottom: 7px; border-radius: 9px; background: var(--paper); }
+.shop-prices summary { display: flex; flex-wrap: wrap; align-items: center; gap: 3px 8px; min-height: 44px; padding: 6px 10px; cursor: pointer; color: var(--teal); font-size: .86rem; font-weight: 700; list-style: none; }
+.shop-prices summary::-webkit-details-marker { display: none; }
+.shop-prices summary::before { content: "▸" / ""; }
+.shop-prices[open] summary::before { content: "▾" / ""; }
+.shop-prices summary small { margin-inline-start: auto; font-weight: 600; color: var(--muted); }
+.shop-price-body { padding: 0 10px 9px; }
+.shop-price-spec { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; margin: 2px 0 6px; font-size: .84rem; font-weight: 700; }
+.shop-price-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 8px; padding: 8px 0; border-top: 1px solid var(--line); overflow-wrap: anywhere; font-size: .85rem; }
+.shop-price-row a { display: inline-block; }
+.shop-price-row strong { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.shop-price-row small, .shop-price-spec small, .shop-price-note { color: var(--muted); font-size: .76rem; font-weight: 400; }
+.shop-price-row small { display: block; }
+.shop-price-note { margin: 5px 0 0; }
 .page-footer { border-top: 1px solid var(--line); margin: 22px 0 20px; color: var(--muted); font-size: .82rem; display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
 dialog { color: var(--ink); border-radius: 17px; border: 1px solid var(--line); padding: clamp(16px, 5vw, 24px); width: min(100% - 28px, 510px); max-height: 85dvh; }
 dialog::backdrop { background: rgb(16 43 50 / 58%); }
