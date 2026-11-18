@@ -409,10 +409,13 @@ document.addEventListener("DOMContentLoaded", () => {
             <span>${e(video.author)}</span>
           </a>` : ""}
         </div>
-        <div class="card-actions">${catalogVote(item.id)}</div>
+        <div class="card-actions">${catalogVote(item.id)}
+          ${item.shopping ? `<button type="button" class="shop-save" data-shop-save="${e(item.id)}" aria-pressed="false">＋ 加入採買</button>` : ""}
+        </div>
       </article>`;
     }).join("");
     loadPhotos($("catalog-items"));
+    paintShoppingButtons();
     for (const button of $("catalog-items").querySelectorAll("[data-vote]")) paintVote(button);
     $("catalog-pages").hidden = pages === 1;
     $("catalog-page").textContent = `第 ${catalogPage + 1} / ${pages} 頁`;
@@ -629,9 +632,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }, "儲存並加入採買");
   }
 
+  function paintShoppingButtons() {
+    const profile = shoppingProfile();
+    for (const button of $("catalog-items").querySelectorAll("[data-shop-save]")) {
+      const saved = hasShoppingItem(profile, button.dataset.shopSave);
+      button.setAttribute("aria-pressed", String(saved));
+      button.textContent = saved ? "✓ 已加入採買" : "＋ 加入採買";
+    }
+  }
+
   function renderShopping() {
     const profile = shoppingProfile();
     const cards = portCatalog.filter(item => item.shopping && hasShoppingItem(profile, item.id));
+    for (const [id, note] of Object.entries(profile?.notes || {})) {
+      if (note.port === port.id && hasShoppingItem(profile, id)) cards.push({ id, note: note.title });
+    }
+    const remaining = cards.filter(item => !profile.items[item.id]).length;
+    $("shop-progress").hidden = !cards.length;
+    $("shop-summary").textContent = `${port.name} · 待買 ${remaining}／${cards.length} 件`;
     const count = $("shop-count");
     count.textContent = String(cards.length);
     count.hidden = !cards.length;
@@ -642,28 +660,34 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!cards.length) {
       const message = !name ? "選擇名字後，就能建立自己的採買清單。" :
         catalogState === "error" ? "商品資料暫時讀不到，請到「選商品」重新讀取。" :
-        catalogState !== "ready" ? "正在讀取商品…" : "這一港還沒有採買項目。打開商品詳情，按「加入採買」。";
+        catalogState !== "ready" ? "正在讀取商品…" : "這一港還沒有採買項目。可以直接記一筆，或從「選商品」加入。";
       target.replaceChildren(Object.assign(document.createElement("p"), { className: "notice", textContent: message }));
       return;
     }
     const groups = new Map();
     for (const item of cards) {
-      const venue = item.store || "其他商品";
+      if ($("shop-pending").checked && profile.items[item.id]) continue;
+      const venue = item.note ? "自己記的" : item.store || "其他商品";
       if (!groups.has(venue)) groups.set(venue, []);
       groups.get(venue).push(item);
+    }
+    if (!groups.size) {
+      target.textContent = "這一港都買齊了。取消「只看待買」就能查看已買品項。";
+      return;
     }
     target.innerHTML = [...groups].map(([venue, items]) => `<section class="shop-group">
       <div class="shop-heading"><h3>${e(venue)}</h3>${items[0].storeSearch ? external(OkinawaCatalogLocations.mapURL(items[0].storeSearch), "地圖") : ""}</div>
       <ul>${items.map(item => {
-        const { title, original } = NahaCatalog.names(item);
+        const { title, original } = item.note ? { title: item.note } : NahaCatalog.names(item);
         const checked = profile.items[item.id];
         return `<li>
-          <label class="shop-item">
+          <label class="shop-item${item.note ? " shop-note-item" : ""}">
             <input class="shop-check" type="checkbox" aria-label="已買 ${e(title)}" data-bought="${e(item.id)}" ${checked ? "checked" : ""}>
-            ${photoSlot(item, "shop-thumb")}
-            <span class="shop-names"><strong>${e(title)}</strong>${original ? `<small class="shop-original" lang="ja">${e(original)}</small>` : ""}</span>
+            ${item.note ? "" : photoSlot(item, "shop-thumb")}
+            <span class="shop-names"><strong>${e(title)}</strong>${item.price ? `<small class="shop-original">${e(item.price)}</small>` : ""}${original ? `<small class="shop-original" lang="ja">${e(original)}</small>` : ""}</span>
           </label>
-          <button class="quiet shop-detail" type="button" data-catalog-item="${e(item.id)}" aria-label="查看${e(title)}資料">詳情</button>
+          ${item.note ? `<button class="quiet shop-detail" type="button" data-remove-note="${e(item.id)}" aria-label="移除${e(title)}">移除</button>` :
+            `<button class="quiet shop-detail" type="button" data-catalog-item="${e(item.id)}" aria-label="查看${e(title)}資料">詳情</button>`}
         </li>`;
       }).join("")}</ul>
     </section>`).join("");
@@ -684,6 +708,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function render() {
     renderItinerary();
     renderShopping();
+    paintShoppingButtons();
     renderSync();
     if (!$("discussion").hidden && ($("catalog-mine").checked || $("catalog-sort").value === "votes")) renderCatalog();
     else for (const button of $("catalog-items").querySelectorAll("[data-vote]")) paintVote(button);
@@ -911,6 +936,7 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("storage", event => {
     if (!name || event.key !== shoppingKey(name)) return;
     shoppingProfiles.delete(name);
+    paintShoppingButtons();
     renderShopping();
     if ($("catalog-dialog").open) updateCatalogDetail();
   });
@@ -939,6 +965,19 @@ document.addEventListener("DOMContentLoaded", () => {
       catalogPage = 0;
       renderCatalog();
     } else if (target.dataset.catalogItem) showCatalogItem(target.dataset.catalogItem);
+    else if (target.dataset.shopSave) toggleShoppingItem(target.dataset.shopSave);
+    else if (target.dataset.removeNote && name) {
+      const profile = shoppingProfile();
+      const id = target.dataset.removeNote;
+      if (profile.notes?.[id]?.port !== port.id) return;
+      const notes = { ...profile.notes };
+      const items = { ...profile.items };
+      delete notes[id];
+      delete items[id];
+      const saved = saveShoppingProfile({ ...profile, notes, items });
+      renderShopping();
+      announce(saved ? "已移除品項" : "這次變更只保留在目前頁面");
+    }
     else if (target.dataset.vote) vote(target.dataset.vote);
     else if (target.dataset.discuss) openDiscussion(target.dataset.discuss, target.dataset.title);
     else if (target.dataset.schedule) openSchedule(target.dataset.schedule);
@@ -979,6 +1018,22 @@ document.addEventListener("DOMContentLoaded", () => {
       $("catalog-status").scrollIntoView({ block: "start" });
     });
   }
+  $("shop-pending").addEventListener("change", renderShopping);
+  $("shop-note-form").addEventListener("submit", event => {
+    event.preventDefault();
+    const input = $("shop-note");
+    const title = input.value.trim();
+    if (!title) return input.focus();
+    askName(() => {
+      const profile = shoppingProfile();
+      const id = "note:" + crypto.randomUUID();
+      const notes = { ...profile.notes, [id]: { port: port.id, title } };
+      const saved = saveShoppingProfile({ ...profile, notes, items: { ...profile.items, [id]: false } });
+      input.value = "";
+      render();
+      announce(saved ? "已記下品項" : "這次變更只保留在目前頁面");
+    }, "儲存並記下品項");
+  });
   $("shopping-list").addEventListener("change", event => {
     const id = event.target.dataset.bought;
     if (!id || !name) return;
@@ -986,6 +1041,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!hasShoppingItem(profile, id)) return;
     const items = { ...profile.items, [id]: event.target.checked };
     if (!saveShoppingProfile({ ...profile, items })) announce("這次勾選只保留在目前頁面");
+    renderShopping();
+    const next = Array.from($("shopping-list").querySelectorAll("[data-bought]"));
+    (next.find(input => input.dataset.bought === id) || next[0] || $("shop-pending")).focus({ preventScroll: true });
   });
 
   $("itinerary-heading").tabIndex = -1;

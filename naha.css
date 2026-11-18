@@ -193,3 +193,12 @@ textarea { resize: vertical; }
   .shop-item { grid-template-columns: auto 42px minmax(0, 1fr); gap: 6px; }
   .shop-thumb { width: 42px; height: 42px; }
 }
+
+.shop-note-form { display: flex; gap: 8px; margin-bottom: 8px; }
+.shop-note-form input { min-width: 0; flex: 1; border: 1px solid var(--line); border-radius: 9px; padding: 8px 10px; }
+.shop-progress { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px 8px; margin-bottom: 6px; }
+.shop-progress label { min-height: 44px; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+.shop-progress input { accent-color: var(--teal); }
+.shop-item.shop-note-item { grid-template-columns: auto minmax(0, 1fr); min-height: 48px; }
+.shop-save { flex: 1 0 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 9px; background: var(--white); color: var(--teal); font-weight: 650; }
+.shop-save[aria-pressed="true"] { background: var(--soft); }

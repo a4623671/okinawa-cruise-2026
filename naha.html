@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f6f2">
   <title>沖繩郵輪｜三港行程與討論</title>
-  <link rel="stylesheet" href="naha.css?v=20261117-ports-r11">
+  <link rel="stylesheet" href="naha.css?v=20261118-shopping">
   <link id="board-style" rel="stylesheet" href="trip-board.css?v=20261117-ports-r12">
   <script src="trip-data.js" defer></script>
   <script src="trip-timing.js" defer></script>
@@ -15,7 +15,7 @@
   <script src="trip-catalog-locations.js?v=20261117-ports-r8" defer></script>
   <script src="naha-catalog.js?v=20261117-ports-r9" defer></script>
   <script src="trip-board-ui.js?v=20261117-ports-r12" defer></script>
-  <script src="naha.js?v=20261117-ports-r11" defer></script>
+  <script src="naha.js?v=20261118-shopping" defer></script>
 </head>
 <body>
   <header class="top">
@@ -130,6 +130,14 @@
           <button id="shopping-identity" class="quiet" type="button">設定名字</button>
           <a id="shop-browse" class="button secondary" href="#discussion">選商品</a>
         </div>
+      </div>
+      <form id="shop-note-form" class="shop-note-form">
+        <input id="shop-note" aria-label="自訂採買品項" placeholder="想買什麼？例如：眼藥水 2 盒" maxlength="100" required>
+        <button class="button secondary" type="submit">記一筆</button>
+      </form>
+      <div id="shop-progress" class="shop-progress" hidden>
+        <strong id="shop-summary" role="status"></strong>
+        <label><input id="shop-pending" type="checkbox">只看待買</label>
       </div>
       <div id="shopping-list"></div>
     </section>
