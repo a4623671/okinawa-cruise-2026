@@ -123,7 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const portLinks = document.querySelectorAll("[data-port]");
   const viewLinks = document.querySelectorAll(".views [data-view]");
   const market = new URLSearchParams(location.search).get("area") === "shopping" || location.hash === "#shopping";
-  const groupNames = { all: "全部", ...NahaCatalog.categories, ...(market && { beauty: "藥妝", cosmetics: "美妝" }) };
+  const groupNames = { all: "全部", ...NahaCatalog.categories, ...(market && { beauty: "藥妝", cosmetics: "美妝", gift: "伴手禮", smallGoods: "小物" }) };
   document.body.classList.toggle("market", market);
   document.querySelector(".market-nav").hidden = !market;
   if (market) {
@@ -132,6 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
     videoFilter.textContent = "有影片";
     document.querySelector(".catalog-quick").hidden = true;
     document.querySelector(".catalog-options").append(videoFilter);
+    $("catalog-ranks").hidden = false;
     $("catalog-products-title").textContent = "商品類別";
     $("catalog-products").setAttribute("aria-label", "商品類別");
   }
@@ -334,7 +335,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const available = new Set(portCatalog.filter(item => item.group === catalogGroup).map(item => item.catalogType));
     if (!available.has(typeChoice)) typeChoice = "";
     const types = catalogGroup === "beauty" ? ["", "貼布", "感冒藥・漢方", "眼藥水", "止痛藥", "腸胃藥", "鼻炎・過敏",
-      "外用藥", "防曬", "面膜", "清潔保養", "彩妝", "保健品", "其他藥妝"] : ["", ...available];
+      "外用藥", "暈車暈船", "防曬", "面膜", "清潔保養", "彩妝", "保健品", "其他藥妝"] : ["", ...available];
     $("catalog-type-choices").innerHTML = types.filter(type => !type || available.has(type)).map(type =>
       `<button type="button" data-item-type="${e(type)}" aria-pressed="${type === typeChoice}">${e(type || "全部" + groupNames[catalogGroup])}</button>`).join("");
   }
@@ -372,10 +373,14 @@ document.addEventListener("DOMContentLoaded", () => {
           const existing = products.get(item.id);
           if (existing && !item.recommendation && (existing.recommendation || item.port !== island.id)) continue;
           const cosmetics = ["防曬", "面膜", "清潔保養", "彩妝"].includes(item.catalogType);
-          products.set(item.id, { ...item, group: cosmetics ? "cosmetics" : item.group });
+          const smallGoods = item.group === "gift" && (["3COINS", "紀念品"].includes(item.category) ||
+            ["生活小物", "旅行・收納", "紀念品・工藝"].includes(item.catalogType));
+          products.set(item.id, { ...item, group: cosmetics ? "cosmetics" : smallGoods ? "smallGoods" : item.group });
         }
       }
-      portCatalog = [...products.values(), ...NahaCatalog.coldProducts()];
+      for (const item of NahaCatalog.coldProducts()) products.set(item.id, item);
+      portCatalog = NahaCatalog.withShoppingRankVideos(products);
+      portCatalog.sort((a, b) => Number(Boolean(b.videos[0]?.taiwan)) - Number(Boolean(a.videos[0]?.taiwan)));
     } else {
       portCatalog = NahaCatalog.itemsForPort(catalog, port).filter(item =>
         item.group !== "beauty" && item.group !== "electronics" && item.category !== "3COINS");
@@ -405,7 +410,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `<button type="button" data-catalog-filter="${e(group)}" aria-pressed="false">${e(groupNames[group])}</button>`
     ).join("");
     $("catalog-places").innerHTML = filters(NahaCatalog.placeGroups);
-    $("catalog-products").innerHTML = filters(market ? ["all", "beauty", "cosmetics", "electronics", "gift"] : ["gift"]);
+    $("catalog-products").innerHTML = filters(market ? ["all", "beauty", "cosmetics", "electronics", "gift", "smallGoods"] : ["gift"]);
     updatePortCatalog();
     renderCatalog();
     renderShopping();
@@ -528,6 +533,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ${card ? `<p class="venue">${e(card.venue)}</p>
           <p>${e(card.description)}</p><p class="tip">${e(card.tip)}</p>` : ""}
         <div class="link-list">${item.videos.map(video => external(videoURL(video), `${video.author} · ${video.label}`)).join("")}</div>
+        ${item.shoppingNote ? `<p>${e(item.shoppingNote)}</p>` : ""}
         ${item.videoDisclosure ? `<p class="muted">${e(item.videoDisclosure)}</p>` : ""}
         ${card ? `<div class="link-list">${external(google(card.mapQuery || card.venue), "推薦地點")}
           ${card.sources.map(source => external(source.url, source.label)).join("")}</div>` : ""}

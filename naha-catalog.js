@@ -175,12 +175,13 @@ const NahaCatalog = (() => {
     if (/眼藥水|目薬/.test(product)) return "眼藥水";
     if (/鼻用|Alesion|Allegra/i.test(product)) return "鼻炎・過敏";
     if (/頭痛薬|EVE |Loxonin .*錠|Calonal|洛索洛芬錠/i.test(product)) return "止痛藥";
-    if (/Bio-?Three|Biofermin|便秘|胃散/i.test(product)) return "腸胃藥";
+    if (/Bio-?Three|Biofermin|便秘|胃散|若元|正露丸/i.test(product)) return "腸胃藥";
+    if (/暈車|暈船/.test(product)) return "暈車暈船";
     if (/防曬|日焼け止め/.test(product)) return "防曬";
     if (/面膜|フェイスマスク/.test(product)) return "面膜";
     if (/睫毛|眼線|唇膏|口紅|チーク/.test(product)) return "彩妝";
     if (item.category === "美妝") return "清潔保養";
-    if (item.category === "保健品") return "保健品";
+    if (item.category === "保健品" || /DHC 維生素/i.test(product)) return "保健品";
     if (/外用液|撒隆巴斯液|凝膠|萬金油/.test(product)) return "外用藥";
     return "其他藥妝";
   }
@@ -224,7 +225,7 @@ const NahaCatalog = (() => {
     ],
     electronics: [
       ["耳機・音訊", /耳機|AirPods|SONY (WF|WH|MDR)-|Bose|Soundcore|Buds|SOUNDPEATS|EarFun|final E500|Victor HA-|RP-HZ47|Shokz|JBL TOUR|HiTune|Beats Studio/i],
-      ["廚房家電", /炊飯|電鍋|電子鍋/],
+      ["廚房家電", /炊飯|電鍋|電子鍋|鬆餅機/],
       ["健康・按摩", /体組成|體組成|體脂|血圧|血壓|按摩|マッサージ/],
       ["美容・個人護理", /吹風|ドライヤー|シェーバー|牙刷|ソニッケアー|美容|美顔|刮鬍/],
     ],
@@ -289,6 +290,32 @@ const NahaCatalog = (() => {
       category: "感冒藥", catalogType: "感冒藥・漢方", store: "藥妝店",
       search: searchable([title, packageName, "感冒藥 漢方 藥妝店", ...videos.map(v => v.author)].join(" ")),
     }));
+  }
+
+  function withShoppingRankVideos(products) {
+    for (const { title, group, match, note: shoppingNote, video } of OkinawaShoppingRanks.productVideos) {
+      const existing = match && [...products.values()].find(item => item.group === group &&
+        match.test([item.title, names(item).title].join(" ")));
+      if (existing) {
+        const videos = [video, ...existing.videos.filter(previous => previous.id !== video.id || previous.start !== video.start)];
+        const image = existing.imageIsCover ? "" : existing.image;
+        products.set(existing.id, withCover({ ...existing, image, shoppingNote, videos,
+          search: searchable(existing.search + " " + title + " " + video.author) }));
+        continue;
+      }
+      // A saved item keeps its ID when its rank or featured video changes.
+      const key = "rank-" + group + "-" + encodeURIComponent(title);
+      const type = group === "smallGoods" && title.startsWith("3COINS") ? "生活小物" :
+        group === "cosmetics" ? (/面膜/.test(title) ? "面膜" : "彩妝保養") :
+        group === "electronics" ? kindRules.electronics.find(([, pattern]) => pattern.test(title))?.[0] || "其他電器" :
+        group === "beauty" ? beautyType({ title, group }, title) :
+        group === "gift" ? catalogType({ title, group }, title) : "沖繩紀念品";
+      const category = { gift: "伴手禮", electronics: "電器", cosmetics: "美妝", beauty: "藥妝", smallGoods: "小物" }[group];
+      products.set(key, withCover({ id: key, title, group, category, catalogType: type, shopping: true, shoppingNote,
+        store: title.startsWith("3COINS") ? "3COINS" : "",
+        videos: [video], search: searchable([title, category, type, video.author].join(" ")) }));
+    }
+    return [...products.values()];
   }
 
   function match(items, { query, group, store, selected, recommendedOnly }, voter) {
@@ -382,5 +409,5 @@ const NahaCatalog = (() => {
     return fragment;
   }
 
-  return { categories, placeGroups, coldProducts, read, itemsForPort, recommended, itemIds, primaryId, names, match, detail, videoCover };
+  return { categories, placeGroups, coldProducts, withShoppingRankVideos, read, itemsForPort, recommended, itemIds, primaryId, names, match, detail, videoCover };
 })();

@@ -226,7 +226,7 @@ textarea { resize: vertical; }
 .market .catalog-options label, .market .page-footer, .market #settings-button { display: none; }
 .market .catalog-groups { display: block; padding: 4px; margin-top: 12px; background: var(--paper); }
 .market .catalog-group + .catalog-group { display: block; border: 0; padding: 0; }
-.market #catalog-products { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(0, 1.65fr); gap: 4px; }
+.market #catalog-products { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(0, 1.35fr) minmax(0, 1fr); gap: 4px; }
 .market #catalog-products button { font-size: .875rem; white-space: nowrap; overflow-wrap: normal; }
 .market #catalog-products button[aria-pressed="false"] { background: transparent; }
 .market #catalog-products button:hover { box-shadow: inset 0 0 0 1px #b6d0c6; }
@@ -234,3 +234,17 @@ textarea { resize: vertical; }
 .market .catalog-options { gap: 6px; padding-block: 8px 2px; }
 .market #catalog-yt { min-height: 44px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 10px; color: var(--teal); background: var(--white); font-weight: 700; }
 .market #catalog-yt[aria-pressed="true"] { background: var(--soft); border-color: #b6d0c6; }
+
+.ranks-page { max-width: 680px; padding-block: 18px 28px; }
+.ranks-page h1 { font-size: 1.55rem; margin-bottom: 12px; }
+.rank-groups { display: grid; grid-template-columns: 1.8fr repeat(4, minmax(0, 1fr)); gap: 4px; margin-bottom: 10px; }
+.rank-groups button { padding-inline: 2px; white-space: nowrap; }
+.rank-sources { margin-bottom: 8px; }
+.rank-list { padding: 0; list-style: none; counter-reset: shopping-rank; }
+.rank-list li { position: relative; counter-increment: shopping-rank; margin-bottom: 8px; padding: 10px 12px 5px 49px; border: 1px solid var(--line); border-radius: 12px; background: var(--white); overflow-wrap: anywhere; }
+.rank-list li::before { content: counter(shopping-rank); position: absolute; top: 10px; left: 10px; display: grid; place-items: center; width: 27px; height: 27px; border-radius: 8px; background: var(--soft); color: var(--teal); font-weight: 800; }
+.rank-list h2 { font-size: 1rem; }
+.rank-list p, .ranks-method { color: var(--muted); font-size: .86rem; }
+.rank-source { display: inline-flex; align-items: center; gap: 5px; min-height: 44px; }
+.rank-source img { flex: none; object-fit: contain; }
+.ranks-method summary { padding-block: 8px; cursor: pointer; color: var(--teal); font-weight: 750; }
