@@ -15,7 +15,7 @@ const OkinawaShoppingPrices = (() => {
       ["Fines Pharma", 1879, "online", "https://store.shopping.yahoo.co.jp/finespharma/4987306045132.html"],
     ]],
     [/^新 Lulu A Gold DXα 感冒錠$/, "60 錠", [
-      ["Drug Fortress", 1999, "online", "https://store.shopping.yahoo.co.jp/fortress/4987107625458puff.html", "此筆網路價含指定寄送運費"],
+      ["Drug Fortress", 1999, "online", "https://store.shopping.yahoo.co.jp/fortress/4987107625458puff.html", "此筆網路售價含指定寄送運費"],
     ]],
     [/^Lulu Attack EX Premium 感冒錠$/, "36 錠", [
       ["第一三共", 2420, "reference", "https://www.daiichisankyo-hc.co.jp/products/details/lulu_attack_ex_premium/", "原廠建議售價"],

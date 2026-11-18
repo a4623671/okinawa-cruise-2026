@@ -766,12 +766,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const localOffers = offers.filter(([, , kind]) => kind === "store").sort(byPrice);
     const onlineOffers = offers.filter(([, , kind]) => kind === "online").sort(byPrice);
     const yen = amount => "¥" + amount.toLocaleString("ja-JP");
-    const labels = { store: "門市刊登", history: "歷史門市價", online: "網路價", reference: "參考價" };
+    const labels = { store: "門市刊登", history: "歷史門市價", online: "網路售價", reference: "參考價" };
     const onlineAmounts = [...new Set(onlineOffers.map(([, amount]) => amount))];
     const reference = offers.find(([, , kind]) => kind === "reference");
-    const summary = localOffers.length ? "門市刊登 " + yen(localOffers[0][1]) :
-      onlineAmounts.length ? "網路價 " + yen(Math.min(...onlineAmounts)) + (onlineAmounts.length > 1 ? " 起" : "") :
-      reference ? "參考價 " + yen(reference[1]) : "價格待確認";
+    const summary = localOffers.length ? labels.store + " " + yen(localOffers[0][1]) :
+      onlineAmounts.length ? labels.online + " " + yen(onlineAmounts[0]) + (onlineAmounts.length > 1 ? " 起" : "") :
+      reference ? labels.reference + " " + yen(reference[1]) : "價格待確認";
     const showOffers = list => list.map(([store, amount, kind, url, note]) => `<div class="shop-price-row">
       <div>${external(url, store)}<small>${labels[kind]}${note ? " · " + e(note) : ""}</small></div>
       <strong>${yen(amount)}</strong>
