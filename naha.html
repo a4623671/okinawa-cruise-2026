@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f6f2">
   <title>沖繩郵輪｜三港行程與討論</title>
-  <link rel="stylesheet" href="naha.css?v=20261118-types">
+  <link rel="stylesheet" href="naha.css?v=20261118-market">
   <link id="board-style" rel="stylesheet" href="trip-board.css?v=20261117-ports-r12">
   <script src="trip-data.js" defer></script>
   <script src="trip-timing.js" defer></script>
@@ -13,9 +13,9 @@
   <script src="naha-content.js?v=20261116-ports-r5" defer></script>
   <script src="naha-shopping-names.js?v=20261116-ports-r4" defer></script>
   <script src="trip-catalog-locations.js?v=20261117-ports-r8" defer></script>
-  <script src="naha-catalog.js?v=20261118-types" defer></script>
+  <script src="naha-catalog.js?v=20261118-market" defer></script>
   <script src="trip-board-ui.js?v=20261117-ports-r12" defer></script>
-  <script src="naha.js?v=20261118-types" defer></script>
+  <script src="naha.js?v=20261118-market" defer></script>
 </head>
 <body>
   <header class="top">
@@ -39,7 +39,10 @@
       <a href="#itinerary" data-view="itinerary" aria-current="page">行程</a>
       <a href="#schedule" data-view="schedule">排程</a>
       <a href="#discussion" data-view="discussion">攻略投票</a>
-      <a href="#shopping" data-view="shopping">我的採買 <span id="shop-count" hidden></span></a>
+    </nav>
+    <nav class="views market-nav" hidden aria-label="採買專區">
+      <a href="?area=shopping#discussion" data-view="discussion">找商品</a>
+      <a href="?area=shopping#shopping" data-view="shopping">我的採買 <span id="shop-count" hidden></span></a>
     </nav>
 
     <div id="sync-banner" class="notice sync-banner" hidden>
@@ -127,7 +130,7 @@
         <h1 id="shopping-heading">我的採買</h1>
         <div class="shopping-tools">
           <button id="shopping-identity" class="quiet" type="button">設定名字</button>
-          <a id="shop-browse" class="button secondary" href="#discussion">選商品</a>
+          <a id="shop-browse" class="button secondary" href="?area=shopping#discussion">選商品</a>
         </div>
       </div>
       <form id="shop-note-form" class="shop-note-form">

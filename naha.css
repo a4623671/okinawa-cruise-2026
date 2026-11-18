@@ -38,7 +38,7 @@ button:disabled { cursor: default; opacity: .65; }
 .ports span { margin-left: 6px; font-size: .77rem; font-weight: 650; }
 .ports a[aria-current] { background: #dbeae0; color: #144b3f; box-shadow: inset 0 0 0 1px #a4c5b7; }
 .ports a:hover { background: var(--soft); }
-.views { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); position: sticky; top: 0; z-index: 1; background: var(--paper); border-bottom: 1px solid var(--line); margin-bottom: 18px; padding-top: 6px; }
+.views { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); position: sticky; top: 0; z-index: 1; background: var(--paper); border-bottom: 1px solid var(--line); margin-bottom: 18px; padding-top: 6px; }
 .views a { display: flex; align-items: center; justify-content: center; gap: 3px; min-width: 0; min-height: 48px; padding: 8px 2px; white-space: nowrap; font-size: .95rem; font-weight: 750; text-decoration: none; border-bottom: 3px solid transparent; color: var(--muted); }
 .views a[aria-current] { color: var(--teal); border-color: var(--teal); }
 #shop-count { background: var(--soft); color: var(--teal); border-radius: 999px; padding: 1px 4px; font-size: .72rem; }
@@ -184,7 +184,6 @@ textarea { resize: vertical; }
   .catalog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 420px) {
-  .views { grid-template-columns: repeat(2, minmax(0, .8fr)) minmax(0, 1.12fr) minmax(0, 1.28fr); }
 }
 @media (max-width: 560px) {
   .catalog-groups { grid-template-columns: minmax(0, 1fr); padding: 4px 6px; }
@@ -223,3 +222,10 @@ textarea { resize: vertical; }
 #catalog-type-choices { display: flex; flex-wrap: wrap; gap: 3px 4px; }
 #catalog-type-choices button { min-height: 44px; padding: 4px 9px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); font-size: .86rem; }
 #catalog-type-choices button[aria-pressed="true"] { background: var(--soft); color: var(--teal); font-weight: 750; }
+
+.market-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.market .ports, .market .views:not(.market-nav), .market .catalog-group:first-child,
+.market .catalog-options label, .market .page-footer, .market #settings-button { display: none; }
+.market .catalog-groups { display: block; }
+.market .catalog-group + .catalog-group { border: 0; padding: 0; }
+.market .catalog-group h2 { display: none; }

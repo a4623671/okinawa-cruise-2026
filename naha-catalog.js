@@ -273,6 +273,24 @@ const NahaCatalog = (() => {
     });
   }
 
+  function coldProducts() {
+    const video = { id: "pvex6yyxkf4", author: "薬剤師まるやまのお薬チャンネル", label: "Gold A 系列成分與注意事項" };
+    const luluVideo = { id: "BYsCOB6H2pE", author: video.author, label: "藥師解說 EX Premium" };
+    const taisho = "https://brand.taisho.co.jp/content/dam/selfmedication/jp/ja/pabron/images/";
+    const daiichi = "https://www.daiichisankyo-hc.co.jp/";
+    const products = [
+      ["pabron-granules", "大正百保能 Gold A 微粒", "パブロンゴールドA〈微粒〉", taisho + "04515/pdf/04515_ProductPDF_tw.pdf", "https://taisho.scene7.com/is/image/taisho/ga_grain?fmt=png-alpha", [video]],
+      ["pabron-tablets", "大正百保能 Gold A 錠", "パブロンゴールドA〈錠〉", taisho + "04513/pdf/04513_ProductPDF_tw.pdf", "https://taisho.scene7.com/is/image/taisho/ga_tablet?fmt=png-alpha", [video]],
+      ["lulu-gold-dx", "新 Lulu A Gold DXα 感冒錠", "新ルルAゴールドDXα", daiichi + "products/details/lulu_a_gold_dx_alpha/", daiichi + "library/content/img_library/image/lulu_a_gold_dx_alpha_1A008_main.jpg", []],
+      ["lulu-attack-ex", "Lulu Attack EX Premium 感冒錠", "ルルアタックEXプレミアム", daiichi + "products/details/lulu_attack_ex_premium/", daiichi + "library/content/img_library/image/lulu_attack_ex_premium_1C310_main.jpg", [luluVideo], "影片說明欄揭露含 Amazon 聯盟連結。"],
+    ];
+    return products.map(([id, title, packageName, productSource, image, videos, videoDisclosure]) => ({
+      id, title, packageName, productSource, image, videos, videoDisclosure, group: "beauty", shopping: true,
+      category: "感冒藥", catalogType: "感冒藥・漢方", store: "藥妝店",
+      search: searchable([title, packageName, "感冒藥 漢方 藥妝店", ...videos.map(v => v.author)].join(" ")),
+    }));
+  }
+
   function match(items, { query, group, store, selected, recommendedOnly }, voter) {
     const terms = searchable(query).split(" ").filter(Boolean);
     return items.filter(item => (group === "all" || item.group === group) && (!store || item.store === store) &&
@@ -364,5 +382,5 @@ const NahaCatalog = (() => {
     return fragment;
   }
 
-  return { categories, placeGroups, read, itemsForPort, recommended, itemIds, primaryId, names, match, detail, videoCover };
+  return { categories, placeGroups, coldProducts, read, itemsForPort, recommended, itemIds, primaryId, names, match, detail, videoCover };
 })();

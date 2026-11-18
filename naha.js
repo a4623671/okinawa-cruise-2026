@@ -122,6 +122,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const scheduleFrame = $("schedule-frame");
   const portLinks = document.querySelectorAll("[data-port]");
   const viewLinks = document.querySelectorAll(".views [data-view]");
+  const market = new URLSearchParams(location.search).get("area") === "shopping" || location.hash === "#shopping";
+  const groupNames = { ...NahaCatalog.categories, ...(market && { beauty: "藥妝", cosmetics: "美妝" }) };
+  document.body.classList.toggle("market", market);
+  document.querySelector(".market-nav").hidden = !market;
+  if (market) {
+    document.title = "我的採買｜沖繩郵輪";
+    $("catalog-yt").textContent = "有影片";
+    $("catalog-products-title").textContent = "商品類別";
+    $("catalog-products").setAttribute("aria-label", "商品類別");
+  }
   const fullSchedule = new URLSearchParams(location.search).get("full") === "1";
   const canSend = action => action.file === "plan" ? TripData.canWrite() : action.publish === true;
   const portFromAddress = () => {
@@ -178,11 +188,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const url = new URL(location.href);
     if (id === "naha") url.searchParams.delete("port");
     else url.searchParams.set("port", id);
+    if (market) { url.searchParams.set("area", "shopping"); url.searchParams.delete("port"); }
     url.hash = view;
     return url.href;
   }
 
   function showView(view, scroll = true) {
+    if (market && view !== "discussion") view = "shopping";
     if (view === "guide") view = "discussion";
     view = panels.includes(view) ? view : port.id === "naha" ? "itinerary" : "discussion";
     const page = $("port-page");
@@ -244,7 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
     fullLink.href = scheduleURL.href;
     fullLink.target = fullSchedule ? "_self" : "_blank";
     fullLink.textContent = fullSchedule ? "回整合頁" : "全螢幕排程 ↗";
-    $("discussion-heading").textContent = port.name + "完整項目";
+    $("discussion-heading").textContent = market ? "找商品" : port.name + "完整項目";
     $("final-link").href = `final.html?day=${port.date}`;
     for (const link of portLinks) {
       if (link.dataset.port === port.id) link.setAttribute("aria-current", "page");
@@ -321,7 +333,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const types = catalogGroup === "beauty" ? ["", "貼布", "感冒藥・漢方", "眼藥水", "止痛藥", "腸胃藥", "鼻炎・過敏",
       "外用藥", "防曬", "面膜", "清潔保養", "彩妝", "保健品", "其他藥妝"] : ["", ...available];
     $("catalog-type-choices").innerHTML = types.filter(type => !type || available.has(type)).map(type =>
-      `<button type="button" data-item-type="${e(type)}" aria-pressed="${type === typeChoice}">${e(type || "全部" + NahaCatalog.categories[catalogGroup])}</button>`).join("");
+      `<button type="button" data-item-type="${e(type)}" aria-pressed="${type === typeChoice}">${e(type || "全部" + groupNames[catalogGroup])}</button>`).join("");
   }
 
   function updateCatalogStores() {
@@ -349,7 +361,22 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function updatePortCatalog() {
-    portCatalog = NahaCatalog.itemsForPort(catalog, port);
+    if (market) {
+      const products = new Map();
+      for (const island of OKINAWA_PORTS) {
+        for (const item of NahaCatalog.itemsForPort(catalog, island)) {
+          if (!item.shopping) continue;
+          const existing = products.get(item.id);
+          if (existing && !item.recommendation && (existing.recommendation || item.port !== island.id)) continue;
+          const cosmetics = ["防曬", "面膜", "清潔保養", "彩妝"].includes(item.catalogType);
+          products.set(item.id, { ...item, group: cosmetics ? "cosmetics" : item.group });
+        }
+      }
+      portCatalog = [...products.values(), ...NahaCatalog.coldProducts()];
+    } else {
+      portCatalog = NahaCatalog.itemsForPort(catalog, port).filter(item =>
+        item.group !== "beauty" && item.group !== "electronics" && item.category !== "3COINS");
+    }
     catalogIndex = new Map(portCatalog.map(item => [item.id, item]));
     updateCatalogStores();
   }
@@ -372,10 +399,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     $("catalog-tools").hidden = false;
     const filters = groups => groups.map(group =>
-      `<button type="button" data-catalog-filter="${e(group)}" aria-pressed="false">${e(NahaCatalog.categories[group])}</button>`
+      `<button type="button" data-catalog-filter="${e(group)}" aria-pressed="false">${e(groupNames[group])}</button>`
     ).join("");
     $("catalog-places").innerHTML = filters(NahaCatalog.placeGroups);
-    $("catalog-products").innerHTML = filters(Object.keys(NahaCatalog.categories).filter(group => !NahaCatalog.placeGroups.includes(group)));
+    $("catalog-products").innerHTML = filters(market ? ["beauty", "cosmetics", "electronics", "gift"] : ["gift"]);
     updatePortCatalog();
     renderCatalog();
     renderShopping();
@@ -453,7 +480,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <span>${e(video.author)}</span>
           </a>` : ""}
         </div>
-        <div class="card-actions">${catalogVote(item.id)}
+        <div class="card-actions">${market ? "" : catalogVote(item.id)}
           ${item.shopping ? `<button type="button" class="shop-save" data-shop-save="${e(item.id)}" aria-pressed="false">＋ 加入採買</button>` : ""}
         </div>
       </article>`;
@@ -494,18 +521,24 @@ document.addEventListener("DOMContentLoaded", () => {
     if (item.videos.length) {
       const note = document.createElement("section");
       note.className = "catalog-recommendation";
-      note.innerHTML = `<h3>推薦影片</h3>
+      note.innerHTML = `<h3>影片介紹</h3>
         ${card ? `<p class="venue">${e(card.venue)}</p>
           <p>${e(card.description)}</p><p class="tip">${e(card.tip)}</p>` : ""}
         <div class="link-list">${item.videos.map(video => external(videoURL(video), `${video.author} · ${video.label}`)).join("")}</div>
+        ${item.videoDisclosure ? `<p class="muted">${e(item.videoDisclosure)}</p>` : ""}
         ${card ? `<div class="link-list">${external(google(card.mapQuery || card.venue), "推薦地點")}
           ${card.sources.map(source => external(source.url, source.label)).join("")}</div>` : ""}
         ${card?.disclosure ? `<p class="muted">${e(card.disclosure)}</p>` : ""}`;
       content.append(note);
     }
+    if (item.productSource) {
+      const sources = document.createElement("p");
+      sources.innerHTML = external(item.productSource, "原廠產品說明");
+      content.append(sources);
+    }
     content.append(NahaCatalog.detail(item));
     const votes = $("catalog-detail-actions");
-    votes.innerHTML = `${catalogVote(item.id)}
+    votes.innerHTML = market ? "" : `${catalogVote(item.id)}
       <button class="quiet" type="button" data-discuss="${e(item.id)}" data-title="${e(title)}">留言</button>
       ${card?.stop ? `<button class="quiet" type="button" data-schedule="${e(card.id)}">試排時間</button>` : ""}`;
     updateCatalogDetail();
@@ -514,7 +547,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateCatalogDetail() {
     const details = $("catalog-detail-actions");
-    paintVote(details.querySelector("[data-vote]"));
+    if (!market) paintVote(details.querySelector("[data-vote]"));
     const shoppingButton = $("catalog-shopping-toggle");
     if (!shoppingButton.hidden) {
       const added = hasShoppingItem(shoppingProfile(), shoppingButton.dataset.shoppingItem);
@@ -592,7 +625,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const id = validCard(stop.id) ? stop.id : "";
       const key = `${port.id}-${id || index}`;
       const title = cleanTitle(stop.t);
-      const products = port.cards.filter(card => id && card.parentStop === id && selected(card.id));
       const subStops = Array.isArray(stop.sub) ? stop.sub.filter(child => child?.t && !child.skip) : [];
       const linkedCard = port.cards.find(card => matchesStop(card, stop));
       const navigation = !stop.gap && title
@@ -601,12 +633,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const when = Number.isFinite(start) ? NahaPlan.format(start) : stop.from || "";
       const meta = stop.skip ? "略過" : [when, Number(stop.min) > 0 ? `停留 ${stop.min} 分` : "",
         id && !sharedStops.has(id) ? "本機草稿" : ""].filter(Boolean).join(" · ");
-      const details = navigation || id || subStops.length || products.length ? `<details class="stop-details" data-stop="${e(key)}" ${opened.has(key) ? "open" : ""}>
+      const details = navigation || id || subStops.length ? `<details class="stop-details" data-stop="${e(key)}" ${opened.has(key) ? "open" : ""}>
         <summary>站點詳情</summary>
         ${stop.from && forecast ? `<p class="muted">原定時間 ${e(stop.from)}${stop.to ? "–" + e(stop.to) : " 起"}</p>` : ""}
         ${subStops.length ? `<ul>${subStops.map(child => `<li>${e(cleanTitle(child.t))}</li>`).join("")}</ul>` : ""}
-        ${products.length ? `<div class="stop-purchases"><strong>這一站的採買</strong><ul>${products.map(card =>
-          `<li><button class="quiet" type="button" data-open-card="${e(card.id)}">${e(card.title)}</button></li>`).join("")}</ul></div>` : ""}
         <div class="link-list">${navigation}
           ${id ? `<button class="quiet" type="button" data-discuss="${e(id)}" data-title="${e(title)}">留言 ${list(shared.comments, id).length || ""}</button>` : ""}
         </div>
@@ -653,7 +683,7 @@ document.addEventListener("DOMContentLoaded", () => {
     for (const id of products) if (!Object.hasOwn(items, id) && selected(id)) items[id] = false;
     // A removal made before votes loaded must also survive the one-time import.
     for (const id of Object.keys(items)) if (items[id] === null) delete items[id];
-    profile = { items, importedVotes: true };
+    profile = { ...profile, items, importedVotes: true };
     saveShoppingProfile(profile);
     return profile;
   }
@@ -689,11 +719,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const profile = shoppingProfile();
     const cards = portCatalog.filter(item => item.shopping && hasShoppingItem(profile, item.id));
     for (const [id, note] of Object.entries(profile?.notes || {})) {
-      if (note.port === port.id && hasShoppingItem(profile, id)) cards.push({ id, note: note.title });
+      if ((market || note.port === port.id) && hasShoppingItem(profile, id)) cards.push({ id, note: note.title });
     }
     const remaining = cards.filter(item => !profile.items[item.id]).length;
     $("shop-progress").hidden = !cards.length;
-    $("shop-summary").textContent = `${port.name} · 待買 ${remaining}／${cards.length} 件`;
+    $("shop-summary").textContent = `待買 ${remaining}／${cards.length} 件`;
     const count = $("shop-count");
     count.textContent = String(remaining);
     count.setAttribute("aria-label", `待買 ${remaining} 件`);
@@ -705,7 +735,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!cards.length) {
       const message = !name ? "選擇名字後，就能建立自己的採買清單。" :
         catalogState === "error" ? "商品資料暫時讀不到，請到「選商品」重新讀取。" :
-        catalogState !== "ready" ? "正在讀取商品…" : "這一港還沒有採買項目。可以直接記一筆，或從「選商品」加入。";
+        catalogState !== "ready" ? "正在讀取商品…" : "清單還沒有採買項目。可以直接記一筆，或從「選商品」加入。";
       target.replaceChildren(Object.assign(document.createElement("p"), { className: "notice", textContent: message }));
       return;
     }
@@ -717,11 +747,11 @@ document.addEventListener("DOMContentLoaded", () => {
       groups.get(venue).push(item);
     }
     if (!groups.size) {
-      target.textContent = "這一港都買齊了。取消「只看待買」就能查看已買品項。";
+      target.textContent = "清單上的東西都買齊了。取消「只看待買」就能查看已買品項。";
       return;
     }
     target.innerHTML = [...groups].map(([venue, items]) => `<section class="shop-group">
-      <div class="shop-heading"><h3>${e(venue)}</h3>${items[0].storeSearch ? external(OkinawaCatalogLocations.mapURL(items[0].storeSearch), "地圖") : ""}</div>
+      <div class="shop-heading"><h3>${e(venue)}</h3>${!market && items[0].storeSearch ? external(OkinawaCatalogLocations.mapURL(items[0].storeSearch), "地圖") : ""}</div>
       <ul>${items.map(item => {
         const { title, original } = item.note ? { title: item.note } : NahaCatalog.names(item);
         const checked = profile.items[item.id];
@@ -744,14 +774,14 @@ document.addEventListener("DOMContentLoaded", () => {
     $("identity-button").setAttribute("aria-label", name ? "切換名字，目前是 " + name : "設定我的名字");
     $("data-status").textContent = displayStatus;
     $("reload-data").disabled = loading || syncing;
-    $("sync-banner").hidden = !syncError;
+    $("sync-banner").hidden = market || !syncError;
     $("sync-button").hidden = !pending.some(canSend);
     $("sync-button").disabled = syncing || loading;
     $("sync-message").textContent = syncError;
   }
 
   function render() {
-    renderItinerary();
+    if (!market) renderItinerary();
     renderShopping();
     paintShoppingButtons();
     renderSync();
@@ -765,9 +795,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (syncing || loading) return;
     loading = true;
     renderSync();
-    const results = await Promise.allSettled(files.map(file => NahaShared.readPublic(file)));
+    const requestedFiles = market ? ["votes"] : files;
+    const results = await Promise.allSettled(requestedFiles.map(file => NahaShared.readPublic(file)));
     results.forEach((result, idx) => {
-      if (result.status === "fulfilled") shared[files[idx]] = result.value;
+      if (result.status === "fulfilled") shared[requestedFiles[idx]] = result.value;
     });
     const count = results.filter(result => result.status === "fulfilled").length;
     if (count) writeStorage(cacheKey, shared);
@@ -802,7 +833,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function syncPending() {
-    if (syncing || loading) return;
+    if (market || syncing || loading) return;
     const batch = pending.filter(canSend);
     if (!batch.length) return;
     syncing = true;
@@ -1021,7 +1052,7 @@ document.addEventListener("DOMContentLoaded", () => {
     else if (target.dataset.removeNote && name) {
       const profile = shoppingProfile();
       const id = target.dataset.removeNote;
-      if (profile.notes?.[id]?.port !== port.id) return;
+      if (!profile.notes?.[id] || (!market && profile.notes[id].port !== port.id)) return;
       const notes = { ...profile.notes };
       const items = { ...profile.items };
       delete notes[id];
@@ -1036,7 +1067,7 @@ document.addEventListener("DOMContentLoaded", () => {
     else if (target.dataset.openCard) showCatalogItem(target.dataset.openCard);
     else if (target.id === "shop-browse" && !alternateClick) {
       event.preventDefault();
-      catalogGroup = "gift";
+      catalogGroup = market ? "all" : "gift";
       typeChoice = "";
       catalogPage = 0;
       $("catalog-query").value = "";
@@ -1045,7 +1076,7 @@ document.addEventListener("DOMContentLoaded", () => {
       $("catalog-yt").setAttribute("aria-pressed", "false");
       showView("discussion");
     }
-    else if (target.matches("a[href^='#']") && panels.includes(target.hash.slice(1)) && !alternateClick) {
+    else if ((target.dataset.view || target.matches("a[href^='#']")) && panels.includes(target.hash.slice(1)) && !alternateClick) {
       event.preventDefault();
       showView(target.hash.slice(1));
     }
@@ -1095,7 +1126,7 @@ document.addEventListener("DOMContentLoaded", () => {
     askName(() => {
       const profile = shoppingProfile();
       const id = "note:" + crypto.randomUUID();
-      const notes = { ...profile.notes, [id]: { port: port.id, title } };
+      const notes = { ...profile.notes, [id]: { port: market ? "" : port.id, title } };
       const saved = saveShoppingProfile({ ...profile, notes, items: { ...profile.items, [id]: false } });
       input.value = "";
       render();
