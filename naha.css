@@ -218,8 +218,8 @@ textarea { resize: vertical; }
 .shop-save[aria-pressed="true"] { background: var(--soft); }
 
 
-#beauty-types { padding: 12px 0 8px; border-bottom: 1px solid var(--line); }
-#beauty-types h2 { font-size: .88rem; margin-bottom: 5px; }
-#beauty-choices { display: flex; flex-wrap: wrap; gap: 3px 4px; }
-#beauty-choices button { min-height: 44px; padding: 4px 9px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); font-size: .86rem; }
-#beauty-choices button[aria-pressed="true"] { background: var(--soft); color: var(--teal); font-weight: 750; }
+#catalog-types { padding: 12px 0 8px; border-bottom: 1px solid var(--line); }
+#catalog-types h2 { font-size: .88rem; margin-bottom: 5px; }
+#catalog-type-choices { display: flex; flex-wrap: wrap; gap: 3px 4px; }
+#catalog-type-choices button { min-height: 44px; padding: 4px 9px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); font-size: .86rem; }
+#catalog-type-choices button[aria-pressed="true"] { background: var(--soft); color: var(--teal); font-weight: 750; }

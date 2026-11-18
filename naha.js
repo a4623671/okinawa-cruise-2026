@@ -160,7 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let catalogIndex = new Map();
   let catalogState = "idle";
   let catalogGroup = "all";
-  let beautyChoice = "";
+  let typeChoice = "";
   let catalogPage = 0;
   const catalogPageSize = 8;
   if (!Array.isArray(pending)) pending = [];
@@ -309,19 +309,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function storeItems() {
     return portCatalog.filter(item => (catalogGroup === "all" || item.group === catalogGroup) &&
-      (catalogGroup !== "beauty" || !beautyChoice || item.beautyType === beautyChoice));
+      (catalogGroup === "all" || !typeChoice || item.catalogType === typeChoice));
   }
 
-  function renderBeautyChoices() {
-    const section = $("beauty-types");
-    section.hidden = catalogGroup !== "beauty";
+  function renderTypeChoices() {
+    const section = $("catalog-types");
+    section.hidden = catalogGroup === "all";
     if (section.hidden) return;
-    const available = new Set(portCatalog.map(item => item.beautyType).filter(Boolean));
-    if (!available.has(beautyChoice)) beautyChoice = "";
-    const types = ["", "貼布", "感冒藥・漢方", "眼藥水", "止痛藥", "腸胃藥", "鼻炎・過敏",
-      "外用藥", "防曬", "面膜", "清潔保養", "彩妝", "保健品", "其他藥妝"];
-    $("beauty-choices").innerHTML = types.filter(type => !type || available.has(type)).map(type =>
-      `<button type="button" data-beauty-type="${e(type)}" aria-pressed="${type === beautyChoice}">${e(type || "全部藥妝")}</button>`).join("");
+    const available = new Set(portCatalog.filter(item => item.group === catalogGroup).map(item => item.catalogType));
+    if (!available.has(typeChoice)) typeChoice = "";
+    const types = catalogGroup === "beauty" ? ["", "貼布", "感冒藥・漢方", "眼藥水", "止痛藥", "腸胃藥", "鼻炎・過敏",
+      "外用藥", "防曬", "面膜", "清潔保養", "彩妝", "保健品", "其他藥妝"] : ["", ...available];
+    $("catalog-type-choices").innerHTML = types.filter(type => !type || available.has(type)).map(type =>
+      `<button type="button" data-item-type="${e(type)}" aria-pressed="${type === typeChoice}">${e(type || "全部" + NahaCatalog.categories[catalogGroup])}</button>`).join("");
   }
 
   function updateCatalogStores() {
@@ -419,7 +419,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderCatalog() {
     if (catalogState !== "ready") return;
-    renderBeautyChoices();
+    renderTypeChoices();
     updateCatalogStores();
     const showMine = $("catalog-mine").checked;
     const recommendedOnly = $("catalog-yt").getAttribute("aria-pressed") === "true";
@@ -1004,14 +1004,14 @@ document.addEventListener("DOMContentLoaded", () => {
       selectPort(OKINAWA_PORTS.find(item => item.id === target.dataset.port));
       showView($("port-page").dataset.view);
     } else if (target.matches("[data-close]")) target.closest("dialog").close();
-    else if (target.hasAttribute("data-beauty-type")) {
-      beautyChoice = target.dataset.beautyType;
+    else if (target.hasAttribute("data-item-type")) {
+      typeChoice = target.dataset.itemType;
       catalogPage = 0;
       renderCatalog();
-      $("beauty-choices").querySelector('[aria-pressed="true"]').focus({ preventScroll: true });
+      $("catalog-type-choices").querySelector('[aria-pressed="true"]').focus({ preventScroll: true });
     }
     else if (target.dataset.catalogFilter) {
-      beautyChoice = "";
+      typeChoice = "";
       catalogGroup = target.dataset.catalogFilter;
       if (catalogGroup === "all") $("catalog-yt").setAttribute("aria-pressed", "false");
       catalogPage = 0;
@@ -1037,6 +1037,7 @@ document.addEventListener("DOMContentLoaded", () => {
     else if (target.id === "shop-browse" && !alternateClick) {
       event.preventDefault();
       catalogGroup = "gift";
+      typeChoice = "";
       catalogPage = 0;
       $("catalog-query").value = "";
       selectStore("");

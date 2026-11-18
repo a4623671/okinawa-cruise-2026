@@ -185,6 +185,58 @@ const NahaCatalog = (() => {
     return "其他藥妝";
   }
 
+  // Match the product or venue name, never the surrounding store or video description.
+  const kindRules = {
+    food: [
+      ["麵食", /拉麵|ラーメン|そば|八重山麵|宮古麵/],
+      ["海鮮・壽司", /海鮮|壽司|寿司|魚市場|泊いゆまち|ひとし/],
+      ["飯糰・漢堡", /飯糰|漢堡|バーガー|おにぎり/],
+      ["牛排・燒肉", /牛排|牛肉|石垣牛|燒肉|焼肉|琉球の牛|steak/i],
+      ["甜點・飲品", /冰淇淋|冰品|布丁|炸球|甜甜圈|blue seal|サーターアンダギー|製菓/i],
+      ["食堂・鄉土料理", /食堂|料理|豆腐/],
+    ],
+    spot: [
+      ["海岸・觀景", /海灘|海岸|海灣|海岬|海景|大橋|ビーチ|前浜|東平安名岬|川平湾|川平灣|17END|瀨長島/i],
+      ["神社・寺院", /神社|御嶽|八幡宮|護國|寺|孔子廟|波上宮|末吉宮|沖宮/],
+      ["博物館・展館", /博物館|美術館|水族館|ミュージアム/],
+      ["歷史・文化", /首里城|人頭税石|唐人墓|宮良殿内|やいま村|工房/],
+      ["街區・市場", /市場|國際通|美國村|商店街/],
+      ["遊覽體驗", /體驗|玻璃船|グラスボート/],
+    ],
+    shop: [
+      ["玩具・動漫", /玩具|扭蛋|動漫|おもちゃ|ガチャ|TOYS/i],
+      ["電器行", /Bic\s?Camera|ビックカメラ|電器/i],
+      ["百貨・商場", /DFS|Main Place|サンエー|りうぼう|百貨|購物中心|PARCO/i],
+      ["折扣賣場", /唐吉|ドン・キホーテ/],
+      ["商店街・市場", /商店街|市場|通り|浮島通|モール/],
+      ["伴手禮・工藝店", /工房|島の駅|土產|伴手禮|御菓子/],
+    ],
+    gift: [
+      ["酒類", /泡盛|啤酒|生啤/],
+      ["旅行・收納", /旅行|收納|購物袋|壓縮|頸枕|摺疊包|斜背包/],
+      ["生活小物", /3COINS/],
+      ["紀念品・工藝", /紀念|織布|織小物|吉祥物|グッズ|夾腳拖|島ぞうり/],
+      ["調味・食材", /胡椒|ラー油|辣油|豆腐の素|豆腐粉|雪塩（宮古島|宮古島雪鹽/],
+      ["鹹味零食", /蝦餅|仙貝|えびせん|椒鹽棒|プレッツェル|洋芋|ポテト/],
+      ["糖果・巧克力", /軟糖|黑糖|黑巧|黒糖|巧克力|チョコ|ハイチュウ|ぷっちょ/],
+      ["糕餅・甜點", /塔|糕|餅|蛋糕|甜甜圈|布丁|紅芋|紅いも|ちんすこう|ラングドシャ|ケーキ|サーターアンダギー|タルト|雪塩さんど|タンナファクルー/],
+      ["水果加工品", /加工品|果汁|芒果/],
+    ],
+    electronics: [
+      ["耳機・音訊", /耳機|AirPods|SONY (WF|WH|MDR)-|Bose|Soundcore|Buds|SOUNDPEATS|EarFun|final E500|Victor HA-|RP-HZ47|Shokz|JBL TOUR|HiTune|Beats Studio/i],
+      ["廚房家電", /炊飯|電鍋|電子鍋/],
+      ["健康・按摩", /体組成|體組成|體脂|血圧|血壓|按摩|マッサージ/],
+      ["美容・個人護理", /吹風|ドライヤー|シェーバー|牙刷|ソニッケアー|美容|美顔|刮鬍/],
+    ],
+  };
+
+  function catalogType(item, title) {
+    if (item.group === "beauty") return beautyType(item, title);
+    const text = [title, item.title, item.recommendation?.venue].filter(Boolean).join(" ");
+    const match = kindRules[item.group]?.find(([, pattern]) => pattern.test(text));
+    return match?.[0] || "其他" + categories[item.group];
+  }
+
   function itemsForPort(catalog, port) {
     const items = new Map();
     for (const item of catalog) {
@@ -216,8 +268,8 @@ const NahaCatalog = (() => {
       const search = [legacyText, item.title, title, original, item.category, item.store, item.storeSearch,
         item.recommendation?.venue, channels].join(" ");
       const store = item.store === "國際通藥妝店・大國藥妝 Lantana 店" ? "大國藥妝 國際通 Lantana 店" : item.store;
-      const type = beautyType(item, title);
-      return withCover({ ...item, store, beautyType: type, search: searchable(search + " " + type) });
+      const type = catalogType(item, title);
+      return withCover({ ...item, store, catalogType: type, search: searchable(search + " " + type) });
     });
   }
 
