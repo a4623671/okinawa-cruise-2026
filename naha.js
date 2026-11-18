@@ -651,8 +651,9 @@ document.addEventListener("DOMContentLoaded", () => {
     $("shop-progress").hidden = !cards.length;
     $("shop-summary").textContent = `${port.name} · 待買 ${remaining}／${cards.length} 件`;
     const count = $("shop-count");
-    count.textContent = String(cards.length);
-    count.hidden = !cards.length;
+    count.textContent = String(remaining);
+    count.setAttribute("aria-label", `待買 ${remaining} 件`);
+    count.hidden = !remaining;
     const identity = $("shopping-identity");
     identity.textContent = name || "設定名字";
     identity.setAttribute("aria-label", name ? "切換採買名字，目前是 " + name : "設定採買名字");
