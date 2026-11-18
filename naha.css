@@ -275,3 +275,11 @@ textarea { resize: vertical; }
 .market #catalog-status { scroll-margin-top: 58px; }
 
 .final-header #offline-status { flex-basis: 100%; font-size: .8rem; }
+
+
+button.rank-photo { padding: 0; border: 0; cursor: zoom-in; }
+button.rank-photo:disabled { cursor: default; }
+#rank-photo-dialog { width: min(100% - 22px, 690px); padding: 12px; max-height: calc(100dvh - 24px); }
+#rank-photo-large { display: block; width: 100%; max-height: min(68dvh, 560px); object-fit: contain; background: var(--paper); border-radius: 8px; }
+#rank-photo-caption { margin-top: 6px; }
+#rank-photo-source { display: inline-flex; align-items: center; min-height: 44px; }

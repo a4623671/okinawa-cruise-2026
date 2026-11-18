@@ -6,6 +6,32 @@ const OkinawaRankView = (onRender => {
   let group = groups.find(entry => entry.id === new URLSearchParams(location.search).get("category")) || groups[0];
   let source = "video";
 
+  const preview = document.getElementById("rank-photo-dialog");
+  const previewTitle = document.getElementById("rank-photo-title");
+  const previewImage = document.getElementById("rank-photo-large");
+  const previewLabel = document.getElementById("rank-photo-caption");
+  const previewSource = document.getElementById("rank-photo-source");
+  const previewError = document.getElementById("rank-photo-error");
+
+  function openPhoto(title, photo) {
+    previewTitle.textContent = title;
+    previewImage.alt = photo.alt || title;
+    previewImage.hidden = false;
+    previewError.hidden = true;
+    previewLabel.textContent = photo.label || "";
+    previewLabel.hidden = !photo.label;
+    previewSource.hidden = !photo.source;
+    if (photo.source) previewSource.href = photo.source;
+    else previewSource.removeAttribute("href");
+    previewImage.src = photo.url;
+    preview.showModal();
+  }
+
+  previewImage.addEventListener("error", () => {
+    previewImage.hidden = true;
+    previewError.hidden = false;
+  });
+
   for (const entry of groups) {
     const button = document.createElement("button");
     button.type = "button";
@@ -43,13 +69,13 @@ const OkinawaRankView = (onRender => {
         link.textContent = label + " ↗";
       }
       const photo = OkinawaShoppingPhotos.get(title);
-      const media = document.createElement(photo?.source ? "a" : "div");
+      const media = document.createElement(photo ? "button" : "div");
       media.className = "rank-photo photo-frame";
-      if (photo?.source) {
-        media.href = photo.source;
-        media.target = "_blank";
-        media.rel = "noopener";
-        media.setAttribute("aria-label", title + "圖片來源");
+      if (photo) {
+        media.type = "button";
+        media.setAttribute("aria-label", "放大" + title + "商品照");
+        media.setAttribute("aria-haspopup", "dialog");
+        media.addEventListener("click", () => openPhoto(title, photo));
       }
       const missing = document.createElement("span");
       missing.className = "photo-message";
@@ -64,6 +90,7 @@ const OkinawaRankView = (onRender => {
         image.addEventListener("error", () => {
           image.hidden = true;
           missing.hidden = false;
+          media.disabled = true;
           media.querySelector(".rank-photo-label")?.remove();
         }, { once: true });
         media.append(image);

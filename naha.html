@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f6f2">
   <title>沖繩郵輪｜三港行程與討論</title>
-  <link rel="stylesheet" href="naha.css?v=20261118-system">
+  <link rel="stylesheet" href="naha.css?v=20261118-photo-zoom">
   <link id="board-style" rel="stylesheet" href="trip-board.css?v=20261117-ports-r12">
   <script src="trip-data.js" defer></script>
   <script src="trip-timing.js" defer></script>
@@ -13,12 +13,12 @@
   <script src="naha-content.js?v=20261116-ports-r5" defer></script>
   <script src="naha-shopping-names.js?v=20261116-ports-r4" defer></script>
   <script src="trip-catalog-locations.js?v=20261117-ports-r8" defer></script>
-  <script src="shopping-photos.js?v=20261118-system" defer></script>
-  <script src="shopping-ranks-data.js?v=20261118-system" defer></script>
-  <script src="naha-catalog.js?v=20261118-system" defer></script>
+  <script src="shopping-photos.js?v=20261118-photo-zoom" defer></script>
+  <script src="shopping-ranks-data.js?v=20261118-photo-zoom" defer></script>
+  <script src="naha-catalog.js?v=20261118-photo-zoom" defer></script>
   <script src="trip-board-ui.js?v=20261117-ports-r12" defer></script>
-  <script src="shopping-ranks.js?v=20261118-system" defer></script>
-  <script src="naha.js?v=20261118-system" defer></script>
+  <script src="shopping-ranks.js?v=20261118-photo-zoom" defer></script>
+  <script src="naha.js?v=20261118-photo-zoom" defer></script>
 </head>
 <body>
   <header class="top">
@@ -93,7 +93,7 @@
     <section id="discussion" class="pane" aria-labelledby="discussion-heading" hidden>
       <div class="section-head">
         <h1 id="discussion-heading">完整項目清單</h1>
-        <a id="catalog-ranks" class="text-link" data-view="ranks" href="?area=shopping&amp;v=20261118-system#ranks" hidden>推薦排行 ↗</a>
+        <a id="catalog-ranks" class="text-link" data-view="ranks" href="?area=shopping&amp;v=20261118-photo-zoom#ranks" hidden>推薦排行 ↗</a>
       </div>
       <div id="catalog-tools" hidden>
         <label class="sr-only" for="catalog-query">搜尋完整項目</label>
@@ -184,6 +184,17 @@
     </header>
     <input id="store-query" type="search" placeholder="搜尋店家名稱" aria-label="搜尋店家名稱">
     <div id="store-options" role="group" aria-label="店家選項"></div>
+  </dialog>
+
+  <dialog id="rank-photo-dialog" aria-labelledby="rank-photo-title">
+    <div class="dialog-heading">
+      <h2 id="rank-photo-title">商品照</h2>
+      <button class="quiet" type="button" data-close autofocus>關閉</button>
+    </div>
+    <img id="rank-photo-large" alt="">
+    <p id="rank-photo-error" class="muted" role="status" hidden>暫時無法載入商品照。</p>
+    <p id="rank-photo-caption" class="muted" hidden></p>
+    <a id="rank-photo-source" class="text-link" target="_blank" rel="noopener" hidden>查看照片來源 ↗</a>
   </dialog>
 
   <dialog id="catalog-dialog" aria-labelledby="catalog-title">
