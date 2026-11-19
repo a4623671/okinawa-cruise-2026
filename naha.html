@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f6f2">
   <title>沖繩郵輪｜三港行程與討論</title>
-  <link rel="stylesheet" href="naha.css?v=20261119-top30">
+  <link rel="stylesheet" href="naha.css?v=20261119-note-photo">
   <link id="board-style" rel="stylesheet" href="trip-board.css?v=20261117-ports-r12">
   <script src="trip-data.js" defer></script>
   <script src="trip-timing.js" defer></script>
@@ -20,7 +20,7 @@
   <script src="shopping-ranks.js?v=20261119-top30" defer></script>
   <script src="shopping-price-list.js?v=20261118-price-coverage" defer></script>
   <script src="shopping-prices.js?v=20261118-online-price" defer></script>
-  <script src="naha.js?v=20261119-top30" defer></script>
+  <script src="naha.js?v=20261119-note-photo" defer></script>
 </head>
 <body>
   <header class="top">
@@ -163,6 +163,7 @@
         <input id="shop-note" aria-label="自訂採買品項" placeholder="想買什麼？例如：眼藥水 2 盒" maxlength="100" required>
         <button class="button secondary" type="submit">記一筆</button>
       </form>
+      <div id="shop-note-matches" class="shop-note-matches" role="group" aria-label="選商品並帶入照片" hidden></div>
       <div id="shop-progress" class="shop-progress" hidden>
         <strong id="shop-summary" role="status"></strong>
         <label><input id="shop-pending" type="checkbox">只看待買</label>

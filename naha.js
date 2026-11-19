@@ -425,6 +425,7 @@ document.addEventListener("DOMContentLoaded", () => {
     refreshRanks?.();
     renderCatalog();
     renderShopping();
+    renderNoteMatches();
   }
 
   function catalogVote(id) {
@@ -727,6 +728,65 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const hasShoppingItem = (profile, id) => typeof profile?.items[id] === "boolean";
 
+  const noteName = value => value.normalize("NFKC").toLocaleLowerCase("zh-TW").replace(/[^\p{L}\p{N}]+/gu, "");
+  const noteWithoutQuantity = value => value.normalize("NFKC")
+    .replace(/\s*\d+(?:\.\d+)?\s*(?:盒|瓶|罐|包|個|件|組|套|條|支|片|台|份|杯|雙|袋|顆)\s*$/u, "").trim();
+  const canAttachPhoto = item => item?.shopping && item.image && !item.imageIsCover;
+
+  function notePhotoMatches(value) {
+    const exactName = noteName(value);
+    const query = noteName(noteWithoutQuantity(value));
+    if (query.length < 2) return { exact: null, choices: [] };
+    const exact = new Map();
+    const choices = new Map();
+    for (const item of portCatalog) {
+      if (!canAttachPhoto(item)) continue;
+      const { title, original } = NahaCatalog.names(item);
+      const names = [title, original].filter(Boolean).map(noteName);
+      const key = names[0] + "\n" + item.image;
+      if (names.includes(exactName) || names.includes(query)) exact.set(key, item);
+      else if (choices.size < 3 && names.some(name => name.includes(query))) choices.set(key, item);
+    }
+    return {
+      exact: exact.size === 1 ? exact.values().next().value : null,
+      choices: [...exact.values(), ...choices.values()].slice(0, 3),
+    };
+  }
+
+  function renderNoteMatches() {
+    const target = $("shop-note-matches");
+    const { exact, choices } = notePhotoMatches($("shop-note").value);
+    target.hidden = !choices.length;
+    if (!choices.length) {
+      target.replaceChildren();
+      return;
+    }
+    target.innerHTML = `<p class="muted">${exact ? "記一筆會帶入商品照" : "點商品即可記一筆並帶入照片"}</p>` +
+      choices.map(item => {
+        const { title } = NahaCatalog.names(item);
+        return `<button type="button" data-note-product="${e(item.id)}">${photoSlot(item, "shop-thumb")}<span>${e(title)}</span></button>`;
+      }).join("");
+    loadPhotos(target);
+  }
+
+  function addShoppingNote(product) {
+    const input = $("shop-note");
+    const title = input.value.trim();
+    if (!title) return input.focus();
+    askName(() => {
+      const profile = shoppingProfile();
+      const id = "note:" + newToken();
+      const note = { port: market ? "" : port.id, title };
+      if (canAttachPhoto(product)) note.productId = product.id;
+      const notes = { ...profile.notes, [id]: note };
+      const saved = saveShoppingProfile({ ...profile, notes, items: { ...profile.items, [id]: false } });
+      input.value = "";
+      renderNoteMatches();
+      render();
+      announce(saved ? "已記下品項" : "這次變更只保留在目前頁面");
+    }, "儲存並記下品項");
+  }
+
   function toggleShoppingItem(id) {
     const primary = NahaCatalog.primaryId(id);
     if (!catalogIndex.get(primary)?.shopping) return;
@@ -803,7 +863,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const profile = shoppingProfile();
     const cards = portCatalog.filter(item => item.shopping && hasShoppingItem(profile, item.id));
     for (const [id, note] of Object.entries(profile?.notes || {})) {
-      if ((market || note.port === port.id) && hasShoppingItem(profile, id)) cards.push({ id, note: note.title });
+      if ((market || note.port === port.id) && hasShoppingItem(profile, id)) {
+        const match = note.productId ? catalogIndex.get(note.productId) : notePhotoMatches(note.title).exact;
+        cards.push({ id, note: note.title, product: canAttachPhoto(match) ? match : null });
+      }
     }
     const remaining = cards.filter(item => !profile.items[item.id]).length;
     $("shop-progress").hidden = !cards.length;
@@ -838,14 +901,16 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="shop-heading"><h3>${e(venue)}</h3>${!market && items[0].storeSearch ? external(OkinawaCatalogLocations.mapURL(items[0].storeSearch), "地圖") : ""}</div>
       <ul>${items.map(item => {
         const { title, original } = item.note ? { title: item.note } : NahaCatalog.names(item);
+        const productTitle = item.product ? NahaCatalog.names(item.product).title : "";
+        const linkedTitle = productTitle && noteName(noteWithoutQuantity(title)) !== noteName(productTitle) ? productTitle : "";
         const checked = profile.items[item.id];
         const pricing = item.note ? null : OkinawaShoppingPrices.forItem(item, title, original);
         const legacyPrice = !pricing?.offers.length && /\d/.test(item.price || "") ? item.price : "";
         return `<li>
-          <label class="shop-item${item.note ? " shop-note-item" : ""}">
+          <label class="shop-item${item.note && !item.product ? " shop-note-item" : ""}">
             <input class="shop-check" type="checkbox" aria-label="已買 ${e(title)}" data-bought="${e(item.id)}" ${checked ? "checked" : ""}>
-            ${item.note ? "" : photoSlot(item, "shop-thumb")}
-            <span class="shop-names"><strong>${e(title)}</strong>${original ? `<small class="shop-original" lang="ja">${e(original)}</small>` : ""}${legacyPrice ? `<small class="shop-original">原清單參考 ${e(legacyPrice)}</small>` : ""}</span>
+            ${item.note && !item.product ? "" : photoSlot(item.product || item, "shop-thumb")}
+            <span class="shop-names"><strong>${e(title)}</strong>${linkedTitle ? `<small class="shop-original">${e(linkedTitle)}</small>` : ""}${original ? `<small class="shop-original" lang="ja">${e(original)}</small>` : ""}${legacyPrice ? `<small class="shop-original">原清單參考 ${e(legacyPrice)}</small>` : ""}</span>
           </label>
           ${item.note ? `<button class="quiet shop-detail" type="button" data-remove-note="${e(item.id)}" aria-label="移除${e(title)}">移除</button>` :
             `<button class="quiet shop-detail" type="button" data-catalog-item="${e(item.id)}" aria-label="查看${e(title)}資料">詳情</button>`}
@@ -1250,20 +1315,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
   $("shop-pending").addEventListener("change", renderShopping);
+  $("shop-note").addEventListener("input", renderNoteMatches);
+  $("shop-note-matches").addEventListener("click", event => {
+    const button = event.target.closest("[data-note-product]");
+    if (button) addShoppingNote(catalogIndex.get(button.dataset.noteProduct));
+  });
   $("shop-note-form").addEventListener("submit", event => {
     event.preventDefault();
-    const input = $("shop-note");
-    const title = input.value.trim();
-    if (!title) return input.focus();
-    askName(() => {
-      const profile = shoppingProfile();
-      const id = "note:" + crypto.randomUUID();
-      const notes = { ...profile.notes, [id]: { port: market ? "" : port.id, title } };
-      const saved = saveShoppingProfile({ ...profile, notes, items: { ...profile.items, [id]: false } });
-      input.value = "";
-      render();
-      announce(saved ? "已記下品項" : "這次變更只保留在目前頁面");
-    }, "儲存並記下品項");
+    addShoppingNote(notePhotoMatches($("shop-note").value).exact);
   });
   $("shopping-list").addEventListener("change", event => {
     const id = event.target.dataset.bought;

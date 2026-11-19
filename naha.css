@@ -232,6 +232,11 @@ textarea { resize: vertical; }
 
 .shop-note-form { display: flex; gap: 8px; margin-bottom: 8px; }
 .shop-note-form input { min-width: 0; flex: 1; border: 1px solid var(--line); border-radius: 9px; padding: 8px 10px; }
+.shop-note-matches { margin-bottom: 8px; padding: 8px; border: 1px solid var(--line); border-radius: 10px; background: var(--white); }
+.shop-note-matches p { padding: 0 5px 3px; }
+.shop-note-matches button { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 44px; padding: 4px 5px; border: 0; border-radius: 7px; background: transparent; color: var(--teal); font-size: .86rem; font-weight: 700; text-align: start; }
+.shop-note-matches button:hover { background: var(--soft); }
+.shop-note-matches .shop-thumb { flex: none; width: 32px; height: 32px; }
 .shop-progress { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px 8px; margin-bottom: 6px; }
 .shop-progress label { min-height: 44px; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
 .shop-progress input { accent-color: var(--teal); }
