@@ -22,7 +22,8 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .customs{background:#fff8e1;border:1px solid #f0dfa8;border-radius:12px;margin:10px 12px 0;padding:10px 12px;font-size:13px;color:#6b4d00}
 .customs summary{font-weight:800;cursor:pointer}
 .customs ul{margin:6px 0 0 18px}
-.days{display:flex;gap:8px;padding:10px 12px;background:#fff;border-bottom:1px solid #e2e8f0;overflow-x:auto;position:sticky;top:47px;z-index:19;scrollbar-width:none}
+.day-nav{position:sticky;top:47px;z-index:19}
+.days{display:flex;gap:8px;padding:10px 12px;background:#fff;border-bottom:1px solid #e2e8f0;overflow-x:auto;scrollbar-width:none}
 .days::-webkit-scrollbar{display:none}
 .day{flex:none;border:1px solid #d8e0ea;border-radius:16px;padding:5px 13px;font-size:14px;background:#fff;cursor:pointer;text-align:center}
 .day small{display:block;font-size:11px;color:#888}
@@ -147,8 +148,14 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .mapbox{position:relative;flex:1;min-height:280px}
 .mapfabs{position:absolute;right:10px;bottom:12px;z-index:1100;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
 .mapfabs button{width:46px;height:46px;border-radius:50%;border:1px solid #d8e0ea;background:#fff;font-size:20px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;padding:0}
-.fab .geo-toggle,.mapfabs .geo-toggle{width:auto;border-radius:24px;padding-inline:12px;color:#10293f;font-size:13px;font-weight:800;white-space:nowrap}
-.fab .geo-toggle[aria-pressed="true"],.mapfabs .geo-toggle[aria-pressed="true"]{border-color:#10293f;background:#10293f;color:#fff}
+.geo-toggle{position:relative}
+.geo-toggle span{filter:grayscale(1);opacity:.65}
+.geo-toggle::after{content:"";position:absolute;top:7px;right:7px;width:8px;height:8px;border-radius:50%;background:#94a3ad}
+.geo-toggle[aria-pressed="true"]{border-color:#17877a;background:#e5f1e9}
+.geo-toggle[aria-pressed="true"] span{filter:none;opacity:1}
+.geo-toggle[aria-pressed="true"]::after{background:#1dc68e;box-shadow:0 0 0 2px #136658}
+.geo-status{flex:none;padding:3px 12px;background:#eaf4f2;border-bottom:1px solid #c8e0db;color:#285950;font-size:12px;font-weight:650}
+.geo-status.error{background:#fff4e4;border-color:#edd6b5;color:#783919}
 .movfoot{padding:10px 14px;font-size:13px;border-top:1px solid #eee;max-height:42%;overflow:auto}
 .movfoot a{display:inline-block;margin:3px 6px 3px 0;background:#eef4ff;border:1px solid #9db8e8;color:#2b4d8f;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;text-decoration:none}
 .movfoot .fmapbtn{display:inline-block;margin:3px 6px 3px 0;background:#eef4ff;border:1px solid #9db8e8;color:#2b4d8f;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer}
@@ -207,8 +214,11 @@ body.dark .smbtn.on{background:#0ea5e9;border-color:#0ea5e9;color:#062033}
 body.dark .gapbar{background:#241a33;border-color:#4a3a66;color:#c9a8f0}
 body.dark .gapbar .gapt{color:#a58ad0}
 body.dark .mapfabs button{background:#1b2733;border-color:#2c3a49;color:#dbe4ec}
-body.dark .fab .geo-toggle,body.dark .mapfabs .geo-toggle{background:#1b2733;border-color:#567089;color:#f1f5f9}
-body.dark .geo-toggle[aria-pressed="true"],body.dark .map-route-card{background:#16354f;color:#f1f5f9;border-color:#567089}
+body.dark .geo-toggle{background:#1b2733;border-color:#567089;color:#f1f5f9}
+body.dark .geo-toggle[aria-pressed="true"]{background:#174438;border-color:#46a884}
+body.dark .geo-status{background:#193b35;border-color:#34594f;color:#daf6eb}
+body.dark .geo-status.error{background:#492e20;border-color:#80533b;color:#ffddb4}
+body.dark .map-route-card{background:#16354f;color:#f1f5f9;border-color:#567089}
 body.dark .map-route-heading h3,body.dark .map-route-heading span,body.dark .map-route-note,body.dark .map-route-card small{color:#dbe4ec}
 body.dark .map-route-leg{background:#1b2733;color:#dbe4ec;border-color:#567089}
 body.dark .pdots span{background:#2c3a49}
@@ -242,7 +252,7 @@ body.dark .mined{background:#16212c;color:#9fc3ff}
 #txtpre{background:#fff;border:1px solid #dbe4ec;border-radius:14px;padding:18px 20px;font:13.5px/1.85 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word;color:#1f2937;box-shadow:0 2px 10px rgba(15,23,42,.06);margin:0}
 body.dark .txtbar button{background:#1b2733;color:#dbe4ec;border-color:#2c3a49}
 body.dark #txtpre{background:#1b2733;border-color:#2c3a49;color:#dbe4ec}
-@media print{.topbar,.days,.fab,.customs,#nowtoast,.meline{display:none}.plan{display:block!important;padding:0}.stop{break-inside:avoid}}
+@media print{.topbar,.day-nav,.fab,.customs,#nowtoast,.meline{display:none}.plan{display:block!important;padding:0}.stop{break-inside:avoid}}
 </style>
 </head>
 <body>
@@ -285,21 +295,25 @@ body.dark #txtpre{background:#1b2733;border-color:#2c3a49;color:#dbe4ec}
 <li>本頁風險等級僅為公開預報推估；<b>是否靠港一律由船長與當地港務局現場決定</b></li>
 </ul>
 </details>
+<div class="day-nav">
 <div class="days" id="days"></div>
+<div id="geo-status" class="geo-status" role="status" hidden></div>
+</div>
 <div id="content"></div>
 <div id="textview" style="display:none">
 <div class="txtbar"><button onclick="copyText()">📋 複製全部</button><button onclick="downloadText()">⬇️ 下載 TXT</button><button onclick="toggleText(false)">🗂 回卡片版</button></div>
 <pre id="txtpre"></pre>
 </div>
 <div class="fab">
-<button id="fabMe" class="geo-toggle" type="button" aria-label="定位" aria-pressed="false" onclick="locateMe()">📍 開啟定位</button>
+<button id="fabMe" class="geo-toggle" type="button" aria-label="定位" aria-pressed="false" onclick="locateMe()"><span aria-hidden="true">📍</span></button>
 <button id="fabMap" title="當日地圖" onclick="openMap()">🗺</button>
 </div>
 <div class="mov" id="mapov">
 <div class="movcard">
 <div class="movhead"><span id="mapTitle">🗺 地圖</span><button onclick="closeMap()">✕ 關閉</button></div>
+<div id="map-geo-status" class="geo-status" role="status" hidden></div>
 <div class="mapbox"><div id="movMap"></div>
-<div class="mapfabs"><button id="mfabMe" class="geo-toggle" type="button" aria-label="定位" aria-pressed="false" onclick="locateMe()">📍 開啟定位</button><button id="mfabNow" title="定位行程（現在／下一站）" onclick="focusNowOnMap()">⏱</button></div>
+<div class="mapfabs"><button id="mfabMe" class="geo-toggle" type="button" aria-label="定位" aria-pressed="false" onclick="locateMe()"><span aria-hidden="true">📍</span></button><button id="mfabNow" title="定位行程（現在／下一站）" onclick="focusNowOnMap()">⏱</button></div>
 </div>
 <div class="movfoot" id="mapfoot"></div>
 </div>
@@ -970,15 +984,22 @@ var GEOID=null,GEOGEN=0;
 function paintGeoToggle(){
  var active=GEOID!=null;
  ['fabMe','mfabMe'].forEach(function(id){
-  var b=document.getElementById(id);
-  b.setAttribute('aria-pressed',String(active));
-  b.textContent=active?'📍 關閉定位':'📍 開啟定位';
+  document.getElementById(id).setAttribute('aria-pressed',String(active));
  });
+}
+function paintGeoStatus(message,isError){
+ ['geo-status','map-geo-status'].forEach(function(id){
+  var el=document.getElementById(id);
+  if(el.textContent!==message)el.textContent=message;
+  el.classList.toggle('error',Boolean(isError));
+  el.hidden=!message;
+ });
+ if(MAPOPEN&&MAP)MAP.invalidateSize({pan:false});
 }
 function redrawGeoMap(){
  if(MAPOPEN){if(MAPMODE)drawSubMap();else drawDayMap();}
 }
-function stopGeo(){
+function stopGeo(message){
  var watch=GEOID;
  GEOID=null;GEOGEN++;
  if(watch!=null)navigator.geolocation.clearWatch(watch);
@@ -986,16 +1007,20 @@ function stopGeo(){
  var line=document.getElementById('meline');
  line.textContent='';line.style.display='none';
  paintGeoToggle();
+ paintGeoStatus(message||'',Boolean(message));
  redrawGeoMap();
 }
-function geoOk(p){ME=[p.coords.latitude,p.coords.longitude,p.coords.accuracy||null];gotoMe();}
+function geoOk(p){
+ if(!ME)paintGeoStatus('');
+ ME=[p.coords.latitude,p.coords.longitude,p.coords.accuracy||null];gotoMe();
+}
 function geoErr(error){
- stopGeo();
- toast(error&&error.code===1?'請允許定位權限後再開啟':'暫時讀不到位置，請再試一次');
+ var message=error&&error.code===1?'請在瀏覽器允許定位':'暫時讀不到位置，請再試一次';
+ stopGeo(message);
 }
 function locateMe(){
- if(!navigator.geolocation){toast('此裝置不支援定位');return;}
- if(GEOID!=null){stopGeo();toast('📍 已關閉定位');return;}
+ if(!navigator.geolocation){paintGeoStatus('此裝置不支援定位',true);return;}
+ if(GEOID!=null){stopGeo();return;}
  var generation=++GEOGEN;
  try{
   GEOID=navigator.geolocation.watchPosition(
@@ -1005,7 +1030,7 @@ function locateMe(){
   );
  }catch(error){geoErr(error);return;}
  paintGeoToggle();
- toast('📡 等待定位訊號…');
+ paintGeoStatus('正在取得定位…');
 }
 function gotoMe(){
  var el=document.getElementById('meline');
