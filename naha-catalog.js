@@ -293,9 +293,13 @@ const NahaCatalog = (() => {
   }
 
   function withShoppingRanks(products) {
-    const { groups, sources, youtube } = OkinawaShoppingRanks;
+    const { groups, sources, youtube, formerEntries } = OkinawaShoppingRanks;
     const rankedIds = new Map();
     const equivalentTitles = new Map([["3COINS 衣物壓縮袋", "3COINS 旅行衣物壓縮袋"]]);
+    const formerTitles = new Map([
+      ["八重山南風堂沖夢紫紅芋塔", "御菓子御殿沖夢紫紅芋塔"],
+      ["護那酷涼外用液", "護那酷涼外用凝膠"],
+    ]);
 
     function addChoice({ title, group, match, note, video, source, matchTitle }) {
       const photo = OkinawaShoppingPhotos.get(title);
@@ -318,7 +322,7 @@ const NahaCatalog = (() => {
         return;
       }
 
-      const id = "rank-" + group + "-" + encodeURIComponent(title);
+      const id = "rank-" + group + "-" + encodeURIComponent(formerTitles.get(title) || title);
       const type = group === "smallGoods" && title.startsWith("3COINS") ? "生活小物" :
         group === "cosmetics" ? (/面膜/.test(title) ? "面膜" : "彩妝保養") :
         group === "electronics" ? kindRules.electronics.find(([, pattern]) => pattern.test(title))?.[0] || "其他電器" :
@@ -343,6 +347,10 @@ const NahaCatalog = (() => {
           addChoice({ title, group, note, source: sources[key] });
         }
       }
+    }
+    for (const [group, kind, title, key, detail, note] of formerEntries) {
+      if (kind === "video") addChoice({ title, group, note, matchTitle: true, video: youtube(key, detail, title) });
+      else addChoice({ title, group, note: detail, source: sources[key] });
     }
     return { items: [...products.values()], rankedIds };
   }

@@ -82,7 +82,7 @@ const OkinawaShoppingRanks = (() => {
         ["星之太郎沖繩限定辣寬麵", "kart", 235, "把系列名和辣味版本一起抄下來。"],
         ["沖繩蕎麥風即食麵", "kart", 337, "面向貨架時找「沖縄そば」包裝並核對配料。"],
         ["石垣鹽金楚糕", "ishigaki", 51, "和宮古島雪鹽版比產區與盒裝片數。"],
-        ["御菓子御殿沖夢紫紅芋塔", "ishigaki", 138, "選購時找「沖夢紫」，盒子與經典款不同。"],
+        ["八重山南風堂沖夢紫紅芋塔", "ishigaki", 138, "選購時找「沖夢紫」，盒子與經典款不同。"],
         ["ROYCE’ 石垣島黑糖巧克力", "ishigaki", 396, "看黑糖版外盒，和同牌洋芋片分開挑。"],
         ["石垣之鹽", "ishigaki", 654, "廚房型伴手禮，可挑重量輕的小包。"],
         ["石垣島花生糕 Kunpen", "ishigaki", 847, "傳統烤點，找包裝上的「くんぺん」。"],
@@ -220,7 +220,7 @@ const OkinawaShoppingRanks = (() => {
         ["無比止癢 EX", "masaDrug", 502, "認 EX 版本與塗抹瓶型，核對包裝。"],
         ["Q&P Kowa Gold Premium", "masaDrug", 525, "用 Gold Premium 字樣和錠數辨認。"],
         ["明治膠原蛋白粉", "masaDrug", 560, "罐裝和補充袋可分開找。"],
-        ["護那酷涼外用凝膠", "masaDrug", 680, "影片可對照管裝與外盒名稱。"],
+        ["護那酷涼外用液", "masaDrug", 680, "影片可對照日文外盒和瓶身。"],
         ["APAGARD 牙膏", "masaDrug", 716, "同牌容量和系列較多，結帳前核對一次。"],
         ["休足時間舒緩貼片", "masaDrug", 899, "可用外盒和每包片數比較。"],
         ["Chocola BB Plus", "masaDrug", 1130, "認 Plus 錠包裝，與同系列飲品區分。"],
@@ -345,7 +345,7 @@ const OkinawaShoppingRanks = (() => {
         ["3COINS 防靜電梳", "merry", 0, "看梳面大小，想隨身帶可以先試握。"],
         ["3COINS 吸水手腕帶", "merry", 0, "影片有實測，想帶出門可先看厚度。"],
         ["3COINS 防曬袖套", "merry2", 0, "看袖口和長度，再挑適合的款。"],
-        ["3COINS 刷具收納套", "merry2", 0, "先量家中最長的刷具能不能放入。"],
+        ["3COINS 迷你玩具相機", "yoshidaGoods", 85, "按下快門前可先看影片中的尺寸與玩法。"],
         ["3COINS 隨行傘架", "merry2", 0, "先看固定方式，再對照自己的傘柄。"],
         ["3COINS 洗米籃", "zhi", 0, "看籃面孔洞和倒水方式。"],
         ["3COINS 快速解凍盤", "zhi", 0, "選購前可以先看影片裡的尺寸和厚度。"],
@@ -355,9 +355,9 @@ const OkinawaShoppingRanks = (() => {
         ["3COINS 折疊旅行袋", "yoshidaGoods", 1125, "實測段能看展開體積和收起大小。"],
         ["3COINS 行李拉桿杯架", "yoshidaGoods", 264, "先量行李箱拉桿寬度，再看杯架開口。"],
         ["3COINS 半自動捲線器", "yoshidaGoods", 1275, "看收線方式，再核對線材粗細。"],
-        ["3COINS 防盜錢包", "yoshidaGoods", 931, "看可放的卡片和掛戴方式。"],
-        ["3COINS 刷具清洗碗", "yoshidaGoods", 1065, "看底部清洗紋路和收起的厚度。"],
-        ["3COINS 矽膠肥皂盒", "yoshidaGoods", 1436, "先確認肥皂大小和盒子開合方式。"],
+        ["3COINS 可折疊行李箱", "yoshidaGoods", 152, "影片展示如何折疊，買前可比收合與展開的尺寸。"],
+        ["3COINS 折疊椅", "yoshida", 199, "影片展示整張椅子，可先核對收合體積。"],
+        ["3COINS 旅行延長線盤", "yoshidaGoods", 288, "可看插座與充電孔配置，購買時核對機身標示。"],
         ["3COINS 防水手機支架", "yoshida", 1567, "先量含手機殼的大小，影片有實測。"],
         ["3COINS 水壺晾乾架", "yoshida", 1766, "可拿常用水壺的高度和口徑比較。"],
         ["3COINS 磁吸環形補光燈", "yoshida", 1446, "先看磁吸位置，再看亮度調整。"],
@@ -378,7 +378,7 @@ const OkinawaShoppingRanks = (() => {
         ["3COINS 行李拉桿杯架", "jpGoods", "用拉桿寬度與常用杯子口徑比對。"],
         ["3COINS 3WAY 拉桿收納包", "jpGoods", "可看不同掛法與收納位置。"],
         ["3COINS 可折疊行李箱", "jpGoods", "先確認折起與展開的大小。"],
-        ["3COINS 防盜髮圈", "jpGoods", "看看收納袋如何打開，先比能放的物件。"],
+        ["3COINS 自動收衣架", "fanfan", "原文有收折示範，可看單手取得衣物的方式。"],
         ["3COINS 薄紗水母手機掛繩", "jpGoods", "有多種顏色，先檢查自己的手機殼能否固定。"],
         ["3COINS 輕便腳架自拍棒", "jpGoods", "核對折起長度與手機夾寬度。"],
         ["3COINS 防滴水手機盒 Plus", "jpGoods", "原文有壁掛方式，先核對手機是否放得下。"],
@@ -388,7 +388,7 @@ const OkinawaShoppingRanks = (() => {
         ["3COINS 多合一眼鏡盒", "jpGoods", "同盒收眼鏡與隱形眼鏡，先檢查鏡框大小。"],
         ["3COINS 六用微波調理盒", "jpGoods", "看附件件數和微波爐內部尺寸。"],
         ["3COINS 防靜電梳", "jpGoods", "確認梳面和手柄長度是否好攜帶。"],
-        ["3COINS 刷具清洗盒", "jpGoods", "可比較清洗紋路與晾乾位置。"],
+        ["3COINS 微波爐烹飪杯", "fanfan", "外出前想買小型廚具，可以先看杯身和配件。"],
         ["3COINS 旅用旋轉藥盒", "fanfan", "原文有分格照片，選之前可看容量。"],
         ["3COINS 手機掛繩", "fanfan", "先核對手機殼是否留得下掛片。"],
         ["3COINS 輕巧砧板", "fanfan", "看放入抽屜後需要的長寬。"],
@@ -397,6 +397,16 @@ const OkinawaShoppingRanks = (() => {
     },
   ];
 
+  // Keep IDs for items already saved from earlier editions.
+  const formerEntries = [
+    ["smallGoods", "video", "3COINS 刷具收納套", "merry2", 0, "先量家中最長的刷具能不能放入。"],
+    ["smallGoods", "video", "3COINS 防盜錢包", "yoshidaGoods", 931, "看可放的卡片和掛戴方式。"],
+    ["smallGoods", "video", "3COINS 刷具清洗碗", "yoshidaGoods", 1065, "看底部清洗紋路和收起的厚度。"],
+    ["smallGoods", "video", "3COINS 矽膠肥皂盒", "yoshidaGoods", 1436, "先確認肥皂大小和盒子開合方式。"],
+    ["smallGoods", "taiwan", "3COINS 防盜髮圈", "jpGoods", "看看收納袋如何打開，先比能放的物件。"],
+    ["smallGoods", "taiwan", "3COINS 刷具清洗盒", "jpGoods", "可比較清洗紋路與晾乾位置。"],
+  ];
+
   const youtube = (channel, start, label) => ({ ...channels[channel], start, label });
-  return { sources, groups, youtube };
+  return { sources, groups, youtube, formerEntries };
 })();
