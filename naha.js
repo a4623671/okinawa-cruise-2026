@@ -176,6 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let portCatalog = [];
   let catalogIndex = new Map();
   let rankedIds = new Map();
+  let refreshRanks;
   let catalogState = "idle";
   let catalogGroup = "all";
   let typeChoice = "";
@@ -421,6 +422,7 @@ document.addEventListener("DOMContentLoaded", () => {
     $("catalog-places").innerHTML = filters(NahaCatalog.placeGroups);
     $("catalog-products").innerHTML = filters(market ? ["all", "beauty", "cosmetics", "electronics", "gift", "smallGoods"] : ["gift"]);
     updatePortCatalog();
+    refreshRanks?.();
     renderCatalog();
     renderShopping();
   }
@@ -1300,7 +1302,10 @@ document.addEventListener("DOMContentLoaded", () => {
     for (const id of ["days", "mapdays"]) page.getElementById(id)?.addEventListener("click", matchBoardDate);
     alignSchedule();
   });
-  if (market) OkinawaRankView(paintShoppingButtons);
+  if (market) refreshRanks = OkinawaRankView(paintShoppingButtons, title => {
+    const item = catalogIndex.get(rankedIds.get(title));
+    return item?.photo || (item?.image && !item.imageIsCover ? { url: item.image } : undefined);
+  });
   if (!market && new URLSearchParams(location.search).has("port")) writeStorage(lastPortKey, port.id);
   updatePortHeader();
   updatePortCatalog();

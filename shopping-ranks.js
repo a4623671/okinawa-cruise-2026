@@ -1,4 +1,4 @@
-const OkinawaRankView = (onRender => {
+const OkinawaRankView = ((onRender, catalogPhoto) => {
   const { groups, sources, youtube } = OkinawaShoppingRanks;
   const groupMenu = document.getElementById("rank-groups");
   const sourceMenu = document.getElementById("rank-sources");
@@ -68,7 +68,7 @@ const OkinawaRankView = (onRender => {
         link.href = url;
         link.textContent = label + " ↗";
       }
-      const photo = OkinawaShoppingPhotos.get(title);
+      const photo = OkinawaShoppingPhotos.get(title) || catalogPhoto(title);
       const media = document.createElement(photo ? "button" : "div");
       media.className = "rank-photo photo-frame";
       if (photo) {
@@ -129,4 +129,5 @@ const OkinawaRankView = (onRender => {
     render();
   });
   render();
+  return render;
 });

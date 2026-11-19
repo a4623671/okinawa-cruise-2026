@@ -293,17 +293,18 @@ const NahaCatalog = (() => {
   }
 
   function withShoppingRanks(products) {
-    const groups = OkinawaShoppingRanks.groups;
+    const { groups, sources, youtube } = OkinawaShoppingRanks;
     const rankedIds = new Map();
     const equivalentTitles = new Map([["3COINS 衣物壓縮袋", "3COINS 旅行衣物壓縮袋"]]);
 
-    function addChoice({ title, group, match, note, video, source }) {
+    function addChoice({ title, group, match, note, video, source, matchTitle }) {
       const photo = OkinawaShoppingPhotos.get(title);
       const equivalent = equivalentTitles.get(title);
       const existing = products.get(rankedIds.get(equivalent || title)) || [...products.values()].find(item => {
         if (item.group !== group) return false;
         const name = names(item).title;
-        if (video) return match?.test([item.title, name].join(" "));
+        if (video && match?.test([item.title, name].join(" "))) return true;
+        if (video && !matchTitle) return false;
         return searchable(name) === searchable(title) ||
           (photo?.url.startsWith("images/goods/") && !photo.label && item.image?.endsWith(photo.url));
       });
@@ -330,10 +331,17 @@ const NahaCatalog = (() => {
       rankedIds.set(title, id);
     }
 
-    for (const product of OkinawaShoppingRanks.productVideos) addChoice(product);
-    for (const { group, taiwan } of groups) {
-      for (const [title, key, note] of taiwan) {
-        addChoice({ title, group, note, source: OkinawaShoppingRanks.sources[key] });
+    // Resolve the original recommendations first to preserve saved item IDs.
+    for (const [start, end] of [[0, 10], [10, 30]]) {
+      for (const { group, video } of groups) {
+        for (const [title, channel, offset, note, match] of video.slice(start, end)) {
+          addChoice({ title, group, note, match, matchTitle: start > 0, video: youtube(channel, offset, title) });
+        }
+      }
+      for (const { group, taiwan } of groups) {
+        for (const [title, key, note] of taiwan.slice(start, end)) {
+          addChoice({ title, group, note, source: sources[key] });
+        }
       }
     }
     return { items: [...products.values()], rankedIds };
