@@ -252,6 +252,10 @@ textarea { resize: vertical; }
 #catalog-type-choices button[aria-pressed="true"] { background: var(--soft); color: var(--teal); font-weight: 750; }
 
 .market-nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.shopping-embedded .top { display: none; }
+.shopping-embedded .shell { width: calc(100% - 20px); }
+.shopping-embedded .views { margin-bottom: 12px; }
+.shopping-embedded .views a { font-size: .875rem; }
 .market .ports, .market .views:not(.market-nav), .market .catalog-group:first-child,
 .market .catalog-options label, .market .page-footer, .market #settings-button { display: none; }
 .market .catalog-groups { display: block; padding: 4px; margin-top: 12px; background: var(--paper); }

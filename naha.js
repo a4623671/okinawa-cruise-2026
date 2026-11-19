@@ -124,9 +124,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const scheduleFrame = $("schedule-frame");
   const portLinks = document.querySelectorAll("[data-port]");
   const viewLinks = document.querySelectorAll(".views [data-view]");
-  const market = new URLSearchParams(location.search).get("area") === "shopping" || location.hash === "#shopping";
+  const params = new URLSearchParams(location.search);
+  const market = params.get("area") === "shopping" || location.hash === "#shopping";
   const groupNames = { all: "全部", ...NahaCatalog.categories, ...(market && { beauty: "藥妝", cosmetics: "美妝", gift: "伴手禮", smallGoods: "小物" }) };
   document.body.classList.toggle("market", market);
+  document.body.classList.toggle("shopping-embedded", market && params.get("embed") === "1");
   document.querySelector(".market-nav").hidden = !market;
   if (market) {
     document.title = "我的採買｜沖繩郵輪";
