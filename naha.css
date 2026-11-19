@@ -287,9 +287,10 @@ textarea { resize: vertical; }
 }
 
 .rank-photo { display: grid; width: 68px; height: 68px; }
+.rank-photo:has(.rank-photo-label) { align-self: start; height: auto; grid-template-rows: 68px auto; }
 .rank-photo .photo-message { font-size: .65rem; padding: 2px; }
 
-.rank-photo-label { position: absolute; right: 0; bottom: 0; padding: 1px 4px; background: var(--ink); color: var(--white); font-size: .63rem; border-radius: 4px 0 0; }
+.rank-photo-label { padding: 2px 3px; color: var(--muted); font-size: .63rem; }
 .market .catalog-gallery:has(img:only-child) { grid-template-columns: minmax(0, 1fr); }
 
 
