@@ -1,39 +1,43 @@
 const frame = document.getElementById("final-frame");
-const download = document.getElementById("offline-download");
-const offlineStatus = document.getElementById("offline-status");
-const fallback = document.getElementById("offline-fallback");
-const currentSnapshot = () => OfflineTrip.snapshot(frame.contentWindow.PLAN, frame.contentWindow.DAYS);
+function bindDownload(page) {
+  const download = page.getElementById("offline-download");
+  if (!download) return;
 
-function checkSnapshot() {
-  const next = currentSnapshot();
-  if (!next) return null;
-  offlineStatus.textContent = next.label;
-  download.disabled = false;
-  fallback.hidden = true;
-  return next;
-}
-
-download.addEventListener("click", () => {
-  const next = checkSnapshot();
-  if (!next) return;
-  const url = URL.createObjectURL(new Blob([OfflineTrip.render(next)], { type: "text/html;charset=utf-8" }));
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "沖繩離線行程.html";
-  link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-});
-
-const deadline = Date.now() + 20_000;
-const timer = setInterval(() => {
-  if (checkSnapshot()) {
-    clearInterval(timer);
-  } else if (Date.now() >= deadline) {
-    clearInterval(timer);
-    offlineStatus.textContent = "線上排程暫時讀不到。";
-    fallback.hidden = false;
+  const snapshot = () => OfflineTrip.snapshot(frame.contentWindow.PLAN, frame.contentWindow.DAYS);
+  download.hidden = false;
+  download.addEventListener("click", () => {
+    const trip = snapshot();
+    const link = document.createElement("a");
+    if (!trip) {
+      link.href = "offline.html?v=20261119-ishigaki-lunch";
+      link.download = "沖繩備用離線行程.html";
+      link.click();
+      return;
+    }
+    const url = URL.createObjectURL(new Blob([OfflineTrip.render(trip)], { type: "text/html;charset=utf-8" }));
+    link.href = url;
+    link.download = "沖繩離線行程.html";
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+  if (snapshot()) {
+    download.disabled = false;
+    return;
   }
-}, 250);
+  const deadline = Date.now() + 20_000;
+  const timer = setInterval(() => {
+    if (!download.isConnected) {
+      clearInterval(timer);
+    } else if (snapshot()) {
+      download.disabled = false;
+      clearInterval(timer);
+    } else if (Date.now() >= deadline) {
+      download.textContent = "下載備用行程";
+      download.disabled = false;
+      clearInterval(timer);
+    }
+  }, 250);
+}
 
 const day = new URLSearchParams(location.search).get("day");
 
@@ -52,7 +56,8 @@ frame.addEventListener("load", () => {
   }
 
   const entrance = page.querySelector('.topbar a[href="index.html"]');
-  if (entrance) entrance.style.display = "none";
+  if (entrance) entrance.target = "_top";
+  bindDownload(page);
   const planner = page.querySelector('.topbar a[href="plan.html"]');
   if (planner) {
     const port = { "2026-12-17": "miyako", "2026-12-18": "naha", "2026-12-19": "ishigaki" };

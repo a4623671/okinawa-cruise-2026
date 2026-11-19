@@ -4,16 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<title>MSC榮耀號・沖繩岸上觀光定稿（排程板自動生成）</title>
+<title>沖繩渡假5天4夜遊</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;background:#f2f4f7;color:#222;line-height:1.6}
-.topbar{background:#fff;border-bottom:1px solid #e2e8f0;padding:8px 10px;display:flex;align-items:center;gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;position:sticky;top:0;z-index:20}
-.topbar::-webkit-scrollbar{display:none}
-.topbar .logo{font-weight:800;font-size:15px;white-space:nowrap;flex:none}
-.topbar>a{flex:none;white-space:nowrap;font-size:13px;color:#10293f;text-decoration:none;font-weight:700}
-.topbar .sp{flex:1;min-width:2px}
-.topbar button{border:1px solid #d8e0ea;background:#fff;border-radius:18px;padding:5px 11px;font-size:13px;cursor:pointer;flex:none;white-space:nowrap}
+.topbar{background:#fff;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:20}
+.trip-heading,.trip-actions{display:flex;align-items:center;padding-inline:12px;gap:8px}
+.trip-heading{height:38px;gap:12px}
+.trip-heading h1{font-weight:800;font-size:17px;margin:0}
+.trip-actions{height:40px;overflow-x:auto;scrollbar-width:none}
+.trip-actions::-webkit-scrollbar{display:none}
+.topbar a,.topbar button{flex:none;white-space:nowrap;font-size:13px;font-weight:700;text-decoration:none;color:#10293f}
+.trip-actions a,.trip-actions button{border:1px solid #d8e0ea;background:#fff;border-radius:12px;padding:6px 10px;cursor:pointer}
+.trip-actions #offline-download{background:#146052;border-color:#146052;color:#fff}
+.trip-actions #offline-download:disabled{opacity:.55}
 .hero{background:linear-gradient(135deg,#0e3a5d,#146b8c);color:#fff;padding:16px 14px 12px}
 .hero h1{font-size:19px;margin-bottom:4px}
 .hero .meta{font-size:13px;opacity:.92}
@@ -22,7 +26,7 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .customs{background:#fff8e1;border:1px solid #f0dfa8;border-radius:12px;margin:10px 12px 0;padding:10px 12px;font-size:13px;color:#6b4d00}
 .customs summary{font-weight:800;cursor:pointer}
 .customs ul{margin:6px 0 0 18px}
-.day-nav{position:sticky;top:47px;z-index:19}
+.day-nav{position:sticky;top:79px;z-index:19}
 .days{display:flex;gap:8px;padding:10px 12px;background:#fff;border-bottom:1px solid #e2e8f0;overflow-x:auto;scrollbar-width:none}
 .days::-webkit-scrollbar{display:none}
 .day{flex:none;border:1px solid #d8e0ea;border-radius:16px;padding:5px 13px;font-size:14px;background:#fff;cursor:pointer;text-align:center}
@@ -179,7 +183,7 @@ button.map-route-main{flex:1;min-height:44px;padding:0;border:0;background:trans
 .ver{text-align:center;font-size:11.5px;color:#98a4b3;padding:8px 0 20px}
 body.dark{background:#0f1720;color:#dbe4ec}
 body.dark .topbar,body.dark .days{background:#16212c;border-color:#24313f}
-body.dark .topbar button,body.dark .day{background:#1b2733;color:#dbe4ec;border-color:#2c3a49}
+body.dark .topbar a,body.dark .topbar button,body.dark .day{background:#1b2733;color:#dbe4ec;border-color:#2c3a49}
 body.dark .day.on{background:#0ea5e9;border-color:#0ea5e9;color:#062033}
 body.dark .day.on small{color:#062033}
 body.dark .stop,body.dark .health,body.dark .info,body.dark .movcard{background:#1b2733;color:#dbe4ec}
@@ -255,20 +259,23 @@ body.dark #txtpre{background:#1b2733;border-color:#2c3a49;color:#dbe4ec}
 </head>
 <body>
 <div class="topbar">
-<div class="logo">📋 定稿</div>
-<a href="index.html">‹ 入口</a>
-<a href="plan.html">排程板</a>
-<div class="sp"></div>
+<div class="trip-heading">
+<a href="index.html">‹ 首頁</a>
+<h1>沖繩渡假5天4夜遊</h1>
+</div>
+<div class="trip-actions" aria-label="行程工具">
+<button id="offline-download" type="button" hidden disabled>下載離線行程</button>
 <button type="button" onclick="openShopping()" id="btnGift" aria-haspopup="dialog">🎁 我的採買</button>
 <button onclick="toggleText()" id="btnTxt">📄 文字版</button>
 <button onclick="locateNow()">⏱ 目前行程</button>
+<a href="plan.html">排程</a>
 <button onclick="cycleFs()">A</button>
 <button onclick="toggleDark()">🌙</button>
 <button onclick="window.print()">🖨</button>
 <button onclick="location.href='admin.html'">« 管理</button>
 </div>
+</div>
 <div class="hero">
-<h1>MSC榮耀號・沖繩5日｜岸上觀光定稿</h1>
 <div class="meta" id="herometa">2026/12/16 基隆 → 宮古島 → 那霸 → 石垣島 → 12/20 基隆</div>
 <div class="nowline" id="nowline">⌛ 讀取排程板…</div>
 <div class="meline" id="meline"></div>
