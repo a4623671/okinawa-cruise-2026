@@ -8,7 +8,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;background:#f2f4f7;color:#222;line-height:1.6}
-.topbar{background:#fff;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:20}
+.topbar{background:#fff;border-bottom:1px solid #e2e8f0}
 .trip-heading,.trip-actions{display:flex;align-items:center;padding-inline:12px;gap:8px}
 .trip-heading{height:38px;gap:12px}
 .trip-heading h1{font-weight:800;font-size:17px;margin:0}
@@ -26,7 +26,7 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .customs{background:#fff8e1;border:1px solid #f0dfa8;border-radius:12px;margin:10px 12px 0;padding:10px 12px;font-size:13px;color:#6b4d00}
 .customs summary{font-weight:800;cursor:pointer}
 .customs ul{margin:6px 0 0 18px}
-.day-nav{position:sticky;top:79px;z-index:19}
+.day-nav{position:sticky;top:0;z-index:19}
 .days{display:flex;gap:8px;padding:10px 12px;background:#fff;border-bottom:1px solid #e2e8f0;overflow-x:auto;scrollbar-width:none}
 .days::-webkit-scrollbar{display:none}
 .day{flex:none;border:1px solid #d8e0ea;border-radius:16px;padding:5px 13px;font-size:14px;background:#fff;cursor:pointer;text-align:center}
@@ -265,7 +265,6 @@ body.dark #txtpre{background:#1b2733;border-color:#2c3a49;color:#dbe4ec}
 </div>
 <div class="trip-actions" aria-label="行程工具">
 <button id="offline-download" type="button" hidden disabled>下載離線行程</button>
-<button type="button" onclick="openShopping()" id="btnGift" aria-haspopup="dialog">🎁 我的採買</button>
 <button onclick="toggleText()" id="btnTxt">📄 文字版</button>
 <button onclick="locateNow()">⏱ 目前行程</button>
 <a href="plan.html">排程</a>
@@ -310,6 +309,7 @@ body.dark #txtpre{background:#1b2733;border-color:#2c3a49;color:#dbe4ec}
 <pre id="txtpre"></pre>
 </div>
 <div class="fab">
+<button id="btnGift" type="button" aria-label="我的採買" title="我的採買" aria-haspopup="dialog" aria-controls="shopping-dialog" onclick="openShopping()"><span aria-hidden="true">🎁</span></button>
 <button id="fabMe" class="geo-toggle" type="button" aria-label="定位" aria-pressed="false" onclick="locateMe()"><span aria-hidden="true">📍</span></button>
 <button id="fabMap" title="當日地圖" onclick="openMap()">🗺</button>
 </div>
