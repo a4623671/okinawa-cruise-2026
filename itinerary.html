@@ -136,7 +136,7 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .gd{font-size:11px;color:#667;padding:2px 8px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .gv{font-size:11px;color:#0b6e5f;font-weight:700;padding:4px 8px 7px;margin-top:auto}
 .info{background:#fff;border-radius:12px;padding:12px 14px;font-size:13.5px;color:#445;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.fab{position:fixed;right:12px;bottom:16px;z-index:30;display:flex;flex-direction:column;gap:8px}
+.fab{position:fixed;right:12px;bottom:16px;z-index:30;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
 .fab button{width:48px;height:48px;border-radius:50%;border:1px solid #d8e0ea;background:#fff;font-size:21px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.25)}
 .mov{position:fixed;inset:0;z-index:50;display:none;background:rgba(0,0,0,.45)}
 .mov.open{display:block}
@@ -145,14 +145,28 @@ body{font-family:-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei"
 .movhead button{margin-left:auto;border:none;border-radius:16px;padding:6px 14px;cursor:pointer}
 #movMap{width:100%;height:100%}
 .mapbox{position:relative;flex:1;min-height:280px}
-.mapfabs{position:absolute;right:10px;bottom:12px;z-index:1100;display:flex;flex-direction:column;gap:8px}
+.mapfabs{position:absolute;right:10px;bottom:12px;z-index:1100;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
 .mapfabs button{width:46px;height:46px;border-radius:50%;border:1px solid #d8e0ea;background:#fff;font-size:20px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;padding:0}
+.fab .geo-toggle,.mapfabs .geo-toggle{width:auto;border-radius:24px;padding-inline:12px;color:#10293f;font-size:13px;font-weight:800;white-space:nowrap}
+.fab .geo-toggle[aria-pressed="true"],.mapfabs .geo-toggle[aria-pressed="true"]{border-color:#10293f;background:#10293f;color:#fff}
 .movfoot{padding:10px 14px;font-size:13px;border-top:1px solid #eee;max-height:42%;overflow:auto}
 .movfoot a{display:inline-block;margin:3px 6px 3px 0;background:#eef4ff;border:1px solid #9db8e8;color:#2b4d8f;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;text-decoration:none}
 .movfoot .fmapbtn{display:inline-block;margin:3px 6px 3px 0;background:#eef4ff;border:1px solid #9db8e8;color:#2b4d8f;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer}
 .movfoot .fmapbtn.on{background:#10293f;color:#fff;border-color:#10293f}
-.lg{margin-right:9px;white-space:nowrap}
-.lgline{display:inline-block;width:22px;vertical-align:middle;margin-right:3px}
+.map-route-heading{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:2px 8px}
+.map-route-heading h3{font-size:15px;color:#10293f}
+.map-route-heading span,.map-route-note{font-size:11.5px;color:#49596d}
+.map-route-strip{display:flex;align-items:stretch;gap:6px;overflow-x:auto;overscroll-behavior-x:contain;padding:5px 0 4px}
+.map-route-strip:focus-visible{outline-offset:-2px}
+.map-route-card{flex:0 0 clamp(128px,40vw,176px);min-width:0;border:1px solid #d8e0ea;border-radius:10px;padding:7px 8px;background:#fff;color:#10293f;text-align:left;font:inherit;line-height:1.35;overflow-wrap:anywhere}
+button.map-route-card{cursor:pointer}
+.map-route-card strong,.map-route-card small{display:block}
+.map-route-card small{margin-top:4px;color:#49596d;font-size:11.5px}
+.map-route-card.current{border-color:#a96025}
+.map-route-card.port{flex-basis:106px;background:#e9f3f0}
+.map-route-card.gap{flex-basis:104px;background:#fff7e8}
+.map-route-leg{align-self:center;flex:0 0 70px;border:1px solid #d8e0ea;border-radius:9px;padding:5px 3px;background:#f4f7fb;color:#33415c;text-align:center;font-size:11.5px;line-height:1.4}
+.map-route-leg strong{display:block}
 .giftsheet{padding:12px 14px;overflow:auto;flex:1}
 .giftsheet h3{font-size:15px;margin:10px 0 4px}
 .giftsheet li{margin:3px 0 3px 18px;font-size:13.5px}
@@ -193,6 +207,10 @@ body.dark .smbtn.on{background:#0ea5e9;border-color:#0ea5e9;color:#062033}
 body.dark .gapbar{background:#241a33;border-color:#4a3a66;color:#c9a8f0}
 body.dark .gapbar .gapt{color:#a58ad0}
 body.dark .mapfabs button{background:#1b2733;border-color:#2c3a49;color:#dbe4ec}
+body.dark .fab .geo-toggle,body.dark .mapfabs .geo-toggle{background:#1b2733;border-color:#567089;color:#f1f5f9}
+body.dark .geo-toggle[aria-pressed="true"],body.dark .map-route-card{background:#16354f;color:#f1f5f9;border-color:#567089}
+body.dark .map-route-heading h3,body.dark .map-route-heading span,body.dark .map-route-note,body.dark .map-route-card small{color:#dbe4ec}
+body.dark .map-route-leg{background:#1b2733;color:#dbe4ec;border-color:#567089}
 body.dark .pdots span{background:#2c3a49}
 body.dark .pdots span.on{background:#9fc3ff}
 body.dark .pinbtn{background:#16212c;border-color:#2c3a49;color:#dbe4ec}
@@ -274,14 +292,14 @@ body.dark #txtpre{background:#1b2733;border-color:#2c3a49;color:#dbe4ec}
 <pre id="txtpre"></pre>
 </div>
 <div class="fab">
-<button id="fabMe" title="我的位置" onclick="locateMe()">📍</button>
+<button id="fabMe" class="geo-toggle" type="button" aria-label="定位" aria-pressed="false" onclick="locateMe()">📍 開啟定位</button>
 <button id="fabMap" title="當日地圖" onclick="openMap()">🗺</button>
 </div>
 <div class="mov" id="mapov">
 <div class="movcard">
 <div class="movhead"><span id="mapTitle">🗺 地圖</span><button onclick="closeMap()">✕ 關閉</button></div>
 <div class="mapbox"><div id="movMap"></div>
-<div class="mapfabs"><button id="mfabMe" title="我的位置" onclick="locateMe()">📍</button><button id="mfabNow" title="定位行程（現在／下一站）" onclick="focusNowOnMap()">⏱</button></div>
+<div class="mapfabs"><button id="mfabMe" class="geo-toggle" type="button" aria-label="定位" aria-pressed="false" onclick="locateMe()">📍 開啟定位</button><button id="mfabNow" title="定位行程（現在／下一站）" onclick="focusNowOnMap()">⏱</button></div>
 </div>
 <div class="movfoot" id="mapfoot"></div>
 </div>
@@ -948,22 +966,46 @@ function paintNowline(){
 setInterval(function(){paintNowline();paintNow();},30000);
 
 /* ================= GPS ================= */
-var GEOID=null;
+var GEOID=null,GEOGEN=0;
+function paintGeoToggle(){
+ var active=GEOID!=null;
+ ['fabMe','mfabMe'].forEach(function(id){
+  var b=document.getElementById(id);
+  b.setAttribute('aria-pressed',String(active));
+  b.textContent=active?'📍 關閉定位':'📍 開啟定位';
+ });
+}
+function redrawGeoMap(){
+ if(MAPOPEN){if(MAPMODE)drawSubMap();else drawDayMap();}
+}
+function stopGeo(){
+ var watch=GEOID;
+ GEOID=null;GEOGEN++;
+ if(watch!=null)navigator.geolocation.clearWatch(watch);
+ ME=null;
+ var line=document.getElementById('meline');
+ line.textContent='';line.style.display='none';
+ paintGeoToggle();
+ redrawGeoMap();
+}
 function geoOk(p){ME=[p.coords.latitude,p.coords.longitude,p.coords.accuracy||null];gotoMe();}
-function geoErr(){if(GEOID!=null){try{navigator.geolocation.clearWatch(GEOID);}catch(x){}}GEOID=null;toast('定位失敗：請允許定位權限');}
-function startGeo(){GEOID=navigator.geolocation.watchPosition(geoOk,geoErr,{enableHighAccuracy:true,maximumAge:15000,timeout:20000});}
+function geoErr(error){
+ stopGeo();
+ toast(error&&error.code===1?'請允許定位權限後再開啟':'暫時讀不到位置，請再試一次');
+}
 function locateMe(){
  if(!navigator.geolocation){toast('此裝置不支援定位');return;}
- if(GEOID!=null){toast('📍 已開啟定位'+(ME?'':'（等待訊號…）'));if(ME)gotoMe();return;}
- toast('📡 定位中…');startGeo();
-}
-function tryAutoGeo(){
- if(GEOID!=null||!navigator.geolocation)return;
+ if(GEOID!=null){stopGeo();toast('📍 已關閉定位');return;}
+ var generation=++GEOGEN;
  try{
-  if(navigator.permissions&&navigator.permissions.query){
-   navigator.permissions.query({name:'geolocation'}).then(function(s){if(s.state==='granted')startGeo();}).catch(function(){});
-  }
- }catch(e){}
+  GEOID=navigator.geolocation.watchPosition(
+   function(position){if(generation===GEOGEN)geoOk(position);},
+   function(error){if(generation===GEOGEN)geoErr(error);},
+   {enableHighAccuracy:true,maximumAge:15000,timeout:20000}
+  );
+ }catch(error){geoErr(error);return;}
+ paintGeoToggle();
+ toast('📡 等待定位訊號…');
 }
 function gotoMe(){
  var el=document.getElementById('meline');
@@ -974,7 +1016,7 @@ function gotoMe(){
    txt+='：距「'+String(t.o.t).replace(/✅/g,'').trim()+'」約 '+km.toFixed(1)+' km（步行約 '+Math.round(km*1.35/4.5*60)+' 分）・方位 '+dirName(b)+'（'+Math.round(b)+'°）';}
  }
  el.textContent=txt;el.style.display='block';
- if(MAPOPEN){if(MAPMODE)drawSubMap();else drawDayMap();}
+ redrawGeoMap();
 }
 
 /* ================= 地圖 ================= */
@@ -986,7 +1028,6 @@ function openMap(){
   if(!window.L){document.getElementById('movMap').innerHTML='<div style="padding:20px">地圖元件載入失敗（需連網）</div>';return;}
   if(!MAP){MAP=L.map('movMap');L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(MAP);}
   drawDayMap();
-  tryAutoGeo();
   setTimeout(function(){try{MAP.invalidateSize();}catch(e){}},150);
  },60);
 }
@@ -1025,40 +1066,92 @@ function focusNowOnMap(){
  }
  toast((r.kind==='cur'?'📍 目前：':'⏳ 下一站：')+String(t.o.t).replace(/✅/g,'').trim());
 }
+function drawRouteStrip(d,seq,numbers,nowK,nowLbl){
+ var foot=document.getElementById('mapfoot'),old=foot.querySelector('.map-route-strip');
+ var left=old&&foot.dataset.routeDay===d.k?old.scrollLeft:0;
+ var focused=old&&old.contains(document.activeElement)?document.activeElement.dataset.mapStop:null;
+ var times=new Map((TIMES[d.k]||[]).map(function(t){return [t.k,t];}));
+ var cards=[],after=[],key='in';
+ function portCard(title,time,detail){
+  return '<div class="map-route-card port"><strong>'+title+'</strong><small>'+esc(time||'')+(detail?'<br>'+esc(detail):'')+'</small></div>';
+ }
+ function traffic(k){
+  var leg=cache.legs[d.k+':'+k];
+  if(leg&&leg.cross)return '<div class="map-route-leg"><strong>跨港</strong>交通另計</div>';
+  return '<div class="map-route-leg">'+esc((leg&&MODEN[leg.mode])||'交通')+'<strong>'+(leg&&leg.min!=null?fmtMin(leg.min):'待估')+'</strong></div>';
+ }
+ function timeLabel(t){
+  return t&&t.s!=null&&t.e!=null?hm2s(t.s)+'–'+hm2s(t.e):'時間待估';
+ }
+ cards.push(portCard(d.arr?'🚢 下船':'⚓ 集合',dayOff(d),d.arr?'到港 '+d.arr:''));
+ seq.forEach(function(x,k){
+  if(x.o.skip)return;
+  var title=esc(String(x.o.t).replace(/✅/g,'').trim());
+  var time=timeLabel(times.get(k));
+  if(x.o.gap){
+   var gap='<div class="map-route-card gap"><strong>'+title+'</strong><small>'+time+'</small></div>';
+   (x.o.after?after:cards).push(gap);
+   return;
+  }
+  cards.push(traffic(key));
+  if(after.length){cards.push.apply(cards,after);after=[];}
+  var tag=MKREF[k]?'button':'div';
+  var button=MKREF[k]?' type="button" data-map-stop="'+k+'" onclick="mapFocusPin('+k+')"':'';
+  cards.push('<'+tag+' class="map-route-card'+(k===nowK?' current':'')+'"'+button+'>'
+   +'<strong>'+numbers[k]+'. '+title+'</strong><small>'+time+'<br>停留 '+fmtMin(x.o.min||0)
+   +(k===nowK?'・'+nowLbl:'')+'</small></'+tag+'>');
+  key=String(k);
+ });
+ if(after.length)cards.push.apply(cards,after);
+ if(key!=='in')cards.push(traffic('out'));
+ var board=dayBoard(d);
+ if(board||d.dep)cards.push(portCard(board?'🚢 最晚回船':'🚢 啟航',board||d.dep,board&&d.dep?'啟航 '+d.dep:''));
+ foot.innerHTML='<div class="map-route-heading"><h3>行程順序</h3><span>左右滑動 · 點站名看地圖</span></div>'
+  +(ME?'<p class="map-route-note">藍點是我的位置</p>':'')
+  +'<div class="map-route-strip" tabindex="0" role="group" aria-label="行程順序，可左右滑動">'+cards.join('')+'</div>';
+ foot.dataset.routeDay=d.k;
+ foot.querySelector('.map-route-strip').scrollLeft=left;
+ if(focused!=null){
+  var button=foot.querySelector('[data-map-stop="'+focused+'"]');
+  if(button)button.focus({preventScroll:true});
+ }
+}
 function drawDayMap(){
  if(!MAP)return;
  MAPMODE=null;
  MKREF={};
  document.getElementById('mfabNow').style.display='flex';
- if(LYR){LYR.clearLayers();}
+ if(LYR)MAP.removeLayer(LYR);
  LYR=L.layerGroup().addTo(MAP);
  var di=DAYS.findIndex(function(d){return d.k===curDay;});var d=DAYS[di];
  document.getElementById('mapTitle').textContent='🗺 '+d.t+'・'+d.port;
  var pc=PORT[d.port];
- var it=PLAN.items[d.k],seq=flatOf(d);
- var pts=[],bounds=[];
-  if(pc){pts.push([pc.lat,pc.lng]);L.marker([pc.lat,pc.lng],{icon:L.divIcon({className:'',html:pin('🚢','#10293f',30),iconSize:[30,30]})}).addTo(LYR).bindPopup('<b>'+esc(pc.n)+'</b>');bounds.push([pc.lat,pc.lng]);}
+ var seq=PLAN&&PLAN.items[d.k]&&d.plan?flatOf(d):[];
+ var bounds=[],numbers={};
+  if(pc){L.marker([pc.lat,pc.lng],{icon:L.divIcon({className:'',html:pin('🚢','#10293f',30),iconSize:[30,30]})}).addTo(LYR).bindPopup('<b>'+esc(pc.n)+'</b>');bounds.push([pc.lat,pc.lng]);}
   var nr=findNow(),nowK=-1,nowLbl='';
   if(nr&&!nr.toast&&DAYS[nr.di]&&DAYS[nr.di].k===d.k){var tt=(TIMES[d.k]||[])[nr.i];if(tt&&!tt.skip){nowK=tt.k;nowLbl=(nr.kind==='cur'?'📍 現在':'⏳ 下一站');}}
   var cnt=0;
   seq.forEach(function(x,k){
+   if(x.o.gap)return;
+   if(!x.o.skip)numbers[k]=++cnt;
    var c=coordOf(x.o);if(!c)return;
    if(x.o.skip){
     L.marker(c,{icon:L.divIcon({className:'',html:'<div style="background:#b8c4d0;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;border:2px solid #fff;opacity:.75">⏭</div>',iconSize:[24,24]})}).addTo(LYR).bindPopup('<b>'+esc(x.o.t)+'</b><br>已跳過（不列入路線）');
-    bounds.push(c);return;
+    return;
    }
-   cnt++;
-   pts.push(c);bounds.push(c);
+   bounds.push(c);
    var isNow=(k===nowK);
+   var label=cnt+'. '+String(x.o.t).replace(/✅/g,'').trim();
    var iconHTML=isNow?('<div style="border-radius:50%;box-shadow:0 0 0 5px rgba(224,83,7,.35),0 0 14px rgba(224,83,7,.85)">'+pin(String(cnt),'#e05307',34)+'</div>'):pin(String(cnt),'#e05307',28);
-   var mk=L.marker(c,{icon:L.divIcon({className:'',html:iconHTML,iconSize:[isNow?34:28,isNow?34:28]})})
-    .addTo(LYR).bindPopup('<b>'+esc(x.o.t)+'</b>'+(isNow?('<br><b style="color:#e05307">'+nowLbl+'</b>'):'')+'<br>停留 '+fmtMin(x.o.min||0)+(coordOf(x.o)?'<br><a target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+c[0]+','+c[1]+'&travelmode=walking">📍 導航</a>':'')+((x.o.sub&&x.o.sub.length)?('<br><button onclick="openSubMap('+di+','+k+')" style="margin-top:6px;border:none;background:#7a3fa0;color:#fff;border-radius:10px;padding:5px 10px;font-weight:700">🧭 週邊地圖</button>'):''));
+   var mk=L.marker(c,{title:label,icon:L.divIcon({className:'itinerary-map-stop',html:iconHTML,iconSize:[isNow?34:28,isNow?34:28]})})
+    .addTo(LYR).bindPopup('<b>'+esc(label)+'</b>'+(isNow?('<br><b style="color:#e05307">'+nowLbl+'</b>'):'')+'<br>停留 '+fmtMin(x.o.min||0)+(coordOf(x.o)?'<br><a target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+c[0]+','+c[1]+'&travelmode=walking">📍 導航</a>':'')+((x.o.sub&&x.o.sub.length)?('<br><button onclick="openSubMap('+di+','+k+')" style="margin-top:6px;border:none;background:#7a3fa0;color:#fff;border-radius:10px;padding:5px 10px;font-weight:700">🧭 週邊地圖</button>'):''));
    if(isNow)mk.bindTooltip(nowLbl,{permanent:true,direction:'top',offset:[0,-20]});
    MKREF[k]=mk;
   });
   var lkey='in';
   seq.forEach(function(x,k){
-   if(x.o.skip)return;
+   if(x.o.skip||x.o.gap)return;
    var LC=cache.legs[d.k+':'+lkey];
    if(LC&&LC.coords&&LC.coords.length>1)L.polyline(LC.coords,legStyle(LC.mode)).addTo(LYR);
    lkey=String(k);
@@ -1068,17 +1161,11 @@ function drawDayMap(){
   if(ME){
    var tg=null;
    if(nr&&!nr.toast&&DAYS[nr.di].k===d.k){var tt2=(TIMES[d.k]||[])[nr.i];if(tt2)tg=coordOf(tt2.o);}
-   if(!tg){seq.some(function(x){if(x.o.skip)return false;var c0=coordOf(x.o);if(c0){tg=c0;return true;}return false;});}
+   if(!tg){seq.some(function(x){if(x.o.skip||x.o.gap)return false;var c0=coordOf(x.o);if(c0){tg=c0;return true;}return false;});}
    addMe(LYR,tg);bounds.push([ME[0],ME[1]]);
   }
   if(bounds.length){try{MAP.fitBounds(bounds,{padding:[36,36]});}catch(e){MAP.setView(bounds[0],12);}}
-  var foot='';
-  seq.forEach(function(x,k){
-   var c=coordOf(x.o);if(!c||x.o.skip)return;
-   var sfx=(k===nowK)?('<b style="color:#e05307">（'+(nowLbl.indexOf('現在')>=0?'現在':'下一站')+'）</b>'):'';
-   foot+='<button class="fmapbtn'+(k===nowK?' on':'')+'" onclick="mapFocusPin('+k+')">📍 '+esc(String(x.o.t).replace(/✅/g,'').trim().slice(0,14))+'</button>'+sfx;
-  });
-  document.getElementById('mapfoot').innerHTML=legendHTML()+'<div style="margin-bottom:4px">'+(ME?('📍 藍點＝我的位置・箭頭＝方向'+(nowK>=0?('・'+nowLbl+'＝目前行程'):'')):'📍 右下按鈕可開啟定位・⏱ 定位目前行程')+'・點站名＝在地圖上看</div>'+foot;
+  drawRouteStrip(d,seq,numbers,nowK,nowLbl);
 }
 function pin(txt,bg,size){return '<div style="background:'+bg+';color:#fff;min-width:'+size+'px;height:'+size+'px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:'+(size>=30?15:12)+'px;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35)">'+txt+'</div>';}
 
@@ -1100,14 +1187,6 @@ function subLeg(A,B,mode){
 }
 var LEGST={walk:{color:'#2e7d32',weight:4,dashArray:'10 8'},taxi:{color:'#555555',weight:4},bus:{color:'#1e5bb8',weight:4},mono:{color:'#7a3fa0',weight:4,dashArray:'12 8'}};
 function legStyle(m){var s=LEGST[m]||LEGST.mono;return {color:s.color,weight:s.weight,opacity:.85,dashArray:s.dashArray};}
-function legendHTML(){
- return '<div style="margin-bottom:4px;font-size:11.5px;color:#33415c">'
-  +'<span class="lg"><span class="lgline" style="border-top:4px dashed #2e7d32"></span>步行</span>'
-  +'<span class="lg"><span class="lgline" style="border-top:4px solid #555555"></span>計程車</span>'
-  +'<span class="lg"><span class="lgline" style="border-top:4px solid #1e5bb8"></span>公車</span>'
-  +'<span class="lg"><span class="lgline" style="border-top:4px dashed #7a3fa0"></span>單軌</span>'
-  +'・回到行程點交通卡可切換即時更新</div>';
-}
 function computeSubLegs(p){
  if(SUBCACHE[p.id])return Promise.resolve(SUBCACHE[p.id]);
  var loc=subLoc(p),legs={},chain=Promise.resolve();
@@ -1178,8 +1257,8 @@ function drawSubMap(){
  if(!MAP||!MAPMODE)return;
  document.getElementById('mfabNow').style.display='none';
  MSREF={};
- if(LYR)LYR.clearLayers();
- LYR=L.layerGroup().addTo(MAP);
+ if(LYR)MAP.removeLayer(LYR);
+ var layer=LYR=L.layerGroup().addTo(MAP);
  var d=DAYS[MAPMODE.di],seq=flatOf(d),p=seq[MAPMODE.k]&&seq[MAPMODE.k].o;
  if(!p){drawDayMap();return;}
  document.getElementById('mapTitle').textContent='🧭 週邊：'+String(p.t).replace(/✅/g,'').trim();
@@ -1196,6 +1275,7 @@ function drawSubMap(){
  if(ME){addMe(LYR,loc.length?loc[0].c:pc);bounds.push([ME[0],ME[1]]);}
  if(bounds.length){try{MAP.fitBounds(bounds,{padding:[36,36]});}catch(e){MAP.setView(bounds[0],15);}}
  computeSubLegs(p).then(function(legs){
+  if(!MAPOPEN||LYR!==layer)return;
   var loc2=subLoc(p);
   for(var q=0;q<loc2.length-1;q++){var LC=legs[loc2[q+1].i];if(LC&&LC.coords&&LC.coords.length>1)L.polyline(LC.coords,legStyle(LC.mode)).addTo(LYR);}
   var tot=subTotals(p,legs).tot;var over=Math.max(0,tot-(+p.min||0));
